@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('error_reporting', -1);
+
 if (file_exists(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.core.php')) {
     /** @noinspection PhpIncludeInspection */
     require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config.core.php';

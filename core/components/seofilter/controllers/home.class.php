@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The home manager controller for SeoFilter.
  *
