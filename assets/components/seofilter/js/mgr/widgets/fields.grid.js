@@ -1,4 +1,4 @@
-SeoFilter.grid.Items = function (config) {
+SeoFilter.grid.Fields = function (config) {
     config = config || {};
     if (!config.id) {
         config.id = 'seofilter-grid-fields';
@@ -15,7 +15,7 @@ SeoFilter.grid.Items = function (config) {
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
-                this.updateItem(grid, e, row);
+                this.updateField(grid, e, row);
             }
         },
         viewConfig: {
@@ -34,7 +34,7 @@ SeoFilter.grid.Items = function (config) {
         remoteSort: true,
         autoHeight: true,
     });
-    SeoFilter.grid.Items.superclass.constructor.call(this, config);
+    SeoFilter.grid.Fields.superclass.constructor.call(this, config);
 
     // Clear selection on grid refresh
     this.store.on('load', function () {
@@ -43,7 +43,7 @@ SeoFilter.grid.Items = function (config) {
         }
     }, this);
 };
-Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
+Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
     windows: {},
 
     getMenu: function (grid, rowIndex) {
@@ -52,10 +52,10 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         var row = grid.getStore().getAt(rowIndex);
         var menu = SeoFilter.utils.getMenu(row.data['actions'], this, ids);
 
-        this.addContextMenuItem(menu);
+        this.addContextMenuField(menu);
     },
 
-    createItem: function (btn, e) {
+    createField: function (btn, e) {
         var w = MODx.load({
             xtype: 'seofilter-field-window-create',
             id: Ext.id(),
@@ -72,7 +72,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         w.show(e.target);
     },
 
-    updateItem: function (btn, e, row) {
+    updateField: function (btn, e, row) {
         if (typeof(row) != 'undefined') {
             this.menu.record = row.data;
         }
@@ -111,7 +111,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         });
     },
 
-    removeItem: function () {
+    removeField: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -139,7 +139,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         return true;
     },
 
-    disableItem: function () {
+    disableField: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -160,7 +160,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         })
     },
 
-    enableItem: function () {
+    enableField: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -220,7 +220,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
     getTopBar: function () {
         return [{
             text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_field_create'),
-            handler: this.createItem,
+            handler: this.createField,
             scope: this
         }, '->', {
             xtype: 'seofilter-field-search',
@@ -284,4 +284,4 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         this.getBottomToolbar().changePage(1);
     },
 });
-Ext.reg('seofilter-grid-fields', SeoFilter.grid.Items);
+Ext.reg('seofilter-grid-fields', SeoFilter.grid.Fields);

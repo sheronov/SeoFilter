@@ -1,4 +1,4 @@
-SeoFilter.window.CreateItem = function (config) {
+SeoFilter.window.CreateField = function (config) {
     config = config || {};
     if (!config.id) {
         config.id = 'seofilter-field-window-create';
@@ -16,9 +16,9 @@ SeoFilter.window.CreateItem = function (config) {
             }, scope: this
         }]
     });
-    SeoFilter.window.CreateItem.superclass.constructor.call(this, config);
+    SeoFilter.window.CreateField.superclass.constructor.call(this, config);
 };
-Ext.extend(SeoFilter.window.CreateItem, MODx.Window, {
+Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
 
     getFields: function (config) {
         return [{
@@ -48,10 +48,10 @@ Ext.extend(SeoFilter.window.CreateItem, MODx.Window, {
     }
 
 });
-Ext.reg('seofilter-field-window-create', SeoFilter.window.CreateItem);
+Ext.reg('seofilter-field-window-create', SeoFilter.window.CreateField);
 
 
-SeoFilter.window.UpdateItem = function (config) {
+SeoFilter.window.UpdateField = function (config) {
     config = config || {};
     if (!config.id) {
         config.id = 'seofilter-field-window-update';
@@ -69,9 +69,9 @@ SeoFilter.window.UpdateItem = function (config) {
             }, scope: this
         }]
     });
-    SeoFilter.window.UpdateItem.superclass.constructor.call(this, config);
+    SeoFilter.window.UpdateField.superclass.constructor.call(this, config);
 };
-Ext.extend(SeoFilter.window.UpdateItem, MODx.Window, {
+Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
 
     getFields: function (config) {
         return [{
@@ -104,4 +104,4 @@ Ext.extend(SeoFilter.window.UpdateItem, MODx.Window, {
     }
 
 });
-Ext.reg('seofilter-field-window-update', SeoFilter.window.UpdateItem);
+Ext.reg('seofilter-field-window-update', SeoFilter.window.UpdateField);

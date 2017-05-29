@@ -58,8 +58,8 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
         $array['actions'][] = array(
             'cls' => '',
             'icon' => 'fa fa-edit',
-            'title' => $this->modx->lexicon('seofilter_item_update'),
-            //'multiple' => $this->modx->lexicon('seofilter_items_update'),
+            'title' => $this->modx->lexicon('seofilter_field_update'),
+            //'multiple' => $this->modx->lexicon('seofilter_fields_update'),
             'action' => 'updateItem',
             'button' => true,
             'menu' => true,
@@ -69,8 +69,8 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
             $array['actions'][] = array(
                 'cls' => '',
                 'icon' => 'fa fa-power-off action-green',
-                'title' => $this->modx->lexicon('seofilter_item_enable'),
-                'multiple' => $this->modx->lexicon('seofilter_items_enable'),
+                'title' => $this->modx->lexicon('seofilter_field_enable'),
+                'multiple' => $this->modx->lexicon('seofilter_fields_enable'),
                 'action' => 'enableItem',
                 'button' => true,
                 'menu' => true,
@@ -79,8 +79,8 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
             $array['actions'][] = array(
                 'cls' => '',
                 'icon' => 'fa fa-power-off action-gray',
-                'title' => $this->modx->lexicon('seofilter_item_disable'),
-                'multiple' => $this->modx->lexicon('seofilter_items_disable'),
+                'title' => $this->modx->lexicon('seofilter_field_disable'),
+                'multiple' => $this->modx->lexicon('seofilter_fields_disable'),
                 'action' => 'disableItem',
                 'button' => true,
                 'menu' => true,
@@ -91,8 +91,8 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
         $array['actions'][] = array(
             'cls' => '',
             'icon' => 'fa fa-trash-o action-red',
-            'title' => $this->modx->lexicon('seofilter_item_remove'),
-            'multiple' => $this->modx->lexicon('seofilter_items_remove'),
+            'title' => $this->modx->lexicon('seofilter_field_remove'),
+            'multiple' => $this->modx->lexicon('seofilter_fields_remove'),
             'action' => 'removeItem',
             'button' => true,
             'menu' => true,
