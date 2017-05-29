@@ -2,13 +2,30 @@
 <model package="seofilter" baseClass="xPDOObject" platform="mysql" defaultEngine="MyISAM" phpdoc-package="seofilter"
        version="1.1">
 
-    <object class="SeoFilterItem" table="seofilter_items" extends="xPDOSimpleObject">
+    <object class="sfField" table="seofilter_field" extends="xPDOSimpleObject">
         <field key="name" dbtype="varchar" precision="100" phptype="string" null="false" default=""/>
-        <field key="description" dbtype="text" phptype="text" null="true" default=""/>
+        <field key="class" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="key" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
+        <field key="urltpl" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+
+        <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default="1"/>
+        <field key="translit" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="ajax" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+
+        <field key="seo" dbtype="text" phptype="array" null="true" default=""/>
+        <field key="rank" dbtype="tinyint" precision="1" phptype="integer" attributes="unsigned" null="true" default="0"/>
 
         <index alias="name" name="name" primary="false" unique="false" type="BTREE">
             <column key="name" length="" collation="A" null="false"/>
+        </index>
+        <index alias="alias" name="alias" primary="false" unique="false" type="BTREE">
+            <column key="alias" length="" collation="A" null="false"/>
+        </index>
+        <index alias="page" name="page" primary="false" unique="false" type="BTREE">
+            <column key="page" length="" collation="A" null="false"/>
         </index>
         <index alias="active" name="active" primary="false" unique="false" type="BTREE">
             <column key="active" length="" collation="A" null="false"/>
