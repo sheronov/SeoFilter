@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterItemCreateProcessor extends modObjectCreateProcessor
+class sfFieldCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfField';
+    public $classKey = 'sfField';
     public $languageTopics = array('seofilter');
     //public $permission = 'create';
 
@@ -25,4 +25,4 @@ class SeoFilterItemCreateProcessor extends modObjectCreateProcessor
 
 }
 
-return 'SeoFilterItemCreateProcessor';
+return 'sfFieldCreateProcessor';

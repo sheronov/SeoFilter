@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterItemRemoveProcessor extends modObjectProcessor
+class sfFieldRemoveProcessor extends modObjectProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfField';
+    public $classKey = 'sfField';
     public $languageTopics = array('seofilter');
     //public $permission = 'remove';
 
@@ -23,7 +23,7 @@ class SeoFilterItemRemoveProcessor extends modObjectProcessor
         }
 
         foreach ($ids as $id) {
-            /** @var SeoFilterItem $object */
+            /** @var sfField $object */
             if (!$object = $this->modx->getObject($this->classKey, $id)) {
                 return $this->failure($this->modx->lexicon('seofilter_item_err_nf'));
             }
@@ -36,4 +36,4 @@ class SeoFilterItemRemoveProcessor extends modObjectProcessor
 
 }
 
-return 'SeoFilterItemRemoveProcessor';
+return 'sfFieldRemoveProcessor';

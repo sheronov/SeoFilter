@@ -79,7 +79,7 @@ class officeModExtraController extends officeDefaultController
                 MODX_ASSETS_URL . 'components/seofilter/js/mgr/seofilter.js',
                 MODX_ASSETS_URL . 'components/seofilter/js/mgr/misc/utils.js',
                 MODX_ASSETS_URL . 'components/seofilter/js/office/home.panel.js',
-                MODX_ASSETS_URL . 'components/seofilter/js/office/items.grid.js',
+                MODX_ASSETS_URL . 'components/seofilter/js/office/fields.grid.js',
                 MODX_ASSETS_URL . 'components/seofilter/js/office/items.windows.js',
                 str_replace($config['pl'], $config['vl'], $js),
             ), 'seofilter/all');

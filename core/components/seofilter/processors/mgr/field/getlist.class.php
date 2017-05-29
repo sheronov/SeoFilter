@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterItemGetListProcessor extends modObjectGetListProcessor
+class sfFieldGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfField';
+    public $classKey = 'sfField';
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';
     //public $permission = 'list';
@@ -103,4 +103,4 @@ class SeoFilterItemGetListProcessor extends modObjectGetListProcessor
 
 }
 
-return 'SeoFilterItemGetListProcessor';
+return 'sfFieldGetListProcessor';

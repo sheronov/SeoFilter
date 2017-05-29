@@ -1,7 +1,7 @@
 SeoFilter.grid.Items = function (config) {
     config = config || {};
     if (!config.id) {
-        config.id = 'seofilter-grid-items';
+        config.id = 'seofilter-grid-fields';
     }
     Ext.applyIf(config, {
         url: SeoFilter.config.connector_url,
@@ -10,7 +10,7 @@ SeoFilter.grid.Items = function (config) {
         tbar: this.getTopBar(config),
         sm: new Ext.grid.CheckboxSelectionModel(),
         baseParams: {
-            action: 'mgr/item/getlist'
+            action: 'mgr/field/getlist'
         },
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
@@ -57,7 +57,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
 
     createItem: function (btn, e) {
         var w = MODx.load({
-            xtype: 'seofilter-item-window-create',
+            xtype: 'seofilter-field-window-create',
             id: Ext.id(),
             listeners: {
                 success: {
@@ -84,14 +84,14 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/item/get',
+                action: 'mgr/field/get',
                 id: id
             },
             listeners: {
                 success: {
                     fn: function (r) {
                         var w = MODx.load({
-                            xtype: 'seofilter-item-window-update',
+                            xtype: 'seofilter-field-window-update',
                             id: Ext.id(),
                             record: r,
                             listeners: {
@@ -118,14 +118,14 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         }
         MODx.msg.confirm({
             title: ids.length > 1
-                ? _('seofilter_items_remove')
-                : _('seofilter_item_remove'),
+                ? _('seofilter_fields_remove')
+                : _('seofilter_field_remove'),
             text: ids.length > 1
-                ? _('seofilter_items_remove_confirm')
-                : _('seofilter_item_remove_confirm'),
+                ? _('seofilter_fields_remove_confirm')
+                : _('seofilter_field_remove_confirm'),
             url: this.config.url,
             params: {
-                action: 'mgr/item/remove',
+                action: 'mgr/field/remove',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -147,7 +147,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/item/disable',
+                action: 'mgr/field/disable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -168,7 +168,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/item/enable',
+                action: 'mgr/field/enable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -187,22 +187,22 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
 
     getColumns: function () {
         return [{
-            header: _('seofilter_item_id'),
+            header: _('seofilter_field_id'),
             dataIndex: 'id',
             sortable: true,
             width: 70
         }, {
-            header: _('seofilter_item_name'),
+            header: _('seofilter_field_name'),
             dataIndex: 'name',
             sortable: true,
             width: 200,
         }, {
-            header: _('seofilter_item_description'),
+            header: _('seofilter_field_description'),
             dataIndex: 'description',
             sortable: false,
             width: 250,
         }, {
-            header: _('seofilter_item_active'),
+            header: _('seofilter_field_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
@@ -219,7 +219,7 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
 
     getTopBar: function () {
         return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_item_create'),
+            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_field_create'),
             handler: this.createItem,
             scope: this
         }, '->', {
@@ -284,4 +284,4 @@ Ext.extend(SeoFilter.grid.Items, MODx.grid.Grid, {
         this.getBottomToolbar().changePage(1);
     },
 });
-Ext.reg('seofilter-grid-items', SeoFilter.grid.Items);
+Ext.reg('seofilter-grid-fields', SeoFilter.grid.Items);

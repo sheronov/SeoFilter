@@ -20,13 +20,13 @@ SeoFilter.panel.Home = function (config) {
             border: true,
             hideMode: 'offsets',
             items: [{
-                title: _('seofilter_items'),
+                title: _('seofilter_fields'),
                 layout: 'anchor',
                 items: [{
-                    html: _('seofilter_intro_msg'),
+                    html: _('seofilter_fields_intro'),
                     cls: 'panel-desc',
                 }, {
-                    xtype: 'seofilter-grid-items',
+                    xtype: 'seofilter-grid-fields',
                     cls: 'main-wrapper',
                 }]
             }]

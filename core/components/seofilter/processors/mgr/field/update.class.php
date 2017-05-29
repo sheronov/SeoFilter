@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterItemUpdateProcessor extends modObjectUpdateProcessor
+class sfFieldUpdateProcessor extends modObjectUpdateProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfField';
+    public $classKey = 'sfField';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';
 
@@ -45,4 +45,4 @@ class SeoFilterItemUpdateProcessor extends modObjectUpdateProcessor
     }
 }
 
-return 'SeoFilterItemUpdateProcessor';
+return 'sfFieldUpdateProcessor';

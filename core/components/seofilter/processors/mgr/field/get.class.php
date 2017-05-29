@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterItemGetProcessor extends modObjectGetProcessor
+class sfFieldGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfField';
+    public $classKey = 'sfField';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';
 
@@ -25,4 +25,4 @@ class SeoFilterItemGetProcessor extends modObjectGetProcessor
 
 }
 
-return 'SeoFilterItemGetProcessor';
+return 'sfFieldGetProcessor';
