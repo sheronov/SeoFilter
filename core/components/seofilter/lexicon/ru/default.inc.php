@@ -12,6 +12,13 @@ $_lang['seofilter_field_id'] = 'Id';
 $_lang['seofilter_field_name'] = 'Название';
 $_lang['seofilter_field_description'] = 'Описание';
 $_lang['seofilter_field_active'] = 'Активно';
+$_lang['seofilter_field_page'] = 'Страница';
+$_lang['seofilter_field_class'] = 'Класс';
+$_lang['seofilter_field_key'] = 'Ключ';
+$_lang['seofilter_field_alias'] = 'Синоним';
+$_lang['seofilter_field_translit'] = 'Транслитерация';
+$_lang['seofilter_field_urltpl'] = 'Шаблон url';
+$_lang['seofilter_field_priority'] = 'Приоритет';
 
 $_lang['seofilter_field_create'] = 'Добавить поле';
 $_lang['seofilter_field_update'] = 'Изменить поле';
@@ -34,3 +41,5 @@ $_lang['seofilter_field_err_save'] = 'Ошибка при сохранении �
 
 $_lang['seofilter_grid_search'] = 'Поиск';
 $_lang['seofilter_grid_actions'] = 'Действия';
+
+$_lang['seofilter_combo_select'] = 'Выберите из списка';

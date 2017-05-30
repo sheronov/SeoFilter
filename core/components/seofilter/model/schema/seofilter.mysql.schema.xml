@@ -9,7 +9,7 @@
         <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
         <field key="urltpl" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
 
-        <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default="1"/>
+        <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="translit" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
         <field key="ajax" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>

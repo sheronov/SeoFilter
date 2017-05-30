@@ -12,6 +12,13 @@ $_lang['seofilter_field_id'] = 'Id';
 $_lang['seofilter_field_name'] = 'Name';
 $_lang['seofilter_field_description'] = 'Description';
 $_lang['seofilter_field_active'] = 'Active';
+$_lang['seofilter_field_page'] = 'Resource';
+$_lang['seofilter_field_class'] = 'Class';
+$_lang['seofilter_field_key'] = 'Key';
+$_lang['seofilter_field_alias'] = 'Alias';
+$_lang['seofilter_field_translit'] = 'Transliteration';
+$_lang['seofilter_field_urltpl'] = 'Url tpl';
+$_lang['seofilter_field_priority'] = 'Priority';
 
 $_lang['seofilter_field_create'] = 'Create Item';
 $_lang['seofilter_field_update'] = 'Update Item';

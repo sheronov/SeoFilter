@@ -4,6 +4,12 @@ SeoFilter.utils.renderBoolean = function (value) {
         : String.format('<span class="red">{0}</span>', _('no'));
 };
 
+SeoFilter.utils.renderResource = function (value, cell, row) {
+    return value
+        ? String.format('({0}) {1}', value, row.data['pagetitle'])
+        : value;
+};
+
 SeoFilter.utils.getMenu = function (actions, grid, selected) {
     var menu = [];
     var cls, icon, title, action;

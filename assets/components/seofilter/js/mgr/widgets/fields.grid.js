@@ -52,7 +52,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
         var row = grid.getStore().getAt(rowIndex);
         var menu = SeoFilter.utils.getMenu(row.data['actions'], this, ids);
 
-        this.addContextMenuField(menu);
+        this.addContextMenuItem(menu);
     },
 
     createField: function (btn, e) {
@@ -182,7 +182,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'description', 'active', 'actions'];
+        return ['id', 'name', 'page', 'class', 'key', 'alias', 'translit', 'priority', 'urltpl', 'active', 'ajax','rank', 'seo', 'actions','pagetitle'];
     },
 
     getColumns: function () {
@@ -195,18 +195,50 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             header: _('seofilter_field_name'),
             dataIndex: 'name',
             sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_field_page'),
+            dataIndex: 'page',
+            renderer: SeoFilter.utils.renderResource,
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_field_class'),
+            dataIndex: 'class',
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_field_key'),
+            dataIndex: 'key',
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_field_alias'),
+            dataIndex: 'alias',
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_field_translit'),
+            dataIndex: 'translit',
+            renderer: SeoFilter.utils.renderBoolean,
+            sortable: false,
+            width: 75,
+        }, {
+            header: _('seofilter_field_urltpl'),
+            dataIndex: 'urltpl',
+            sortable: false,
             width: 200,
         }, {
-            header: _('seofilter_field_description'),
-            dataIndex: 'description',
-            sortable: false,
-            width: 250,
+            header: _('seofilter_field_priority'),
+            dataIndex: 'priority',
+            sortable: true,
+            width: 50
         }, {
             header: _('seofilter_field_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
-            width: 100,
+            width: 75,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',

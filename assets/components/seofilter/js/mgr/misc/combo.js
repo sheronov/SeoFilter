@@ -46,3 +46,27 @@ Ext.extend(SeoFilter.combo.Search, Ext.form.TwinTriggerField, {
 });
 Ext.reg('seofilter-combo-search', SeoFilter.combo.Search);
 Ext.reg('seofilter-field-search', SeoFilter.combo.Search);
+
+
+SeoFilter.combo.Resource = function (config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'page',
+        hiddenName: 'page',
+        displayField: 'pagetitle',
+        valueField: 'id',
+        editable: true,
+        fields: ['id', 'pagetitle'],
+        pageSize: 20,
+        emptyText: _('seofilter_combo_select'),
+        hideMode: 'offsets',
+        url: SeoFilter.config.connector_url,
+        baseParams: {
+            action: 'mgr/system/getlist',
+            combo: true
+        }
+    });
+    SeoFilter.combo.Resource.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.combo.Resource, MODx.combo.ComboBox);
+Ext.reg('seofilter-combo-resource', SeoFilter.combo.Resource);

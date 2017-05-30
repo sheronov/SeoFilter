@@ -36,9 +36,16 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
         if ($query) {
             $c->where(array(
                 'name:LIKE' => "%{$query}%",
-                'OR:description:LIKE' => "%{$query}%",
             ));
         }
+
+
+        //if($this->getProperty('page')) {
+
+            $c->leftJoin('modResource', 'modResource', 'sfField.page = modResource.id');
+            $c->select(array('sfField.*','modResource.pagetitle'));
+        //}
+
 
         return $c;
     }
@@ -51,7 +58,19 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
      */
     public function prepareRow(xPDOObject $object)
     {
+
         $array = $object->toArray();
+
+//        $array['pagetitle'] = '';
+//        if ($page = $array['page']) {
+//            $q = $this->modx->newQuery('modResource', array('id' => $page));
+//            $q->select('pagetitle');
+//            $q->limit(1);
+//            if ($q->prepare() && $q->stmt->execute()) {
+//                $array['pagetitle'] = $q->stmt->fetch(PDO::FETCH_COLUMN);
+//            }
+//        }
+
         $array['actions'] = array();
 
         // Edit
