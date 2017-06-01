@@ -9,7 +9,7 @@ $tmp = array(
         'file' => 'seofilter',
         'description' => '',
         'events' => array(
-            'OnPageNotFound' => array()
+            'OnPageNotFound' => array(),
         )
     )
 );
