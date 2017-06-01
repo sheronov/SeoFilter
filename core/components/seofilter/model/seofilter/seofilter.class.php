@@ -42,4 +42,9 @@ class SeoFilter
         $this->modx->lexicon->load('seofilter:default');
     }
 
+    public function translit($value)
+    {
+        return $value.'trans';
+    }
+
 }
