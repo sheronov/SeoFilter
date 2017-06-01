@@ -4,15 +4,14 @@
 
 $plugins = array();
 
-$tmp = array(/*
+$tmp = array(
     'SeoFilter' => array(
         'file' => 'seofilter',
         'description' => '',
         'events' => array(
-            'OnManagerPageInit' => array()
+            'OnPageNotFound' => array()
         )
     )
-    */
 );
 
 foreach ($tmp as $k => $v) {

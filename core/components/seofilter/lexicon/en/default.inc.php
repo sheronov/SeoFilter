@@ -40,3 +40,5 @@ $_lang['seofilter_field_err_save'] = 'An error occurred while trying to save the
 
 $_lang['seofilter_grid_search'] = 'Search';
 $_lang['seofilter_grid_actions'] = 'Actions';
+
+$_lang['seofilter_combo_select'] = 'Choose in select';

@@ -39,7 +39,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     ,border:false
                     ,items: [
                         {
-                            xtype: 'textfield',
+                            xtype: 'seofilter-combo-resource',
                             fieldLabel: _('seofilter_field_page'),
                             name: 'page',
                             id: config.id + '-page',
