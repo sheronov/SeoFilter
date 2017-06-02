@@ -10,6 +10,7 @@ $tmp = array(
         'description' => '',
         'events' => array(
             'OnPageNotFound' => array(),
+            'OnLoadWebDocument' => array(),
         )
     )
 );

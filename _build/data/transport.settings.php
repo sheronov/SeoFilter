@@ -4,14 +4,42 @@
 
 $settings = array();
 
-$tmp = array(/*
-    'some_setting' => array(
+
+$tmp = array(
+    'separator' => array(
+        'xtype' => 'textfield',
+        'value' => '-',
+        'area' => 'seofilter_main',
+    ),
+    'valuefirst' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_main',
+    ),
+    'redirect' => array(
         'xtype' => 'combo-boolean',
         'value' => true,
         'area' => 'seofilter_main',
     ),
-    */
+    'ajax' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofilter_main',
+    ),
+    'replace' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofilter_main',
+    ),
+    'decline' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofilter_main',
+    )
+
+
 );
+
 
 foreach ($tmp as $k => $v) {
     /** @var modSystemSetting $setting */
