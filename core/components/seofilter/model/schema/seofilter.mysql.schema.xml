@@ -3,23 +3,33 @@
        version="1.1">
 
     <object class="sfField" table="seofilter_field" extends="xPDOSimpleObject">
-        <field key="name" dbtype="varchar" precision="100" phptype="string" null="false" default=""/>
+        <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="class" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="key" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
-        <field key="urltpl" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
-
         <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="translit" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
-        <field key="ajax" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
-        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
         <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
 
-        <field key="seo" dbtype="text" phptype="array" null="true" default=""/>
-        <field key="rank" dbtype="tinyint" precision="1" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="translit" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="valuefirst" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
+        <field key="exact" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
-        <index alias="name" name="name" primary="false" unique="false" type="BTREE">
-            <column key="name" length="" collation="A" null="false"/>
+        <field key="xpdo" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
+        <field key="xpdo_package" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="xpdo_class" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="xpdo_id" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="xpdo_name" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="xpdo_where" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
+        <field key="rank" dbtype="tinyint" precision="1" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <index alias="class" name="class" primary="false" unique="false" type="BTREE">
+            <column key="class" length="" collation="A" null="false"/>
+        </index>
+        <index alias="key" name="key" primary="false" unique="false" type="BTREE">
+            <column key="key" length="" collation="A" null="false"/>
         </index>
         <index alias="alias" name="alias" primary="false" unique="false" type="BTREE">
             <column key="alias" length="" collation="A" null="false"/>
@@ -30,7 +40,161 @@
         <index alias="active" name="active" primary="false" unique="false" type="BTREE">
             <column key="active" length="" collation="A" null="false"/>
         </index>
+
+        <composite alias="Seo" class="sfSeoMeta" local="id" foreign="field_id" cardinality="one" owner="local" />
+        <composite alias="Dictionary" class="sfDictionary" local="id" foreign="field_id" cardinality="many" owner="local" />
+        <aggregate alias="Link" class="sfFieldIds" local="id" foreign="field_id" cardinality="many" owner="foreign" />
+
     </object>
+
+
+    <object class="sfMultiField" table="seofilter_multifield" extends="xPDOSimpleObject">
+        <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
+        <field key="url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+
+        <field key="rank" dbtype="tinyint" precision="1" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <index alias="url" name="url" primary="false" unique="false" type="BTREE">
+            <column key="url" length="" collation="A" null="false"/>
+        </index>
+        <index alias="page" name="page" primary="false" unique="false" type="BTREE">
+            <column key="page" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
+        <composite alias="Seo" class="sfSeoMeta" local="id" foreign="multi_id" cardinality="one" owner="local" />
+        <aggregate alias="Link" class="sfFieldIds" local="id" foreign="multi_id" cardinality="many" owner="foreign" />
+    </object>
+
+
+    <object class="sfFieldIds" table="seofilter_fieldids" extends="xPDOSimpleObject">
+        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
+        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
+        <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <field key="where" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
+        <field key="compare" dbtype="integer" precision="2"  attributes="unsigned" phptype="integer" null="true" default=""/>
+        <field key="value" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
+        <field key="condition" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
+        <index alias="multi_id" name="multi_id" primary="false" unique="false" type="BTREE">
+            <column key="multi_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="field_id" name="field_id" primary="false" unique="false" type="BTREE">
+            <column key="field_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="where" name="where" primary="false" unique="false" type="BTREE">
+            <column key="where" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
+        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="local" />
+        <aggregate alias="Multi" class="sfMultiField" local="multi_id" foreign="id" cardinality="one" owner="local" />
+
+    </object>
+
+
+    <object class="sfSeoMeta" table="seofilter_seometa" extends="xPDOSimpleObject">
+        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+
+        <field key="name" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
+        <field key="title" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="h1" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="h2" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="introtext" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="text" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="text" phptype="string" null="true" default=""/>
+
+        <field key="rank" dbtype="tinyint" precision="1" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <index alias="multi_id" name="multi_id" primary="false" unique="false" type="BTREE">
+            <column key="multi_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="field_id" name="field_id" primary="false" unique="false" type="BTREE">
+            <column key="field_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
+        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Multi" class="sfMultiField" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
+    </object>
+
+
+    <object class="sfDictionary" table="seofilter_dictionary" extends="xPDOSimpleObject">
+        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="value" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="translit" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="class" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="key" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
+        <field key="menu_on" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="menutitle" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
+        <field key="menuindex" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
+        <field key="link_attributes" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
+
+        <field key="value_i" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_r" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_d" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_v" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_t" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_p" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_o" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
+        <field key="values_i" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="values_r" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="values_d" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="values_v" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="values_t" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="values_p" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="values_o" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
+        <field key="value_to" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_in" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="value_from" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <index alias="field_id" name="field_id" primary="false" unique="false" type="BTREE">
+            <column key="field_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="value" name="value" primary="false" unique="false" type="BTREE">
+            <column key="value" length="" collation="A" null="false"/>
+        </index>
+        <index alias="translit" name="translit" primary="false" unique="false" type="BTREE">
+            <column key="translit" length="" collation="A" null="false"/>
+        </index>
+        <index alias="class" name="class" primary="false" unique="false" type="BTREE">
+            <column key="class" length="" collation="A" null="false"/>
+        </index>
+        <index alias="key" name="key" primary="false" unique="false" type="BTREE">
+            <column key="key" length="" collation="A" null="false"/>
+        </index>
+        <index alias="menu_on" name="menu_on" primary="false" unique="false" type="BTREE">
+            <column key="menu_on" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
+        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
+
+    </object>
+
+
+
 
 
 
