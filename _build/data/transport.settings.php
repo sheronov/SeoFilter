@@ -33,9 +33,19 @@ $tmp = array(
     ),
     'decline' => array(
         'xtype' => 'combo-boolean',
-        'value' => true,
+        'value' => false,
         'area' => 'seofilter_main',
-    )
+    ),
+    'morpher_username' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
+    'morpher_password' => array(
+        'xtype' => 'text-password',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
 
 
 );

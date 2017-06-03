@@ -12,6 +12,7 @@
         <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
 
         <field key="translit" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="translate" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
         <field key="valuefirst" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
         <field key="exact" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
