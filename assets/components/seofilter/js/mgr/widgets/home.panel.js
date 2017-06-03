@@ -39,6 +39,26 @@ SeoFilter.panel.Home = function (config) {
                     xtype: 'seofilter-grid-multifields',
                     cls: 'main-wrapper',
                 }]
+            },{
+                title: _('seofilter_seometas'),
+                layout: 'anchor',
+                items: [{
+                    html: _('seofilter_seometas_intro'),
+                    cls: 'panel-desc',
+                }, {
+                    xtype: 'seofilter-grid-seometas',
+                    cls: 'main-wrapper',
+                }]
+            },{
+                title: _('seofilter_dictionary'),
+                layout: 'anchor',
+                items: [{
+                    html: _('seofilter_dictionary_intro'),
+                    cls: 'panel-desc',
+                }, {
+                    xtype: 'seofilter-grid-dictionaries',
+                    cls: 'main-wrapper',
+                }]
             }]
         }]
     });

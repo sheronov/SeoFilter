@@ -1,113 +1,109 @@
-SeoFilter.window.CreateMultiField = function (config) {
+SeoFilter.window.CreateSeoMeta = function (config) {
     config = config || {};
     if (!config.id) {
-        config.id = 'seofilter-multifield-window-create';
+        config.id = 'seofilter-seometa-window-create';
     }
     Ext.applyIf(config, {
-        title: _('seofilter_multifield_create'),
-        width: 550,
-        autoHeight: true,
+        title: _('seofilter_seometa_create'),
+        width: 650,
+        //autoHeight: true,
+        autoHeight: false,
         url: SeoFilter.config.connector_url,
-        action: 'mgr/multifield/create',
-        bodyStyle: 'padding-top:10px;',
+        action: 'mgr/seometa/create',
         fields: this.getFields(config),
+        bodyStyle: 'padding-top:10px;',
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
                 this.submit()
             }, scope: this
         }]
     });
-    SeoFilter.window.CreateMultiField.superclass.constructor.call(this, config);
+    SeoFilter.window.CreateSeoMeta.superclass.constructor.call(this, config);
 };
-Ext.extend(SeoFilter.window.CreateMultiField, MODx.Window, {
+
+Ext.extend(SeoFilter.window.CreateSeoMeta, MODx.Window, {
 
     getFields: function (config) {
-        return {
-            xtype: 'modx-tabs'
-            ,deferredRender: false
-            ,border: true
-            ,items: [{
-                // Таб №1 - Информация
-                title: _('seofilter_multifield')
-                ,hideMode: 'offsets'
-                ,layout: 'form'
-                ,bodyStyle: 'margin-top:-10px;padding-bottom:5px;'
-                ,border:false
-                ,items: [{
+        return [{
                     xtype: 'textfield',
-                    fieldLabel: _('seofilter_multifield_name'),
+                    fieldLabel: _('seofilter_seometa_name'),
                     name: 'name',
                     id: config.id + '-name',
                     anchor: '99%',
                     allowBlank: false,
-                },{
+                }, {
                     xtype: 'textfield',
-                    fieldLabel: _('seofilter_multifield_url'),
-                    name: 'url',
-                    id: config.id + '-url',
+                    fieldLabel: _('seofilter_seometa_title'),
+                    name: 'title',
+                    id: config.id + '-title',
                     anchor: '99%',
                 }, {
-                    layout: 'column',
-                    border: false,
-                    anchor: '100%',
-                    items: [{
-                        columnWidth: .5
-                        , layout: 'form'
-                        , defaults: {msgTarget: 'under'}
-                        , border: false
-                        , items: [
-                            {
-                                xtype: 'seofilter-combo-resource',
-                                fieldLabel: _('seofilter_field_page'),
-                                name: 'page',
-                                id: config.id + '-page',
-                                anchor: '99%',
-                            }
-                        ]
-                    }, {
-                        columnWidth: .5
-                        , layout: 'form'
-                        , defaults: {msgTarget: 'under'}
-                        , border: false
-                        , items: [
-                            {
-                                xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_active'),
-                                name: 'active',
-                                id: config.id + '-active',
-                            }
-                        ]
-                    }]
-                }]
-            }, {
-                // Таб №2 - Пользователи
-                title: _('seofilter_seo')
-                // Здесь должен быть xtype с таблицей подписчиков, пока комментируем
-                //,xtype: 'sendex-grid-newsletter-subscribers'
-                , xtype: 'displayfield'
-                , html: _('seofilter_seo_after_save')
-            }]
-        };
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_h1'),
+                    name: 'h1',
+                    id: config.id + '-h1',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_h2'),
+                    name: 'h2',
+                    id: config.id + '-h2',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_description'),
+                    name: 'description',
+                    id: config.id + '-description',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_introtext'),
+                    name: 'introtext',
+                    id: config.id + '-introtext',
+                    anchor: '99%',
+                },{
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_text'),
+                    name: 'text',
+                    id: config.id + '-text',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_content'),
+                    name: 'content',
+                    id: config.id + '-content',
+                    listeners: {
+                        render: function () {
+                            if(MODx.loadRTE) MODx.loadRTE(config.id + '-content');
+                        }
+                    },
+                    anchor: '99%',
+                }, {
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_field_active'),
+                    name: 'active',
+                    id: config.id + '-active',
+                }];
     },
 
     loadDropZones: function () {
     }
 
 });
-Ext.reg('seofilter-multifield-window-create', SeoFilter.window.CreateMultiField);
+Ext.reg('seofilter-seometa-window-create', SeoFilter.window.CreateSeoMeta);
 
-
-SeoFilter.window.UpdateMultiField = function (config) {
+SeoFilter.window.UpdateSeoMeta = function (config) {
     config = config || {};
     if (!config.id) {
-        config.id = 'seofilter-multifield-window-update';
+        config.id = 'seofilter-seometa-window-update';
     }
     Ext.applyIf(config, {
-        title: _('seofilter_multifield_update'),
-        width: 550,
-        autoHeight: true,
+        title: _('seofilter_seometa_update'),
+        width: 650,
+        //autoHeight: true,
+        autoHeight: false,
         url: SeoFilter.config.connector_url,
-        action: 'mgr/multifield/update',
+        action: 'mgr/seometa/update',
         bodyStyle: 'padding-top:10px;',
         fields: this.getFields(config),
         keys: [{
@@ -116,9 +112,9 @@ SeoFilter.window.UpdateMultiField = function (config) {
             }, scope: this
         }]
     });
-    SeoFilter.window.UpdateMultiField.superclass.constructor.call(this, config);
+    SeoFilter.window.UpdateSeoMeta.superclass.constructor.call(this, config);
 };
-Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
+Ext.extend(SeoFilter.window.UpdateSeoMeta, MODx.Window, {
 
     getFields: function (config) {
         return {
@@ -127,7 +123,7 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
             ,border: true
             ,items: [{
                 // Таб №1 - Информация
-                title: _('seofilter_multifield')
+                title: _('seofilter_seometa')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
                 ,bodyStyle: 'margin-top:-10px;padding-bottom:5px;'
@@ -138,14 +134,14 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
                         id: config.id + '-id',
                     },{
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_multifield_name'),
+                        fieldLabel: _('seofilter_seometa_name'),
                         name: 'name',
                         id: config.id + '-name',
                         anchor: '99%',
                         allowBlank: false,
                     },{
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_multifield_url'),
+                        fieldLabel: _('seofilter_seometa_url'),
                         name: 'url',
                         id: config.id + '-url',
                         anchor: '99%',
@@ -197,4 +193,4 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
     }
 
 });
-Ext.reg('seofilter-multifield-window-update', SeoFilter.window.UpdateMultiField);
+Ext.reg('seofilter-seometa-window-update', SeoFilter.window.UpdateSeoMeta);

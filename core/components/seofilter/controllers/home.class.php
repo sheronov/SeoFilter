@@ -62,9 +62,12 @@ class SeoFilterHomeManagerController extends modExtraManagerController
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fields.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/multifields.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/multifields.windows.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/seometa.grid.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/seometa.windows.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.grid.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/home.panel.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/sections/home.js');
-
         $this->addHtml('<script type="text/javascript">
         SeoFilter.config = ' . json_encode($this->SeoFilter->config) . ';
         SeoFilter.config.connector_url = "' . $this->SeoFilter->config['connectorUrl'] . '";
@@ -73,6 +76,7 @@ class SeoFilterHomeManagerController extends modExtraManagerController
         });
         </script>
         ');
+
     }
 
 

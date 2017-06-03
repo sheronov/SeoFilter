@@ -108,9 +108,9 @@
 
         <field key="name" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
-        <field key="title" dbtype="text" phptype="string" null="true" default=""/>
-        <field key="h1" dbtype="text" phptype="string" null="true" default=""/>
-        <field key="h2" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="title" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
+        <field key="h1" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
+        <field key="h2" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="introtext" dbtype="text" phptype="string" null="true" default=""/>
         <field key="description" dbtype="text" phptype="string" null="true" default=""/>
         <field key="text" dbtype="text" phptype="string" null="true" default=""/>
@@ -136,8 +136,9 @@
 
     <object class="sfDictionary" table="seofilter_dictionary" extends="xPDOSimpleObject">
         <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="input" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="value" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
-        <field key="translit" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="class" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="key" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 

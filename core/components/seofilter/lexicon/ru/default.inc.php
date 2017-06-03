@@ -5,11 +5,21 @@ $_lang['seofilter'] = 'SeoFilter';
 $_lang['seofilter_menu_desc'] = 'Управление ЧПУ и SEO для mFilter2';
 $_lang['seofilter_intro_msg'] = 'Вы можете выделять сразу несколько предметов при помощи Shift или Ctrl.';
 
+$_lang['seofilter_field'] = 'Поле';
 $_lang['seofilter_fields'] = 'Поля фильтра';
 $_lang['seofilter_fields_intro'] = 'На этой странице вы создаёте и редактируете базовые поля для формирования ЧПУ в фильтре После сохранения в режиме редактирования можно будет ввести информацию по полям для SEO. ';
 
+$_lang['seofilter_multifield'] = 'Пересечение';
 $_lang['seofilter_multifields'] = 'Пересечение полей';
 $_lang['seofilter_multifields_intro'] = 'Здесь вы можете настроить правила для формирования адресов для двух и более полей. Можно задавать конкретные значения для двух полей одного ключа, чтобы получить одну страницу.';
+
+$_lang['seofilter_seometa'] = 'SEO';
+$_lang['seofilter_seometas'] = 'SEO';
+$_lang['seofilter_seometas_intro'] = 'Для большего удобства в управлении все прописанные SEO и Meta поля собраны в одну таблицу';
+
+$_lang['seofilter_dictionary'] = 'Словарь';
+$_lang['seofilter_dictionary_intro'] = 'После добавления поля здесь появляются запросы и их склонения, если включено, которые можно откорректировать в ручную';
+
 
 $_lang['seofilter_field_id'] = 'Id';
 $_lang['seofilter_field_name'] = 'Название';
@@ -74,3 +84,52 @@ $_lang['seofilter_multifield_err_nf'] = 'Пересечение не найде�
 $_lang['seofilter_multifield_err_ns'] = 'Пересечение не указано.';
 $_lang['seofilter_multifield_err_remove'] = 'Ошибка при удалении пересечения.';
 $_lang['seofilter_multifield_err_save'] = 'Ошибка при сохранении пересечения.';
+
+$_lang['seofilter_seo'] = 'SEO';
+$_lang['seofilter_seo_after_save'] = '<p>Ввести информацию можно будет после сохранения</p>';
+
+
+$_lang['seofilter_seometa_id'] = 'Id';
+$_lang['seofilter_seometa_name'] = 'Название';
+$_lang['seofilter_seometa_title'] = 'Заголовок страницы';
+$_lang['seofilter_seometa_h1'] = 'Заголовок H1';
+$_lang['seofilter_seometa_h2'] = 'Заголовок H2';
+$_lang['seofilter_seometa_active'] = 'Активно';
+$_lang['seofilter_seometa_description'] = 'Описание';
+$_lang['seofilter_seometa_introtext'] = 'Вводный текст';
+$_lang['seofilter_seometa_text'] = 'Текстовое поле';
+$_lang['seofilter_seometa_content'] = 'Контент';
+
+$_lang['seofilter_seometa_create'] = 'Добавить значения';
+
+
+$_lang['seofilter_dictionary_create'] = 'Добавить запись';
+$_lang['seofilter_dictionary_id'] = 'Id';
+$_lang['seofilter_dictionary_field_id'] = 'Поле';
+$_lang['seofilter_dictionary_active'] = 'Активно';
+$_lang['seofilter_dictionary_input'] = 'Запрос';
+$_lang['seofilter_dictionary_value'] = 'Значение';
+$_lang['seofilter_dictionary_alias'] = 'Синоним';
+$_lang['seofilter_dictionary_class'] = 'Класс';
+$_lang['seofilter_dictionary_key'] = 'Ключ';
+$_lang['seofilter_dictionary_menu_on'] = 'Показывать в меню';
+$_lang['seofilter_dictionary_menutitle'] = 'Пункт меню';
+$_lang['seofilter_dictionary_menuindex'] = 'Позиция в меню';
+$_lang['seofilter_dictionary_link_attributes'] = 'Атрибуты ссылки';
+$_lang['seofilter_dictionary_value_i'] = 'В именительном падеже';
+$_lang['seofilter_dictionary_value_r'] = 'В родительном падеже';
+$_lang['seofilter_dictionary_value_d'] = 'В дательном падеже';
+$_lang['seofilter_dictionary_value_v'] = 'В винительном падеже';
+$_lang['seofilter_dictionary_value_t'] = 'В творительном падеже';
+$_lang['seofilter_dictionary_value_p'] = 'В предложном падеже';
+$_lang['seofilter_dictionary_value_o'] = 'О чём / о ком';
+$_lang['seofilter_dictionary_values_i'] = 'ИП множественное число';
+$_lang['seofilter_dictionary_values_r'] = 'РП множественное число';
+$_lang['seofilter_dictionary_values_d'] = 'ДП множественное число';
+$_lang['seofilter_dictionary_values_v'] = 'ВП множественное число';
+$_lang['seofilter_dictionary_values_t'] = 'ТП множественное число';
+$_lang['seofilter_dictionary_values_p'] = 'ПП множественное число';
+$_lang['seofilter_dictionary_values_o'] = 'О ком во множ. числе';
+$_lang['seofilter_dictionary_value_to'] = 'Куда';
+$_lang['seofilter_dictionary_value_in'] = 'Где';
+$_lang['seofilter_dictionary_value_from'] = 'Откуда';
