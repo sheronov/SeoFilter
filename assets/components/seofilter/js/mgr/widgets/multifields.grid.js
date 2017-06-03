@@ -57,7 +57,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
 
     createField: function (btn, e) {
         var w = MODx.load({
-            xtype: 'seofilter-field-window-create',
+            xtype: 'seofilter-multifield-window-create',
             id: Ext.id(),
             listeners: {
                 success: {
@@ -91,7 +91,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
                 success: {
                     fn: function (r) {
                         var w = MODx.load({
-                            xtype: 'seofilter-field-window-update',
+                            xtype: 'seofilter-multifield-window-update',
                             id: Ext.id(),
                             record: r,
                             listeners: {
@@ -204,17 +204,17 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
             width: 150,
         }, {
             header: _('seofilter_multifield_url'),
-            dataIndex: 'class',
+            dataIndex: 'url',
             sortable: true,
             width: 150,
         }, {
             header: _('seofilter_multifield_count'),
-            dataIndex: 'key',
+            dataIndex: 'count',
             sortable: true,
             width: 70,
         }, {
             header: _('seofilter_multifield_fields'),
-            dataIndex: 'alias',
+            dataIndex: 'fields',
             sortable: true,
             width: 150,
         }, {

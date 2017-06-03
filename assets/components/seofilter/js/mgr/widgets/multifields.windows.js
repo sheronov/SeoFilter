@@ -1,14 +1,14 @@
-SeoFilter.window.CreateField = function (config) {
+SeoFilter.window.CreateMultiField = function (config) {
     config = config || {};
     if (!config.id) {
-        config.id = 'seofilter-field-window-create';
+        config.id = 'seofilter-multifield-window-create';
     }
     Ext.applyIf(config, {
-        title: _('seofilter_field_create'),
+        title: _('seofilter_multifield_create'),
         width: 550,
         autoHeight: true,
         url: SeoFilter.config.connector_url,
-        action: 'mgr/field/create',
+        action: 'mgr/multifield/create',
         fields: this.getFields(config),
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
@@ -16,9 +16,9 @@ SeoFilter.window.CreateField = function (config) {
             }, scope: this
         }]
     });
-    SeoFilter.window.CreateField.superclass.constructor.call(this, config);
+    SeoFilter.window.CreateMultiField.superclass.constructor.call(this, config);
 };
-Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
+Ext.extend(SeoFilter.window.CreateMultiField, MODx.Window, {
 
     getFields: function (config) {
         return [{
@@ -26,6 +26,13 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
             fieldLabel: _('seofilter_multifield_name'),
             name: 'name',
             id: config.id + '-name',
+            anchor: '99%',
+            allowBlank: false,
+        },{
+            xtype: 'textfield',
+            fieldLabel: _('seofilter_multifield_url'),
+            name: 'url',
+            id: config.id + '-url',
             anchor: '99%',
             allowBlank: false,
         }, {
@@ -68,20 +75,20 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
     }
 
 });
-Ext.reg('seofilter-field-window-create', SeoFilter.window.CreateField);
+Ext.reg('seofilter-multifield-window-create', SeoFilter.window.CreateMultiField);
 
 
-SeoFilter.window.UpdateField = function (config) {
+SeoFilter.window.UpdateMultiField = function (config) {
     config = config || {};
     if (!config.id) {
-        config.id = 'seofilter-field-window-update';
+        config.id = 'seofilter-multifield-window-update';
     }
     Ext.applyIf(config, {
-        title: _('seofilter_field_update'),
+        title: _('seofilter_multifield_update'),
         width: 550,
         autoHeight: true,
         url: SeoFilter.config.connector_url,
-        action: 'mgr/field/update',
+        action: 'mgr/multifield/update',
         fields: this.getFields(config),
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
@@ -89,9 +96,9 @@ SeoFilter.window.UpdateField = function (config) {
             }, scope: this
         }]
     });
-    SeoFilter.window.UpdateField.superclass.constructor.call(this, config);
+    SeoFilter.window.UpdateMultiField.superclass.constructor.call(this, config);
 };
-Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
+Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
 
     getFields: function (config) {
         return [{
@@ -100,11 +107,17 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
             id: config.id + '-id',
         },{
             xtype: 'textfield',
-            fieldLabel: _('seofilter_field_name'),
+            fieldLabel: _('seofilter_multifield_name'),
             name: 'name',
             id: config.id + '-name',
             anchor: '99%',
             allowBlank: false,
+        },{
+            xtype: 'textfield',
+            fieldLabel: _('seofilter_multifield_url'),
+            name: 'url',
+            id: config.id + '-url',
+            anchor: '99%',
         }, {
             layout:'column',
             border: false,
@@ -121,24 +134,6 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                         name: 'page',
                         id: config.id + '-page',
                         anchor: '99%',
-                    }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_class'),
-                        name: 'class',
-                        id: config.id + '-class',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_key'),
-                        name: 'key',
-                        id: config.id + '-key',
-                        anchor: '99%',
-                    },{
-                        xtype: 'xcheckbox',
-                        boxLabel: _('seofilter_field_translit'),
-                        name: 'translit',
-                        id: config.id + '-translit',
-                        anchor: '99%',
                     }
                 ]
             },{
@@ -147,25 +142,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                 ,defaults: { msgTarget: 'under' }
                 ,border:false
                 ,items: [
-                    {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_alias'),
-                        name: 'alias',
-                        id: config.id + '-alias',
-                        anchor: '99%',
-                    },  {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_urltpl'),
-                        name: 'urltpl',
-                        id: config.id + '-urltpl',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'numberfield',
-                        fieldLabel: _('seofilter_field_priority'),
-                        name: 'priority',
-                        id: config.id + '-priority',
-                        anchor: '99%',
-                    }, {
+                     {
                         xtype: 'xcheckbox',
                         boxLabel: _('seofilter_field_active'),
                         name: 'active',
@@ -180,4 +157,4 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
     }
 
 });
-Ext.reg('seofilter-field-window-update', SeoFilter.window.UpdateField);
+Ext.reg('seofilter-multifield-window-update', SeoFilter.window.UpdateMultiField);
