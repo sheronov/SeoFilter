@@ -46,3 +46,31 @@ $_lang['seofilter_grid_search'] = 'Поиск';
 $_lang['seofilter_grid_actions'] = 'Действия';
 
 $_lang['seofilter_combo_select'] = 'Выберите из списка';
+
+$_lang['seofilter_multifield_id'] = 'Id';
+$_lang['seofilter_multifield_active'] = 'Активно';
+$_lang['seofilter_multifield_page'] = 'Страница';
+$_lang['seofilter_multifield_name'] = 'Название';
+$_lang['seofilter_multifield_url'] = 'URL адрес';
+$_lang['seofilter_multifield_count'] = 'Кол-во';
+$_lang['seofilter_multifield_fields'] = 'Поля';
+$_lang['seofilter_multifield_tablefields'] = 'Выберите поля';
+
+$_lang['seofilter_multifield_create'] = 'Добавить пересечение';
+$_lang['seofilter_multifield_update'] = 'Изменить пересечение';
+$_lang['seofilter_multifield_enable'] = 'Включить пересечение';
+$_lang['seofilter_multifields_enable'] = 'Включить пересечения';
+$_lang['seofilter_multifield_disable'] = 'Отключить пересечение';
+$_lang['seofilter_multifields_disable'] = 'Отключить пересечения';
+$_lang['seofilter_multifield_remove'] = 'Удалить пересечение';
+$_lang['seofilter_multifields_remove'] = 'Удалить пересечения';
+$_lang['seofilter_multifield_remove_confirm'] = 'Вы уверены, что хотите удалить это пересечение?';
+$_lang['seofilter_multifields_remove_confirm'] = 'Вы уверены, что хотите удалить эти пересечения?';
+$_lang['seofilter_multifield_active'] = 'Включено';
+
+$_lang['seofilter_multifield_err_name'] = 'Вы должны указать имя пересечения.';
+$_lang['seofilter_multifield_err_ae'] = 'Пересечение с таким именем уже существует.';
+$_lang['seofilter_multifield_err_nf'] = 'Пересечение не найдено.';
+$_lang['seofilter_multifield_err_ns'] = 'Пересечение не указано.';
+$_lang['seofilter_multifield_err_remove'] = 'Ошибка при удалении пересечения.';
+$_lang['seofilter_multifield_err_save'] = 'Ошибка при сохранении пересечения.';

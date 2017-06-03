@@ -1,6 +1,6 @@
 <?php
 
-class sfFieldGetListProcessor extends modObjectGetListProcessor
+class sfMultiFieldGetListProcessor extends modObjectGetListProcessor
 {
     public $objectType = 'sfMultiField';
     public $classKey = 'sfMultiField';
@@ -42,8 +42,8 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
 
         //if($this->getProperty('page')) {
 
-            $c->leftJoin('modResource', 'modResource', 'sfsfMultiField.page = modResource.id');
-            $c->select(array('sfMultiField.*','modResource.pagetitle'));
+            $c->leftJoin('modResource', 'modResource', $this->classKey.'.page = modResource.id');
+            $c->select(array($this->classKey.'.*','modResource.pagetitle'));
         //}
 
 
@@ -77,8 +77,8 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
         $array['actions'][] = array(
             'cls' => '',
             'icon' => 'icon icon-edit',
-            'title' => $this->modx->lexicon('seofilter_field_update'),
-            //'multiple' => $this->modx->lexicon('seofilter_fields_update'),
+            'title' => $this->modx->lexicon('seofilter_multifield_update'),
+            //'multiple' => $this->modx->lexicon('seofilter_multifields_update'),
             'action' => 'updateField',
             'button' => true,
             'menu' => true,
@@ -88,8 +88,8 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
             $array['actions'][] = array(
                 'cls' => '',
                 'icon' => 'icon icon-power-off action-green',
-                'title' => $this->modx->lexicon('seofilter_field_enable'),
-                'multiple' => $this->modx->lexicon('seofilter_fields_enable'),
+                'title' => $this->modx->lexicon('seofilter_multifield_enable'),
+                'multiple' => $this->modx->lexicon('seofilter_multifields_enable'),
                 'action' => 'enableField',
                 'button' => true,
                 'menu' => true,
@@ -98,8 +98,8 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
             $array['actions'][] = array(
                 'cls' => '',
                 'icon' => 'icon icon-power-off action-gray',
-                'title' => $this->modx->lexicon('seofilter_field_disable'),
-                'multiple' => $this->modx->lexicon('seofilter_fields_disable'),
+                'title' => $this->modx->lexicon('seofilter_multifield_disable'),
+                'multiple' => $this->modx->lexicon('seofilter_multifields_disable'),
                 'action' => 'disableField',
                 'button' => true,
                 'menu' => true,
@@ -110,8 +110,8 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
         $array['actions'][] = array(
             'cls' => '',
             'icon' => 'icon icon-trash-o action-red',
-            'title' => $this->modx->lexicon('seofilter_field_remove'),
-            'multiple' => $this->modx->lexicon('seofilter_fields_remove'),
+            'title' => $this->modx->lexicon('seofilter_multifield_remove'),
+            'multiple' => $this->modx->lexicon('seofilter_multifields_remove'),
             'action' => 'removeField',
             'button' => true,
             'menu' => true,
@@ -122,4 +122,4 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
 
 }
 
-return 'sfFieldGetListProcessor';
+return 'sfMultiFieldGetListProcessor';

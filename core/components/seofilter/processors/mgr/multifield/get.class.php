@@ -1,9 +1,9 @@
 <?php
 
-class sfFieldGetProcessor extends modObjectGetProcessor
+class sfMultiFieldGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'sfField';
-    public $classKey = 'sfField';
+    public $objectType = 'sfMultiField';
+    public $classKey = 'sfMultiField';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';
 
@@ -25,4 +25,4 @@ class sfFieldGetProcessor extends modObjectGetProcessor
 
 }
 
-return 'sfFieldGetProcessor';
+return 'sfMultiFieldGetProcessor';

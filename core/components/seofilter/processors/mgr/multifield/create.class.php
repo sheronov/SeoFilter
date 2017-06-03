@@ -1,9 +1,9 @@
 <?php
 
-class sfFieldCreateProcessor extends modObjectCreateProcessor
+class sfMultiFieldCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType = 'sfField';
-    public $classKey = 'sfField';
+    public $objectType = 'sfMultiField';
+    public $classKey = 'sfMultiField';
     public $languageTopics = array('seofilter');
     //public $permission = 'create';
 
@@ -25,4 +25,4 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
 
 }
 
-return 'sfFieldCreateProcessor';
+return 'sfMultiFieldCreateProcessor';

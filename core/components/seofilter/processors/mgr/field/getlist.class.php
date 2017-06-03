@@ -42,8 +42,8 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
 
         //if($this->getProperty('page')) {
 
-            $c->leftJoin('modResource', 'modResource', 'sfField.page = modResource.id');
-            $c->select(array('sfField.*','modResource.pagetitle'));
+            $c->leftJoin('modResource', 'modResource', $this->classKey.'.page = modResource.id');
+            $c->select(array($this->classKey.'.*','modResource.pagetitle'));
         //}
 
 

@@ -23,7 +23,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
     getFields: function (config) {
         return [{
             xtype: 'textfield',
-            fieldLabel: _('seofilter_field_name'),
+            fieldLabel: _('seofilter_multifield_name'),
             name: 'name',
             id: config.id + '-name',
             anchor: '99%',
@@ -40,27 +40,9 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                 ,items: [
                     {
                         xtype: 'seofilter-combo-resource',
-                        fieldLabel: _('seofilter_field_page'),
+                        fieldLabel: _('seofilter_multifield_page'),
                         name: 'page',
                         id: config.id + '-page',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_class'),
-                        name: 'class',
-                        id: config.id + '-class',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_key'),
-                        name: 'key',
-                        id: config.id + '-key',
-                        anchor: '99%',
-                    },{
-                        xtype: 'xcheckbox',
-                        boxLabel: _('seofilter_field_translit'),
-                        name: 'translit',
-                        id: config.id + '-translit',
                         anchor: '99%',
                     }
                 ]
@@ -70,27 +52,9 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                 ,defaults: { msgTarget: 'under' }
                 ,border:false
                 ,items: [
-                    {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_alias'),
-                        name: 'alias',
-                        id: config.id + '-alias',
-                        anchor: '99%',
-                    },  {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_urltpl'),
-                        name: 'urltpl',
-                        id: config.id + '-urltpl',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'numberfield',
-                        fieldLabel: _('seofilter_field_priority'),
-                        name: 'priority',
-                        id: config.id + '-priority',
-                        anchor: '99%',
-                    }, {
+                     {
                         xtype: 'xcheckbox',
-                        boxLabel: _('seofilter_field_active'),
+                        boxLabel: _('seofilter_multifield_active'),
                         name: 'active',
                         id: config.id + '-active',
                         checked: true,

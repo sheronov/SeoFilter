@@ -1,9 +1,9 @@
 <?php
 
-class sfFieldRemoveProcessor extends modObjectProcessor
+class sfMultiFieldRemoveProcessor extends modObjectProcessor
 {
-    public $objectType = 'sfField';
-    public $classKey = 'sfField';
+    public $objectType = 'sfMultiField';
+    public $classKey = 'sfMultiField';
     public $languageTopics = array('seofilter');
     //public $permission = 'remove';
 
@@ -36,4 +36,4 @@ class sfFieldRemoveProcessor extends modObjectProcessor
 
 }
 
-return 'sfFieldRemoveProcessor';
+return 'sfMultiFieldRemoveProcessor';

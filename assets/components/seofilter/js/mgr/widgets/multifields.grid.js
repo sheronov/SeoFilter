@@ -57,7 +57,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
 
     createField: function (btn, e) {
         var w = MODx.load({
-            xtype: 'seofilter-multifield-window-create',
+            xtype: 'seofilter-field-window-create',
             id: Ext.id(),
             listeners: {
                 success: {
@@ -91,7 +91,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
                 success: {
                     fn: function (r) {
                         var w = MODx.load({
-                            xtype: 'seofilter-multifield-window-update',
+                            xtype: 'seofilter-field-window-update',
                             id: Ext.id(),
                             record: r,
                             listeners: {
@@ -182,7 +182,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'class', 'key', 'alias', 'translit', 'priority', 'urltpl', 'active', 'ajax','rank', 'seo', 'actions','pagetitle'];
+        return ['id', 'name', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle'];
     },
 
     getColumns: function () {
@@ -203,36 +203,20 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_multifield_class'),
+            header: _('seofilter_multifield_url'),
             dataIndex: 'class',
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_multifield_key'),
+            header: _('seofilter_multifield_count'),
             dataIndex: 'key',
             sortable: true,
-            width: 150,
+            width: 70,
         }, {
-            header: _('seofilter_multifield_alias'),
+            header: _('seofilter_multifield_fields'),
             dataIndex: 'alias',
             sortable: true,
             width: 150,
-        }, {
-            header: _('seofilter_multifield_translit'),
-            dataIndex: 'translit',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: false,
-            width: 75,
-        }, {
-            header: _('seofilter_multifield_urltpl'),
-            dataIndex: 'urltpl',
-            sortable: false,
-            width: 200,
-        }, {
-            header: _('seofilter_multifield_priority'),
-            dataIndex: 'priority',
-            sortable: true,
-            width: 50
         }, {
             header: _('seofilter_multifield_active'),
             dataIndex: 'active',
@@ -255,7 +239,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
             handler: this.createField,
             scope: this
         }, '->', {
-            xtype: 'seofilter-multifield-search',
+            xtype: 'seofilter-field-search',
             width: 250,
             listeners: {
                 search: {
