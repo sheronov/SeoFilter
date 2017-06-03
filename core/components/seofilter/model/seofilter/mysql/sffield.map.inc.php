@@ -10,21 +10,27 @@ $xpdo_meta_map['sfField']= array (
     'class' => '',
     'key' => '',
     'page' => 0,
-    'urltpl' => '',
-    'alias' => '1',
-    'translit' => 1,
-    'ajax' => 1,
-    'active' => 1,
+    'alias' => '',
     'priority' => 0,
-    'seo' => '',
+    'translit' => 1,
+    'translate' => 0,
+    'valuefirst' => 0,
+    'exact' => 1,
+    'xpdo' => 0,
+    'xpdo_package' => '',
+    'xpdo_class' => '',
+    'xpdo_id' => '',
+    'xpdo_name' => '',
+    'xpdo_where' => '',
     'rank' => 0,
+    'active' => 1,
   ),
   'fieldMeta' => 
   array (
     'name' => 
     array (
       'dbtype' => 'varchar',
-      'precision' => '100',
+      'precision' => '255',
       'phptype' => 'string',
       'null' => false,
       'default' => '',
@@ -54,45 +60,13 @@ $xpdo_meta_map['sfField']= array (
       'null' => false,
       'default' => 0,
     ),
-    'urltpl' => 
-    array (
-      'dbtype' => 'varchar',
-      'precision' => '255',
-      'phptype' => 'string',
-      'null' => false,
-      'default' => '',
-    ),
     'alias' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
       'phptype' => 'string',
       'null' => true,
-      'default' => '1',
-    ),
-    'translit' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => true,
-      'default' => 1,
-    ),
-    'ajax' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => true,
-      'default' => 1,
-    ),
-    'active' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => true,
-      'default' => 1,
+      'default' => '',
     ),
     'priority' => 
     array (
@@ -103,10 +77,83 @@ $xpdo_meta_map['sfField']= array (
       'null' => false,
       'default' => 0,
     ),
-    'seo' => 
+    'translit' => 
     array (
-      'dbtype' => 'text',
-      'phptype' => 'array',
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
+      'default' => 1,
+    ),
+    'translate' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
+      'default' => 0,
+    ),
+    'valuefirst' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
+      'default' => 0,
+    ),
+    'exact' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
+      'default' => 1,
+    ),
+    'xpdo' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => false,
+      'default' => 0,
+    ),
+    'xpdo_package' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'xpdo_class' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'xpdo_id' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'xpdo_name' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'xpdo_where' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
       'null' => true,
       'default' => '',
     ),
@@ -119,18 +166,42 @@ $xpdo_meta_map['sfField']= array (
       'null' => true,
       'default' => 0,
     ),
+    'active' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
+      'default' => 1,
+    ),
   ),
   'indexes' => 
   array (
-    'name' => 
+    'class' => 
     array (
-      'alias' => 'name',
+      'alias' => 'class',
       'primary' => false,
       'unique' => false,
       'type' => 'BTREE',
       'columns' => 
       array (
-        'name' => 
+        'class' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'key' => 
+    array (
+      'alias' => 'key',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'key' => 
         array (
           'length' => '',
           'collation' => 'A',
@@ -185,6 +256,33 @@ $xpdo_meta_map['sfField']= array (
           'null' => false,
         ),
       ),
+    ),
+  ),
+  'composites' => 
+  array (
+    'Seo' => 
+    array (
+      'class' => 'sfSeoMeta',
+      'local' => 'id',
+      'foreign' => 'field_id',
+      'cardinality' => 'one',
+      'owner' => 'local',
+    ),
+    'Dictionary' => 
+    array (
+      'class' => 'sfDictionary',
+      'local' => 'id',
+      'foreign' => 'field_id',
+      'cardinality' => 'many',
+      'owner' => 'local',
+    ),
+    'Link' => 
+    array (
+      'class' => 'sfFieldIds',
+      'local' => 'id',
+      'foreign' => 'field_id',
+      'cardinality' => 'many',
+      'owner' => 'local',
     ),
   ),
 );

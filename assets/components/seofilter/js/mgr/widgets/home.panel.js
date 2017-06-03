@@ -29,6 +29,16 @@ SeoFilter.panel.Home = function (config) {
                     xtype: 'seofilter-grid-fields',
                     cls: 'main-wrapper',
                 }]
+            },{
+                title: _('seofilter_multifields'),
+                layout: 'anchor',
+                items: [{
+                    html: _('seofilter_multifields_intro'),
+                    cls: 'panel-desc',
+                }, {
+                    xtype: 'seofilter-grid-multifields',
+                    cls: 'main-wrapper',
+                }]
             }]
         }]
     });

@@ -8,7 +8,7 @@ switch ($modx->event->name) {
             $q = $modx->newQuery('sfField');
             $q->where(array('page' => $page));
             if($modx->getCount('sfField',$q)) {
-                if(!$SeoFilter->initialized[$modx->context]) {
+                if(!$SeoFilter->initialized[$modx->context->key]) {
                     $SeoFilter->initialize($modx->context->key, array('page' => (int)$page));
                 }
             }
