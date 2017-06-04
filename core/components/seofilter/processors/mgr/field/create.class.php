@@ -23,53 +23,52 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
         return parent::beforeSet();
     }
 
+    public function beforeSave()
+    {
+        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
+        if($this->getProperty('priority') == 1) {
+            $this->object->set('translit',1);
+        } elseif($this->getProperty('priority') == 2) {
+            $this->object->set('translate',1);
+        }
+        return parent::beforeSave();
+    }
+
     public  function afterSave()
     {
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
-        if($class = $this->getProperty('class') && $key = $this->getProperty('key')) {
-            $q = $this->modx->newQuery($class);
-            $q->limit(0);
-            $q->select(array('DISTINCT '.$class.'.'.$key));
-            if ($q->prepare() && $q->stmt->execute()) {
-                while($word = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
-                    if($this->getProperty('translit')) {
-                        //$this->translit($word,1);
-                    } elseif($this->getProperty('translate')) {
-                        echo $word;
-                    }
-                    echo '<br>';
-                }
-            }
-        }
+        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
+
 
         $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
         $field = $this->object;
         $class = $field->get('class');
         $key = $field->get('key');
-        $q = $this->modx->newQuery($class);
-        $q->limit(0);
-        $q->select(array('DISTINCT '.$class.'.'.$key));
-        if ($q->prepare() && $q->stmt->execute()) {
-            while($input = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
-                if($field->get('xpdo')) {
-                    $value = '';
-                } else {
-                    $value = $input;
-                }
-                $processorProps = array(
-                    'input' => $input,
-                    'value' => $value,
-                    'translit' => $field->get('translit'),
-                    'translate' => $field->get('translate'),
-                    'xpdo' => $field->get('xpdo'),
-                    'class' => $class,
-                    'key' => $key,
-                    'field_id' => $field->id
-                );
-                $otherProps = array('processors_path' => $path.'processors/');
-                $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                if ($response->isError()) {
-                    $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+        if($class && $key) {
+            $q = $this->modx->newQuery($class);
+            $q->limit(0);
+            $q->select(array('DISTINCT ' . $class . '.' . $key));
+            if ($q->prepare() && $q->stmt->execute()) {
+                while ($input = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
+                    if ($field->get('xpdo')) {
+                        $value = '';
+                    } else {
+                        $value = $input;
+                    }
+                    $processorProps = array(
+                        'input' => $input,
+                        'value' => $value,
+                        'translit' => $field->get('translit'),
+                        'translate' => $field->get('translate'),
+                        'xpdo' => $field->get('xpdo'),
+                        'class' => $class,
+                        'key' => $key,
+                        'field_id' => $field->id
+                    );
+                    $otherProps = array('processors_path' => $path . 'processors/');
+                    $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                    if ($response->isError()) {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                    }
                 }
             }
         }
@@ -93,7 +92,7 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
 //                }
 //            }
 //        }
-        return true;
+        return parent::afterSave();
     }
 
 }

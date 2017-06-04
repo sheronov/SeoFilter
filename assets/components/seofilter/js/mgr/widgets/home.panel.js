@@ -59,6 +59,16 @@ SeoFilter.panel.Home = function (config) {
                     xtype: 'seofilter-grid-dictionaries',
                     cls: 'main-wrapper',
                 }]
+            },{
+                title: _('seofilter_urls'),
+                layout: 'anchor',
+                items: [{
+                    html: _('seofilter_urls_intro'),
+                    cls: 'panel-desc',
+                }, {
+                    xtype: 'seofilter-grid-urls',
+                    cls: 'main-wrapper',
+                }]
             }]
         }]
     });

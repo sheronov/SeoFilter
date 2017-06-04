@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterOfficeItemEnableProcessor extends modObjectProcessor
+class sfUrlsDisableProcessor extends modObjectProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfUrls';
+    public $classKey = 'sfUrls';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';
 
@@ -19,16 +19,16 @@ class SeoFilterOfficeItemEnableProcessor extends modObjectProcessor
 
         $ids = $this->modx->fromJSON($this->getProperty('ids'));
         if (empty($ids)) {
-            return $this->failure($this->modx->lexicon('seofilter_item_err_ns'));
+            return $this->failure($this->modx->lexicon('seofilter_url_err_ns'));
         }
 
         foreach ($ids as $id) {
-            /** @var SeoFilterItem $object */
+            /** @var sfUrls $object */
             if (!$object = $this->modx->getObject($this->classKey, $id)) {
-                return $this->failure($this->modx->lexicon('seofilter_item_err_nf'));
+                return $this->failure($this->modx->lexicon('seofilter_url_err_nf'));
             }
 
-            $object->set('active', true);
+            $object->set('active', false);
             $object->save();
         }
 
@@ -37,4 +37,4 @@ class SeoFilterOfficeItemEnableProcessor extends modObjectProcessor
 
 }
 
-return 'SeoFilterOfficeItemEnableProcessor';
+return 'sfUrlsDisableProcessor';

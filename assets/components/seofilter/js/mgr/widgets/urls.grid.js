@@ -1,7 +1,7 @@
-SeoFilter.grid.Fields = function (config) {
+SeoFilter.grid.Urls = function (config) {
     config = config || {};
     if (!config.id) {
-        config.id = 'seofilter-grid-fields';
+        config.id = 'seofilter-grid-urls';
     }
     Ext.applyIf(config, {
         url: SeoFilter.config.connector_url,
@@ -10,7 +10,7 @@ SeoFilter.grid.Fields = function (config) {
         tbar: this.getTopBar(config),
         sm: new Ext.grid.CheckboxSelectionModel(),
         baseParams: {
-            action: 'mgr/field/getlist'
+            action: 'mgr/urls/getlist'
         },
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
@@ -34,7 +34,7 @@ SeoFilter.grid.Fields = function (config) {
         remoteSort: true,
         autoHeight: true,
     });
-    SeoFilter.grid.Fields.superclass.constructor.call(this, config);
+    SeoFilter.grid.Urls.superclass.constructor.call(this, config);
 
     // Clear selection on grid refresh
     this.store.on('load', function () {
@@ -43,7 +43,7 @@ SeoFilter.grid.Fields = function (config) {
         }
     }, this);
 };
-Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
+Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     windows: {},
 
     getMenu: function (grid, rowIndex) {
@@ -57,13 +57,14 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
 
     createField: function (btn, e) {
         var w = MODx.load({
-            xtype: 'seofilter-field-window-create',
+            xtype: 'seofilter-url-window-create',
             id: Ext.id(),
             listeners: {
                 success: {
                     fn: function () {
                         this.refresh();
-                    }, scope: this
+
+                    }, scope: this,
                 }
             }
         });
@@ -84,14 +85,14 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/field/get',
+                action: 'mgr/urls/get',
                 id: id
             },
             listeners: {
                 success: {
                     fn: function (r) {
                         var w = MODx.load({
-                            xtype: 'seofilter-field-window-update',
+                            xtype: 'seofilter-url-window-update',
                             id: Ext.id(),
                             record: r,
                             listeners: {
@@ -118,14 +119,14 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
         }
         MODx.msg.confirm({
             title: ids.length > 1
-                ? _('seofilter_fields_remove')
-                : _('seofilter_field_remove'),
+                ? _('seofilter_urls_remove')
+                : _('seofilter_url_remove'),
             text: ids.length > 1
-                ? _('seofilter_fields_remove_confirm')
-                : _('seofilter_field_remove_confirm'),
+                ? _('seofilter_urls_remove_confirm')
+                : _('seofilter_url_remove_confirm'),
             url: this.config.url,
             params: {
-                action: 'mgr/field/remove',
+                action: 'mgr/urls/remove',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -147,7 +148,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/field/disable',
+                action: 'mgr/urls/disable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -168,7 +169,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/field/enable',
+                action: 'mgr/urls/enable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -182,61 +183,47 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'class', 'key', 'alias', 'translit', 'translate', 'priority', 'active', 'rank', 'actions','pagetitle','translate','method','exact','valuefirst','hideparam'];
+        return ['id', 'multi_id', 'old_url', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name'];
     },
 
     getColumns: function () {
         return [{
-            header: _('seofilter_field_id'),
+            header: _('seofilter_url_id'),
             dataIndex: 'id',
             sortable: true,
             width: 70
         }, {
-            header: _('seofilter_field_name'),
-            dataIndex: 'name',
+            header: _('seofilter_url_multi_id'),
+            dataIndex: 'multi_id',
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_field_page'),
-            dataIndex: 'page',
-            renderer: SeoFilter.utils.renderResource,
+            header: _('seofilter_url_old_url'),
+            dataIndex: 'old_url',
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_field_class'),
-            dataIndex: 'class',
+            header: _('seofilter_url_new_url'),
+            dataIndex: 'new_url',
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_field_key'),
-            dataIndex: 'key',
+            header: _('seofilter_url_editedon'),
+            dataIndex: 'editedon',
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_field_alias'),
-            dataIndex: 'alias',
+            header: _('seofilter_url_createdon'),
+            dataIndex: 'createdon',
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_field_translit'),
-            dataIndex: 'translit',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: false,
-            width: 75,
-        }, {
-            header: _('seofilter_field_translate'),
-            dataIndex: 'translate',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: false,
-            width: 200,
-        }, {
-            header: _('seofilter_field_hideparam'),
-            dataIndex: 'hideparam',
-            renderer: SeoFilter.utils.renderBoolean,
+            header: _('seofilter_url_count'),
+            dataIndex: 'count',
             sortable: true,
-            width: 50
+            width: 150,
         }, {
-            header: _('seofilter_field_active'),
+            header: _('seofilter_url_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
@@ -253,7 +240,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
 
     getTopBar: function () {
         return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_field_create'),
+            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_url_create'),
             handler: this.createField,
             scope: this
         }, '->', {
@@ -318,4 +305,4 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
         this.getBottomToolbar().changePage(1);
     },
 });
-Ext.reg('seofilter-grid-fields', SeoFilter.grid.Fields);
+Ext.reg('seofilter-grid-urls', SeoFilter.grid.Urls);

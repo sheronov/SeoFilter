@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
+class sfUrlsGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfUrls';
+    public $classKey = 'sfUrls';
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';
     //public $permission = 'list';
@@ -36,7 +36,6 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
         if ($query) {
             $c->where(array(
                 'name:LIKE' => "%{$query}%",
-                'OR:description:LIKE' => "%{$query}%",
             ));
         }
 
@@ -51,16 +50,28 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
      */
     public function prepareRow(xPDOObject $object)
     {
+
         $array = $object->toArray();
+
+//        $array['pagetitle'] = '';
+//        if ($page = $array['page']) {
+//            $q = $this->modx->newQuery('modResource', array('id' => $page));
+//            $q->select('pagetitle');
+//            $q->limit(1);
+//            if ($q->prepare() && $q->stmt->execute()) {
+//                $array['pagetitle'] = $q->stmt->fetch(PDO::FETCH_COLUMN);
+//            }
+//        }
+
         $array['actions'] = array();
 
         // Edit
         $array['actions'][] = array(
             'cls' => '',
-            'icon' => 'fa fa-edit',
-            'title' => $this->modx->lexicon('seofilter_field_update'),
-            //'multiple' => $this->modx->lexicon('seofilter_fields_update'),
-            'action' => 'updateItem',
+            'icon' => 'icon icon-edit',
+            'title' => $this->modx->lexicon('seofilter_url_update'),
+            //'multiple' => $this->modx->lexicon('seofilter_url_update'),
+            'action' => 'updateField',
             'button' => true,
             'menu' => true,
         );
@@ -68,20 +79,20 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
         if (!$array['active']) {
             $array['actions'][] = array(
                 'cls' => '',
-                'icon' => 'fa fa-power-off action-green',
-                'title' => $this->modx->lexicon('seofilter_field_enable'),
-                'multiple' => $this->modx->lexicon('seofilter_fields_enable'),
-                'action' => 'enableItem',
+                'icon' => 'icon icon-power-off action-green',
+                'title' => $this->modx->lexicon('seofilter_url_enable'),
+                'multiple' => $this->modx->lexicon('seofilter_url_enable'),
+                'action' => 'enableField',
                 'button' => true,
                 'menu' => true,
             );
         } else {
             $array['actions'][] = array(
                 'cls' => '',
-                'icon' => 'fa fa-power-off action-gray',
-                'title' => $this->modx->lexicon('seofilter_field_disable'),
-                'multiple' => $this->modx->lexicon('seofilter_fields_disable'),
-                'action' => 'disableItem',
+                'icon' => 'icon icon-power-off action-gray',
+                'title' => $this->modx->lexicon('seofilter_url_disable'),
+                'multiple' => $this->modx->lexicon('seofilter_url_disable'),
+                'action' => 'disableField',
                 'button' => true,
                 'menu' => true,
             );
@@ -90,10 +101,10 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
         // Remove
         $array['actions'][] = array(
             'cls' => '',
-            'icon' => 'fa fa-trash-o action-red',
-            'title' => $this->modx->lexicon('seofilter_field_remove'),
-            'multiple' => $this->modx->lexicon('seofilter_fields_remove'),
-            'action' => 'removeItem',
+            'icon' => 'icon icon-trash-o action-red',
+            'title' => $this->modx->lexicon('seofilter_url_remove'),
+            'multiple' => $this->modx->lexicon('seofilter_url_remove'),
+            'action' => 'removeField',
             'button' => true,
             'menu' => true,
         );
@@ -103,4 +114,4 @@ class SeoFilterOfficeItemGetListProcessor extends modObjectGetListProcessor
 
 }
 
-return 'SeoFilterOfficeItemGetListProcessor';
+return 'sfUrlsGetListProcessor';

@@ -1,9 +1,9 @@
 <?php
 
-class SeoFilterOfficeItemGetProcessor extends modObjectGetProcessor
+class sfUrlsGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'SeoFilterItem';
-    public $classKey = 'SeoFilterItem';
+    public $objectType = 'sfUrls';
+    public $classKey = 'sfUrls';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';
 
@@ -25,4 +25,4 @@ class SeoFilterOfficeItemGetProcessor extends modObjectGetProcessor
 
 }
 
-return 'SeoFilterOfficeItemGetProcessor';
+return 'sfUrlsGetProcessor';

@@ -20,6 +20,8 @@ $_lang['seofilter_seometas_intro'] = 'Для большего удобства �
 $_lang['seofilter_dictionary'] = 'Словарь';
 $_lang['seofilter_dictionary_intro'] = 'После добавления поля здесь появляются запросы и их склонения, если включено, которые можно откорректировать в ручную';
 
+$_lang['seofilter_urls'] = 'Таблица URL';
+$_lang['seofilter_urls_intro'] = 'После добавления пересечения полей здесь автоматически появляются адреса и статистика по переходам. Для каждой страницы можно индивидуально задать SEO и meta поля';
 
 $_lang['seofilter_field_id'] = 'Id';
 $_lang['seofilter_field_name'] = 'Название';
@@ -29,9 +31,15 @@ $_lang['seofilter_field_page'] = 'Страница';
 $_lang['seofilter_field_class'] = 'Класс';
 $_lang['seofilter_field_key'] = 'Ключ';
 $_lang['seofilter_field_alias'] = 'Синоним';
+$_lang['seofilter_field_dont'] = 'Не обрабатывать';
 $_lang['seofilter_field_translit'] = 'Транслитерация';
+$_lang['seofilter_field_translate'] = 'Переводить на англ.';
 $_lang['seofilter_field_urltpl'] = 'Шаблон url';
 $_lang['seofilter_field_priority'] = 'Приоритет';
+$_lang['seofilter_field_method'] = 'Как обрабатывать значения';
+$_lang['seofilter_field_exact'] = 'Точное вхожение (строгий поиск)';
+$_lang['seofilter_field_valuefirst'] = 'Значение перед параметром';
+$_lang['seofilter_field_hideparam'] = 'Скрывать параметр в url';
 
 $_lang['seofilter_field_create'] = 'Добавить поле';
 $_lang['seofilter_field_update'] = 'Изменить поле';
@@ -150,3 +158,14 @@ $_lang['seofilter_fieldids_condition'] = 'Where';
 $_lang['seofilter_fieldids_update'] = 'Изменить условия';
 $_lang['seofilter_fieldids_remove'] = 'Исключить поле';
 $_lang['seofilter_fieldids_remove_confirm'] = 'Вы уверены, что хотите исключить это поле?';
+
+$_lang['seofilter_url_id'] = 'Id';
+$_lang['seofilter_url_multi_id'] = 'Пересечение';
+$_lang['seofilter_url_old_url'] = 'Базовый Url';
+$_lang['seofilter_url_new_url'] = 'Исправленный Url';
+$_lang['seofilter_url_editedon'] = 'Отредактировано';
+$_lang['seofilter_url_createdon'] = 'Создано';
+$_lang['seofilter_url_count'] = 'Переходов';
+$_lang['seofilter_url_active'] = 'Активно';
+
+$_lang['seofilter_url_create'] = 'Добавить URL';
