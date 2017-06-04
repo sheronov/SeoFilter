@@ -13,12 +13,13 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
      */
     public function beforeSet()
     {
-        $name = trim($this->getProperty('name'));
-        if (empty($name)) {
-            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_dictionary_err_name'));
-        } elseif ($this->modx->getCount($this->classKey, array('name' => $name))) {
-            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_dictionary_err_ae'));
+        $name = trim($this->getProperty('input'));
+        if (empty($input)) {
+            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_seometa_err_input'));
+        } elseif ($this->modx->getCount($this->classKey, array('input' => $name))) {
+            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_seometa_err_ae'));
         }
+
 
         return parent::beforeSet();
     }

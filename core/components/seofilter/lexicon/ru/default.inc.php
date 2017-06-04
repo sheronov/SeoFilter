@@ -129,7 +129,10 @@ $_lang['seofilter_dictionary_values_d'] = 'ДП множественное чи�
 $_lang['seofilter_dictionary_values_v'] = 'ВП множественное число';
 $_lang['seofilter_dictionary_values_t'] = 'ТП множественное число';
 $_lang['seofilter_dictionary_values_p'] = 'ПП множественное число';
-$_lang['seofilter_dictionary_values_o'] = 'О ком во множ. числе';
+$_lang['seofilter_dictionary_values_o'] = 'О ком, о чём во множ. числе';
 $_lang['seofilter_dictionary_value_to'] = 'Куда';
 $_lang['seofilter_dictionary_value_in'] = 'Где';
 $_lang['seofilter_dictionary_value_from'] = 'Откуда';
+
+$_lang['seofilter_disctionary_decline'] = 'Склонения по падежам';
+$_lang['seofilter_disctionary_decline_desc'] = 'Склонения по падежам только для русского языка';

@@ -30,16 +30,16 @@ class sfMultiFieldUpdateProcessor extends modObjectUpdateProcessor
     public function beforeSet()
     {
         $id = (int)$this->getProperty('id');
-        $name = trim($this->getProperty('name'));
+       // $name = trim($this->getProperty('name'));
         if (empty($id)) {
             return $this->modx->lexicon('seofilter_multifield_err_ns');
         }
 
-        if (empty($name)) {
-            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_multifield_err_name'));
-        } elseif ($this->modx->getCount($this->classKey, array('name' => $name, 'id:!=' => $id))) {
-            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_multifield_err_ae'));
-        }
+//        if (empty($name)) {
+//            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_multifield_err_name'));
+//        } elseif ($this->modx->getCount($this->classKey, array('name' => $name, 'id:!=' => $id))) {
+//            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_multifield_err_ae'));
+//        }
 
         return parent::beforeSet();
     }

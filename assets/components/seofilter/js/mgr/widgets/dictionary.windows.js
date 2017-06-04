@@ -5,13 +5,11 @@ SeoFilter.window.CreateDictionary = function (config) {
     }
     Ext.applyIf(config, {
         title: _('seofilter_dictionary_create'),
-        width: 650,
-        //autoHeight: true,
-        autoHeight: false,
+        width: 600,
+        autoHeight: true,
         url: SeoFilter.config.connector_url,
         action: 'mgr/dictionary/create',
         fields: this.getFields(config),
-        bodyStyle: 'padding-top:10px;',
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
                 this.submit()
@@ -25,65 +23,198 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
 
     getFields: function (config) {
         return [{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_dictionary_name'),
-                    name: 'name',
-                    id: config.id + '-name',
-                    anchor: '99%',
-                    allowBlank: false,
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_dictionary_title'),
-                    name: 'title',
-                    id: config.id + '-title',
-                    anchor: '99%',
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_dictionary_h1'),
-                    name: 'h1',
-                    id: config.id + '-h1',
-                    anchor: '99%',
-                },{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_dictionary_h2'),
-                    name: 'h2',
-                    id: config.id + '-h2',
-                    anchor: '99%',
-                }, {
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_dictionary_description'),
-                    name: 'description',
-                    id: config.id + '-description',
-                    anchor: '99%',
-                }, {
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_dictionary_introtext'),
-                    name: 'introtext',
-                    id: config.id + '-introtext',
-                    anchor: '99%',
-                },{
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_dictionary_text'),
-                    name: 'text',
-                    id: config.id + '-text',
-                    anchor: '99%',
-                }, {
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_dictionary_content'),
-                    name: 'content',
-                    id: 'seofilter-dictionary-content',
-                    listeners: {
-                        render: function () {
-                            if(MODx.loadRTE) MODx.loadRTE('seofilter-dictionary-content');
-                        }
-                    },
-                    anchor: '99%',
-                }, {
-                    xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_field_active'),
-                    name: 'active',
-                    id: config.id + '-active',
-                }];
+            layout: 'column',
+            border: false,
+            anchor: '100%',
+            items: [{
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_input'),
+                        name: 'input',
+                        id: config.id + '-input',
+                        anchor: '99%',
+                        allowBlank: false,
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value'),
+                        name: 'value',
+                        id: config.id + '-value',
+                        anchor: '99%',
+                    }, {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_alias'),
+                        name: 'alias',
+                        id: config.id + '-alias',
+                        anchor: '99%',
+                    }
+                ]
+            }, {
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_field_id'),
+                        name: 'field_id',
+                        id: config.id + '-field_id',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_class'),
+                        name: 'class',
+                        id: config.id + '-class',
+                        anchor: '99%',
+                    }, {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_key'),
+                        name: 'key',
+                        id: config.id + '-key',
+                        anchor: '99%',
+                    }
+                ]
+            }]
+        },{
+        //     xtype: 'xcheckbox',
+        //     boxLabel: _('seofilter_dictionary_active'),
+        //     name: 'active',
+        //     id: config.id + '-active',
+        // }, {
+            title: _('seofilter_disctionary_decline')
+            , style: 'border-top:1px solid #ccc;padding-top:5px;'
+            , xtype: 'displayfield'
+            , html: _('seofilter_disctionary_decline_desc')
+        },{
+            layout: 'column',
+            border: false,
+            anchor: '100%',
+            items: [{
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , style: 'padding-bottom:10px;'
+                , items: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_i'),
+                        name: 'value_i',
+                        id: config.id + '-value_i',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_r'),
+                        name: 'value_r',
+                        id: config.id + '-value_r',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_d'),
+                        name: 'value_d',
+                        id: config.id + '-value_d',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_v'),
+                        name: 'value_v',
+                        id: config.id + '-value_v',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_t'),
+                        name: 'value_t',
+                        id: config.id + '-value_t',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_p'),
+                        name: 'value_p',
+                        id: config.id + '-value_p',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_o'),
+                        name: 'value_o',
+                        id: config.id + '-value_o',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_to'),
+                        name: 'value_to',
+                        id: config.id + '-value_to',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_in'),
+                        name: 'value_in',
+                        id: config.id + '-value_in',
+                        anchor: '99%',
+                    }
+                ]
+            }, {
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_i'),
+                        name: 'values_i',
+                        id: config.id + '-values_i',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_r'),
+                        name: 'values_r',
+                        id: config.id + '-values_r',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_d'),
+                        name: 'values_d',
+                        id: config.id + '-values_d',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_v'),
+                        name: 'values_v',
+                        id: config.id + '-values_v',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_t'),
+                        name: 'values_t',
+                        id: config.id + '-values_t',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_p'),
+                        name: 'values_p',
+                        id: config.id + '-values_p',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_o'),
+                        name: 'values_o',
+                        id: config.id + '-values_o',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_from'),
+                        name: 'value_from',
+                        id: config.id + '-value_from',
+                        anchor: '99%',
+                    }
+                ]
+            }]
+        }];
     },
 
     loadDropZones: function () {
@@ -99,12 +230,10 @@ SeoFilter.window.UpdateDictionary = function (config) {
     }
     Ext.applyIf(config, {
         title: _('seofilter_dictionary_update'),
-        width: 650,
-        //autoHeight: true,
-        autoHeight: false,
+        width: 600,
+        autoHeight: true,
         url: SeoFilter.config.connector_url,
         action: 'mgr/dictionary/update',
-        bodyStyle: 'padding-top:10px;',
         fields: this.getFields(config),
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
@@ -117,76 +246,201 @@ SeoFilter.window.UpdateDictionary = function (config) {
 Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
 
     getFields: function (config) {
-        return {
-            xtype: 'modx-tabs'
-            ,deferredRender: false
-            ,border: true
-            ,items: [{
-                // Таб №1 - Информация
-                title: _('seofilter_dictionary')
-                ,hideMode: 'offsets'
-                ,layout: 'form'
-                ,bodyStyle: 'margin-top:-10px;padding-bottom:5px;'
-                ,border:false
-                ,items: [{
-                        xtype: 'hidden',
-                        name: 'id',
-                        id: config.id + '-id',
-                    },{
+        return [{
+            xtype: 'hidden',
+            name: 'id',
+            id: config.id + '-id',
+        },{
+            layout: 'column',
+            border: false,
+            anchor: '100%',
+            items: [{
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_dictionary_name'),
-                        name: 'name',
-                        id: config.id + '-name',
+                        fieldLabel: _('seofilter_dictionary_input'),
+                        name: 'input',
+                        id: config.id + '-input',
                         anchor: '99%',
                         allowBlank: false,
                     },{
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_dictionary_url'),
-                        name: 'url',
-                        id: config.id + '-url',
+                        fieldLabel: _('seofilter_dictionary_value'),
+                        name: 'value',
+                        id: config.id + '-value',
                         anchor: '99%',
                     }, {
-                        layout: 'column',
-                        border: false,
-                        anchor: '100%',
-                        items: [{
-                            columnWidth: .5
-                            , layout: 'form'
-                            , defaults: {msgTarget: 'under'}
-                            , border: false
-                            , items: [
-                                {
-                                    xtype: 'seofilter-combo-resource',
-                                    fieldLabel: _('seofilter_field_page'),
-                                    name: 'page',
-                                    id: config.id + '-page',
-                                    anchor: '99%',
-                                }
-                            ]
-                        }, {
-                            columnWidth: .5
-                            , layout: 'form'
-                            , defaults: {msgTarget: 'under'}
-                            , border: false
-                            , items: [
-                                {
-                                    xtype: 'xcheckbox',
-                                    boxLabel: _('seofilter_field_active'),
-                                    name: 'active',
-                                    id: config.id + '-active',
-                                }
-                            ]
-                        }]
-                    }]
-                }, {
-                // Таб №2 - Пользователи
-                title: _('seofilter_seo')
-                // Здесь должен быть xtype с таблицей подписчиков, пока комментируем
-                //,xtype: 'sendex-grid-newsletter-subscribers'
-                , xtype: 'displayfield'
-                , html: '<p>SEO вкладка</p>'
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_alias'),
+                        name: 'alias',
+                        id: config.id + '-alias',
+                        anchor: '99%',
+                    }
+                ]
+            }, {
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_field_id'),
+                        name: 'field_id',
+                        id: config.id + '-field_id',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_class'),
+                        name: 'class',
+                        id: config.id + '-class',
+                        anchor: '99%',
+                    }, {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_key'),
+                        name: 'key',
+                        id: config.id + '-key',
+                        anchor: '99%',
+                    }
+                ]
             }]
-        };
+        },{
+            //     xtype: 'xcheckbox',
+            //     boxLabel: _('seofilter_dictionary_active'),
+            //     name: 'active',
+            //     id: config.id + '-active',
+            // }, {
+            title: _('seofilter_disctionary_decline')
+            , xtype: 'displayfield'
+            , html: _('seofilter_disctionary_decline_desc')
+        },{
+            layout: 'column',
+            border: false,
+            anchor: '100%',
+            items: [{
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_i'),
+                        name: 'value_i',
+                        id: config.id + '-value_i',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_r'),
+                        name: 'value_r',
+                        id: config.id + '-value_r',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_d'),
+                        name: 'value_d',
+                        id: config.id + '-value_d',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_v'),
+                        name: 'value_v',
+                        id: config.id + '-value_v',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_t'),
+                        name: 'value_t',
+                        id: config.id + '-value_t',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_p'),
+                        name: 'value_p',
+                        id: config.id + '-value_p',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_o'),
+                        name: 'value_o',
+                        id: config.id + '-value_o',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_to'),
+                        name: 'value_to',
+                        id: config.id + '-value_to',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_in'),
+                        name: 'value_in',
+                        id: config.id + '-value_in',
+                        anchor: '99%',
+                    }
+                ]
+            }, {
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_i'),
+                        name: 'values_i',
+                        id: config.id + '-values_i',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_r'),
+                        name: 'values_r',
+                        id: config.id + '-values_r',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_d'),
+                        name: 'values_d',
+                        id: config.id + '-values_d',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_v'),
+                        name: 'values_v',
+                        id: config.id + '-values_v',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_t'),
+                        name: 'values_t',
+                        id: config.id + '-values_t',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_p'),
+                        name: 'values_p',
+                        id: config.id + '-values_p',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_values_o'),
+                        name: 'values_o',
+                        id: config.id + '-values_o',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_from'),
+                        name: 'value_from',
+                        id: config.id + '-value_from',
+                        anchor: '99%',
+                    }
+                ]
+            }]
+        }];
     },
 
     loadDropZones: function () {

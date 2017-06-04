@@ -50,12 +50,14 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                             name: 'class',
                             id: config.id + '-class',
                             anchor: '99%',
+                            allowBlank:false,
                         }, {
                             xtype: 'textfield',
                             fieldLabel: _('seofilter_field_key'),
                             name: 'key',
                             id: config.id + '-key',
                             anchor: '99%',
+                            allowBlank:false,
                         },{
                             xtype: 'xcheckbox',
                             boxLabel: _('seofilter_field_translit'),

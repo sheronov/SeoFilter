@@ -30,15 +30,15 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
     public function beforeSet()
     {
         $id = (int)$this->getProperty('id');
-        $name = trim($this->getProperty('name'));
+        $name = trim($this->getProperty('value'));
         if (empty($id)) {
             return $this->modx->lexicon('seofilter_dictionary_err_ns');
         }
 
         if (empty($name)) {
-            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_dictionary_err_name'));
-        } elseif ($this->modx->getCount($this->classKey, array('name' => $name, 'id:!=' => $id))) {
-            $this->modx->error->addField('name', $this->modx->lexicon('seofilter_dictionary_err_ae'));
+            $this->modx->error->addField('value', $this->modx->lexicon('seofilter_dictionary_err_name'));
+        } elseif ($this->modx->getCount($this->classKey, array('value' => $name, 'id:!=' => $id))) {
+            $this->modx->error->addField('value', $this->modx->lexicon('seofilter_dictionary_err_ae'));
         }
 
         return parent::beforeSet();
