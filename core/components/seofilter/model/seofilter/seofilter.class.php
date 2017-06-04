@@ -86,6 +86,7 @@ class SeoFilter
                 if($q->prepare() && $q->stmt->execute()) {
                     $this->config['aliases'] = $q->stmt->fetchALL(PDO::FETCH_COLUMN);
                 }
+                $this->config['url'] = $this->modx->makeUrl($this->config['page'],$ctx,'','full');
             }
 
             $data = json_encode(array(
@@ -98,6 +99,7 @@ class SeoFilter
                 'separator' => $this->config['separator'],
                 'valuefirst' => $this->config['valuefirst'],
                 'redirect' => $this->config['redirect'],
+                'url' => $this->config['url'],
             ), true);
             $this->modx->regClientStartupScript(
                 '<script type="text/javascript">seoFilterConfig = ' . $data . ';</script>', true

@@ -161,7 +161,48 @@ jQuery(document).ready(function ($) {
             set: function (vars) {
                 var hash = '';
                 var aliases = seoFilter.config.aliases;
+                var count = 0;
+                var origin = seoFilter.config.url || document.location.pathname;
+                console.log(origin);
+
+                for (var i in vars) {
+                    if (vars.hasOwnProperty(i)) {
+                        if(aliases.indexOf(i) != -1) {
+                            if(count || origin[origin.length-1] != '/') {
+                                hash += '/' + i + seoFilter.config.separator + vars[i].toLowerCase();
+                            } else {
+                                hash += i + seoFilter.config.separator + vars[i].toLowerCase();
+                            }
+                            count++;
+                        } else {
+                            hash += '&' + i + '=' + vars[i];
+                        }
+                    }
+                }
+                console.log(document.location.pathname);
+                if (!this.oldbrowser()) {
+                    if (hash.length != 0) {
+                        if(count) {
+                            hash = hash.replace('%', '%25').replace('+', '%2B');
+                        } else {
+                            hash = '?' + hash.substr(1).replace('%', '%25').replace('+', '%2B');
+                        }
+                    }
+                    console.log(hash);
+                    console.log(document.location.href);
+                    console.log(document.location.origin);
+                    //window.history.pushState({mSearch2: document.location.pathname + hash}, '', document.location.pathname + hash);
+                    window.history.pushState({mSearch2: origin + hash}, '', origin + hash);
+                }
+                else {
+                    window.location.hash = hash.substr(1);
+                }
+            },
+            set2: function (vars) {
+                var hash = '';
+                var aliases = seoFilter.config.aliases;
                 var check = false;
+                console.log(vars);
                 for (var i in vars) {
                     if (vars.hasOwnProperty(i)) {
                         if(aliases.indexOf(i) != -1) {
