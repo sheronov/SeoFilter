@@ -1,21 +1,19 @@
 <?php
-$xpdo_meta_map['sfFieldIds']= array (
+$xpdo_meta_map['sfUrls']= array (
   'package' => 'seofilter',
   'version' => '1.1',
-  'table' => 'seofilter_fieldids',
+  'table' => 'seofilter_urls',
   'extends' => 'xPDOSimpleObject',
   'fields' => 
   array (
     'multi_id' => 0,
-    'field_id' => 0,
-    'priority' => 0,
+    'old_url' => '',
+    'new_url' => '',
+    'editedon' => 0,
+    'createdon' => 0,
+    'count' => 0,
+    'rank' => 0,
     'active' => 1,
-    'where' => 0,
-    'compare' => 0,
-    'value' => '',
-    'condition' => '',
-    'hideparam' => 0,
-    'valuefirst' => 0,
   ),
   'fieldMeta' => 
   array (
@@ -28,22 +26,56 @@ $xpdo_meta_map['sfFieldIds']= array (
       'null' => false,
       'default' => 0,
     ),
-    'field_id' => 
+    'old_url' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => false,
+      'default' => '',
+    ),
+    'new_url' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'editedon' => 
     array (
       'dbtype' => 'integer',
-      'precision' => '10',
+      'precision' => '20',
       'attributes' => 'unsigned',
       'phptype' => 'integer',
       'null' => false,
       'default' => 0,
     ),
-    'priority' => 
+    'createdon' => 
     array (
       'dbtype' => 'integer',
-      'precision' => '10',
+      'precision' => '20',
       'attributes' => 'unsigned',
       'phptype' => 'integer',
       'null' => false,
+      'default' => 0,
+    ),
+    'count' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'attributes' => 'unsigned',
+      'null' => true,
+      'default' => 0,
+    ),
+    'rank' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'attributes' => 'unsigned',
+      'null' => true,
       'default' => 0,
     ),
     'active' => 
@@ -53,55 +85,6 @@ $xpdo_meta_map['sfFieldIds']= array (
       'phptype' => 'boolean',
       'null' => true,
       'default' => 1,
-    ),
-    'where' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => true,
-      'default' => 0,
-    ),
-    'compare' => 
-    array (
-      'dbtype' => 'integer',
-      'precision' => '2',
-      'attributes' => 'unsigned',
-      'phptype' => 'integer',
-      'null' => true,
-      'default' => 0,
-    ),
-    'value' => 
-    array (
-      'dbtype' => 'varchar',
-      'precision' => '255',
-      'phptype' => 'string',
-      'null' => true,
-      'default' => '',
-    ),
-    'condition' => 
-    array (
-      'dbtype' => 'varchar',
-      'precision' => '255',
-      'phptype' => 'string',
-      'null' => true,
-      'default' => '',
-    ),
-    'hideparam' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => true,
-      'default' => 0,
-    ),
-    'valuefirst' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => true,
-      'default' => 0,
     ),
   ),
   'indexes' => 
@@ -122,15 +105,15 @@ $xpdo_meta_map['sfFieldIds']= array (
         ),
       ),
     ),
-    'field_id' => 
+    'old_url' => 
     array (
-      'alias' => 'field_id',
+      'alias' => 'old_url',
       'primary' => false,
       'unique' => false,
       'type' => 'BTREE',
       'columns' => 
       array (
-        'field_id' => 
+        'old_url' => 
         array (
           'length' => '',
           'collation' => 'A',
@@ -138,15 +121,15 @@ $xpdo_meta_map['sfFieldIds']= array (
         ),
       ),
     ),
-    'where' => 
+    'new_url' => 
     array (
-      'alias' => 'where',
+      'alias' => 'new_url',
       'primary' => false,
       'unique' => false,
       'type' => 'BTREE',
       'columns' => 
       array (
-        'where' => 
+        'new_url' => 
         array (
           'length' => '',
           'collation' => 'A',
@@ -173,14 +156,6 @@ $xpdo_meta_map['sfFieldIds']= array (
   ),
   'aggregates' => 
   array (
-    'Field' => 
-    array (
-      'class' => 'sfField',
-      'local' => 'field_id',
-      'foreign' => 'id',
-      'cardinality' => 'one',
-      'owner' => 'foreign',
-    ),
     'Multi' => 
     array (
       'class' => 'sfMultiField',

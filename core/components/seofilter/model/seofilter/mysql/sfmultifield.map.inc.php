@@ -41,8 +41,8 @@ $xpdo_meta_map['sfMultiField']= array (
     ),
     'rank' => 
     array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
+      'dbtype' => 'integer',
+      'precision' => '10',
       'phptype' => 'integer',
       'attributes' => 'unsigned',
       'null' => true,
@@ -121,6 +121,14 @@ $xpdo_meta_map['sfMultiField']= array (
     'Link' => 
     array (
       'class' => 'sfFieldIds',
+      'local' => 'id',
+      'foreign' => 'multi_id',
+      'cardinality' => 'many',
+      'owner' => 'local',
+    ),
+    'Url' => 
+    array (
+      'class' => 'sfUrls',
       'local' => 'id',
       'foreign' => 'multi_id',
       'cardinality' => 'many',

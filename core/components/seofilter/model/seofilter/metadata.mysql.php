@@ -7,6 +7,7 @@ $xpdo_meta_map = array (
     1 => 'sfMultiField',
     2 => 'sfFieldIds',
     3 => 'sfSeoMeta',
-    4 => 'sfDictionary',
+    4 => 'sfUrls',
+    5 => 'sfDictionary',
   ),
 );

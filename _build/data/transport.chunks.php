@@ -8,11 +8,7 @@ $tmp = array(
     'tpl.SeoFilter.item' => array(
         'file' => 'item',
         'description' => '',
-    ),
-    'tpl.SeoFilter.office' => array(
-        'file' => 'office',
-        'description' => '',
-    ),
+    )
 );
 
 // Save chunks for setup options

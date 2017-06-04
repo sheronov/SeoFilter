@@ -101,8 +101,8 @@ $xpdo_meta_map['sfSeoMeta']= array (
     ),
     'rank' => 
     array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
+      'dbtype' => 'integer',
+      'precision' => '10',
       'phptype' => 'integer',
       'attributes' => 'unsigned',
       'null' => true,
