@@ -316,6 +316,7 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
             // }, {
             title: _('seofilter_disctionary_decline')
             , xtype: 'displayfield'
+            , style: 'border-top:1px solid #ccc;padding-top:5px;'
             , html: _('seofilter_disctionary_decline_desc')
         },{
             layout: 'column',

@@ -62,6 +62,7 @@ $_lang['seofilter_multifield_active'] = 'Активно';
 $_lang['seofilter_multifield_page'] = 'Страница';
 $_lang['seofilter_multifield_name'] = 'Название';
 $_lang['seofilter_multifield_url'] = 'URL адрес';
+$_lang['seofilter_multifield_url_more'] = 'URL адрес (если нужен конкретный URL и прописаны условия)';
 $_lang['seofilter_multifield_count'] = 'Кол-во';
 $_lang['seofilter_multifield_fields'] = 'Поля';
 $_lang['seofilter_multifield_tablefields'] = 'Выберите поля';
@@ -136,3 +137,16 @@ $_lang['seofilter_dictionary_value_from'] = 'Откуда';
 
 $_lang['seofilter_disctionary_decline'] = 'Склонения по падежам';
 $_lang['seofilter_disctionary_decline_desc'] = 'Склонения по падежам только для русского языка';
+
+$_lang['seofilter_fieldids_id'] = 'Id';
+$_lang['seofilter_fieldids_field_id'] = 'Поле';
+$_lang['seofilter_fieldids_multi_id'] = 'Пересечение';
+$_lang['seofilter_fieldids_priority'] = 'Порядок';
+$_lang['seofilter_fieldids_where'] = 'Условие (для создания конкретных страниц)';
+$_lang['seofilter_fieldids_compare'] = 'Сравнение';
+$_lang['seofilter_fieldids_value'] = 'Значение';
+$_lang['seofilter_fieldids_condition'] = 'Where';
+
+$_lang['seofilter_fieldids_update'] = 'Изменить условия';
+$_lang['seofilter_fieldids_remove'] = 'Исключить поле';
+$_lang['seofilter_fieldids_remove_confirm'] = 'Вы уверены, что хотите исключить это поле?';

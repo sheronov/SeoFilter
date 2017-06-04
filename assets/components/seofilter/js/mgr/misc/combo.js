@@ -70,3 +70,27 @@ SeoFilter.combo.Resource = function (config) {
 };
 Ext.extend(SeoFilter.combo.Resource, MODx.combo.ComboBox);
 Ext.reg('seofilter-combo-resource', SeoFilter.combo.Resource);
+
+
+SeoFilter.combo.Field = function (config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'field_id',
+        hiddenName: 'field_id',
+        displayField: 'name',
+        valueField: 'id',
+        editable: true,
+        fields: ['id', 'name'],
+        pageSize: 20,
+        emptyText: _('seofilter_combo_select'),
+        hideMode: 'offsets',
+        url: SeoFilter.config.connector_url,
+        baseParams: {
+            action: 'mgr/field/getlist',
+            combo: true
+        }
+    });
+    SeoFilter.combo.Field.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.combo.Field, MODx.combo.ComboBox);
+Ext.reg('seofilter-combo-field', SeoFilter.combo.Field);

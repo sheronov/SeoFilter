@@ -28,7 +28,7 @@ switch ($modx->event->name) {
             $valuefirst = $modx->getOption('seofilter_valuefirst', null, 0, true); //добавить в системные настройки (если true, то значение спереди)
             $redirect  = $modx->getOption('seofilter_redirect', null, 1, true); //добавить в системные настройки (перенаправление на приоритетный url)
             $site_start = $modx->context->getOption('site_start', 1);  //если назначена главной страница с фильтром
-            $charset = $modx->context->getOption('	modx_charset', 'UTF-8'); //кодировка
+            $charset = $modx->context->getOption('modx_charset', 'UTF-8'); //кодировка
             $check = $novalue = $page = 0; //переменные для проверки
             $params = array(); //итоговый массив с параметром и значением
             $last_char = ''; //был ли в конце url-а слэш

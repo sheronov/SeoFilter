@@ -49,21 +49,24 @@ $xpdo_meta_map['sfSeoMeta']= array (
     ),
     'title' => 
     array (
-      'dbtype' => 'text',
+      'dbtype' => 'varchar',
+      'precision' => '255',
       'phptype' => 'string',
       'null' => true,
       'default' => '',
     ),
     'h1' => 
     array (
-      'dbtype' => 'text',
+      'dbtype' => 'varchar',
+      'precision' => '255',
       'phptype' => 'string',
       'null' => true,
       'default' => '',
     ),
     'h2' => 
     array (
-      'dbtype' => 'text',
+      'dbtype' => 'varchar',
+      'precision' => '255',
       'phptype' => 'string',
       'null' => true,
       'default' => '',

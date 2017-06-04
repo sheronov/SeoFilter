@@ -7,8 +7,9 @@ $xpdo_meta_map['sfDictionary']= array (
   'fields' => 
   array (
     'field_id' => 0,
+    'input' => '',
     'value' => '',
-    'translit' => '',
+    'alias' => '',
     'class' => '',
     'key' => '',
     'menu_on' => 1,
@@ -45,6 +46,14 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => false,
       'default' => 0,
     ),
+    'input' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => false,
+      'default' => '',
+    ),
     'value' => 
     array (
       'dbtype' => 'varchar',
@@ -53,7 +62,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => false,
       'default' => '',
     ),
-    'translit' => 
+    'alias' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',

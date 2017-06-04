@@ -13,15 +13,38 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
      */
     public function beforeSet()
     {
-        $name = trim($this->getProperty('input'));
+        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
+
+        $input = trim($this->getProperty('input'));
+        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($input,1));
         if (empty($input)) {
             $this->modx->error->addField('input', $this->modx->lexicon('seofilter_seometa_err_input'));
-        } elseif ($this->modx->getCount($this->classKey, array('input' => $name))) {
+        } elseif ($this->modx->getCount($this->classKey, array('input' => $input))) {
             $this->modx->error->addField('input', $this->modx->lexicon('seofilter_seometa_err_ae'));
         }
 
 
         return parent::beforeSet();
+    }
+
+    public function beforeSave()
+    {
+       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
+       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
+        if($this->object->get('value') && !$this->object->get('alias')) {
+            $this->object->set('alias', $this->object->translit($this->object->get('value')));
+        }
+        return parent::beforeSave();
+    }
+
+    public function afterSave()
+    {
+
+        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
+       // if($value = $this->object->get('value')) {
+            //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->translit($value),1));
+       // }
+        return parent::afterSave();
     }
 
 }

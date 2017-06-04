@@ -1,21 +1,20 @@
-SeoFilter.grid.MultiFields = function (config) {
+SeoFilter.grid.FieldIds = function (config) {
     config = config || {};
-    if (!config.id) {
-        config.id = 'seofilter-grid-multifields';
-    }
     Ext.applyIf(config, {
+        id: 'seofilter-grid-fieldids',
         url: SeoFilter.config.connector_url,
         fields: this.getFields(config),
         columns: this.getColumns(config),
         tbar: this.getTopBar(config),
         sm: new Ext.grid.CheckboxSelectionModel(),
         baseParams: {
-            action: 'mgr/multifield/getlist'
+            action: 'mgr/multifield/fieldids/getlist'
+            ,multi_id: config.record.id
         },
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
-                this.updateField(grid, e, row);
+                this.updateFieldIds(grid, e, row);
             }
         },
         viewConfig: {
@@ -30,11 +29,21 @@ SeoFilter.grid.MultiFields = function (config) {
                     : '';
             }
         },
-        paging: true,
+        limit: 0,
+        pageSize: 0,
+        paging: false,
         remoteSort: true,
         autoHeight: true,
+        multi_select: true,
+        stateful: true,
+        stateId: config.id,
+        autosave: true,
+        save_action: 'mgr/multifield/fieldids/updatefromgrid',
+        plugins: this.getPlugins(config),
+        ddGroup: 'dd-ids-grid',
+        enableDragDrop: true,
     });
-    SeoFilter.grid.MultiFields.superclass.constructor.call(this, config);
+    SeoFilter.grid.FieldIds.superclass.constructor.call(this, config);
 
     // Clear selection on grid refresh
     this.store.on('load', function () {
@@ -43,7 +52,7 @@ SeoFilter.grid.MultiFields = function (config) {
         }
     }, this);
 };
-Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
+Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
     windows: {},
 
     getMenu: function (grid, rowIndex) {
@@ -55,24 +64,39 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         this.addContextMenuItem(menu);
     },
 
-    createField: function (btn, e) {
+    getPlugins: function () {
+        return [new Ext.ux.dd.GridDragDropRowOrder({
+            copy: false,
+            scrollable: true,
+            targetCfg: {},
+            listeners: {
+                afterrowmove: {
+                    fn: this.onAfterRowMove,
+                    scope: this
+                }
+            }
+        })];
+    },
+
+    createFieldIds: function (btn, e) {
         var w = MODx.load({
-            xtype: 'seofilter-multifield-window-create',
+            xtype: 'seofilter-fieldids-window-create',
             id: Ext.id(),
             listeners: {
                 success: {
                     fn: function () {
                         this.refresh();
-                    }, scope: this
+
+                    }, scope: this,
                 }
             }
         });
         w.reset();
-        w.setValues({active: true});
+        w.setValues({active: true,multi_id:this.config.record.id,priority:this.config.store.totalLength});
         w.show(e.target);
     },
 
-    updateField: function (btn, e, row) {
+    updateFieldIds: function (btn, e, row) {
         if (typeof(row) != 'undefined') {
             this.menu.record = row.data;
         }
@@ -84,18 +108,14 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/get',
+                action: 'mgr/multifield/fieldids/get',
                 id: id
             },
             listeners: {
                 success: {
                     fn: function (r) {
-                        if(this.windows.updateField) {
-                            this.windows.updateField.close();
-                            this.windows.updateField.destroy();
-                        }
-                        this.windows.updateField = MODx.load({
-                            xtype: 'seofilter-multifield-window-update',
+                        var w = MODx.load({
+                            xtype: 'seofilter-fieldids-window-update',
                             id: Ext.id(),
                             record: r,
                             listeners: {
@@ -106,30 +126,30 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
                                 }
                             }
                         });
-                        this.windows.updateField.reset();
-                        this.windows.updateField.setValues(r.object);
-                        this.windows.updateField.show(e.target);
+                        w.reset();
+                        w.setValues(r.object);
+                        w.show(e.target);
                     }, scope: this
                 }
             }
         });
     },
 
-    removeField: function () {
+    removeFieldIds: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
         }
         MODx.msg.confirm({
             title: ids.length > 1
-                ? _('seofilter_multifields_remove')
-                : _('seofilter_multifield_remove'),
+                ? _('seofilter_fieldids_remove')
+                : _('seofilter_fieldids_remove'),
             text: ids.length > 1
-                ? _('seofilter_multifields_remove_confirm')
-                : _('seofilter_multifield_remove_confirm'),
+                ? _('seofilter_fieldids_remove_confirm')
+                : _('seofilter_fieldids_remove_confirm'),
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/remove',
+                action: 'mgr/multifield/fieldids/remove',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -143,7 +163,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         return true;
     },
 
-    disableField: function () {
+    disableFieldIds: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -151,7 +171,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/disable',
+                action: 'mgr/multifield/fieldids/disable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -164,7 +184,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         })
     },
 
-    enableField: function () {
+    enableFieldIds: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -172,7 +192,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/enable',
+                action: 'mgr/multifield/fieldids/enable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -186,47 +206,39 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle'];
+        return ['id','field_id','name','multi_id','priority','where','compare','value','condition','compare_string','condition_bool','actions','active'];
     },
 
     getColumns: function () {
         return [{
-            header: _('seofilter_multifield_id'),
-            dataIndex: 'id',
-            sortable: true,
-            width: 70
-        }, {
-            header: _('seofilter_multifield_name'),
+            //     header: _('seofilter_fieldids_id'),
+            //     dataIndex: 'id',
+            //     width: 50
+            // },{
+            header: _('seofilter_fieldids_field_id'),
             dataIndex: 'name',
-            sortable: true,
-            width: 150,
-        }, {
-            header: _('seofilter_multifield_page'),
-            dataIndex: 'page',
-            renderer: SeoFilter.utils.renderResource,
-            sortable: true,
-            width: 150,
-        }, {
-            header: _('seofilter_multifield_url'),
-            dataIndex: 'url',
-            sortable: true,
-            width: 150,
-        }, {
-            header: _('seofilter_multifield_count'),
-            dataIndex: 'count',
-            sortable: true,
-            width: 70,
-        }, {
-            header: _('seofilter_multifield_fields'),
-            dataIndex: 'fields',
-            sortable: true,
-            width: 150,
-        }, {
-            header: _('seofilter_multifield_active'),
-            dataIndex: 'active',
+            width: 100
+        },{
+            header: _('seofilter_fieldids_priority'),
+            dataIndex: 'priority',
+            width: 50
+        },{
+            header: _('seofilter_fieldids_where'),
+            dataIndex: 'where',
+            width: 50,
             renderer: SeoFilter.utils.renderBoolean,
-            sortable: true,
-            width: 75,
+        },{
+            header: _('seofilter_fieldids_compare'),
+            dataIndex: 'compare',
+            width: 50
+        },{
+            header: _('seofilter_fieldids_value'),
+            dataIndex: 'value',
+            width: 100
+            // },{
+            //     header: _('seofilter_fieldids_condition'),
+            //     dataIndex: 'condition',
+            //     width: 100
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
@@ -239,25 +251,9 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
 
     getTopBar: function () {
         return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_multifield_create'),
-            handler: this.createField,
+            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_field_create'),
+            handler: this.createFieldIds,
             scope: this
-        }, '->', {
-            xtype: 'seofilter-field-search',
-            width: 250,
-            listeners: {
-                search: {
-                    fn: function (field) {
-                        this._doSearch(field);
-                    }, scope: this
-                },
-                clear: {
-                    fn: function (field) {
-                        field.setValue('');
-                        this._clearSearch();
-                    }, scope: this
-                },
-            }
         }];
     },
 
@@ -280,6 +276,20 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         return this.processEvent('click', e);
     },
 
+    onAfterRowMove: function () {
+        var s = this.getStore();
+        var start = 0;
+        var size = s.getTotalCount();
+        for (var x = 0; x < size; x++) {
+            var brec = s.getAt(x);
+            brec.set('priority', start + x);
+            brec.commit();
+            this.saveRecord({record: brec});
+        }
+        return true;
+    },
+
+
     _getSelectedIds: function () {
         var ids = [];
         var selected = this.getSelectionModel().getSelections();
@@ -294,15 +304,5 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         return ids;
     },
 
-    _doSearch: function (tf) {
-        this.getStore().baseParams.query = tf.getValue();
-        this.getBottomToolbar().changePage(1);
-    },
-
-    _clearSearch: function () {
-        this.getStore().baseParams.query = '';
-        this.getBottomToolbar().changePage(1);
-    },
 });
-Ext.reg('seofilter-grid-multifields', SeoFilter.grid.MultiFields);
-
+Ext.reg('seofilter-grid-fieldids', SeoFilter.grid.FieldIds);
