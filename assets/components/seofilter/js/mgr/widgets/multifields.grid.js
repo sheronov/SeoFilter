@@ -195,7 +195,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
             header: _('seofilter_multifield_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 70
+            width: 50
         }, {
             header: _('seofilter_multifield_name'),
             dataIndex: 'name',
@@ -211,22 +211,17 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
             header: _('seofilter_multifield_url'),
             dataIndex: 'url',
             sortable: true,
-            width: 150,
-        }, {
-            header: _('seofilter_multifield_seo_id'),
-            dataIndex: 'seo_id',
-            sortable: true,
-            width: 70,
-        }, {
-            header: _('seofilter_multifield_count'),
-            dataIndex: 'count',
-            sortable: true,
-            width: 70,
-        }, {
-            header: _('seofilter_multifield_fields'),
-            dataIndex: 'fields',
-            sortable: true,
-            width: 150,
+            width: 250,
+        // }, {
+        //     header: _('seofilter_multifield_count'),
+        //     dataIndex: 'count',
+        //     sortable: true,
+        //     width: 70,
+        // }, {
+        //     header: _('seofilter_multifield_fields'),
+        //     dataIndex: 'fields',
+        //     sortable: true,
+        //     width: 150,
         }, {
             header: _('seofilter_multifield_active'),
             dataIndex: 'active',

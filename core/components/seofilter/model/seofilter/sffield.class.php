@@ -1,10 +1,6 @@
 <?php
 class sfField extends xPDOSimpleObject {
 
-    /**
-     * @param modX $modx
-     * @param array $config
-     */
 
     /**
      * Returns translated word
