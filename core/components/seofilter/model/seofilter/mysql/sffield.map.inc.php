@@ -12,6 +12,7 @@ $xpdo_meta_map['sfField']= array (
     'page' => 0,
     'alias' => '',
     'priority' => 0,
+    'method' => 0,
     'translit' => 0,
     'translate' => 0,
     'hideparam' => 0,
@@ -76,6 +77,14 @@ $xpdo_meta_map['sfField']= array (
       'attributes' => 'unsigned',
       'phptype' => 'integer',
       'null' => false,
+      'default' => 0,
+    ),
+    'method' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'integer',
+      'null' => true,
       'default' => 0,
     ),
     'translit' => 

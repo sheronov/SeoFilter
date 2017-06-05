@@ -106,6 +106,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
                                 }
                             }
                         });
+
                         this.windows.updateField.reset();
                         this.windows.updateField.setValues(r.object);
                         this.windows.updateField.show(e.target);
@@ -186,7 +187,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle'];
+        return ['id', 'name', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle','seo_id'];
     },
 
     getColumns: function () {
@@ -211,6 +212,11 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
             dataIndex: 'url',
             sortable: true,
             width: 150,
+        }, {
+            header: _('seofilter_multifield_seo_id'),
+            dataIndex: 'seo_id',
+            sortable: true,
+            width: 70,
         }, {
             header: _('seofilter_multifield_count'),
             dataIndex: 'count',

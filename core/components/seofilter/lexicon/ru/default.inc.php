@@ -29,6 +29,7 @@ $_lang['seofilter_field_description'] = 'Описание';
 $_lang['seofilter_field_active'] = 'Активно';
 $_lang['seofilter_field_page'] = 'Страница';
 $_lang['seofilter_field_class'] = 'Класс';
+$_lang['seofilter_field_class_more'] = 'Выберите класс (или впишите свой)';
 $_lang['seofilter_field_key'] = 'Ключ';
 $_lang['seofilter_field_alias'] = 'Синоним';
 $_lang['seofilter_field_dont'] = 'Не обрабатывать';
@@ -40,6 +41,11 @@ $_lang['seofilter_field_method'] = 'Как обрабатывать значен
 $_lang['seofilter_field_exact'] = 'Точное вхожение (строгий поиск)';
 $_lang['seofilter_field_valuefirst'] = 'Значение перед параметром';
 $_lang['seofilter_field_hideparam'] = 'Скрывать параметр в url';
+
+$_lang['seofilter_msProductData'] = 'msProductData (поля товара)';
+$_lang['seofilter_modResource'] = 'modResource (поля ресурса)';
+$_lang['seofilter_msVendor'] = 'msVendor (поля производителя)';
+$_lang['seofilter_msProductOption'] = 'msProductOption (опции minishop2)';
 
 $_lang['seofilter_field_create'] = 'Добавить поле';
 $_lang['seofilter_field_update'] = 'Изменить поле';
@@ -169,3 +175,10 @@ $_lang['seofilter_url_count'] = 'Переходов';
 $_lang['seofilter_url_active'] = 'Активно';
 
 $_lang['seofilter_url_create'] = 'Добавить URL';
+
+$_lang['seofilter_field_xpdo'] = 'Значение в другой таблице';
+$_lang['seofilter_field_xpdo_package'] = 'Компонента, например customExtra';
+$_lang['seofilter_field_xpdo_class'] = 'Класс, например customExtraItem';
+$_lang['seofilter_field_xpdo_id'] = 'Поле для сопоставления (id)';
+$_lang['seofilter_field_xpdo_name'] = 'Поле, где хранится значение (name)';
+$_lang['seofilter_field_xpdo_where'] = 'Дополнительное условие (where)';

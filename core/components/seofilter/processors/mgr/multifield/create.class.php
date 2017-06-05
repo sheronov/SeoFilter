@@ -23,6 +23,22 @@ class sfMultiFieldCreateProcessor extends modObjectCreateProcessor
         return parent::beforeSet();
     }
 
+
+
+    public function afterSave()
+    {
+//        $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
+//        $processorProps = $this->getProperties();
+//        $processorProps['multi_id'] = $this->object->get('id');
+//        $action = 'mgr/seometa/create';
+//        $otherProps = array('processors_path' => $path . 'processors/');
+//        $response = $this->modx->runProcessor($action, $processorProps, $otherProps);
+//        if ($response->isError()) {
+//            $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+//        }
+
+        return parent::afterSave();
+    }
 }
 
 return 'sfMultiFieldCreateProcessor';

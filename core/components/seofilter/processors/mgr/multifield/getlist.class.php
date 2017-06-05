@@ -43,7 +43,14 @@ class sfMultiFieldGetListProcessor extends modObjectGetListProcessor
         //if($this->getProperty('page')) {
 
             $c->leftJoin('modResource', 'modResource', $this->classKey.'.page = modResource.id');
-            $c->select(array($this->classKey.'.*','modResource.pagetitle'));
+            //$c->leftJoin('sfSeoMeta', 'sfSeoMeta', $this->classKey.'.id = sfSeoMeta.multi_id');
+            $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
+            //$c->select($this->modx->getSelectColumns('sfSeoMeta','sfSeoMeta','',array('title','h1')));
+            $c->select($this->modx->getSelectColumns('modResource','modResource','',array('pagetitle')));
+          // $c->select('sfMultiField.*');
+//            $c->select('modResource.pagetitle');
+//            $c->select('sfSeoMeta.*');
+
         //}
 
 

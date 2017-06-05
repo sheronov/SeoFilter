@@ -6,10 +6,11 @@ SeoFilter.window.CreateField = function (config) {
     Ext.applyIf(config, {
         title: _('seofilter_field_create'),
         width: 550,
-        autoHeight: true,
+        autoHeight: false,
         url: SeoFilter.config.connector_url,
         action: 'mgr/field/create',
         fields: this.getFields(config),
+        bodyStyle: 'padding-bottom:15px;',
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
                 this.submit()
@@ -31,7 +32,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
         }, {
             layout:'column',
             border: false,
-            anchor: '100%',
+            anchor: '99%',
                 items: [{
                     columnWidth: .5
                     ,layout: 'form'
@@ -45,8 +46,8 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                             id: config.id + '-page',
                             anchor: '99%',
                         }, {
-                            xtype: 'textfield',
-                            fieldLabel: _('seofilter_field_class'),
+                            xtype: 'seofilter-combo-class',
+                            fieldLabel: _('seofilter_field_class_more'),
                             name: 'class',
                             id: config.id + '-class',
                             anchor: '99%',
@@ -93,6 +94,12 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                         //     name: 'priority',
                         //     id: config.id + '-priority',
                         //     anchor: '99%',
+                        },{
+                            xtype: 'xcheckbox',
+                            boxLabel: _('seofilter_field_active'),
+                            name: 'active',
+                            id: config.id + '-active',
+                            checked: true,
                         }
                     ]
                 }]
@@ -121,10 +128,68 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
             }]
         },{
             xtype: 'xcheckbox',
-            boxLabel: _('seofilter_field_active'),
-            name: 'active',
-            id: config.id + '-active',
-            checked: true,
+            boxLabel: _('seofilter_field_xpdo'),
+            name: 'xpdo',
+            id: config.id + '-xpdo',
+            listeners: {
+                check: SeoFilter.utils.handleChecked,
+                afterrender: SeoFilter.utils.handleChecked
+            }
+        },{
+            layout:'column',
+            border: false,
+            anchor: '97%',
+            items: [{
+                columnWidth: .5
+                ,layout: 'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_package'),
+                    name: 'xpdo_package',
+                    id: config.id + '-xpdo_package',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_class'),
+                    name: 'xpdo_class',
+                    id: config.id + '-xpdo_class',
+                    anchor: '99%',
+                }]
+            },{
+                columnWidth: .5
+                ,layout: 'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_id'),
+                    name: 'xpdo_id',
+                    id: config.id + '-xpdo_id',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_name'),
+                    name: 'xpdo_name',
+                    id: config.id + '-xpdo_name',
+                    anchor: '99%',
+                }]
+            },{
+                columnWidth: 1
+                ,layout:'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_field_xpdo_where'),
+                        name: 'xpdo_where',
+                        id: config.id + '-xpdo_where',
+                        anchor: '99%',
+                        style:'margin-bottom:15px;'
+                    }
+                ]
+            }]
         }];
     },
 
@@ -143,7 +208,7 @@ SeoFilter.window.UpdateField = function (config) {
     Ext.applyIf(config, {
         title: _('seofilter_field_update'),
         width: 550,
-        autoHeight: true,
+        autoHeight: false,
         url: SeoFilter.config.connector_url,
         action: 'mgr/field/update',
         fields: this.getFields(config),
@@ -172,7 +237,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
         }, {
             layout:'column',
             border: false,
-            anchor: '100%',
+            anchor: '99%',
             items: [{
                 columnWidth: .5
                 ,layout: 'form'
@@ -186,23 +251,19 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                         id: config.id + '-page',
                         anchor: '99%',
                     }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_class'),
+                        xtype: 'seofilter-combo-class',
+                        fieldLabel: _('seofilter_field_class_more'),
                         name: 'class',
                         id: config.id + '-class',
                         anchor: '99%',
+                        allowBlank:false,
                     }, {
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_field_key'),
                         name: 'key',
                         id: config.id + '-key',
                         anchor: '99%',
-                    },{
-                        xtype: 'xcheckbox',
-                        boxLabel: _('seofilter_field_translit'),
-                        name: 'translit',
-                        id: config.id + '-translit',
-                        anchor: '99%',
+                        allowBlank:false,
                     }
                 ]
             },{
@@ -217,27 +278,125 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                         name: 'alias',
                         id: config.id + '-alias',
                         anchor: '99%',
-                    },  {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_field_urltpl'),
-                        name: 'urltpl',
-                        id: config.id + '-urltpl',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'numberfield',
-                        fieldLabel: _('seofilter_field_priority'),
-                        name: 'priority',
-                        id: config.id + '-priority',
-                        anchor: '99%',
-                    }, {
+                    },{
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_field_hideparam'),
+                        name: 'hideparam',
+                        id: config.id + '-hideparam',
+                    },{
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_field_valuefirst'),
+                        name: 'valuefirst',
+                        id: config.id + '-valuefirst',
+                    },{
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_field_exact'),
+                        name: 'exact',
+                        id: config.id + '-exact',
+                        // }, {
+                        //     xtype: 'numberfield',
+                        //     fieldLabel: _('seofilter_field_priority'),
+                        //     name: 'priority',
+                        //     id: config.id + '-priority',
+                        //     anchor: '99%',
+                    },{
                         xtype: 'xcheckbox',
                         boxLabel: _('seofilter_field_active'),
                         name: 'active',
                         id: config.id + '-active',
+                        checked: true,
                     }
                 ]
             }]
+        },{
+            xtype: 'radiogroup'
+            ,fieldLabel: _('seofilter_field_method')
+            ,hideLabel: false
+            ,columns: 3
+            ,allowBlank: false
+           ,name: 'priority'
+            ,items: [{
+                boxLabel: _('seofilter_field_dont')
+                ,hideLabel: true
+                ,name: 'priority'
+                ,inputValue: 0
+            },{
+                boxLabel: _('seofilter_field_translit')
+                ,hideLabel: true
+                ,name: 'priority'
+                ,inputValue: 1
+            },{
+                boxLabel: _('seofilter_field_translate')
+                ,hideLabel: true
+                ,name: 'priority'
+                ,inputValue: 2
+            }]
+        },{
+            xtype: 'xcheckbox',
+            boxLabel: _('seofilter_field_xpdo'),
+            name: 'xpdo',
+            id: config.id + '-xpdo',
+            listeners: {
+                check: SeoFilter.utils.handleChecked,
+                afterrender: SeoFilter.utils.handleChecked
+            }
+        },{
+            layout:'column',
+            border: false,
+            anchor: '97%',
+            items: [{
+                columnWidth: .5
+                ,layout: 'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_package'),
+                    name: 'xpdo_package',
+                    id: config.id + '-xpdo_package',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_class'),
+                    name: 'xpdo_class',
+                    id: config.id + '-xpdo_class',
+                    anchor: '99%',
+                }]
+            },{
+                columnWidth: .5
+                ,layout: 'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_id'),
+                    name: 'xpdo_id',
+                    id: config.id + '-xpdo_id',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_name'),
+                    name: 'xpdo_name',
+                    id: config.id + '-xpdo_name',
+                    anchor: '99%',
+                }]
+            },{
+                columnWidth: 1
+                ,layout:'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_field_xpdo_where'),
+                    name: 'xpdo_where',
+                    id: config.id + '-xpdo_where',
+                    anchor: '99%',
+                    style:'margin-bottom:15px;'
+                }
+                ]
+            }]
         }];
+
     },
 
     loadDropZones: function () {

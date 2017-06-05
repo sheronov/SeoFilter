@@ -80,10 +80,7 @@ Ext.extend(SeoFilter.window.CreateMultiField, MODx.Window, {
                     }]
                 }]
             }, {
-                // Таб №2 - Пользователи
                 title: _('seofilter_seo')
-                // Здесь должен быть xtype с таблицей подписчиков, пока комментируем
-                //,xtype: 'sendex-grid-newsletter-subscribers'
                 , xtype: 'displayfield'
                 , html: _('seofilter_seo_after_save')
             }]
@@ -115,7 +112,8 @@ SeoFilter.window.UpdateMultiField = function (config) {
             }, scope: this
         }]
     });
-    SeoFilter.window.UpdateMultiField.superclass.constructor.call(this, config);
+
+    SeoFilter.window.UpdateMultiField.superclass.constructor.call(this, config)
 };
 Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
 
@@ -187,13 +185,16 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
                         }]
                     }]
                 }, {
-                // Таб №2 - Пользователи
                 title: _('seofilter_seo')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
                 ,border:false
                 ,style: 'margin-top:-10px;padding-bottom:5px;'
                 ,items: [{
+                        xtype: 'hidden',
+                        name: 'seo_id',
+                        id: config.id + '-seo_id',
+                    },{
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_seometa_title'),
                         name: 'title',
@@ -230,15 +231,26 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
                         id: config.id + '-text',
                         anchor: '99%',
                     }, {
-                        xtype: 'textarea',
+                        //xtype: 'textarea',
+                        heght:300,
+                        cls: 'modx-richtext',
                         fieldLabel: _('seofilter_seometa_content'),
-                        name: 'content',
-                        id: config.id + '-content',
-                        listeners: {
-                            render: function () {
-                                if(MODx.loadRTE) MODx.loadRTE(config.id + '-content');
-                            }
-                        },
+                        name: 'contenttext',
+                        id: config.id + '-contenttext',
+                        xtype: 'htmleditor',
+                        enableFont:false,
+                        enableColors: false,
+                         enableFontSize : false,
+                        // listeners: {
+                        //     render: function () {
+                        //         console.log(MODx);
+                        //         if(MODx.loadRTE) {
+                        //             window.setTimeout(function() {
+                        //                 MODx.loadRTE(config.id + '-content'); // id поля
+                        //             }, 300);
+                        //         }
+                        //     },
+                        // },
                         anchor: '99%',
                     }
                 ]

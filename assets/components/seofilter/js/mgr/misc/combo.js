@@ -71,6 +71,47 @@ SeoFilter.combo.Resource = function (config) {
 Ext.extend(SeoFilter.combo.Resource, MODx.combo.ComboBox);
 Ext.reg('seofilter-combo-resource', SeoFilter.combo.Resource);
 
+var classes = [
+    ['msProductData', _('seofilter_msProductData')],
+    ['modResource', _('seofilter_modResource')],
+    ['msVendor', _('seofilter_msVendor')],
+    ['msProductOption', _('seofilter_msProductOption')],
+];
+SeoFilter.combo.Class = function (config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'class',
+        hiddenName: 'class',
+        displayField: 'class',
+        valueField: 'cls',
+        editable: true,
+        store: new Ext.data.SimpleStore({
+            id:0,
+            fields:
+                [
+                    'cls',   //числовое значение - номер элемента
+                    'class' //текст
+                ],
+            data:classes
+        }),
+       // fields: ['id', 'pagetitle'],
+        pageSize: 20,
+        emptyText: _('seofilter_combo_select'),
+        hideMode: 'offsets',
+        mode: 'local',
+        forceSelection: false,
+
+        // url: SeoFilter.config.connector_url,
+        // baseParams: {
+        //     action: 'mgr/system/getlist',
+        //     combo: true
+        // }
+    });
+    SeoFilter.combo.Class.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.combo.Class, MODx.combo.ComboBox);
+Ext.reg('seofilter-combo-class', SeoFilter.combo.Class);
+
 
 SeoFilter.combo.Field = function (config) {
     config = config || {};

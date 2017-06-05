@@ -19,8 +19,17 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
         if (!$this->checkPermissions()) {
             return $this->modx->lexicon('access_denied');
         }
-
-        return true;
+        if($this->getProperty('priority') == 1) {
+            $this->object->set('translit',1);
+            $this->object->set('translate',0);
+        } elseif($this->getProperty('priority') == 2) {
+            $this->object->set('translate',1);
+            $this->object->set('translit',0);
+        } else {
+            $this->object->set('translit',0);
+            $this->object->set('translate',0);
+        }
+        return parent::beforeSave();
     }
 
 

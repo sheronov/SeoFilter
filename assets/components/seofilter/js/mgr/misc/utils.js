@@ -103,3 +103,29 @@ SeoFilter.utils.renderActions = function (value, props, row) {
         res.join('')
     );
 };
+
+SeoFilter.utils.handleChecked = function (checkbox) {
+    var workCount = checkbox.workCount;
+    if (!!!workCount) {
+        workCount = 1;
+    }
+    var hideLabel = checkbox.hideLabel;
+    if (!!!hideLabel) {
+        hideLabel = false;
+    }
+
+    var checked = checkbox.getValue();
+    var nextField = checkbox.nextSibling();
+
+    for (var i = 0; i < workCount; i++) {
+        if (checked) {
+            nextField.show().enable();
+        }
+        else {
+            nextField.hide().disable();
+        }
+        nextField.hideLabel = hideLabel;
+        nextField = nextField.nextSibling();
+    }
+    return true;
+};
