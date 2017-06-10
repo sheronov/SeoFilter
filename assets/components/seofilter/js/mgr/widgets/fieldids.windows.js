@@ -44,24 +44,39 @@ Ext.extend(SeoFilter.window.CreateFieldIds, MODx.Window, {
             boxLabel: _('seofilter_fieldids_where'),
             name: 'where',
             id: config.id + '-where',
+            listeners: {
+                check: SeoFilter.utils.handleChecked,
+                afterrender: SeoFilter.utils.handleChecked
+            }
         },{
-            xtype: 'textfield',
-            fieldLabel: _('seofilter_fieldids_compare'),
-            name: 'compare',
-            id: config.id + '-compare',
+            layout:'column',
+            border: false,
             anchor: '99%',
-        }, {
-            xtype: 'textfield',
-            fieldLabel: _('seofilter_fieldids_value'),
-            name: 'value',
-            id: config.id + '-value',
-            anchor: '99%',
-        }, {
-            xtype: 'textfield',
-            fieldLabel: _('seofilter_fieldids_condition'),
-            name: 'condition',
-            id: config.id + '-condition',
-            anchor: '99%',
+            items: [{
+                columnWidth: 1
+                ,layout: 'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_fieldids_compare'),
+                    name: 'compare',
+                    id: config.id + '-compare',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_fieldids_value'),
+                    name: 'value',
+                    id: config.id + '-value',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_fieldids_condition'),
+                    name: 'condition',
+                    id: config.id + '-condition',
+                    anchor: '99%',
+                }]
+            }]
         }];
     },
 
@@ -80,7 +95,7 @@ SeoFilter.window.UpdateFieldIds = function (config) {
     Ext.applyIf(config, {
         title: _('seofilter_fieldids_update'),
         width: 450,
-        autoHeight: false,
+        autoHeight: true,
         url: SeoFilter.config.connector_url,
         action: 'mgr/multifield/fieldids/update',
         fields: this.getFields(config),
@@ -122,24 +137,39 @@ Ext.extend(SeoFilter.window.UpdateFieldIds, MODx.Window, {
             boxLabel: _('seofilter_fieldids_where'),
             name: 'where',
             id: config.id + '-where',
+            listeners: {
+                check: SeoFilter.utils.handleChecked,
+                afterrender: SeoFilter.utils.handleChecked
+            }
         },{
-            xtype: 'textfield',
-            fieldLabel: _('seofilter_fieldids_compare'),
-            name: 'compare',
-            id: config.id + '-compare',
+            layout:'column',
+            border: false,
             anchor: '99%',
-        }, {
-            xtype: 'textfield',
-            fieldLabel: _('seofilter_fieldids_value'),
-            name: 'value',
-            id: config.id + '-value',
-            anchor: '99%',
-        }, {
-            xtype: 'textfield',
-            fieldLabel: _('seofilter_fieldids_condition'),
-            name: 'condition',
-            id: config.id + '-condition',
-            anchor: '99%',
+            items: [{
+                columnWidth: 1
+                ,layout: 'form'
+                ,defaults: { msgTarget: 'under' }
+                ,border:false
+                ,items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_fieldids_compare'),
+                    name: 'compare',
+                    id: config.id + '-compare',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_fieldids_value'),
+                    name: 'value',
+                    id: config.id + '-value',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_fieldids_condition'),
+                    name: 'condition',
+                    id: config.id + '-condition',
+                    anchor: '99%',
+                }]
+            }]
         }];
 
     },

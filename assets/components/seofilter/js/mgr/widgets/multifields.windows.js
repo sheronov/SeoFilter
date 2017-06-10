@@ -27,7 +27,6 @@ Ext.extend(SeoFilter.window.CreateMultiField, MODx.Window, {
             ,deferredRender: false
             ,border: true
             ,items: [{
-                // Таб №1 - Информация
                 title: _('seofilter_multifield')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
@@ -41,9 +40,15 @@ Ext.extend(SeoFilter.window.CreateMultiField, MODx.Window, {
                     anchor: '99%',
                     allowBlank: false,
                 },{
+                    title: _('seofilter_fieldids')
+                    , xtype: 'displayfield'
+                    , html: _('seofilter_fieldids_after_save')
+                }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_multifield_url_more'),
                     name: 'url',
+                    readOnly: true,
+                    style: 'background:#f9f9f9;color:#aaa;',
                     id: config.id + '-url',
                     anchor: '99%',
                 }, {
@@ -123,7 +128,6 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
             ,deferredRender: false
             ,border: false
             ,items: [{
-                // Таб №1 - Информация
                 title: _('seofilter_multifield')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
@@ -148,6 +152,8 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_multifield_url_more'),
                         name: 'url',
+                        readOnly: true,
+                        style: 'background:#f9f9f9;color:#aaa;',
                         id: config.id + '-url',
                         anchor: '99%',
                     }, {
@@ -191,68 +197,68 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
                 ,border:false
                 ,style: 'margin-top:-10px;padding-bottom:5px;'
                 ,items: [{
-                        xtype: 'hidden',
-                        name: 'seo_id',
-                        id: config.id + '-seo_id',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_seometa_title'),
-                        name: 'title',
-                        id: config.id + '-title',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_seometa_h1'),
-                        name: 'h1',
-                        id: config.id + '-h1',
-                        anchor: '99%',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_seometa_h2'),
-                        name: 'h2',
-                        id: config.id + '-h2',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textarea',
-                        fieldLabel: _('seofilter_seometa_description'),
-                        name: 'description',
-                        id: config.id + '-description',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textarea',
-                        fieldLabel: _('seofilter_seometa_introtext'),
-                        name: 'introtext',
-                        id: config.id + '-introtext',
-                        anchor: '99%',
-                    },{
-                        xtype: 'textarea',
-                        fieldLabel: _('seofilter_seometa_text'),
-                        name: 'text',
-                        id: config.id + '-text',
-                        anchor: '99%',
-                    }, {
-                        //xtype: 'textarea',
-                        heght:300,
-                        cls: 'modx-richtext',
-                        fieldLabel: _('seofilter_seometa_content'),
-                        name: 'contenttext',
-                        id: config.id + '-contenttext',
-                        xtype: 'htmleditor',
-                        enableFont:false,
-                        enableColors: false,
-                         enableFontSize : false,
-                        // listeners: {
-                        //     render: function () {
-                        //         console.log(MODx);
-                        //         if(MODx.loadRTE) {
-                        //             window.setTimeout(function() {
-                        //                 MODx.loadRTE(config.id + '-content'); // id поля
-                        //             }, 300);
-                        //         }
-                        //     },
-                        // },
-                        anchor: '99%',
-                    }
+                    xtype: 'hidden',
+                    name: 'seo_id',
+                    id: config.id + '-seo_id',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_title'),
+                    name: 'title',
+                    id: config.id + '-title',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_h1'),
+                    name: 'h1',
+                    id: config.id + '-h1',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_h2'),
+                    name: 'h2',
+                    id: config.id + '-h2',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_description'),
+                    name: 'description',
+                    id: config.id + '-description',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_introtext'),
+                    name: 'introtext',
+                    id: config.id + '-introtext',
+                    anchor: '99%',
+                },{
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_text'),
+                    name: 'text',
+                    id: config.id + '-text',
+                    anchor: '99%',
+                }, {
+                    //xtype: 'textarea',
+                    heght:300,
+                    cls: 'modx-richtext',
+                    fieldLabel: _('seofilter_seometa_content'),
+                    name: 'contenttext',
+                    id: config.id + '-contenttext',
+                    xtype: 'htmleditor',
+                    enableFont:false,
+                    enableColors: false,
+                    enableFontSize : false,
+                    // listeners: {
+                    //     render: function () {
+                    //         console.log(MODx);
+                    //         if(MODx.loadRTE) {
+                    //             window.setTimeout(function() {
+                    //                 MODx.loadRTE(config.id + '-content'); // id поля
+                    //             }, 300);
+                    //         }
+                    //     },
+                    // },
+                    anchor: '99%',
+                }
                 ]
             }]
         };

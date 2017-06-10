@@ -1,28 +1,40 @@
 jQuery(document).ready(function ($) {
     var seoFilter = {
         config : seoFilterConfig || {},
-        array_diff : function(array) {
-            var arr_dif = [], i = 1, argc = arguments.length, argv = arguments, key, key_c, found=false;
-            for ( key in array ){
-                // loop over other arrays
-                for (i = 1; i< argc; i++){
-                    // find in the compare array
-                    found = false;
-                    for (key_c in argv[i]) {
-                        if (argv[i][key_c] == array[key]) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(!found){
-                        arr_dif[key] = array[key];
-                    }
-                }
-            }
-            return arr_dif;
-        }
+        ajax_post: function (array,hash,browser) {
+            $.ajax({
+                type: 'POST',
+                url: this.config.actionUrl,
+                dataType: 'json',
+                data: {
+                    sf_action: 'getmeta',
+                    data: array,
+                    pageId: this.config.page
+                },
+                success: function(response) {
+                    var url = hash;
+                    var origin = seoFilter.config.url || document.location.pathname;
+                    if(response.data.title) {$('title').text(response.data.title);}
+                    if(response.data.description) {$('meta[name="description"]').attr("content", response.data.description);}
+                    if(response.data.h1) {$('#sf_h1').text(response.data.h1);}
+                    if(response.data.url) {url = response.data.url;}
 
-    }
+                    if(browser) {
+                        window.history.pushState({mSearch2: origin + url}, '', origin + url);
+                    }
+                    else {
+                        window.location.hash = url.substr(1);
+                    }
+
+                    console.log(url);
+                    console.log(response);
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+    };
 
 
 
@@ -162,6 +174,7 @@ jQuery(document).ready(function ($) {
                 var hash = '';
                 var aliases = seoFilter.config.aliases;
                 var count = 0;
+                var browser = 0;
                 var origin = seoFilter.config.url || document.location.pathname;
                 console.log(origin);
 
@@ -192,11 +205,13 @@ jQuery(document).ready(function ($) {
                     console.log(document.location.href);
                     console.log(document.location.origin);
                     //window.history.pushState({mSearch2: document.location.pathname + hash}, '', document.location.pathname + hash);
-                    window.history.pushState({mSearch2: origin + hash}, '', origin + hash);
+                    //window.history.pushState({mSearch2: origin + hash}, '', origin + hash); //перемещено в ajax_post
+                    browser = 1;
                 }
                 else {
-                    window.location.hash = hash.substr(1);
+                    //window.location.hash = hash.substr(1);
                 }
+                seoFilter.ajax_post(vars, hash, browser);
             },
             set2: function (vars) {
                 var hash = '';

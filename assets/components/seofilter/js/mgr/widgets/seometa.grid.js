@@ -183,7 +183,7 @@ Ext.extend(SeoFilter.grid.SeoMeta, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'title', 'h1', 'active', 'h2','rank', 'field_id', 'actions','multi_id'];
+        return ['id', 'name', 'title', 'h1', 'active', 'h2','rank', 'field_id', 'actions','multi_id','seofield'];
     },
 
     getColumns: function () {
@@ -194,7 +194,7 @@ Ext.extend(SeoFilter.grid.SeoMeta, MODx.grid.Grid, {
             width: 70
         }, {
             header: _('seofilter_seometa_name'),
-            dataIndex: 'name',
+            dataIndex: 'seofield',
             sortable: true,
             width: 150,
         }, {
@@ -229,11 +229,13 @@ Ext.extend(SeoFilter.grid.SeoMeta, MODx.grid.Grid, {
     },
 
     getTopBar: function () {
-        return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_seometa_create'),
-            handler: this.createField,
-            scope: this
-        }, '->', {
+        return [
+            // {
+            // text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_seometa_create'),
+            // handler: this.createField,
+            // scope: this
+            // },
+            '->', {
             xtype: 'seofilter-field-search',
             width: 250,
             listeners: {

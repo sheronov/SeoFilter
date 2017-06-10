@@ -14,7 +14,7 @@ $_lang['seofilter_multifields'] = 'Пересечение полей';
 $_lang['seofilter_multifields_intro'] = 'Здесь вы можете настроить правила для формирования адресов для двух и более полей. Можно задавать конкретные значения для двух полей одного ключа, чтобы получить одну страницу.';
 
 $_lang['seofilter_seometa'] = 'SEO';
-$_lang['seofilter_seometas'] = 'SEO';
+$_lang['seofilter_seometas'] = 'SEO шаблоны';
 $_lang['seofilter_seometas_intro'] = 'Для большего удобства в управлении все прописанные SEO и Meta поля собраны в одну таблицу';
 
 $_lang['seofilter_dictionary'] = 'Словарь';
@@ -76,7 +76,7 @@ $_lang['seofilter_multifield_active'] = 'Активно';
 $_lang['seofilter_multifield_page'] = 'Страница';
 $_lang['seofilter_multifield_name'] = 'Название';
 $_lang['seofilter_multifield_url'] = 'URL адрес';
-$_lang['seofilter_multifield_url_more'] = 'URL адрес (если нужен конкретный URL и прописаны условия)';
+$_lang['seofilter_multifield_url_more'] = 'Маска URL адреса (можно изменять во вкладке Таблица URL)';
 $_lang['seofilter_multifield_count'] = 'Кол-во';
 $_lang['seofilter_multifield_fields'] = 'Поля';
 $_lang['seofilter_multifield_tablefields'] = 'Выберите поля';
@@ -118,6 +118,13 @@ $_lang['seofilter_seometa_content'] = 'Контент';
 $_lang['seofilter_seometa_create'] = 'Добавить значения';
 
 
+$_lang['seofilter_seometa_update'] = 'Изменить SEO поля';
+$_lang['seofilter_seometa_enable'] = 'Включить SEO';
+$_lang['seofilter_seometa_disable'] = 'Отключить SEO';
+$_lang['seofilter_seometa_remove'] = 'Удалить SEO поля';
+$_lang['seofilter_seometa_remove_confirm'] = 'Вы уверены? Это очистит SEO значения в Поле или в Пересечении полей.';
+
+
 $_lang['seofilter_dictionary_create'] = 'Добавить запись';
 $_lang['seofilter_dictionary_id'] = 'Id';
 $_lang['seofilter_dictionary_field_id'] = 'Поле';
@@ -152,10 +159,11 @@ $_lang['seofilter_dictionary_value_from'] = 'Откуда';
 $_lang['seofilter_disctionary_decline'] = 'Склонения по падежам';
 $_lang['seofilter_disctionary_decline_desc'] = 'Склонения по падежам только для русского языка';
 
+$_lang['seofilter_fieldids'] = 'Поля';
 $_lang['seofilter_fieldids_id'] = 'Id';
 $_lang['seofilter_fieldids_field_id'] = 'Поле';
 $_lang['seofilter_fieldids_multi_id'] = 'Пересечение';
-$_lang['seofilter_fieldids_priority'] = 'Порядок';
+$_lang['seofilter_fieldids_priority'] = 'Порядок (можно изменять в таблицы перетаскиванием полей)';
 $_lang['seofilter_fieldids_where'] = 'Условие (для создания конкретных страниц)';
 $_lang['seofilter_fieldids_compare'] = 'Сравнение';
 $_lang['seofilter_fieldids_value'] = 'Значение';
@@ -171,10 +179,13 @@ $_lang['seofilter_url_old_url'] = 'Базовый Url';
 $_lang['seofilter_url_new_url'] = 'Исправленный Url';
 $_lang['seofilter_url_editedon'] = 'Отредактировано';
 $_lang['seofilter_url_createdon'] = 'Создано';
-$_lang['seofilter_url_count'] = 'Переходов';
+$_lang['seofilter_url_count'] = 'Количество переходов на страницу';
+$_lang['seofilter_url_ajax'] = 'Из них переходов через фильтр';
 $_lang['seofilter_url_active'] = 'Активно';
+$_lang['seofilter_url_active_more'] = 'Активно (если нет, то будет отдавать 404)';
 
 $_lang['seofilter_url_create'] = 'Добавить URL';
+$_lang['seofilter_url_update'] = 'Изменить URL';
 
 $_lang['seofilter_field_xpdo'] = 'Значение в другой таблице';
 $_lang['seofilter_field_xpdo_package'] = 'Компонента, например customExtra';
@@ -182,3 +193,7 @@ $_lang['seofilter_field_xpdo_class'] = 'Класс, например customExtra
 $_lang['seofilter_field_xpdo_id'] = 'Поле для сопоставления (id)';
 $_lang['seofilter_field_xpdo_name'] = 'Поле, где хранится значение (name)';
 $_lang['seofilter_field_xpdo_where'] = 'Дополнительное условие (where)';
+
+$_lang['sf_err_ajax_nf'] = 'Ошибка. Не найден action.';
+
+$_lang['seofilter_fieldids_after_save'] = 'После сохранения можно будет выбрать поля, задать условия и изменять приоритет удерживая поле мышью';

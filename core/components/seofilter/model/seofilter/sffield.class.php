@@ -1,7 +1,6 @@
 <?php
 class sfField extends xPDOSimpleObject {
 
-
     /**
      * Returns translated word
      *
@@ -74,6 +73,21 @@ class sfField extends xPDOSimpleObject {
         $translit = $to_eng == 1 ? $translit : array_flip($translit);
 
         return mb_strtolower(strtr($word, $translit));
+    }
+
+    public function makeUrl($value = '') {
+        $separator = $this->xpdo->getOption('seofilter_separator', null, '-', true);
+        if(!$alias = $this->get('alias')) {
+            $alias = $this->get('key');
+        }
+        if($this->get('hideparam')) {
+            $url = $value;
+        } else if ($this->get('valuefirst')) {
+            $url = $value.$separator.$alias;
+        } else {
+            $url = $alias.$separator.$value;
+        }
+        return $url;
     }
 
 }

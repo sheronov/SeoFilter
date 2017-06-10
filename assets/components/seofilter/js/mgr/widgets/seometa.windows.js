@@ -25,13 +25,13 @@ Ext.extend(SeoFilter.window.CreateSeoMeta, MODx.Window, {
 
     getFields: function (config) {
         return [{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_seometa_name'),
-                    name: 'name',
-                    id: config.id + '-name',
-                    anchor: '99%',
-                    allowBlank: false,
-                }, {
+                //     xtype: 'textfield',
+                //     fieldLabel: _('seofilter_seometa_name'),
+                //     name: 'name',
+                //     id: config.id + '-name',
+                //     anchor: '99%',
+                //     allowBlank: false,
+                // }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_title'),
                     name: 'title',
@@ -128,13 +128,13 @@ Ext.extend(SeoFilter.window.UpdateSeoMeta, MODx.Window, {
                 name: 'id',
                 id: config.id + '-id',
             },{
-                xtype: 'textfield',
-                fieldLabel: _('seofilter_seometa_name'),
-                name: 'name',
-                id: config.id + '-name',
-                anchor: '99%',
-                allowBlank: false,
-            }, {
+            //     xtype: 'textfield',
+            //     fieldLabel: _('seofilter_seometa_name'),
+            //     name: 'name',
+            //     id: config.id + '-name',
+            //     anchor: '99%',
+            //     allowBlank: false,
+            // }, {
                 xtype: 'textfield',
                 fieldLabel: _('seofilter_seometa_title'),
                 name: 'title',

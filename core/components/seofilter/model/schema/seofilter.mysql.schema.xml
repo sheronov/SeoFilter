@@ -11,7 +11,7 @@
 
         <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
 
-        <field key="method" dbtype="tinyint" precision="1" phptype="integer" null="true" default="0"/>
+        <field key="way" dbtype="tinyint" precision="2" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="translit" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
         <field key="translate" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
         <field key="hideparam" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
@@ -149,6 +149,7 @@
         <field key="createdon" dbtype="integer" precision="20" attributes="unsigned" phptype="integer" null="false" default="0" />
 
         <field key="count" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="ajax" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 

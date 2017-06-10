@@ -20,7 +20,7 @@ class sfMultiFieldGetProcessor extends modObjectGetProcessor
             return $this->failure($this->modx->lexicon('access_denied'));
         }
 
-        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
+       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
         if($seo = $this->modx->getObject('sfSeoMeta',array('multi_id'=>$this->object->get('id')))) {
             $seo_array = $seo->toArray();
             $seo_array['seo_id'] = $seo_array['id'];

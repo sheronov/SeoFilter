@@ -12,6 +12,7 @@ $xpdo_meta_map['sfUrls']= array (
     'editedon' => 0,
     'createdon' => 0,
     'count' => 0,
+    'ajax' => 0,
     'rank' => 0,
     'active' => 1,
   ),
@@ -61,6 +62,15 @@ $xpdo_meta_map['sfUrls']= array (
       'default' => 0,
     ),
     'count' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'attributes' => 'unsigned',
+      'null' => true,
+      'default' => 0,
+    ),
+    'ajax' => 
     array (
       'dbtype' => 'integer',
       'precision' => '10',

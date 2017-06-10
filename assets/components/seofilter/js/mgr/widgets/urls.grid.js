@@ -239,11 +239,13 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     },
 
     getTopBar: function () {
-        return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_url_create'),
-            handler: this.createField,
-            scope: this
-        }, '->', {
+        return [
+        //     {
+        //     text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_url_create'),
+        //     handler: this.createField,
+        //     scope: this
+        // },
+            '->', {
             xtype: 'seofilter-field-search',
             width: 250,
             listeners: {

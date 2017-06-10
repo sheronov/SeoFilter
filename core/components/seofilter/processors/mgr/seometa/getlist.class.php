@@ -53,6 +53,14 @@ class sfSeoMetaGetListProcessor extends modObjectGetListProcessor
 
         $array = $object->toArray();
 
+        $array['seofield'] = $array['name'];
+        if($array['field_id']) {
+            $array['seofield'] = '<b>'.$this->modx->lexicon('seofilter_field').'</b>: '.$array['seofield'];
+        }
+        if($array['multi_id']) {
+            $array['seofield'] = '<b>'.$this->modx->lexicon('seofilter_multifield').'</b>: '.$array['seofield'];
+        }
+
 //        $array['pagetitle'] = '';
 //        if ($page = $array['page']) {
 //            $q = $this->modx->newQuery('modResource', array('id' => $page));
@@ -76,27 +84,27 @@ class sfSeoMetaGetListProcessor extends modObjectGetListProcessor
             'menu' => true,
         );
 
-        if (!$array['active']) {
-            $array['actions'][] = array(
-                'cls' => '',
-                'icon' => 'icon icon-power-off action-green',
-                'title' => $this->modx->lexicon('seofilter_seometa_enable'),
-                'multiple' => $this->modx->lexicon('seofilter_seometa_enable'),
-                'action' => 'enableField',
-                'button' => true,
-                'menu' => true,
-            );
-        } else {
-            $array['actions'][] = array(
-                'cls' => '',
-                'icon' => 'icon icon-power-off action-gray',
-                'title' => $this->modx->lexicon('seofilter_seometa_disable'),
-                'multiple' => $this->modx->lexicon('seofilter_seometa_disable'),
-                'action' => 'disableField',
-                'button' => true,
-                'menu' => true,
-            );
-        }
+//        if (!$array['active']) {
+//            $array['actions'][] = array(
+//                'cls' => '',
+//                'icon' => 'icon icon-power-off action-green',
+//                'title' => $this->modx->lexicon('seofilter_seometa_enable'),
+//                'multiple' => $this->modx->lexicon('seofilter_seometa_enable'),
+//                'action' => 'enableField',
+//                'button' => true,
+//                'menu' => true,
+//            );
+//        } else {
+//            $array['actions'][] = array(
+//                'cls' => '',
+//                'icon' => 'icon icon-power-off action-gray',
+//                'title' => $this->modx->lexicon('seofilter_seometa_disable'),
+//                'multiple' => $this->modx->lexicon('seofilter_seometa_disable'),
+//                'action' => 'disableField',
+//                'button' => true,
+//                'menu' => true,
+//            );
+//        }
 
         // Remove
         $array['actions'][] = array(

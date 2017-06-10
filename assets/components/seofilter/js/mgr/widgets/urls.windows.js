@@ -34,22 +34,28 @@ Ext.extend(SeoFilter.window.CreateUrls, MODx.Window, {
                 , items: [
                     {
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_input'),
-                        name: 'input',
-                        id: config.id + '-input',
+                        fieldLabel: _('seofilter_url_multi_id'),
+                        name: 'multi_id',
+                        id: config.id + '-multi_id',
                         anchor: '99%',
                         allowBlank: false,
                     },{
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_value'),
-                        name: 'value',
-                        id: config.id + '-value',
+                        fieldLabel: _('seofilter_url_old_url'),
+                        name: 'old_url',
+                        id: config.id + '-old_url',
                         anchor: '99%',
                     }, {
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_alias'),
-                        name: 'alias',
-                        id: config.id + '-alias',
+                        fieldLabel: _('seofilter_url_new_url'),
+                        name: 'new_url',
+                        id: config.id + '-new_url',
+                        anchor: '99%',
+                    }, {
+                        xtype: 'numberfield',
+                        fieldLabel: _('seofilter_url_count'),
+                        name: 'count',
+                        id: config.id + '-count',
                         anchor: '99%',
                     }
                 ]
@@ -58,26 +64,31 @@ Ext.extend(SeoFilter.window.CreateUrls, MODx.Window, {
                 , layout: 'form'
                 , defaults: {msgTarget: 'under'}
                 , border: false
-                , items: [
-                    {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_field_id'),
-                        name: 'field_id',
-                        id: config.id + '-field_id',
-                        anchor: '99%',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_class'),
-                        name: 'class',
-                        id: config.id + '-class',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_key'),
-                        name: 'key',
-                        id: config.id + '-key',
-                        anchor: '99%',
-                    }
+                , items: [{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_url_active'),
+                    name: 'active',
+                    style: 'padding-top:20px;',
+                    id: config.id + '-active',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_createdon'),
+                    name: 'createdon',
+                    id: config.id + '-createdon',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_editedon'),
+                    name: 'editedon',
+                    id: config.id + '-editedon',
+                    anchor: '99%',
+                }, {
+                    xtype: 'numberfield',
+                    fieldLabel: _('seofilter_url_ajax'),
+                    name: 'ajax',
+                    id: config.id + '-ajax',
+                    anchor: '99%',
+                }
                 ]
             }]
         }];
@@ -117,6 +128,13 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
             name: 'id',
             id: config.id + '-id',
         },{
+            xtype: 'textfield',
+            fieldLabel: _('seofilter_url_multi_id'),
+            name: 'multi_id',
+            id: config.id + '-multi_id',
+            anchor: '99%',
+            allowBlank: false,
+        }, {
             layout: 'column',
             border: false,
             anchor: '100%',
@@ -125,25 +143,25 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 , layout: 'form'
                 , defaults: {msgTarget: 'under'}
                 , border: false
-                , items: [
-                    {
+                , items: [{
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_input'),
-                        name: 'input',
-                        id: config.id + '-input',
-                        anchor: '99%',
-                        allowBlank: false,
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_value'),
-                        name: 'value',
-                        id: config.id + '-value',
+                        fieldLabel: _('seofilter_url_old_url'),
+                        name: 'old_url',
+                        id: config.id + '-old_url',
+                        readOnly: true,
+                        style: 'background:#f9f9f9;color:#aaa;',
                         anchor: '99%',
                     }, {
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_alias'),
-                        name: 'alias',
-                        id: config.id + '-alias',
+                        fieldLabel: _('seofilter_url_new_url'),
+                        name: 'new_url',
+                        id: config.id + '-new_url',
+                        anchor: '99%',
+                    }, {
+                        xtype: 'numberfield',
+                        fieldLabel: _('seofilter_url_count'),
+                        name: 'count',
+                        id: config.id + '-count',
                         anchor: '99%',
                     }
                 ]
@@ -152,28 +170,33 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 , layout: 'form'
                 , defaults: {msgTarget: 'under'}
                 , border: false
-                , items: [
-                    {
+                , items: [{
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_field_id'),
-                        name: 'field_id',
-                        id: config.id + '-field_id',
-                        anchor: '99%',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_class'),
-                        name: 'class',
-                        id: config.id + '-class',
+                        fieldLabel: _('seofilter_url_createdon'),
+                        name: 'createdon',
+                        id: config.id + '-createdon',
                         anchor: '99%',
                     }, {
                         xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_key'),
-                        name: 'key',
-                        id: config.id + '-key',
+                        fieldLabel: _('seofilter_url_editedon'),
+                        name: 'editedon',
+                        id: config.id + '-editedon',
                         anchor: '99%',
+                }, {
+                    xtype: 'numberfield',
+                    fieldLabel: _('seofilter_url_ajax'),
+                    name: 'ajax',
+                    id: config.id + '-ajax',
+                    anchor: '99%',
                     }
                 ]
             }]
+        },{
+            xtype: 'xcheckbox',
+            boxLabel: _('seofilter_url_active_more'),
+            name: 'active',
+            style: 'padding-top:20px;position:relative;',
+            id: config.id + '-active',
         }];
     },
 
