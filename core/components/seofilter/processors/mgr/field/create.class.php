@@ -26,11 +26,6 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
     public function beforeSave()
     {
         //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
-        if($this->getProperty('priority') == 1) {
-            $this->object->set('translit',1);
-        } elseif($this->getProperty('priority') == 2) {
-            $this->object->set('translate',1);
-        }
         return parent::beforeSave();
     }
 
@@ -58,7 +53,6 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         'input' => $input,
                         'value' => $value,
                         'translit' => $field->get('translit'),
-                        'translate' => $field->get('translate'),
                         'xpdo' => $field->get('xpdo'),
                         'class' => $class,
                         'key' => $key,

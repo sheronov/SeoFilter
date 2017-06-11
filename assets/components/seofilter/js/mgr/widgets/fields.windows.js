@@ -69,6 +69,12 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                                 id: config.id + '-key',
                                 anchor: '99%',
                                 allowBlank:false,
+                            },{
+                                xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_field_active'),
+                                name: 'active',
+                                id: config.id + '-active',
+                                checked: true,
                             }
                         ]
                     },{
@@ -98,42 +104,18 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                                 boxLabel: _('seofilter_field_exact'),
                                 name: 'exact',
                                 id: config.id + '-exact',
-                                // }, {
-                                //     xtype: 'numberfield',
-                                //     fieldLabel: _('seofilter_field_priority'),
-                                //     name: 'priority',
-                                //     id: config.id + '-priority',
-                                //     anchor: '99%',
                             },{
                                 xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_active'),
-                                name: 'active',
-                                id: config.id + '-active',
-                                checked: true,
+                                boxLabel: _('seofilter_field_translit'),
+                                name: 'translit',
+                                id: config.id + '-translit',
+                            },{
+                                xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_field_baseparam'),
+                                name: 'baseparam',
+                                id: config.id + '-baseparam',
                             }
                         ]
-                    }]
-                },{
-                    xtype: 'radiogroup'
-                    ,fieldLabel: _('seofilter_field_method')
-                    ,hideLabel: false
-                    ,columns: 3
-                    ,allowBlank: false
-                    ,items: [{
-                        boxLabel: _('seofilter_field_dont')
-                        ,hideLabel: true
-                        ,name: 'way'
-                        ,inputValue: 0
-                    },{
-                        boxLabel: _('seofilter_field_translit')
-                        ,hideLabel: true
-                        ,name: 'way'
-                        ,inputValue: 1
-                    },{
-                        boxLabel: _('seofilter_field_translate')
-                        ,hideLabel: true
-                        ,name: 'way'
-                        ,inputValue: 2
                     }]
                 },{
                     xtype: 'xcheckbox',
@@ -289,6 +271,12 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                                 id: config.id + '-key',
                                 anchor: '99%',
                                 allowBlank:false,
+                        },{
+                            xtype: 'xcheckbox',
+                            boxLabel: _('seofilter_field_active'),
+                            name: 'active',
+                            id: config.id + '-active',
+                            checked: true,
                             }
                         ]
                     },{
@@ -318,44 +306,18 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                                 boxLabel: _('seofilter_field_exact'),
                                 name: 'exact',
                                 id: config.id + '-exact',
-                                // }, {
-                                //     xtype: 'numberfield',
-                                //     fieldLabel: _('seofilter_field_priority'),
-                                //     name: 'priority',
-                                //     id: config.id + '-priority',
-                                //     anchor: '99%',
                             },{
                                 xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_active'),
-                                name: 'active',
-                                id: config.id + '-active',
-                                checked: true,
+                                boxLabel: _('seofilter_field_translit'),
+                                name: 'translit',
+                                id: config.id + '-translit',
+                            },{
+                                xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_field_baseparam'),
+                                name: 'baseparam',
+                                id: config.id + '-baseparam',
                             }
                         ]
-                    }]
-                },{
-                    xtype: 'radiogroup'
-                    ,fieldLabel: _('seofilter_field_method')
-                    ,hideLabel: false
-                    ,columns: 3
-                    ,allowBlank: false
-                    ,id: config.id + '-way'
-                    ,value: ''
-                    ,items: [{
-                        boxLabel: _('seofilter_field_dont')
-                        ,hideLabel: true
-                        ,name: 'way'
-                        ,inputValue: '0'
-                    },{
-                        boxLabel: _('seofilter_field_translit')
-                        ,hideLabel: true
-                        ,name: 'way'
-                        ,inputValue: '1'
-                    },{
-                        boxLabel: _('seofilter_field_translate')
-                        ,hideLabel: true
-                        ,name: 'way'
-                        ,inputValue: '2'
                     }]
                 },{
                     xtype: 'xcheckbox',

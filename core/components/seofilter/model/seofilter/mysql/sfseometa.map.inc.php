@@ -15,7 +15,7 @@ $xpdo_meta_map['sfSeoMeta']= array (
     'introtext' => '',
     'description' => '',
     'text' => '',
-    'contenttext' => '',
+    'content' => '',
     'rank' => 0,
     'active' => 1,
   ),
@@ -92,7 +92,7 @@ $xpdo_meta_map['sfSeoMeta']= array (
       'null' => true,
       'default' => '',
     ),
-    'contenttext' => 
+    'content' => 
     array (
       'dbtype' => 'text',
       'phptype' => 'string',

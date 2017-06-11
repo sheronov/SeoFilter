@@ -32,7 +32,7 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
        // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
        // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
         if($this->object->get('value') && !$this->object->get('alias')) {
-            $this->object->set('alias', $this->object->translit($this->object->get('value')));
+            $this->object->set('alias', modResource::filterPathSegment($this->modx, $this->object->get('value')));
         }
         return parent::beforeSave();
     }

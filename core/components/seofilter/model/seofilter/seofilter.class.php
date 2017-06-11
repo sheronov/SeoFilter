@@ -161,6 +161,22 @@ class SeoFilter
         return $result;
     }
 
+    public function str_replace_once($search, $replace, $text)
+    {
+        $pos = strpos($text, $search);
+        return $pos!==false ? substr_replace($text, $replace, $pos, strlen($search)) : $text;
+    }
+
+    public function getHashUrl($params) {
+        $urls = array();
+
+        foreach($params as $param=>$value) {
+            $urls[] = $param.'='.$value;
+        }
+
+        return '?'.implode('&',$urls);
+    }
+
     public function process($action, $data = array())
     {
         $params = $data['data'];
@@ -168,9 +184,27 @@ class SeoFilter
         switch ($action) {
             case 'getmeta':
                 if(count($params) > 1) {
-                    $meta = $this->getMultiMeta($params,$pageId);
+                    $multi_value = 0;
+                    foreach($params as $param => $value) {
+                        if(count(explode(',',$value)) > 1) {
+                            $multi_value = 1;
+                        }
+                    }
+                    if(!$multi_value) {
+                        $meta = $this->getMultiMeta($params,$pageId);
+                    } else {
+                        $meta = $this->getPageMeta($pageId);
+                        $meta['url'] = $this->getHashUrl($params);
+                    }
                 } elseif(count($params) == 1) {
-                    $meta = $this->getFieldMeta($params,$pageId);
+                    $params_copy = $params;
+                    $shift = array_shift($params_copy);
+                    if(count(explode(',',$shift)) > 1) {
+                        $meta = $this->getPageMeta($pageId);
+                        $meta['url'] = $this->getHashUrl($params);
+                    } else {
+                        $meta = $this->getFieldMeta($params,$pageId);
+                    }
                 } else {
                     $meta = $this->getPageMeta($pageId);
                 }
@@ -227,6 +261,7 @@ class SeoFilter
                 $meta[$tag] = $this->pdo->getChunk($tpl);
             }
         }
+
         return $meta;
     }
 
@@ -290,15 +325,15 @@ class SeoFilter
 
             }
         }
-        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
-        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($find_multi,1));
+       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
+       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($find_multi,1));
         if(!$find_multi && !$meta) {
             $meta = $this->getPageMeta($page_id);
             $meta['url'] = $this->multiUrl($params,0);
         } else {
             $meta['url'] = $this->multiUrl($aliases,$find_multi);
         }
-        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($aliases,1));
+      //  $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($aliases,1));
 
 
         return $meta;
@@ -323,16 +358,21 @@ class SeoFilter
             }
             if(($count = $this->modx->getCount('sfFieldIds',$q)) >= 1) {
                 if($q->prepare() && $q->stmt->execute()) {
-                    $rows = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
-                    foreach($rows as $key=>$row) {
-                        if($this->modx->getCount('sfFieldIds',array('multi_id'=>$row)) != $max_priority) {
-                            unset($rows[$key]);
+                    if($rows = $q->stmt->fetchAll(PDO::FETCH_COLUMN)) {
+                        foreach ($rows as $key => $row) {
+                            if ($this->modx->getCount('sfFieldIds', array('multi_id' => $row)) != $max_priority) {
+                                unset($rows[$key]);
+                            }
                         }
-                    }
-                    if(count($rows) == 1) {
-                        $multi_id = $rows[0];
-                    } elseif($marray = $this->pdo->getArray('sfMultiField',array('id:IN'=>$rows,'page'=>$page_id))) {
-                        $multi_id = $marray['id'];
+                        if (count($rows) == 1) {
+                            $multi_id = $rows[0];
+                        } else {
+                            foreach($rows as $row) {
+                                if($marray = $this->pdo->getArray('sfMultiField', array('id'=>$row,'page' => $page_id))) {
+                                    $multi_id = $marray['id'];
+                                }
+                            }
+                        }
                     }
                 }
             }

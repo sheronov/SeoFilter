@@ -19,17 +19,6 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
         if (!$this->checkPermissions()) {
             return $this->modx->lexicon('access_denied');
         }
-        if($this->getProperty('way') == 1) {
-            $this->object->set('translit',1);
-            $this->object->set('translate',0);
-        } elseif($this->getProperty('way') == 2) {
-            $this->object->set('translate',1);
-            $this->object->set('translit',0);
-        } else {
-            $this->object->set('translit',0);
-            $this->object->set('translate',0);
-        }
-
         $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
         $processorProps = $this->getProperties();
         $processorProps['field_id'] = $processorProps['id'];

@@ -174,7 +174,7 @@ switch ($modx->event->name) {
                         $priorities[$param] = $priorities_asort[$param] = $priority;
 
                         if ($translit && $field = $modx->getObject('sfField', $field_id)) {
-                            $value_tr = $field->translit($value);
+                            $value_tr = modResource::filterPathSegment($modx, $value);
                         }
                         $class_key = $class . '.' . $key;
                         $search_value = '';

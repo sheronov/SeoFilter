@@ -282,6 +282,22 @@ $xpdo_meta_map['sfDictionary']= array (
         ),
       ),
     ),
+    'input' => 
+    array (
+      'alias' => 'input',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'input' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
     'value' => 
     array (
       'alias' => 'value',
@@ -298,15 +314,15 @@ $xpdo_meta_map['sfDictionary']= array (
         ),
       ),
     ),
-    'translit' => 
+    'alias' => 
     array (
-      'alias' => 'translit',
+      'alias' => 'alias',
       'primary' => false,
       'unique' => false,
       'type' => 'BTREE',
       'columns' => 
       array (
-        'translit' => 
+        'alias' => 
         array (
           'length' => '',
           'collation' => 'A',

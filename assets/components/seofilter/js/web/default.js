@@ -10,7 +10,8 @@ jQuery(document).ready(function ($) {
                 data: {
                     sf_action: 'getmeta',
                     data: array,
-                    pageId: this.config.page
+                    pageId: this.config.page,
+                    hash: hash,
                 },
                 success: function(response) {
                     var url = hash;
@@ -44,7 +45,7 @@ jQuery(document).ready(function ($) {
 
     if(typeof mSearch2 != 'undefined') {
        // mSearch2.afterLoad = function () {
-            console.log('afterload');
+           // console.log('afterload');
             // $(this.options['wrapper']).removeClass(this.options['loading_class']);
             // this.results.css('opacity', 1);
             // this.filters.find('.' + this.options.disabled_class).prop('disabled', false).removeClass(this.options.disabled_class);
@@ -184,9 +185,9 @@ jQuery(document).ready(function ($) {
                     if (vars.hasOwnProperty(i)) {
                         if(aliases.indexOf(i) != -1) {
                             if(count || origin[origin.length-1] != '/') {
-                                hash += '/' + i + seoFilter.config.separator + vars[i].toLowerCase();
+                                hash += '/' + i + seoFilter.config.separator + vars[i];
                             } else {
-                                hash += i + seoFilter.config.separator + vars[i].toLowerCase();
+                                hash += i + seoFilter.config.separator + vars[i];
                             }
                             count++;
                         } else {
