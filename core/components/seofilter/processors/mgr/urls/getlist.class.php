@@ -21,6 +21,8 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             return $this->modx->lexicon('access_denied');
         }
 
+
+
         return true;
     }
 
@@ -38,6 +40,9 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                 'name:LIKE' => "%{$query}%",
             ));
         }
+
+        $c->leftJoin('sfMultiField', 'sfMultiField', $this->classKey.'.multi_id = sfMultiField.id');
+        $c->select(array($this->classKey.'.*','sfMultiField.page','sfMultiField.name'));
 
         return $c;
     }
@@ -64,6 +69,24 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
 //        }
 
         $array['actions'] = array();
+
+        if(($array['old_url'] || $array['new_url']) && $array['page']) {
+            if(!($addurl = $array['new_url'])) {
+                $addurl = $array['old_url'];
+            }
+            $array['url_preview'] = $this->modx->makeUrl($array['page']).$addurl;
+        }
+
+        if (!empty($array['url_preview'])) {
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-eye',
+                'title' => $this->modx->lexicon('seofilter_url_view'),
+                'action' => 'viewPage',
+                'button' => true,
+                'menu' => true,
+            );
+        }
 
         // Edit
         $array['actions'][] = array(
@@ -108,6 +131,10 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             'button' => true,
             'menu' => true,
         );
+
+
+
+
 
         return $array;
     }

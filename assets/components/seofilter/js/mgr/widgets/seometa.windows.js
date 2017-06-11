@@ -74,7 +74,7 @@ Ext.extend(SeoFilter.window.CreateSeoMeta, MODx.Window, {
                     enableFontSize : false,
                     cls: 'modx-richtext',
                     fieldLabel: _('seofilter_seometa_content'),
-                    name: 'contenttext',
+                    name: 'content',
                     id: config.id + '-content',
                     // listeners: {
                     //     render: function () {
@@ -176,7 +176,7 @@ Ext.extend(SeoFilter.window.UpdateSeoMeta, MODx.Window, {
                 enableColors: false,
                 enableFontSize : false,
                 fieldLabel: _('seofilter_seometa_content'),
-                name: 'contenttext',
+                name: 'content',
                 id: config.id + '-content',
                 // listeners: {
                 //     render: function () {

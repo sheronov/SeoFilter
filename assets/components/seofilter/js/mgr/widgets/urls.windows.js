@@ -46,12 +46,7 @@ Ext.extend(SeoFilter.window.CreateUrls, MODx.Window, {
                         id: config.id + '-old_url',
                         anchor: '99%',
                     }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_new_url'),
-                        name: 'new_url',
-                        id: config.id + '-new_url',
-                        anchor: '99%',
-                    }, {
+
                         xtype: 'numberfield',
                         fieldLabel: _('seofilter_url_count'),
                         name: 'count',
@@ -72,17 +67,23 @@ Ext.extend(SeoFilter.window.CreateUrls, MODx.Window, {
                     id: config.id + '-active',
                 }, {
                     xtype: 'textfield',
-                    fieldLabel: _('seofilter_url_createdon'),
-                    name: 'createdon',
-                    id: config.id + '-createdon',
+                    fieldLabel: _('seofilter_url_new_url'),
+                    name: 'new_url',
+                    id: config.id + '-new_url',
                     anchor: '99%',
                 }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_url_editedon'),
-                    name: 'editedon',
-                    id: config.id + '-editedon',
-                    anchor: '99%',
-                }, {
+                //     xtype: 'textfield',
+                //     fieldLabel: _('seofilter_url_createdon'),
+                //     name: 'createdon',
+                //     id: config.id + '-createdon',
+                //     anchor: '99%',
+                // }, {
+                //     xtype: 'textfield',
+                //     fieldLabel: _('seofilter_url_editedon'),
+                //     name: 'editedon',
+                //     id: config.id + '-editedon',
+                //     anchor: '99%',
+                // }, {
                     xtype: 'numberfield',
                     fieldLabel: _('seofilter_url_ajax'),
                     name: 'ajax',
@@ -152,15 +153,10 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                         style: 'background:#f9f9f9;color:#aaa;',
                         anchor: '99%',
                     }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_new_url'),
-                        name: 'new_url',
-                        id: config.id + '-new_url',
-                        anchor: '99%',
-                    }, {
                         xtype: 'numberfield',
                         fieldLabel: _('seofilter_url_count'),
                         name: 'count',
+                        readOnly: true,
                         id: config.id + '-count',
                         anchor: '99%',
                     }
@@ -171,22 +167,29 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 , defaults: {msgTarget: 'under'}
                 , border: false
                 , items: [{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_createdon'),
-                        name: 'createdon',
-                        id: config.id + '-createdon',
-                        anchor: '99%',
-                    }, {
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_url_editedon'),
-                        name: 'editedon',
-                        id: config.id + '-editedon',
-                        anchor: '99%',
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_new_url'),
+                    name: 'new_url',
+                    id: config.id + '-new_url',
+                    anchor: '99%',
                 }, {
+                //         xtype: 'textfield',
+                //         fieldLabel: _('seofilter_url_createdon'),
+                //         name: 'createdon',
+                //         id: config.id + '-createdon',
+                //         anchor: '99%',
+                //     }, {
+                //         xtype: 'textfield',
+                //         fieldLabel: _('seofilter_url_editedon'),
+                //         name: 'editedon',
+                //         id: config.id + '-editedon',
+                //         anchor: '99%',
+                // }, {
                     xtype: 'numberfield',
                     fieldLabel: _('seofilter_url_ajax'),
                     name: 'ajax',
                     id: config.id + '-ajax',
+                    readOnly: true,
                     anchor: '99%',
                     }
                 ]

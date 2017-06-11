@@ -2,6 +2,7 @@ jQuery(document).ready(function ($) {
     var seoFilter = {
         config : seoFilterConfig || {},
         ajax_post: function (array,hash,browser) {
+            console.log(array,hash);
             $.ajax({
                 type: 'POST',
                 url: this.config.actionUrl,
@@ -18,6 +19,7 @@ jQuery(document).ready(function ($) {
                     if(response.data.description) {$('meta[name="description"]').attr("content", response.data.description);}
                     if(response.data.h1) {$('#sf_h1').text(response.data.h1);}
                     if(response.data.url) {url = response.data.url;}
+                    //TODO: добавить замену всех тегов
 
                     if(browser) {
                         window.history.pushState({mSearch2: origin + url}, '', origin + url);

@@ -173,19 +173,26 @@ $_lang['seofilter_fieldids_update'] = 'Изменить условия';
 $_lang['seofilter_fieldids_remove'] = 'Исключить поле';
 $_lang['seofilter_fieldids_remove_confirm'] = 'Вы уверены, что хотите исключить это поле?';
 
+$_lang['seofilter_url_view'] = 'Перейти к странице';
 $_lang['seofilter_url_id'] = 'Id';
 $_lang['seofilter_url_multi_id'] = 'Пересечение';
 $_lang['seofilter_url_old_url'] = 'Базовый Url';
-$_lang['seofilter_url_new_url'] = 'Исправленный Url';
+$_lang['seofilter_url_new_url'] = 'Индивидуальный Url';
 $_lang['seofilter_url_editedon'] = 'Отредактировано';
 $_lang['seofilter_url_createdon'] = 'Создано';
-$_lang['seofilter_url_count'] = 'Количество переходов на страницу';
+$_lang['seofilter_url_count'] = 'Переходов';
 $_lang['seofilter_url_ajax'] = 'Из них переходов через фильтр';
 $_lang['seofilter_url_active'] = 'Активно';
 $_lang['seofilter_url_active_more'] = 'Активно (если нет, то будет отдавать 404)';
 
 $_lang['seofilter_url_create'] = 'Добавить URL';
 $_lang['seofilter_url_update'] = 'Изменить URL';
+$_lang['seofilter_url_disable'] = 'Отключить URL (будет 404)';
+$_lang['seofilter_url_remove'] = 'Удалить URL';
+$_lang['seofilter_urls_remove'] = 'Удалить URL';
+$_lang['seofilter_urls_remove_confirm'] = 'Вы уверены, что хотите удалить эти адреса? Страницы будут не доступны';
+$_lang['seofilter_url_remove_confirm'] = 'Вы уверены, что хотите удалить этот адрес? Страница будет не доступна';
+$_lang['seofilter_multiseo_intro'] = 'Синтаксис для двух и более полей: {$alias1}, {$alias2}, где "aliasX" - это синоним поля, прописанный в полях фильтра. На первой вкладке в поле URL адреса как-раз они прописаны. Падежи добавляются так: {$alias1_r} и т.д. За обработку отвечает Fenom.';
 
 $_lang['seofilter_field_xpdo'] = 'Значение в другой таблице';
 $_lang['seofilter_field_xpdo_package'] = 'Компонента, например customExtra';

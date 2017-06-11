@@ -20,16 +20,11 @@ switch ($modx->event->name) {
         if (isset($_REQUEST[$alias])) {
             /** @var SeoFilter $SeoFilter */
             $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null, $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
-            $pdo = $modx->getService('pdoFetch');
-
+            $pdo = $SeoFilter->pdo;
             if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
-
-            $pdo->setConfig(array('loadModels' => 'seofilter'));
-
             $separator = $SeoFilter->config['separator'];
             $site_start = $SeoFilter->config['site_start'];
             $charset = $SeoFilter->config['charset'];
-
             $check = $novalue = $page = $fast_search = 0; //переменные для проверки
             $params = array(); //итоговый массив с параметром и значением
             $last_char = ''; //был ли в конце url-а слэш
@@ -51,7 +46,6 @@ switch ($modx->event->name) {
                     $fields[$row['id']] = $row;
                 }
             }
-
 
             if (count($tmp)) {
                 $page_aliases = array();
@@ -82,6 +76,7 @@ switch ($modx->event->name) {
                 }
             }
 
+
             if (count($tmp) == 1 && $page) {
                 if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[0]))) {
                     if ($field = $pdo->getArray('sfField', $word['field_id'])) {
@@ -89,18 +84,60 @@ switch ($modx->event->name) {
                         $_GET[$alias] = $_REQUEST[$alias] = $findparams[$alias] = $word['input'];
                         $fast_search = true;
                         $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
-                        $meta = $SeoFilter->getmeta($findparams);
+                        $meta = $SeoFilter->getFieldMeta($findparams);
                         $modx->setPlaceholders($meta,'sf.');
                         $modx->sendForward($page);
                     }
                 }
-            } else {
-                if ($words = $pdo->getCollection('sfDictionary', array('alias:IN' => $tmp))) {
-                    print_r($words);
-                    die;
-                }
-                die;
             }
+
+            if(count($tmp) == 1 && $url_array = $SeoFilter->findUrlArray($tmp[0])) {
+                $old_url = $url_array['old_url'];
+                $tmp = explode('/',$old_url);
+            }
+
+                $find_url = implode("/",$tmp);
+                if($find_multi = $SeoFilter->findUrlArray($find_url)['multi_id']) {
+                    if($links = $pdo->getCollection('sfFieldIds',array('multi_id'=>$find_multi),array('sortby' => 'priority'))) {
+                        if(count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
+                            foreach($links as $lkey => $link) {
+                                $field = $pdo->getArray('sfField',$link['field_id']);
+                                $alias = $field['alias'];
+                                if($field['hideparam']) {
+                                    if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
+                                        $_GET[$alias] = $_REQUEST[$alias] = $findparams[$alias] = $word['input'];
+                                    }
+                                } else {
+                                    $tmp_arr = explode($separator,$tmp[$lkey]);
+                                    $walias = '';
+                                    if($field['valuefirst']) {
+                                        $del = array_pop($tmp_arr);
+                                        if($del == $alias) {
+                                            $walias = implode($separator,$tmp_arr);
+                                        }
+                                    } else {
+                                        $del = array_shift($tmp_arr);
+                                        if($del == $alias) {
+                                            $walias = implode($separator,$tmp_arr);
+                                        }
+                                    }
+                                    if($walias && $word = $pdo->getArray('sfDictionary', array('alias' => $walias))) {
+                                        $_GET[$alias] = $_REQUEST[$alias] = $findparams[$alias] = $word['input'];
+                                    }
+                                }
+                            }
+                            $fast_search = true;
+                            $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
+                            $meta = $SeoFilter->getMultiMeta($findparams,$page);
+                            $modx->setPlaceholders($meta,'sf.');
+                            $modx->sendForward($page);
+                        } else {
+                            echo 'данное исключение пока не обработано. Для кастомных урл'; //TODO: Обработать
+                            die;
+                        }
+                    }
+                }
+
 
 
 
@@ -192,7 +229,7 @@ switch ($modx->event->name) {
                         }
                     }
                     $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
-                    $meta = $SeoFilter->getmeta($findparams);
+                    $meta = $SeoFilter->getFieldMeta($findparams);
                     $modx->setPlaceholders($meta,'sf.');
                     $modx->sendForward($page);
                 }

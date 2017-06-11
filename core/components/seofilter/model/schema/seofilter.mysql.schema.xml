@@ -121,7 +121,7 @@
         <field key="introtext" dbtype="text" phptype="string" null="true" default=""/>
         <field key="description" dbtype="text" phptype="string" null="true" default=""/>
         <field key="text" dbtype="text" phptype="string" null="true" default=""/>
-        <field key="contenttext" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="text" phptype="string" null="true" default=""/>
 
         <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>

@@ -14,21 +14,25 @@ class sfMultiField extends xPDOSimpleObject {
         $separator = $this->xpdo->getOption('seofilter_separator', null, '-', true);
         $url = '';
         $urls = array();
+        $count = 1;
         $q = $this->xpdo->newQuery('sfFieldIds');
         $q->sortby('priority', 'ASC');
         if($links = $this->getMany('Link',$q)){
             foreach($links as $key => $link) {
 //                if($link->get('where')) {
-//                    $where = 1;
+//                    $where = 1;  // TODO: сделать проверку для полей из другой таблицы
 //                }
                 if($field = $link->getOne('Field')) {
                     $aliases = array();
                     if($alias = $field->get('alias')) {
 
                         if($field->get('hideparam')) {
-                            $url .= '/{$'.$alias.'}';
+                            $url .= '{$'.$alias.'}/';
                         } else {
-                            $url .= '/' . $alias . $separator . '{$'.$alias.'}';
+                            $url .= $alias . $separator . '{$'.$alias.'}/';
+                        }
+                        if($count == count($links)) {
+                            $url = substr($url, 0,-1);
                         }
 
                         if($returnArray) {
@@ -37,13 +41,19 @@ class sfMultiField extends xPDOSimpleObject {
                                 $aliases[$key][] = $word->get('alias');
                             }
                             foreach($aliases[$key] as $akey => $avalue) {
+
                                 if($field->get('hideparam')) {
-                                    $urls[$key][] .=  '/'.$avalue;
+                                     $add_url = $avalue.'/';
                                 } else {
-                                    $urls[$key][] .= '/' . $alias . $separator .$avalue;
+                                     $add_url = $alias . $separator .$avalue.'/';
                                 }
+                                if($count == count($links)) {
+                                    $add_url = substr($add_url, 0,-1);
+                                }
+                                $urls[$key][] = $add_url;
                             }
                         }
+                        $count++;
                     }
                 }
             }

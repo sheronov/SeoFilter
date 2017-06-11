@@ -191,7 +191,7 @@ Ext.extend(SeoFilter.grid.SeoMeta, MODx.grid.Grid, {
             header: _('seofilter_seometa_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 70
+            width: 50
         }, {
             header: _('seofilter_seometa_name'),
             dataIndex: 'seofield',
@@ -211,19 +211,19 @@ Ext.extend(SeoFilter.grid.SeoMeta, MODx.grid.Grid, {
             header: _('seofilter_seometa_h2'),
             dataIndex: 'h2',
             sortable: true,
-            width: 70,
+            width: 150,
         }, {
             header: _('seofilter_seometa_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
-            width: 75,
+            width: 50,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
             sortable: false,
-            width: 100,
+            width: 50,
             id: 'actions'
         }];
     },

@@ -183,7 +183,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'multi_id', 'old_url', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name'];
+        return ['id', 'multi_id','name', 'old_url', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name','url_preview','page'];
     },
 
     getColumns: function () {
@@ -194,7 +194,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             width: 70
         }, {
             header: _('seofilter_url_multi_id'),
-            dataIndex: 'multi_id',
+            dataIndex: 'name',
             sortable: true,
             width: 150,
         }, {
@@ -216,6 +216,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             header: _('seofilter_url_createdon'),
             dataIndex: 'createdon',
             sortable: true,
+            renderer: SeoFilter.utils.formatDate,
             width: 150,
         }, {
             header: _('seofilter_url_count'),
@@ -233,9 +234,15 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
             sortable: false,
-            width: 100,
+            width: 150,
             id: 'actions'
         }];
+    },
+
+    viewPage: function () {
+        console.log(this);
+        window.open(this.menu.record['url_preview']);
+        return false;
     },
 
     getTopBar: function () {

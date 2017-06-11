@@ -66,6 +66,21 @@ SeoFilter.utils.getMenu = function (actions, grid, selected) {
     return menu;
 };
 
+SeoFilter.utils.formatDate = function (string) {
+    if (string && string != '0000-00-00 00:00:00' && string != '-1-11-30 00:00:00' && string != 0) {
+        if(!(date_format = MODx.config['ms2_date_format'])) {
+            date_format = '%d.%m.%y <span class="gray">%H:%M</span>';
+        }
+        var date = /^[0-9]+$/.test(string)
+            ? new Date(string * 1000)
+            : new Date(string.replace(/(\d+)-(\d+)-(\d+)/, '$2/$3/$1'));
+        return date.strftime(date_format);
+    }
+    else {
+        return '&nbsp;';
+    }
+};
+
 SeoFilter.utils.renderActions = function (value, props, row) {
     var res = [];
     var cls, icon, title, action, item;

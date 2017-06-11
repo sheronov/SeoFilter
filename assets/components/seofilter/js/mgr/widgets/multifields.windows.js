@@ -197,6 +197,9 @@ Ext.extend(SeoFilter.window.UpdateMultiField, MODx.Window, {
                 ,border:false
                 ,style: 'margin-top:-10px;padding-bottom:5px;'
                 ,items: [{
+                    html: _('seofilter_multiseo_intro'),
+                    cls: 'panel-desc',
+                },{
                     xtype: 'hidden',
                     name: 'seo_id',
                     id: config.id + '-seo_id',

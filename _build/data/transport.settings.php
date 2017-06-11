@@ -46,6 +46,41 @@ $tmp = array(
         'value' => '',
         'area' => 'seofilter_main',
     ),
+    'title' => array(
+        'xtype' => 'textfield',
+        'value' => 'pagetitle',
+        'area' => 'seofilter_seo',
+    ),
+    'description' => array(
+        'xtype' => 'textfield',
+        'value' => 'description',
+        'area' => 'seofilter_seo',
+    ),
+    'introtext' => array(
+        'xtype' => 'textfield',
+        'value' => 'introtext',
+        'area' => 'seofilter_seo',
+    ),
+    'h1' => array(
+        'xtype' => 'textfield',
+        'value' => 'longtitle',
+        'area' => 'seofilter_seo',
+    ),
+    'h2' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_seo',
+    ),
+    'text' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_seo',
+    ),
+    'content' => array(
+        'xtype' => 'textfield',
+        'value' => 'content',
+        'area' => 'seofilter_seo',
+    ),
 
 
 );
