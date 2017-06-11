@@ -48,12 +48,17 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                         ,layout: 'form'
                         ,defaults: { msgTarget: 'under' }
                         ,border:false
-                        ,items: [
-                            {
-                                xtype: 'seofilter-combo-resource',
-                                fieldLabel: _('seofilter_field_page'),
-                                name: 'page',
-                                id: config.id + '-page',
+                        ,items: [{
+                            //     xtype: 'seofilter-combo-resource',
+                            //     fieldLabel: _('seofilter_field_page'),
+                            //     name: 'page',
+                            //     id: config.id + '-page',
+                            //     anchor: '99%',
+                            // }, {
+                                xtype: 'textfield',
+                                fieldLabel: _('seofilter_field_pages_more'),
+                                name: 'pages',
+                                id: config.id + '-pages',
                                 anchor: '99%',
                             }, {
                                 xtype: 'seofilter-combo-class',
@@ -252,10 +257,16 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                                 name: 'id',
                                 id: config.id + '-id',
                             }, {
-                                xtype: 'seofilter-combo-resource',
-                                fieldLabel: _('seofilter_field_page'),
-                                name: 'page',
-                                id: config.id + '-page',
+                            //     xtype: 'seofilter-combo-resource',
+                            //     fieldLabel: _('seofilter_field_page'),
+                            //     name: 'page',
+                            //     id: config.id + '-page',
+                            //     anchor: '99%',
+                            // }, {
+                                xtype: 'textfield',
+                                fieldLabel: _('seofilter_field_pages_more'),
+                                name: 'pages',
+                                id: config.id + '-pages',
                                 anchor: '99%',
                             }, {
                                 xtype: 'seofilter-combo-class',

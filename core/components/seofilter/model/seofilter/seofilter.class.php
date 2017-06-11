@@ -181,6 +181,8 @@ class SeoFilter
     {
         $params = $data['data'];
         $pageId = $data['pageId'];
+        $aliases = $data['aliases'];
+        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
         switch ($action) {
             case 'getmeta':
                 if(count($params) > 1) {

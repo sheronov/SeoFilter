@@ -6,7 +6,8 @@
         <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="class" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="key" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
-        <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
+        <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="" />
+        <field key="pages" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
         <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
         <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
@@ -38,6 +39,9 @@
         </index>
         <index alias="page" name="page" primary="false" unique="false" type="BTREE">
             <column key="page" length="" collation="A" null="false"/>
+        </index>
+        <index alias="pages" name="pages" primary="false" unique="false" type="BTREE">
+            <column key="pages" length="" collation="A" null="false"/>
         </index>
         <index alias="active" name="active" primary="false" unique="false" type="BTREE">
             <column key="active" length="" collation="A" null="false"/>

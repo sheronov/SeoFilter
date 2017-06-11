@@ -12,6 +12,7 @@ jQuery(document).ready(function ($) {
                     data: array,
                     pageId: this.config.page,
                     hash: hash,
+                    aliases: this.config.aliases,
                 },
                 success: function(response) {
                     var url = hash;

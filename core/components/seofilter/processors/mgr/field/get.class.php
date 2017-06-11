@@ -28,6 +28,7 @@ class sfFieldGetProcessor extends modObjectGetProcessor
                 $this->object->set($seo_key,$seo_value);
             }
         }
+
         return parent::process();
     }
 

@@ -6,7 +6,9 @@ switch ($modx->event->name) {
             $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null, $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
             if (!($SeoFilter instanceof SeoFilter)) break;
             $q = $modx->newQuery('sfField');
-            $q->where(array('page' => $page));
+
+           // $q->where(array('pages' => $page)); // для олдного поля
+            $q->where(array('1 = 1 AND FIND_IN_SET('.$page.',pages)'));
             if($modx->getCount('sfField',$q)) {
                 if(!$SeoFilter->initialized[$modx->context->key]) {
                     $SeoFilter->initialize($modx->context->key, array('page' => (int)$page));
@@ -46,6 +48,17 @@ switch ($modx->event->name) {
                     $fields[$row['id']] = $row;
                 }
             }
+
+            $q = $modx->newQuery('sfMultiField');
+            $q->limit(0);
+            $q->select(array('sfMultiField.*'));
+            if ($q->prepare() && $q->stmt->execute()) {
+               while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                   $pageids[] = $row['page'];
+                }
+            }
+            // TODO: возможно будут случаи, когда захотят видеть пересечение только на одной странице, без участия в ней параметров
+
 
             if (count($tmp)) {
                 $page_aliases = array();

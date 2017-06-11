@@ -182,7 +182,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'class', 'key', 'alias', 'translit', 'baseparam', 'priority', 'active', 'rank', 'actions','pagetitle','exact','valuefirst','hideparam'];
+        return ['id', 'name', 'page', 'pages','class', 'key', 'alias', 'translit', 'baseparam', 'priority', 'active', 'rank', 'actions','pagetitle','exact','valuefirst','hideparam'];
     },
 
     getColumns: function () {
@@ -196,10 +196,15 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             dataIndex: 'name',
             sortable: true,
             width: 150,
+        // }, {
+        //     header: _('seofilter_field_page'),
+        //     dataIndex: 'page',
+        //     renderer: SeoFilter.utils.renderResource,
+        //     sortable: true,
+        //     width: 150,
         }, {
-            header: _('seofilter_field_page'),
-            dataIndex: 'page',
-            renderer: SeoFilter.utils.renderResource,
+            header: _('seofilter_field_pages'),
+            dataIndex: 'pages',
             sortable: true,
             width: 150,
         }, {

@@ -10,6 +10,7 @@ $xpdo_meta_map['sfField']= array (
     'class' => '',
     'key' => '',
     'page' => 0,
+    'pages' => '',
     'alias' => '',
     'priority' => 0,
     'translit' => 1,
@@ -58,8 +59,16 @@ $xpdo_meta_map['sfField']= array (
       'precision' => '10',
       'attributes' => 'unsigned',
       'phptype' => 'integer',
-      'null' => false,
+      'null' => true,
       'default' => 0,
+    ),
+    'pages' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
     ),
     'alias' => 
     array (
@@ -243,6 +252,22 @@ $xpdo_meta_map['sfField']= array (
       'columns' => 
       array (
         'page' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'pages' => 
+    array (
+      'alias' => 'pages',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'pages' => 
         array (
           'length' => '',
           'collation' => 'A',
