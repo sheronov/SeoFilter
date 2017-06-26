@@ -7,7 +7,7 @@ switch ($modx->event->name) {
             if (!($SeoFilter instanceof SeoFilter)) break;
             $q = $modx->newQuery('sfField');
 
-           // $q->where(array('pages' => $page)); // для олдного поля
+            // $q->where(array('pages' => $page)); // для олдного поля
             $q->where(array('1 = 1 AND FIND_IN_SET('.$page.',pages)'));
             if($modx->getCount('sfField',$q)) {
                 if(!$SeoFilter->initialized[$modx->context->key]) {
@@ -53,11 +53,11 @@ switch ($modx->event->name) {
             $q->limit(0);
             $q->select(array('sfMultiField.*'));
             if ($q->prepare() && $q->stmt->execute()) {
-               while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                   $pageids[] = $row['page'];
+                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $pageids[] = $row['page'];
                 }
             }
-            // TODO: возможно будут случаи, когда захотят видеть пересечение только на одной странице, без участия в ней параметров
+            // TODO: возможно будут случаи, когда захотят видеть пересечение только на одной странице, без участия в ней параметров (пример - сделать страницу Тёплых складов в Московской области)
 
 
             if (count($tmp)) {
@@ -104,109 +104,183 @@ switch ($modx->event->name) {
                 }
             }
 
-            if(count($tmp) == 1 && $url_array = $SeoFilter->findUrlArray($tmp[0])) {
+            if($url_array = $SeoFilter->findUrlArray(implode('/',$tmp))) {
                 $old_url = $url_array['old_url'];
-                $tmp = explode('/',$old_url);
+                $new_url = $url_array['new_url'];
+                if($new_url && $new_url != implode('/',$tmp)) {
+                    $url = $modx->makeUrl($page) . $new_url;
+                    $modx->sendRedirect($url.$last_char);
+                }
+                $tmp = explode('/', $old_url);
             }
 
-                $find_url = implode("/",$tmp);
-                if($find_multi = $SeoFilter->findUrlArray($find_url)['multi_id']) {
-                    if($links = $pdo->getCollection('sfFieldIds',array('multi_id'=>$find_multi),array('sortby' => 'priority'))) {
-                        if(count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
-                            foreach($links as $lkey => $link) {
-                                $field = $pdo->getArray('sfField',$link['field_id']);
-                                $alias = $field['alias'];
-                                if($field['hideparam']) {
-                                    if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
-                                        $_GET[$alias] = $_REQUEST[$alias] = $findparams[$alias] = $word['input'];
+
+            $find_url = implode('/',$tmp);
+            if($find_multi = $SeoFilter->findUrlArray($find_url)['multi_id']) {
+                if($links = $pdo->getCollection('sfFieldIds',array('multi_id'=>$find_multi),array('sortby' => 'priority'))) {
+                    if(count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
+                        foreach($links as $lkey => $link) {
+                            $field = $pdo->getArray('sfField',$link['field_id']);
+                            $alias = $field['alias'];
+                            if($field['hideparam']) {
+                                if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
+                                    $_GET[$alias] = $_REQUEST[$alias] = $findparams[$alias] = $word['input'];
+                                }
+                            } else {
+                                $tmp_arr = explode($separator,$tmp[$lkey]);
+                                $walias = '';
+                                if($field['valuefirst']) {
+                                    $del = array_pop($tmp_arr);
+                                    if($del == $alias) {
+                                        $walias = implode($separator,$tmp_arr);
                                     }
                                 } else {
-                                    $tmp_arr = explode($separator,$tmp[$lkey]);
-                                    $walias = '';
-                                    if($field['valuefirst']) {
-                                        $del = array_pop($tmp_arr);
-                                        if($del == $alias) {
-                                            $walias = implode($separator,$tmp_arr);
-                                        }
-                                    } else {
-                                        $del = array_shift($tmp_arr);
-                                        if($del == $alias) {
-                                            $walias = implode($separator,$tmp_arr);
-                                        }
+                                    $del = array_shift($tmp_arr);
+                                    if($del == $alias) {
+                                        $walias = implode($separator,$tmp_arr);
                                     }
-                                    if($walias && $word = $pdo->getArray('sfDictionary', array('alias' => $walias))) {
-                                        $_GET[$alias] = $_REQUEST[$alias] = $findparams[$alias] = $word['input'];
+                                }
+                                if($walias && $word = $pdo->getArray('sfDictionary', array('alias' => $walias))) {
+                                    $_GET[$alias] = $_REQUEST[$alias] = $findparams[$alias] = $word['input'];
+                                }
+                            }
+                        }
+                        $fast_search = true;
+                        $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
+                        $meta = $SeoFilter->getMultiMeta($findparams,$page);
+                        $modx->setPlaceholders($meta,'sf.');
+                        $modx->sendForward($page);
+                    } else {
+                        echo 'Что-то пошло не так. Найти, когда это всплывёт'; //TODO: Обработать
+                        die;
+                    }
+                }
+            }
+
+
+
+
+            foreach ($tmp as $tid => $tquery) {
+                $query = explode($separator, $tquery);
+//                if (count($query) < 2) {
+//                    $novalue = true;
+//                    break;
+//                }
+                //TODO: какое-то бредовое условие выше я писал
+                $qcount = count($query);
+                foreach($query as $qkey => $qvalue) {
+                    if($field = $pdo->getArray('sfField',array('alias'=>$qvalue))) {
+                        if($qkey == 0 || $qkey == $qcount-1) {
+                            $param = $qvalue;
+                            unset($query[$qkey]);
+                            $params[$param] = implode($separator,$query);
+                        }
+                    }
+                }
+            }
+
+            if (!$page && !$novalue) {
+                if (in_array($site_start, $pageids)) {
+                    $page = $site_start;  //для тех у кого главная страница сайта - фильтр
+                }
+            }
+
+            $priorities = $priorities_asort = array();
+            foreach ($params as $param => $value) {
+                if ($field_id = array_search($param, $aliases)) {
+                    $exact = $fields[$field_id]['exact'];
+                    $class = $fields[$field_id]['class'];
+                    $key = $fields[$field_id]['key'];
+                    $priority = $fields[$field_id]['priority'];
+                    $translit = $fields[$field_id]['translit'];
+
+                    $priorities[$param] = $priorities_asort[$param] = $priority;
+
+                    if ($translit && $field = $modx->getObject('sfField', $field_id)) {
+                        //TODO: возможно стоит здесь оставить обратную транслитерацию
+                        $value_tr = modResource::filterPathSegment($modx, $value);
+                    }
+
+                    if($dic = $pdo->getArray('sfDictionary',array('alias'=>$value))) {
+                        $value_dic = $dic['input'];
+                    }
+
+
+                    $class_key = $class . '.' . $key;
+                    $search_value = '';
+
+
+
+                    if($class == 'modTemplateVar') {
+                        if(isset($value_dic)) {
+                            $_GET[$param] = $_REQUEST[$param] = $findparams[$param] = $value_dic;
+                            $check = true;
+                        } else {
+                            $q = $modx->newQuery($class, array('name' => $key));
+                            $q->limit(1);
+                            $q->select('id');
+                            if ($q->prepare() && $q->stmt->execute()) {
+                                if ($tv_id = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
+                                    $q = $modx->newQuery('modTemplateVarResource');
+                                    $q->where(array('tmplvarid' => $tv_id, 'value:!=' => ''));
+                                    $q->where(array("1 = 1 AND FIND_IN_SET(".$value.", replace(value, '||', ','))"));
+                                    if(isset($value_dic)) {
+                                        $q->where(array("1 = 1 AND FIND_IN_SET(" . $value_dic . ", replace(value, '||', ','))"));
+                                    }
+                                    if(isset($value_tr)) {
+                                        $q->orCondition(array("1 = 1 AND FIND_IN_SET(".$value_tr.", replace(value, '||', ','))"));
+                                    }
+                                    if ($modx->getCount('modTemplateVarResource', $q)) {
+                                        if (isset($value_dic) && $param) {
+                                            $_GET[$param] = $_REQUEST[$param] = $findparams[$param] = $value_dic;
+                                        } else {
+                                            $_GET[$param] = $_REQUEST[$param] = $findparams[$param] = $value;
+                                        }
+                                        $check = true;
+                                        die;
                                     }
                                 }
                             }
-                            $fast_search = true;
-                            $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
-                            $meta = $SeoFilter->getMultiMeta($findparams,$page);
-                            $modx->setPlaceholders($meta,'sf.');
-                            $modx->sendForward($page);
-                        } else {
-                            echo 'данное исключение пока не обработано. Для кастомных урл'; //TODO: Обработать
-                            die;
                         }
-                    }
-                }
-
-
-
-
-                foreach ($tmp as $tid => $tquery) {
-                    $query = explode($separator, $tquery);
-                    if (count($query) < 2) {
-                        $novalue = true;
-                        break;
-                    }
-                    if ($SeoFilter->config['valuefirst']) {
-                        $param = array_pop($query);
                     } else {
-                        $param = array_shift($query);
-                    }
-                    $value = implode($separator, $query);
-                    $params[$param] = $value;
-                }
-
-                if (!$page && !$novalue) {
-                    if (in_array($site_start, $pageids)) {
-                        $page = $site_start;  //для тех у кого главная страница сайта - фильтр
-                    }
-                }
-
-                $priorities = $priorities_asort = array();
-                foreach ($params as $param => $value) {
-                    if ($field_id = array_search($param, $aliases)) {
-                        $exact = $fields[$field_id]['exact'] || 1;
-                        $class = $fields[$field_id]['class'];
-                        $key = $fields[$field_id]['key'];
-                        $priority = $fields[$field_id]['priority'];
-                        $translit = $fields[$field_id]['translit'];
-
-                        $priorities[$param] = $priorities_asort[$param] = $priority;
-
-                        if ($translit && $field = $modx->getObject('sfField', $field_id)) {
-                            $value_tr = modResource::filterPathSegment($modx, $value);
-                        }
-                        $class_key = $class . '.' . $key;
-                        $search_value = '';
-
                         $q = $modx->newQuery($class);
                         $q->limit(1);
                         if ($exact) {
-                            $q->where(array($key . ':LIKE' => $value));
+                            if ($class == 'msProductOption') {
+                                $q->where(array('key' => $key, 'value:!=' => ''));
+                                $key = 'value';
+                                $q->where(array('AND:' . $key . ':LIKE' => $value));
+                            } else {
+                                $q->where(array($key . ':LIKE' => $value));
+                            }
                             if (isset($value_tr)) {
                                 $q->where(array('OR:' . $key . ':LIKE' => $value_tr));
                             }
+                            if (isset($value_dic)) {
+                                $q->where(array('OR:' . $key . ':LIKE' => $value_dic));
+                            }
                         } else {
-                            $q->where(array($key . ':LIKE' => "%" . $value . "%"));
+                            if ($class == 'msProductOption') {
+                                $q->where(array('key' => $key, 'value:!=' => ''));
+                                $key = 'value';
+                                $q->where(array('AND:' . $key . ':LIKE' => "%" . $value . "%"));
+                            } else {
+                                $q->where(array($key . ':LIKE' => "%" . $value . "%"));
+                            }
                             if (isset($value_tr)) {
                                 $q->where(array('OR:' . $key . ':LIKE' => "%" . $value_tr . "%"));
                             }
+                            if (isset($value_dic)) {
+                                $q->where(array('OR:' . $key . ':LIKE' => "%" . $value_dic . "%"));
+                            }
                         }
 
-                        $q->select(array('DISTINCT ' . $class_key));
+                        if ($class == 'msProductOption') {
+                            $q->select(array('DISTINCT ' . $class . '.value'));
+                        } else {
+                            $q->select(array('DISTINCT ' . $class_key));
+                        }
+
                         if ($q->prepare() && $q->stmt->execute()) {
                             if (!$search_value = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
                                 $novalue = true;
@@ -217,35 +291,37 @@ switch ($modx->event->name) {
                             $_GET[$param] = $_REQUEST[$param] = $findparams[$param] = $search_value;
                             $check = true;
                         }
-                    }
-                }
 
-                // echo '<br>Time: '.(microtime(true) - $time).' s<br>';
-                // echo 'Memory: '.round((memory_get_peak_usage(true) / 1024 / 1024),2).' Mb';
-                if ($check && $page && !$novalue) {
-                    if ($SeoFilter->config['redirect'] || $page == $site_start) {
-                        $diff = 0;
-                        $url_add = ''; //добавочный адрес для редиректа
-                        asort($priorities_asort);
-                        $priorities = array_values(array_flip($priorities));
-                        $priorities_asort = array_values(array_flip($priorities_asort));
-                        $add_urls = array();
-                        foreach ($priorities_asort as $p_key => $p_param) {
-                            if ($p_param != $priorities[$p_key]) {
-                                $diff = true;
-                                $add_urls[] = mb_strtolower($p_param, $charset) . $separator . mb_strtolower($params[$p_param], $charset);
-                            }
-                        }
-                        if ($diff) {
-                            $url = $modx->makeUrl($page) . implode('/', $add_urls);
-                            $modx->sendRedirect($url . $last_char);
-                        }
                     }
-                    $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
-                    $meta = $SeoFilter->getFieldMeta($findparams);
-                    $modx->setPlaceholders($meta,'sf.');
-                    $modx->sendForward($page);
                 }
             }
-    break;
+
+            // echo '<br>Time: '.(microtime(true) - $time).' s<br>';
+            // echo 'Memory: '.round((memory_get_peak_usage(true) / 1024 / 1024),2).' Mb';
+            if ($check && $page && !$novalue) {
+                if ($SeoFilter->config['redirect'] || $page == $site_start) {
+                    $diff = 0;
+                    $url_add = ''; //добавочный адрес для редиректа
+                    asort($priorities_asort);
+                    $priorities = array_values(array_flip($priorities));
+                    $priorities_asort = array_values(array_flip($priorities_asort));
+                    $add_urls = array();
+                    foreach ($priorities_asort as $p_key => $p_param) {
+                        if ($p_param != $priorities[$p_key]) {
+                            $diff = true;
+                            $add_urls[] = mb_strtolower($p_param, $charset) . $separator . mb_strtolower($params[$p_param], $charset);
+                        }
+                    }
+                    if ($diff) {
+                        $url = $modx->makeUrl($page) . implode('/', $add_urls);
+                        $modx->sendRedirect($url . $last_char);
+                    }
+                }
+                $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
+                $meta = $SeoFilter->getFieldMeta($findparams);
+                $modx->setPlaceholders($meta,'sf.');
+                $modx->sendForward($page);
+            }
+        }
+        break;
 }

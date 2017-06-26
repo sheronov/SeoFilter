@@ -48,6 +48,7 @@ $_lang['seofilter_msProductData'] = 'msProductData (поля товара)';
 $_lang['seofilter_modResource'] = 'modResource (поля ресурса)';
 $_lang['seofilter_msVendor'] = 'msVendor (поля производителя)';
 $_lang['seofilter_msProductOption'] = 'msProductOption (опции minishop2)';
+$_lang['seofilter_modTemplateVar'] = 'modTemplateVar (TV - поля)';
 
 $_lang['seofilter_field_create'] = 'Добавить поле';
 $_lang['seofilter_field_update'] = 'Изменить поле';
@@ -128,7 +129,12 @@ $_lang['seofilter_seometa_remove_confirm'] = 'Вы уверены? Это очи
 
 
 $_lang['seofilter_dictionary_create'] = 'Добавить запись';
+$_lang['seofilter_dictionary_update'] = 'Отредактировать запись';
+$_lang['seofilter_dictionary_disable'] = 'Отключить запись';
+$_lang['seofilter_dictionary_remove'] = 'Удалить';
+$_lang['seofilter_dictionary_remove_confirm'] = 'Удаление записей повлияет на подстановку значений';
 $_lang['seofilter_dictionary_id'] = 'Id';
+$_lang['seofilter_dictionary_fieldtitle'] = 'Название поля';
 $_lang['seofilter_dictionary_field_id'] = 'Поле';
 $_lang['seofilter_dictionary_active'] = 'Активно';
 $_lang['seofilter_dictionary_input'] = 'Запрос';
@@ -158,8 +164,10 @@ $_lang['seofilter_dictionary_value_to'] = 'Куда';
 $_lang['seofilter_dictionary_value_in'] = 'Где';
 $_lang['seofilter_dictionary_value_from'] = 'Откуда';
 
-$_lang['seofilter_disctionary_decline'] = 'Склонения по падежам';
-$_lang['seofilter_disctionary_decline_desc'] = 'Склонения по падежам только для русского языка';
+$_lang['seofilter_dictionary_decline'] = 'Склонения по падежам';
+$_lang['seofilter_dictionary_decline_desc'] = 'Склонения по падежам для русского, украинского и казахского языка';
+$_lang['seofilter_seometa_err_input'] = 'Ошибка, не введёно вводное слово для словаря';
+$_lang['seofilter_seometa_err_ae'] = 'Ошибка, уже есть такое слово для этого поля';
 
 $_lang['seofilter_fieldids'] = 'Поля';
 $_lang['seofilter_fieldids_id'] = 'Id';
@@ -197,7 +205,7 @@ $_lang['seofilter_url_remove_confirm'] = 'Вы уверены, что хотит
 $_lang['seofilter_multiseo_intro'] = 'Синтаксис для двух и более полей: {$alias1}, {$alias2}, где "aliasX" - это синоним поля, прописанный в полях фильтра. На первой вкладке в поле URL адреса как-раз они прописаны. Падежи добавляются так: {$alias1_r} и т.д. За обработку отвечает Fenom.';
 
 $_lang['seofilter_field_xpdo'] = 'Значение в другой таблице';
-$_lang['seofilter_field_xpdo_package'] = 'Компонента, например customExtra';
+$_lang['seofilter_field_xpdo_package'] = 'Компонент, например customextra';
 $_lang['seofilter_field_xpdo_class'] = 'Класс, например customExtraItem';
 $_lang['seofilter_field_xpdo_id'] = 'Поле для сопоставления (id)';
 $_lang['seofilter_field_xpdo_name'] = 'Поле, где хранится значение (name)';

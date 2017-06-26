@@ -39,6 +39,12 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             ));
         }
 
+        $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
+        //$c->leftJoin('sfSeoMeta', 'sfSeoMeta', $this->classKey.'.id = sfSeoMeta.multi_id');
+        $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
+        //$c->select($this->modx->getSelectColumns('sfSeoMeta','sfSeoMeta','',array('title','h1')));
+        $c->select('sfField.name as fieldtitle');
+
         return $c;
     }
 
@@ -75,28 +81,28 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             'button' => true,
             'menu' => true,
         );
-
-        if (!$array['active']) {
-            $array['actions'][] = array(
-                'cls' => '',
-                'icon' => 'icon icon-power-off action-green',
-                'title' => $this->modx->lexicon('seofilter_dictionary_enable'),
-                'multiple' => $this->modx->lexicon('seofilter_dictionary_enable'),
-                'action' => 'enableField',
-                'button' => true,
-                'menu' => true,
-            );
-        } else {
-            $array['actions'][] = array(
-                'cls' => '',
-                'icon' => 'icon icon-power-off action-gray',
-                'title' => $this->modx->lexicon('seofilter_dictionary_disable'),
-                'multiple' => $this->modx->lexicon('seofilter_dictionary_disable'),
-                'action' => 'disableField',
-                'button' => true,
-                'menu' => true,
-            );
-        }
+//
+//        if (!$array['active']) {
+//            $array['actions'][] = array(
+//                'cls' => '',
+//                'icon' => 'icon icon-power-off action-green',
+//                'title' => $this->modx->lexicon('seofilter_dictionary_enable'),
+//                'multiple' => $this->modx->lexicon('seofilter_dictionary_enable'),
+//                'action' => 'enableField',
+//                'button' => true,
+//                'menu' => true,
+//            );
+//        } else {
+//            $array['actions'][] = array(
+//                'cls' => '',
+//                'icon' => 'icon icon-power-off action-gray',
+//                'title' => $this->modx->lexicon('seofilter_dictionary_disable'),
+//                'multiple' => $this->modx->lexicon('seofilter_dictionary_disable'),
+//                'action' => 'disableField',
+//                'button' => true,
+//                'menu' => true,
+//            );
+//        }
 
         // Remove
         $array['actions'][] = array(

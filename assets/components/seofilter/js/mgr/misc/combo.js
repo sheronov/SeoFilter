@@ -76,6 +76,7 @@ var classes = [
     ['modResource', _('seofilter_modResource')],
     ['msVendor', _('seofilter_msVendor')],
     ['msProductOption', _('seofilter_msProductOption')],
+    ['modTemplateVar', _('seofilter_modTemplateVar')],
 ];
 SeoFilter.combo.Class = function (config) {
     config = config || {};

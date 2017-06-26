@@ -107,7 +107,8 @@ class SeoFilter
             if($this->config['page']) {
                 $q = $this->modx->newQuery('sfField');
                 $q->limit(0);
-                $q->where(array('page' => $this->config['page']));
+                $q->where(array('1 = 1 AND FIND_IN_SET('.$this->config['page'].',pages)'));
+                //$q->where(array('page' => $this->config['page']));
                 $q->select(array('DISTINCT sfField.alias'));
                 if($q->prepare() && $q->stmt->execute()) {
                     $this->config['aliases'] = $q->stmt->fetchALL(PDO::FETCH_COLUMN);
@@ -179,10 +180,15 @@ class SeoFilter
 
     public function process($action, $data = array())
     {
+        $diff = array();
         $params = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
-        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
+        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
+        if(count($params))
+            $diff = array_flip(array_diff(array_flip($params),$aliases));
+        if(count($diff))
+            $params = array_diff($params,$diff);
         switch ($action) {
             case 'getmeta':
                 if(count($params) > 1) {
@@ -193,7 +199,7 @@ class SeoFilter
                         }
                     }
                     if(!$multi_value) {
-                        $meta = $this->getMultiMeta($params,$pageId);
+                        $meta = $this->getMultiMeta($params,$pageId,1);
                     } else {
                         $meta = $this->getPageMeta($pageId);
                         $meta['url'] = $this->getHashUrl($params);
@@ -207,9 +213,19 @@ class SeoFilter
                     } else {
                         $meta = $this->getFieldMeta($params,$pageId);
                     }
+                    foreach($params as $param => $value) {
+                        if(!$value) {
+                            $meta['url'] = $this->getHashUrl($params);
+                        }
+                    }
                 } else {
                     $meta = $this->getPageMeta($pageId);
                 }
+
+                if(count($diff)) {
+                    $meta['url'] = $meta['url'] . $this->getHashUrl($diff);
+                }
+
                 $response = array(
                     'success' => true,
                     'data' => $meta,
@@ -295,17 +311,21 @@ class SeoFilter
         return $meta;
     }
 
-    public function getMultiMeta($params, $page_id = 0,$multi_id = 0) {
+    public function getMultiMeta($params, $page_id = 0,$ajax = 0) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class');
         $meta = array();
         $fields = array();
         $word_array = array();
         $aliases = array();
         $find_multi = 0;
+        $baseparam = array();
 
         foreach ($params as $param => $value) {
             if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
                 $fields[] = $field['id'];
+                if($field['baseparam']) {
+                    $baseparam[$param] = $value;
+                }
                 if ($word = $this->pdo->getArray('sfDictionary', array('input'=>$value,'field_id'=>$field['id']))) {
                     foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
                         $word_array[str_replace('value',$field['alias'],$tmp_key)] = $tmp_array;
@@ -314,6 +334,7 @@ class SeoFilter
                 }
             }
         }
+
 
         if($find_multi = $this->findMultiIdByFields($fields,$page_id)) {
             if ($seo = $this->pdo->getArray('sfSeoMeta', array('multi_id'=>$find_multi))) {
@@ -330,10 +351,15 @@ class SeoFilter
        // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
        // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($find_multi,1));
         if(!$find_multi && !$meta) {
-            $meta = $this->getPageMeta($page_id);
-            $meta['url'] = $this->multiUrl($params,0);
+            if(count($baseparam) == 1) {
+                $meta = $this->getFieldMeta($baseparam);
+                $meta['url'] = $meta['url'].$this->multiUrl(array_diff($params,$baseparam),0);
+            } else {
+                $meta = $this->getPageMeta($page_id);
+                $meta['url'] = $this->multiUrl($params,0);
+            }
         } else {
-            $meta['url'] = $this->multiUrl($aliases,$find_multi);
+            $meta['url'] = $this->multiUrl($aliases,$find_multi,$ajax);
         }
       //  $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($aliases,1));
 
@@ -398,6 +424,18 @@ class SeoFilter
         }
     }
 
+    public function addUrlCount($url_id = 0, $filter = 0) {
+        if($url = $this->modx->getObject('sfUrls',$url_id)) {
+            $count = $url->get('count') + 1;
+            $url->set('count',$count);
+            if($filter) {
+                $ajax = $url->get('ajax') + 1;
+                $url->set('ajax',$ajax);
+            }
+            $url->save();
+        }
+    }
+
 
 
     public function fieldUrl($value = '', $field = array()) {
@@ -414,7 +452,7 @@ class SeoFilter
         return $url;
     }
 
-    public function multiUrl($aliases = array(),$multi_id = 0) {
+    public function multiUrl($aliases = array(),$multi_id = 0,$ajax = 0) {
         $url = '';
         if($multi_id) {
             if($marray = $this->pdo->getArray('sfMultiField',$multi_id)) {
@@ -424,6 +462,7 @@ class SeoFilter
                     if($url_array['new_url']) {
                         $url = $url_array['new_url'];
                     }
+                    $this->addUrlCount($url_array['id'],$ajax);
                 }
             }
         } else {
@@ -441,6 +480,10 @@ class SeoFilter
             }
         }
         return $url;
+    }
+
+    public function multiBaseUrl($baseparam = array(),$params = array()) {
+
     }
 
 

@@ -70,7 +70,6 @@ class sfMultiFieldUpdateProcessor extends modObjectUpdateProcessor
             $processorProps = array(
                 'multi_id' => $multi_id,
                 'old_url' => $url,
-                'createdon' => strtotime(date('Y-m-d H:i:s'))
             );
             $otherProps = array('processors_path' => $path . 'processors/');
             $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);

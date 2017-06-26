@@ -211,6 +211,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             header: _('seofilter_url_editedon'),
             dataIndex: 'editedon',
             sortable: true,
+            renderer: SeoFilter.utils.formatDate,
             width: 150,
         }, {
             header: _('seofilter_url_createdon'),
@@ -222,7 +223,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             header: _('seofilter_url_count'),
             dataIndex: 'count',
             sortable: true,
-            width: 150,
+            width: 70,
         }, {
             header: _('seofilter_url_active'),
             dataIndex: 'active',

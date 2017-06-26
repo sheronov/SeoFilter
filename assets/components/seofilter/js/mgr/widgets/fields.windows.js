@@ -76,6 +76,12 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                                 allowBlank:false,
                             },{
                                 xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_field_translit'),
+                                name: 'translit',
+                                id: config.id + '-translit',
+                                checked: true,
+                            },{
+                                xtype: 'xcheckbox',
                                 boxLabel: _('seofilter_field_active'),
                                 name: 'active',
                                 id: config.id + '-active',
@@ -109,11 +115,6 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                                 boxLabel: _('seofilter_field_exact'),
                                 name: 'exact',
                                 id: config.id + '-exact',
-                            },{
-                                xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_translit'),
-                                name: 'translit',
-                                id: config.id + '-translit',
                             },{
                                 xtype: 'xcheckbox',
                                 boxLabel: _('seofilter_field_baseparam'),
@@ -269,10 +270,12 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                                 id: config.id + '-pages',
                                 anchor: '99%',
                             }, {
-                                xtype: 'seofilter-combo-class',
-                                fieldLabel: _('seofilter_field_class_more'),
+                                xtype: 'textfield',
+                                fieldLabel: _('seofilter_field_class'),
                                 name: 'class',
                                 id: config.id + '-class',
+                                readOnly: true,
+                                style: 'background:#f9f9f9;color:#aaa;',
                                 anchor: '99%',
                                 allowBlank:false,
                             }, {
@@ -281,13 +284,14 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                                 name: 'key',
                                 id: config.id + '-key',
                                 anchor: '99%',
+                                readOnly: true,
+                                style: 'background:#f9f9f9;color:#aaa;',
                                 allowBlank:false,
                         },{
                             xtype: 'xcheckbox',
                             boxLabel: _('seofilter_field_active'),
                             name: 'active',
                             id: config.id + '-active',
-                            checked: true,
                             }
                         ]
                     },{

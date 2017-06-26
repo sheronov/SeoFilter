@@ -43,6 +43,7 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
 
         return parent::beforeSet();
     }
+
 }
 
 return 'sfUrlsUpdateProcessor';

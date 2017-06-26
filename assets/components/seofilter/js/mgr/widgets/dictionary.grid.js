@@ -193,11 +193,11 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             sortable: true,
             width: 70
         }, {
-        //     header: _('seofilter_dictionary_field_id'),
-        //     dataIndex: 'field_id',
-        //     sortable: true,
-        //     width: 150,
-        // }, {
+            header: _('seofilter_dictionary_field_id'),
+            dataIndex: 'fieldtitle',
+            sortable: true,
+            width: 150,
+        }, {
             header: _('seofilter_dictionary_input'),
             dataIndex: 'input',
             sortable: true,
@@ -213,16 +213,16 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_dictionary_class'),
-            dataIndex: 'class',
-            sortable: true,
-            width: 150,
-        }, {
-            header: _('seofilter_dictionary_key'),
-            dataIndex: 'key',
-            sortable: true,
-            width: 150,
-        }, {
+        //     header: _('seofilter_dictionary_class'),
+        //     dataIndex: 'class',
+        //     sortable: true,
+        //     width: 150,
+        // }, {
+        //     header: _('seofilter_dictionary_key'),
+        //     dataIndex: 'key',
+        //     sortable: true,
+        //     width: 150,
+        // }, {
             header: _('seofilter_dictionary_menu_on'),
             dataIndex: 'menu_on',
             sortable: true,
@@ -245,11 +245,13 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     },
 
     getTopBar: function () {
-        return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_dictionary_create'),
-            handler: this.createField,
-            scope: this
-        }, '->', {
+        return [
+            //  {
+            //     text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_dictionary_create'),
+            //     handler: this.createField,
+            //     scope: this
+            // },
+            '->', {
             xtype: 'seofilter-field-search',
             width: 250,
             listeners: {
