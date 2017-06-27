@@ -8,7 +8,6 @@ if (!$SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('
     return 'Could not load SeoFilter class!';
 }
 
-// Do your snippet code here. This demo grabs 5 items from our custom table.
 $tpl = $modx->getOption('tpl', $scriptProperties, 'Item');
 $sortby = $modx->getOption('sortby', $scriptProperties, 'name');
 $sortdir = $modx->getOption('sortbir', $scriptProperties, 'ASC');

@@ -16,7 +16,27 @@ jQuery(document).ready(function ($) {
                 success: function(response) {
                     var url = hash;
                     var origin = seoFilter.config.url || document.location.pathname;
-                    if(response.data.title) {$(seoFilter.config.jtitle).text(response.data.title);}
+
+                    if(response.data.title) {
+                        if (seoFilter.config.replacebefore) {
+                            var separator = seoFilter.config.replaceseparator || ' / ';
+                            var title = $('title').text();
+                            //console.log(title.indexOf(separator));
+                            var arr_title = title.split(separator);
+                            if (arr_title.length > 1) {
+                                arr_title[0] = response.data.title;
+                                $(seoFilter.config.jtitle).text(arr_title.join(separator));
+                            } else {
+                                $(seoFilter.config.jtitle).text(response.data.title);
+                            }
+                        } else {
+                            $(seoFilter.config.jtitle).text(response.data.title);
+                        }
+                    }
+
+
+
+
                     if(response.data.description) {$(seoFilter.config.jdescription).attr("content", response.data.description);}
                     if(response.data.h1) {$(seoFilter.config.jh1).html(response.data.h1);}
                     if(response.data.h2) {$(seoFilter.config.jh2).html(response.data.h2);}
@@ -31,10 +51,10 @@ jQuery(document).ready(function ($) {
                     else {
                         window.location.hash = url.substr(1);
                     }
-                   // console.log(response);
+                    //console.log(response);
                 },
                 error: function (response) {
-                    console.log(response);
+                    //console.log(response);
                 }
             });
         }
@@ -42,6 +62,7 @@ jQuery(document).ready(function ($) {
 
 
     if(typeof mSearch2 != 'undefined') {
+
         mSearch2.Hash.set =  function (vars) {
             var hash = '';
             var aliases = seoFilter.config.aliases;
@@ -63,7 +84,7 @@ jQuery(document).ready(function ($) {
                     }
                 }
             }
-            console.log(document.location.pathname);
+            //console.log(document.location.pathname);
             if (!this.oldbrowser()) {
                 if (hash.length != 0) {
                     if(count) {

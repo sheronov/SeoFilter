@@ -92,7 +92,7 @@ $xpdo_meta_map['sfField']= array (
       'dbtype' => 'tinyint',
       'precision' => '1',
       'phptype' => 'boolean',
-      'null' => true,
+      'null' => false,
       'default' => 1,
     ),
     'hideparam' => 
@@ -100,7 +100,7 @@ $xpdo_meta_map['sfField']= array (
       'dbtype' => 'tinyint',
       'precision' => '1',
       'phptype' => 'boolean',
-      'null' => true,
+      'null' => false,
       'default' => 0,
     ),
     'valuefirst' => 
@@ -108,7 +108,7 @@ $xpdo_meta_map['sfField']= array (
       'dbtype' => 'tinyint',
       'precision' => '1',
       'phptype' => 'boolean',
-      'null' => true,
+      'null' => false,
       'default' => 0,
     ),
     'exact' => 
@@ -116,7 +116,7 @@ $xpdo_meta_map['sfField']= array (
       'dbtype' => 'tinyint',
       'precision' => '1',
       'phptype' => 'boolean',
-      'null' => true,
+      'null' => false,
       'default' => 1,
     ),
     'baseparam' => 
@@ -124,7 +124,7 @@ $xpdo_meta_map['sfField']= array (
       'dbtype' => 'tinyint',
       'precision' => '1',
       'phptype' => 'boolean',
-      'null' => true,
+      'null' => false,
       'default' => 0,
     ),
     'xpdo' => 

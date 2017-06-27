@@ -3,7 +3,8 @@
 switch ($modx->event->name) {
     case 'OnLoadWebDocument':
         if($page = $modx->resource->id) {
-            $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null, $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+            $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
+                    $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
             if (!($SeoFilter instanceof SeoFilter)) break;
             $q = $modx->newQuery('sfField');
 

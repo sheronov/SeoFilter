@@ -81,9 +81,24 @@ $tmp = array(
         'value' => 'content',
         'area' => 'seofilter_seo',
     ),
+    'pagetpl' => array(
+        'xtype' => 'textfield',
+        'value' => '@INLINE [[%seofilter_page]] [[+page]] [[%seofilter_from]] [[+pageCount]]',
+        'area' => 'seofilter_seo',
+    ),
     'jtitle' => array(
         'xtype' => 'textfield',
         'value' => 'title',
+        'area' => 'seofilter_jquery',
+    ),
+    'replacebefore' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofilter_jquery',
+    ),
+    'replaceseparator' => array(
+        'xtype' => 'textfield',
+        'value' => ' / ',
         'area' => 'seofilter_jquery',
     ),
     'jdescription' => array(

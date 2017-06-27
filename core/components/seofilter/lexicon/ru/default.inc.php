@@ -5,6 +5,9 @@ $_lang['seofilter'] = 'SeoFilter';
 $_lang['seofilter_menu_desc'] = 'Управление ЧПУ и SEO для mFilter2';
 $_lang['seofilter_intro_msg'] = 'Вы можете выделять сразу несколько предметов при помощи Shift или Ctrl.';
 
+$_lang['seofilter_page'] = 'стр.';
+$_lang['seofilter_from'] = 'из';
+
 $_lang['seofilter_field'] = 'Поле';
 $_lang['seofilter_fields'] = 'Поля фильтра';
 $_lang['seofilter_fields_intro'] = 'На этой странице вы создаёте и редактируете базовые поля для формирования ЧПУ в фильтре После сохранения в режиме редактирования можно будет ввести информацию по полям для SEO. ';

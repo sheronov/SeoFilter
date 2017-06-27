@@ -32,6 +32,7 @@ class SeoFilter
         $redirect  = $this->modx->getOption('seofilter_redirect', null, 1, true);
         $site_start = $this->modx->context->getOption('site_start', 1);
         $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
+
         $title = $this->modx->getOption('seofilter_title', null, 'pagetitle', true);
         $description = $this->modx->getOption('seofilter_description', null, 'description', true);
         $introtext = $this->modx->getOption('seofilter_introtext', null, 'introtext', true);
@@ -39,7 +40,10 @@ class SeoFilter
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
         $text = $this->modx->getOption('seofilter_text', null, '', true);
         $content= $this->modx->getOption('seofilter_content', null, 'content', true);
+        $pagetpl = $this->modx->getOption('seofilter_pagetpl',null,'@INLINE [[%seofilter_page]] [[+page]] [[%seofilter_from]] [[+pageCount]]',true);
 
+        $replacebefore = $this->modx->getOption('seofilter_replacebefore', null, 1, true);
+        $replaceseparator = $this->modx->getOption('seofilter_replaceseparator', null, ' / ', true);
         $jtitle = $this->modx->getOption('seofilter_jtitle', null, 'title', true);
         $jdescription = $this->modx->getOption('seofilter_jdescription', null, 'meta[name="description"]', true);
         $jintrotext = $this->modx->getOption('seofilter_jintrotext', null, '.sf_introtext', true);
@@ -49,9 +53,9 @@ class SeoFilter
         $jcontent = $this->modx->getOption('seofilter_jcontent', null, '.sf_content', true);
 
 
-
         $this->pdo = $this->modx->getService('pdoFetch');
         $this->pdo->setConfig(array('loadModels' => 'seofilter'));
+
 
         $this->config = array_merge(array(
             'assetsUrl' => $assetsUrl,
@@ -83,7 +87,10 @@ class SeoFilter
             'h2' => $h2,
             'text' => $text,
             'content' => $content,
+            'pagetpl' => $pagetpl,
 
+            'replacebefore' => $replacebefore,
+            'replaceseparator' => $replaceseparator,
             'jtitle' => $jtitle,
             'jdescription' => $jdescription,
             'jintrotext' => $jintrotext,
@@ -142,6 +149,9 @@ class SeoFilter
                 'separator' => $this->config['separator'],
                 'redirect' => $this->config['redirect'],
                 'url' => $this->config['url'],
+                'pagetpl' => str_replace(array('[[+', ']]', '{$'), array('{', '}', '{'), $this->pdo->getChunk($this->config['pagetpl'])),
+                'replacebefore' => $this->config['replacebefore'],
+                'replaceseparator' => $this->config['replaceseparator'],
                 'jtitle' => $this->config['jtitle'],
                 'jdescription' => $this->config['jdescription'],
                 'jintrotext' => $this->config['jintrotext'],
@@ -206,7 +216,7 @@ class SeoFilter
         $params = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
+        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
         if(count($params))
             $diff = array_flip(array_diff(array_flip($params),$aliases));
         if(count($diff))
@@ -222,9 +232,11 @@ class SeoFilter
                     }
                     if(!$multi_value) {
                         $meta = $this->getMultiMeta($params,$pageId,1);
+                        $meta['find'] = 1;
                     } else {
                         $meta = $this->getPageMeta($pageId);
                         $meta['url'] = $this->getHashUrl($params);
+                        $meta['find'] = 0;
                     }
                 } elseif(count($params) == 1) {
                     $params_copy = $params;
@@ -232,8 +244,10 @@ class SeoFilter
                     if(count(explode(',',$shift)) > 1) {
                         $meta = $this->getPageMeta($pageId);
                         $meta['url'] = $this->getHashUrl($params);
+                        $meta['find'] = 0;
                     } else {
                         $meta = $this->getFieldMeta($params,$pageId);
+                        $meta['find'] = 1;
                     }
                     foreach($params as $param => $value) {
                         if(!$value) {
@@ -242,11 +256,13 @@ class SeoFilter
                     }
                 } else {
                     $meta = $this->getPageMeta($pageId);
+                    $meta['find'] = 0;
                 }
 
                 if(count($diff)) {
                     $meta['url'] = $meta['url'] . $this->getHashUrl($diff);
                 }
+
 
                 $response = array(
                     'success' => true,
@@ -297,7 +313,11 @@ class SeoFilter
                 }
             }
             foreach ($system as $tag => $tagname) {
-                $tpl = '@INLINE ' . $page->get($tagname);
+                if(strpos($tagname, '[') || strpos($tagname, '{')) {
+                    $tpl = '@INLINE '. $tagname;
+                } else {
+                    $tpl = '@INLINE ' . $page->get($tagname);
+                }
                 $meta[$tag] = $this->pdo->getChunk($tpl);
             }
         }

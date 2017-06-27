@@ -30,8 +30,8 @@ $xpdo_meta_map['sfDictionary']= array (
     'values_t' => '',
     'values_p' => '',
     'values_o' => '',
-    'value_to' => '',
     'value_in' => '',
+    'value_to' => '',
     'value_from' => '',
     'active' => 1,
   ),
@@ -231,7 +231,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'value_to' => 
+    'value_in' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -239,7 +239,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'value_in' => 
+    'value_to' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',

@@ -5,8 +5,8 @@
 $snippets = array();
 
 $tmp = array(
-    'SeoFilter' => array(
-        'file' => 'seofilter',
+    'SeoFilterTitle' => array(
+        'file' => 'seofiltertitle',
         'description' => '',
     ),
 );
