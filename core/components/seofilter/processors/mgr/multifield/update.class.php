@@ -66,6 +66,21 @@ class sfMultiFieldUpdateProcessor extends modObjectUpdateProcessor
         $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
         $multi_id = $this->object->get('id');
         $urls = $this->object->generateUrl(1);
+        $url_objs = $this->modx->getCollection('sfUrls',array('multi_id'=>$this->object->id));
+        if(count($url_objs)) {
+            $old_urls = array();
+            foreach($url_objs as $url_obj) {
+                $old_urls[] = $url_obj->get('old_url');
+            }
+            $del_urls = array_diff($old_urls,$urls);
+            //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К удалению: '. print_r($del_urls,1));
+            if($del_urls) {
+                $removed = $this->modx->removeCollection('sfUrls',array('old_url:IN'=>$del_urls));
+                $this->modx->log(modX::LOG_LEVEL_ERROR, 'URLs deleted: '. print_r($removed,1));
+            }
+            $urls = array_diff($urls,$old_urls);
+            //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($urls,1));
+        }
         foreach($urls as $url) {
             $processorProps = array(
                 'multi_id' => $multi_id,

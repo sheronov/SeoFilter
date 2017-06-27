@@ -2,7 +2,6 @@ jQuery(document).ready(function ($) {
     var seoFilter = {
         config : seoFilterConfig || {},
         ajax_post: function (array,hash,browser) {
-            console.log(array,hash);
             $.ajax({
                 type: 'POST',
                 url: this.config.actionUrl,
@@ -17,11 +16,14 @@ jQuery(document).ready(function ($) {
                 success: function(response) {
                     var url = hash;
                     var origin = seoFilter.config.url || document.location.pathname;
-                    if(response.data.title) {$('title').text(response.data.title);}
-                    if(response.data.description) {$('meta[name="description"]').attr("content", response.data.description);}
-                    if(response.data.h1) {$('#sf_h1').text(response.data.h1);}
+                    if(response.data.title) {$(seoFilter.config.jtitle).text(response.data.title);}
+                    if(response.data.description) {$(seoFilter.config.jdescription).attr("content", response.data.description);}
+                    if(response.data.h1) {$(seoFilter.config.jh1).html(response.data.h1);}
+                    if(response.data.h2) {$(seoFilter.config.jh2).html(response.data.h2);}
+                    if(response.data.introtext) {$(seoFilter.config.jintrotext).html(response.data.introtext);}
+                    if(response.data.text) {$(seoFilter.config.jtext).html(response.data.text);}
+                    if(response.data.content) {$(seoFilter.config.jcontent).html(response.data.content);}
                     if(response.data.url) {url = response.data.url;}
-                    //TODO: добавить замену всех тегов
 
                     if(browser) {
                         window.history.pushState({mSearch2: origin + url}, '', origin + url);
@@ -29,9 +31,7 @@ jQuery(document).ready(function ($) {
                     else {
                         window.location.hash = url.substr(1);
                     }
-
-                    console.log(url);
-                    console.log(response);
+                   // console.log(response);
                 },
                 error: function (response) {
                     console.log(response);
@@ -48,7 +48,6 @@ jQuery(document).ready(function ($) {
             var count = 0;
             var browser = 0;
             var origin = seoFilter.config.url || document.location.pathname;
-            console.log(origin);
 
             for (var i in vars) {
                 if (vars.hasOwnProperty(i)) {
@@ -73,15 +72,7 @@ jQuery(document).ready(function ($) {
                         hash = '?' + hash.substr(1).replace('%', '%25').replace('+', '%2B');
                     }
                 }
-                console.log(hash);
-                console.log(document.location.href);
-                console.log(document.location.origin);
-                //window.history.pushState({mSearch2: document.location.pathname + hash}, '', document.location.pathname + hash);
-                //window.history.pushState({mSearch2: origin + hash}, '', origin + hash); //перемещено в ajax_post
                 browser = 1;
-            }
-            else {
-                //window.location.hash = hash.substr(1);
             }
             seoFilter.ajax_post(vars, hash, browser);
         }

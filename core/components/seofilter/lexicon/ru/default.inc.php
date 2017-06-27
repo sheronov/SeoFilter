@@ -194,6 +194,9 @@ $_lang['seofilter_url_count'] = 'Переходов';
 $_lang['seofilter_url_ajax'] = 'Из них переходов через фильтр';
 $_lang['seofilter_url_active'] = 'Активно';
 $_lang['seofilter_url_active_more'] = 'Активно (если нет, то будет отдавать 404)';
+$_lang['seofilter_url_err_url'] = 'Не задан URL адрес для ссылки!';
+$_lang['seofilter_url_err_ae'] = 'Ссылка с таким адресом уже существует!';
+
 
 $_lang['seofilter_url_create'] = 'Добавить URL';
 $_lang['seofilter_url_update'] = 'Изменить URL';

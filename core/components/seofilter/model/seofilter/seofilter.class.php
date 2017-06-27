@@ -29,7 +29,6 @@ class SeoFilter
         $actionUrl = $assetsUrl . 'action.php';
         $connectorUrl = $assetsUrl . 'connector.php';
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
-        $valuefirst = $this->modx->getOption('seofilter_valuefirst', null, 0, true);
         $redirect  = $this->modx->getOption('seofilter_redirect', null, 1, true);
         $site_start = $this->modx->context->getOption('site_start', 1);
         $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
@@ -40,6 +39,15 @@ class SeoFilter
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
         $text = $this->modx->getOption('seofilter_text', null, '', true);
         $content= $this->modx->getOption('seofilter_content', null, 'content', true);
+
+        $jtitle = $this->modx->getOption('seofilter_jtitle', null, 'title', true);
+        $jdescription = $this->modx->getOption('seofilter_jdescription', null, 'meta[name="description"]', true);
+        $jintrotext = $this->modx->getOption('seofilter_jintrotext', null, '.sf_introtext', true);
+        $jh1 = $this->modx->getOption('seofilter_jh1', null, '.sf_h1', true);
+        $jh2 = $this->modx->getOption('seofilter_jh2', null, '.sf_h2', true);
+        $jtext = $this->modx->getOption('seofilter_jtext', null, '.sf_text', true);
+        $jcontent = $this->modx->getOption('seofilter_jcontent', null, '.sf_content', true);
+
 
 
         $this->pdo = $this->modx->getService('pdoFetch');
@@ -64,7 +72,6 @@ class SeoFilter
 
             'params' => array(),
             'separator' => $separator,
-            'valuefirst' => $valuefirst,
             'redirect' => $redirect,
             'site_start' => $site_start,
             'charset' => $charset,
@@ -76,6 +83,15 @@ class SeoFilter
             'h2' => $h2,
             'text' => $text,
             'content' => $content,
+
+            'jtitle' => $jtitle,
+            'jdescription' => $jdescription,
+            'jintrotext' => $jintrotext,
+            'jh1' => $jh1,
+            'jh2' => $jh2,
+            'jtext' => $jtext,
+            'jcontent' => $jcontent,
+
         ), $config);
 
         $this->modx->addPackage('seofilter', $this->config['modelPath']);
@@ -124,9 +140,15 @@ class SeoFilter
                 'params' => $this->config['params'],
                 'aliases' => $this->config['aliases'],
                 'separator' => $this->config['separator'],
-                'valuefirst' => $this->config['valuefirst'],
                 'redirect' => $this->config['redirect'],
                 'url' => $this->config['url'],
+                'jtitle' => $this->config['jtitle'],
+                'jdescription' => $this->config['jdescription'],
+                'jintrotext' => $this->config['jintrotext'],
+                'jh1' => $this->config['jh1'],
+                'jh2' => $this->config['jh2'],
+                'jtext' => $this->config['jtext'],
+                'jcontent' => $this->config['jcontent'],
             ), true);
             $this->modx->regClientStartupScript(
                 '<script type="text/javascript">seoFilterConfig = ' . $data . ';</script>', true

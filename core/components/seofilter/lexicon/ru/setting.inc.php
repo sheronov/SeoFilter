@@ -1,6 +1,9 @@
 <?php
 
 $_lang['area_seofilter_main'] = 'Основные';
+$_lang['area_seofilter_seo'] = 'Поля для подстановки по-умолчанию';
+$_lang['area_seofilter_jquery'] = 'jQuery селекторы для подстановки через AJAX';
+
 
 $_lang['setting_seofilter_some_setting'] = 'Какая-то настройка';
 $_lang['setting_seofilter_some_setting_desc'] = 'Это описание для какой-то настройки';
@@ -17,3 +20,8 @@ $_lang['setting_seofilter_separator'] = 'Базовый разделитель �
 $_lang['setting_seofilter_separator_desc'] = 'По-умолчанию "-", по нему идёт разбтвка значения от параметра';
 $_lang['setting_seofilter_valuefirst'] = 'Сначала значение, потом параметр ';
 $_lang['setting_seofilter_valuefirst_desc'] = 'По-умолчанию нет. Если в адресе сначала значение, а потом через разделитель параметр. Пример ".../red-color"';
+
+$_lang['setting_seofilter_morpher_username'] = 'Логин к сервису morpher.ru';
+$_lang['setting_seofilter_morpher_username_desc'] = 'Если указать, будет больше вариантов склонения, включая где, куда, откуда';
+$_lang['setting_seofilter_morpher_password'] = 'Пароль к сервису morpher.ru';
+$_lang['setting_seofilter_morpher_password_desc'] = 'Пароль к логину на morpher.ru';

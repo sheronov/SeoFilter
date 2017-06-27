@@ -81,7 +81,41 @@ $tmp = array(
         'value' => 'content',
         'area' => 'seofilter_seo',
     ),
-
+    'jtitle' => array(
+        'xtype' => 'textfield',
+        'value' => 'title',
+        'area' => 'seofilter_jquery',
+    ),
+    'jdescription' => array(
+        'xtype' => 'textfield',
+        'value' => 'meta[name="description"]',
+        'area' => 'seofilter_jquery',
+    ),
+    'jintrotext' => array(
+        'xtype' => 'textfield',
+        'value' => '.sf_introtext',
+        'area' => 'seofilter_jquery',
+    ),
+    'jh1' => array(
+        'xtype' => 'textfield',
+        'value' => '.sf_h1',
+        'area' => 'seofilter_jquery',
+    ),
+    'jh2' => array(
+        'xtype' => 'textfield',
+        'value' => '.sf_h2',
+        'area' => 'seofilter_jquery',
+    ),
+    'jtext' => array(
+        'xtype' => 'textfield',
+        'value' => '.sf_text',
+        'area' => 'seofilter_jquery',
+    ),
+    'jcontent' => array(
+        'xtype' => 'textfield',
+        'value' => '.sf_content',
+        'area' => 'seofilter_jquery',
+    ),
 
 );
 

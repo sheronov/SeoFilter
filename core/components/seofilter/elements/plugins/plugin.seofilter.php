@@ -57,7 +57,7 @@ switch ($modx->event->name) {
                     $pageids[] = $row['page'];
                 }
             }
-            // TODO: возможно будут случаи, когда захотят видеть пересечение только на одной странице, без участия в ней параметров (пример - сделать страницу Тёплых складов в Московской области)
+            // TODO: возможно будут случаи, когда захотят видеть пересечение только на одной странице, без участия в ней параметров (пример - сделать страницу Тёплых складов в Московской области) связаано с TODO в sfmultifield.class.php
 
 
             if (count($tmp)) {
@@ -150,9 +150,6 @@ switch ($modx->event->name) {
                         $meta = $SeoFilter->getMultiMeta($findparams,$page);
                         $modx->setPlaceholders($meta,'sf.');
                         $modx->sendForward($page);
-                    } else {
-                        echo 'Что-то пошло не так. Найти, когда это всплывёт'; //TODO: Обработать
-                        die;
                     }
                 }
             }
@@ -162,11 +159,6 @@ switch ($modx->event->name) {
 
             foreach ($tmp as $tid => $tquery) {
                 $query = explode($separator, $tquery);
-//                if (count($query) < 2) {
-//                    $novalue = true;
-//                    break;
-//                }
-                //TODO: какое-то бредовое условие выше я писал
                 $qcount = count($query);
                 foreach($query as $qkey => $qvalue) {
                     if($field = $pdo->getArray('sfField',array('alias'=>$qvalue))) {
@@ -197,7 +189,6 @@ switch ($modx->event->name) {
                     $priorities[$param] = $priorities_asort[$param] = $priority;
 
                     if ($translit && $field = $modx->getObject('sfField', $field_id)) {
-                        //TODO: возможно стоит здесь оставить обратную транслитерацию
                         $value_tr = modResource::filterPathSegment($modx, $value);
                     }
 
