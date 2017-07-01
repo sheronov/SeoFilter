@@ -216,7 +216,7 @@ class SeoFilter
         $params = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
-        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
+       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
         if(count($params))
             $diff = array_flip(array_diff(array_flip($params),$aliases));
         if(count($diff))
@@ -224,19 +224,32 @@ class SeoFilter
         switch ($action) {
             case 'getmeta':
                 if(count($params) > 1) {
-                    $multi_value = 0;
+                    $multi_value = $multi_base = 0;
+                    $baseparam = $this->findBaseParam($params);
                     foreach($params as $param => $value) {
                         if(count(explode(',',$value)) > 1) {
                             $multi_value = 1;
+                            if(isset($baseparam[$param])) {
+                                $multi_base = 1;
+                            }
                         }
                     }
+                    //$this->modx->log(modx::LOG_LEVEL_ERROR, '$meta = '.print_r($meta,1));
                     if(!$multi_value) {
                         $meta = $this->getMultiMeta($params,$pageId,1);
                         $meta['find'] = 1;
                     } else {
-                        $meta = $this->getPageMeta($pageId);
-                        $meta['url'] = $this->getHashUrl($params);
-                        $meta['find'] = 0;
+                        if(!$multi_base) {
+                            $meta = $this->getFieldMeta($baseparam,$pageId);
+                            //$this->modx->log(modx::LOG_LEVEL_ERROR, '$meta = '.print_r($meta,1));
+                            $meta['url'] = $meta['url'].$this->multiUrl(array_diff($params,$baseparam),0);
+                            $meta['find'] = 1;
+                        } else {
+                            $meta = $this->getPageMeta($pageId);
+                            $meta['url'] = $this->getHashUrl($params);
+                            $meta['find'] = 0;
+                        }
+
                     }
                 } elseif(count($params) == 1) {
                     $params_copy = $params;
@@ -353,6 +366,19 @@ class SeoFilter
         return $meta;
     }
 
+    public function findBaseParam($params) {
+        $baseparam = array();
+        foreach ($params as $param => $value) {
+            if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
+                if ($field['baseparam']) {
+                    $baseparam[$param] = $value;
+                    break;
+                }
+            }
+        }
+        return $baseparam;
+    }
+
     public function getMultiMeta($params, $page_id = 0,$ajax = 0) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class');
         $meta = array();
@@ -360,14 +386,11 @@ class SeoFilter
         $word_array = array();
         $aliases = array();
         $find_multi = 0;
-        $baseparam = array();
+        $baseparam = $this->findBaseParam($params);
 
         foreach ($params as $param => $value) {
             if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
                 $fields[] = $field['id'];
-                if($field['baseparam']) {
-                    $baseparam[$param] = $value;
-                }
                 if ($word = $this->pdo->getArray('sfDictionary', array('input'=>$value,'field_id'=>$field['id']))) {
                     foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
                         $word_array[str_replace('value',$field['alias'],$tmp_key)] = $tmp_array;
@@ -390,8 +413,8 @@ class SeoFilter
 
             }
         }
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($find_multi,1));
+       //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
+       //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($params,1));
         if(!$find_multi && !$meta) {
             if(count($baseparam) == 1) {
                 $meta = $this->getFieldMeta($baseparam);
@@ -524,9 +547,7 @@ class SeoFilter
         return $url;
     }
 
-    public function multiBaseUrl($baseparam = array(),$params = array()) {
 
-    }
 
 
 }

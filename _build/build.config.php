@@ -4,11 +4,12 @@
 define('PKG_NAME', 'SeoFilter');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
 
-define('PKG_VERSION', '1.0.1');
+define('PKG_VERSION', '1.0.2');
 define('PKG_RELEASE', 'beta');
 define('PKG_AUTO_INSTALL', true);
 //define('PKG_NAMESPACE_PATH', '{core_path}components/' . PKG_NAME_LOWER . '/');
-define('PKG_NAMESPACE_PATH', '{base_path}'.PKG_NAME.'/core/components/'.PKG_NAME_LOWER.'/');
+define('PKG_NAMESPACE_PATH', '{base_path}'.PKG_NAME.'/core/components/'.PKG_NAME_LOWER.'/'); //TODO: удалить после релиза
+
 
 // define paths
 if (isset($_SERVER['MODX_BASE_PATH'])) {
@@ -50,5 +51,4 @@ $BUILD_RESOLVERS = array(
     'tables',
     'chunks',
     //'setup',
-    'office',
 );

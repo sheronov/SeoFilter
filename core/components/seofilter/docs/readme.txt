@@ -1,10 +1,10 @@
 --------------------
 SeoFilter
 --------------------
-Author: John Doe <john@doe.com>
+Author: Evgeniy Sheronov <webrush@bk.ru>
 --------------------
 
-A basic Extra for MODx Revolution.
+SeoFilter for Minishop2 & mSearch2 on MODx Revolution.
 
 Feel free to suggest ideas/improvements/bugs on GitHub:
-http://github.com/username/SeoFilter/issues
+http://github.com/justtop1/SeoFilter/issues
