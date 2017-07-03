@@ -124,9 +124,11 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         //$this->modx->log(modX::LOG_LEVEL_ERROR, print_r($input, 1));
                         $processorProps['input'] = $input[$key];
                         $processorProps['value'] = $value;
-                        $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                        if ($response->isError()) {
-                            $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                        if($input[$key] && $value) {
+                            $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                            if ($response->isError()) {
+                                $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                            }
                         }
                     }
                 }

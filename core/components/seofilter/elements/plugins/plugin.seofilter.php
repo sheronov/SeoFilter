@@ -44,7 +44,10 @@ switch ($modx->event->name) {
             $fields = $aliases = $pageids = $url_parts = $findparams = array();
             if ($q->prepare() && $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $pageids[$row['id']] = $row['page'];
+                    $pages = explode(',',$row['pages']);
+                    foreach($pages as $p) {
+                        $pageids[$row['id']] = $p;
+                    }
                     $aliases[$row['id']] = $row['alias'];
                     $fields[$row['id']] = $row;
                 }
@@ -87,6 +90,12 @@ switch ($modx->event->name) {
                     for ($i = 0; $i <= $tmp_id; $i++) {
                         $url_parts[] = array_shift($tmp);
                     }
+                }
+            }
+
+            if (!$page) {
+                if (in_array($site_start, $pageids)) {
+                    $page = $site_start;  //для тех у кого главная страница сайта - фильтр
                 }
             }
 
