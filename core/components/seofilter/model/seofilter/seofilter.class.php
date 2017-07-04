@@ -213,14 +213,21 @@ class SeoFilter
     public function process($action, $data = array())
     {
         $diff = array();
-        $params = $data['data'];
+        $params = $copyparams = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
        // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
         if(count($params))
-            $diff = array_flip(array_diff(array_flip($params),$aliases));
-        if(count($diff))
-            $params = array_diff($params,$diff);
+            $diff = array_flip(array_diff(array_keys($params),$aliases));
+        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($diff,1));
+        if(count($diff)) {
+            foreach($diff as $dif => $dff) {
+                unset($copyparams[$dif]);
+            }
+            $diff = array_diff_key($params,$copyparams);
+            $params = array_intersect_key($params,$copyparams);
+        }
+        // TODO: тут надо бы сократить велосипед
         switch ($action) {
             case 'getmeta':
                 if(count($params) > 1) {
@@ -273,7 +280,12 @@ class SeoFilter
                 }
 
                 if(count($diff)) {
-                    $meta['url'] = $meta['url'] . $this->getHashUrl($diff);
+                    if(strpos($meta['url'],'?')) {
+                        $meta['url'] = $meta['url'] . str_replace('?','&', $this->getHashUrl($diff));
+                    } else {
+                        $meta['url'] = $meta['url'] . $this->getHashUrl($diff);
+                    }
+
                 }
 
 

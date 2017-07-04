@@ -72,16 +72,16 @@ jQuery(document).ready(function ($) {
 
             for (var i in vars) {
                 if (vars.hasOwnProperty(i)) {
-                    if(aliases.indexOf(i) != -1) {
-                        if(count || origin[origin.length-1] != '/') {
-                            hash += '/' + i + seoFilter.config.separator + vars[i];
-                        } else {
-                            hash += i + seoFilter.config.separator + vars[i];
-                        }
-                        count++;
-                    } else {
+                    // if(aliases.indexOf(i) != -1) {
+                    //     if(count || origin[origin.length-1] != '/') {
+                    //         hash += '/' + i + seoFilter.config.separator + vars[i];
+                    //     } else {
+                    //         hash += i + seoFilter.config.separator + vars[i];
+                    //     }
+                    //     count++;
+                    // } else {
                         hash += '&' + i + '=' + vars[i];
-                    }
+                    //}
                 }
             }
             //console.log(document.location.pathname);

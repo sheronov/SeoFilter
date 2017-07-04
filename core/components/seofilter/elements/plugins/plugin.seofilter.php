@@ -46,7 +46,7 @@ switch ($modx->event->name) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     $pages = explode(',',$row['pages']);
                     foreach($pages as $p) {
-                        $pageids[$row['id']] = $p;
+                        $pageids[] = $p;
                     }
                     $aliases[$row['id']] = $row['alias'];
                     $fields[$row['id']] = $row;
