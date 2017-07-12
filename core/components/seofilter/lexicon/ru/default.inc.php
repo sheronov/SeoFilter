@@ -39,7 +39,8 @@ $_lang['seofilter_field_key'] = 'Ключ';
 $_lang['seofilter_field_alias'] = 'Синоним';
 $_lang['seofilter_field_dont'] = 'Не обрабатывать';
 $_lang['seofilter_field_translit'] = 'Транслитерация';
-$_lang['seofilter_field_baseparam'] = 'Базовый параметр (оставляет свои мета-тексты)';
+$_lang['seofilter_field_baseparam'] = 'Базовый параметр';
+$_lang['seofilter_field_baseparam_more'] = 'Базовый параметр (оставляет свои мета-тексты)';
 $_lang['seofilter_field_urltpl'] = 'Шаблон url';
 $_lang['seofilter_field_priority'] = 'Приоритет';
 $_lang['seofilter_field_method'] = 'Как обрабатывать значения';
@@ -220,3 +221,8 @@ $_lang['seofilter_field_xpdo_where'] = 'Дополнительное услов�
 $_lang['sf_err_ajax_nf'] = 'Ошибка. Не найден action.';
 
 $_lang['seofilter_fieldids_after_save'] = 'После сохранения можно будет выбрать поля, задать условия и изменять приоритет удерживая поле мышью';
+
+$_lang['seofilter_filter_key'] = 'Выберите ключ';
+$_lang['seofilter_filter_class'] = 'Выберите класс';
+$_lang['seofilter_filter_field'] = 'Выберите поле';
+$_lang['seofilter_filter_class_or'] = 'или выберите класс';

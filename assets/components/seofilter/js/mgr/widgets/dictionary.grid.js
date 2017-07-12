@@ -194,9 +194,10 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             width: 70
         }, {
             header: _('seofilter_dictionary_field_id'),
-            dataIndex: 'fieldtitle',
+            dataIndex: 'field_id',
             sortable: true,
             width: 150,
+            editor: { xtype: 'seofilter-combo-field' ,renderer: true}
         }, {
             header: _('seofilter_dictionary_input'),
             dataIndex: 'input',
@@ -223,12 +224,12 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         //     sortable: true,
         //     width: 150,
         // }, {
-            header: _('seofilter_dictionary_menu_on'),
-            dataIndex: 'menu_on',
-            sortable: true,
-            renderer: SeoFilter.utils.renderBoolean,
-            width: 70,
-        }, {
+        //     header: _('seofilter_dictionary_menu_on'),
+        //     dataIndex: 'menu_on',
+        //     sortable: true,
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     width: 70,
+        // }, {
             header: _('seofilter_dictionary_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
@@ -251,6 +252,32 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             //     handler: this.createField,
             //     scope: this
             // },
+            {
+                xtype: 'seofilter-combo-field'
+                ,id: 'tbar-seofilter-combo-field'
+                ,width: 200
+                ,addall: true
+                ,emptyText: _('seofilter_filter_field')
+                ,listeners: {
+                    select: {fn: this.filterByField, scope:this}
+                }
+            },{
+                xtype: 'seofilter-combo-class'
+                ,id: 'tbar-seofilter-combo-class'
+                ,width: 200
+                ,addall: true
+                ,emptyText: _('seofilter_filter_class_or')
+                ,listeners: {
+                    select: {fn: this.filterByClass, scope:this}
+                }
+            },{
+                xtype: 'button'
+                ,id: 'seofilter-filters-clear'
+                ,text: '<i class="icon icon-times"></i>'
+                ,listeners: {
+                    click: {fn: this.clearFilter, scope: this}
+                }
+            },
             '->', {
             xtype: 'seofilter-field-search',
             width: 250,
@@ -265,9 +292,30 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                         field.setValue('');
                         this._clearSearch();
                     }, scope: this
-                },
+                }
             }
         }];
+    },
+
+    filterByField: function(cb) {
+        this.getStore().baseParams['field'] = cb.value;
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
+    },
+    filterByClass: function(cb) {
+        this.getStore().baseParams['class'] = cb.value;
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
+    },
+
+    clearFilter: function(btn,e) {
+        var s = this.getStore();
+        s.baseParams['field'] = '';
+        s.baseParams['class'] = '';
+        Ext.getCmp('tbar-seofilter-combo-field').setValue('');
+        Ext.getCmp('tbar-seofilter-combo-class').setValue('');
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
     },
 
     onClick: function (e) {

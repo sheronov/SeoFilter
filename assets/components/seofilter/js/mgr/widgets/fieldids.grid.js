@@ -217,24 +217,24 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             // },{
             header: _('seofilter_fieldids_field_id'),
             dataIndex: 'name',
-            width: 100
+            width: 200
         },{
             header: _('seofilter_fieldids_priority'),
             dataIndex: 'priority',
-            width: 50
+            width: 100
         },{
             header: _('seofilter_fieldids_where'),
             dataIndex: 'where',
-            width: 50,
+            width: 100,
             renderer: SeoFilter.utils.renderBoolean,
-        },{
-            header: _('seofilter_fieldids_compare'),
-            dataIndex: 'compare',
-            width: 50
-        },{
-            header: _('seofilter_fieldids_value'),
-            dataIndex: 'value',
-            width: 100
+        // },{
+        //     header: _('seofilter_fieldids_compare'),
+        //     dataIndex: 'compare',
+        //     width: 50
+        // },{
+        //     header: _('seofilter_fieldids_value'),
+        //     dataIndex: 'value',
+        //     width: 100
             // },{
             //     header: _('seofilter_fieldids_condition'),
             //     dataIndex: 'condition',

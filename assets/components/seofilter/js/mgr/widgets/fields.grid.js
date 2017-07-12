@@ -202,11 +202,11 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
         //     renderer: SeoFilter.utils.renderResource,
         //     sortable: true,
         //     width: 150,
-        }, {
-            header: _('seofilter_field_pages'),
-            dataIndex: 'pages',
-            sortable: true,
-            width: 150,
+        // }, {
+        //     header: _('seofilter_field_pages'),
+        //     dataIndex: 'pages',
+        //     sortable: true,
+        //     width: 150,
         }, {
             header: _('seofilter_field_class'),
             dataIndex: 'class',
@@ -223,23 +223,23 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_field_translit'),
-            dataIndex: 'translit',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: false,
-            width: 75,
-        }, {
+        //     header: _('seofilter_field_translit'),
+        //     dataIndex: 'translit',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: false,
+        //     width: 75,
+        // }, {
             header: _('seofilter_field_baseparam'),
             dataIndex: 'baseparam',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: false,
-            width: 200,
+            width: 75,
         }, {
             header: _('seofilter_field_hideparam'),
             dataIndex: 'hideparam',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
-            width: 50
+            width: 75
         }, {
             header: _('seofilter_field_active'),
             dataIndex: 'active',

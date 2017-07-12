@@ -35,15 +35,23 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
         $query = trim($this->getProperty('query'));
         if ($query) {
             $c->where(array(
-                'name:LIKE' => "%{$query}%",
+                'input:LIKE' => "%{$query}%",
+                'OR:value:LIKE' => "%{$query}%",
+                'OR:alias:LIKE' => "%{$query}%",
             ));
         }
 
-        $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
-        //$c->leftJoin('sfSeoMeta', 'sfSeoMeta', $this->classKey.'.id = sfSeoMeta.multi_id');
-        $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
-        //$c->select($this->modx->getSelectColumns('sfSeoMeta','sfSeoMeta','',array('title','h1')));
-        $c->select('sfField.name as fieldtitle');
+        if ($field = $this->getProperty('field',null)) {
+            $c->andCondition(array('field_id' => $field), '', 1);
+        }
+
+        if ($class = $this->getProperty('class',null)) {
+            $c->andCondition(array('class' => $class), '', 1);
+        }
+
+  //      $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
+  //      $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
+  //      $c->select('sfField.name as fieldtitle');
 
         return $c;
     }

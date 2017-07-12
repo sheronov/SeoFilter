@@ -55,12 +55,12 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                             //     id: config.id + '-page',
                             //     anchor: '99%',
                             // }, {
-                                xtype: 'textfield',
-                                fieldLabel: _('seofilter_field_pages_more'),
-                                name: 'pages',
-                                id: config.id + '-pages',
-                                anchor: '99%',
-                            }, {
+                            //     xtype: 'textfield',
+                            //     fieldLabel: _('seofilter_field_pages_more'),
+                            //     name: 'pages',
+                            //     id: config.id + '-pages',
+                            //     anchor: '99%',
+                            // }, {
                                 xtype: 'seofilter-combo-class',
                                 fieldLabel: _('seofilter_field_class_more'),
                                 name: 'class',
@@ -75,17 +75,11 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                                 anchor: '99%',
                                 allowBlank:false,
                             },{
-                                xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_translit'),
-                                name: 'translit',
-                                id: config.id + '-translit',
-                                checked: true,
-                            },{
-                                xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_active'),
-                                name: 'active',
-                                id: config.id + '-active',
-                                checked: true,
+                                xtype: 'textfield',
+                                fieldLabel: _('seofilter_field_alias'),
+                                name: 'alias',
+                                id: config.id + '-alias',
+                                anchor: '99%',
                             }
                         ]
                     },{
@@ -93,14 +87,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                         ,layout: 'form'
                         ,defaults: { msgTarget: 'under' }
                         ,border:false
-                        ,items: [
-                            {
-                                xtype: 'textfield',
-                                fieldLabel: _('seofilter_field_alias'),
-                                name: 'alias',
-                                id: config.id + '-alias',
-                                anchor: '99%',
-                            },{
+                        ,items: [{
                                 xtype: 'xcheckbox',
                                 boxLabel: _('seofilter_field_hideparam'),
                                 name: 'hideparam',
@@ -117,9 +104,15 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                                 id: config.id + '-exact',
                             },{
                                 xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_baseparam'),
+                                boxLabel: _('seofilter_field_baseparam_more'),
                                 name: 'baseparam',
                                 id: config.id + '-baseparam',
+                            },{
+                                xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_field_active'),
+                                name: 'active',
+                                id: config.id + '-active',
+                                checked: true,
                             }
                         ]
                     }]
@@ -264,12 +257,12 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                             //     id: config.id + '-page',
                             //     anchor: '99%',
                             // }, {
-                                xtype: 'textfield',
-                                fieldLabel: _('seofilter_field_pages_more'),
-                                name: 'pages',
-                                id: config.id + '-pages',
-                                anchor: '99%',
-                            }, {
+                            //     xtype: 'textfield',
+                            //     fieldLabel: _('seofilter_field_pages_more'),
+                            //     name: 'pages',
+                            //     id: config.id + '-pages',
+                            //     anchor: '99%',
+                            // }, {
                                 xtype: 'textfield',
                                 fieldLabel: _('seofilter_field_class'),
                                 name: 'class',
@@ -287,11 +280,12 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                                 readOnly: true,
                                 style: 'background:#f9f9f9;color:#aaa;',
                                 allowBlank:false,
-                        },{
-                            xtype: 'xcheckbox',
-                            boxLabel: _('seofilter_field_active'),
-                            name: 'active',
-                            id: config.id + '-active',
+                            },{
+                                xtype: 'textfield',
+                                fieldLabel: _('seofilter_field_alias'),
+                                name: 'alias',
+                                id: config.id + '-alias',
+                                anchor: '99%',
                             }
                         ]
                     },{
@@ -299,14 +293,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                         ,layout: 'form'
                         ,defaults: { msgTarget: 'under' }
                         ,border:false
-                        ,items: [
-                            {
-                                xtype: 'textfield',
-                                fieldLabel: _('seofilter_field_alias'),
-                                name: 'alias',
-                                id: config.id + '-alias',
-                                anchor: '99%',
-                            },{
+                        ,items: [{
                                 xtype: 'xcheckbox',
                                 boxLabel: _('seofilter_field_hideparam'),
                                 name: 'hideparam',
@@ -322,15 +309,20 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                                 name: 'exact',
                                 id: config.id + '-exact',
                             },{
+                            //     xtype: 'xcheckbox',
+                            //     boxLabel: _('seofilter_field_translit'),
+                            //     name: 'translit',
+                            //     id: config.id + '-translit',
+                            // },{
                                 xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_translit'),
-                                name: 'translit',
-                                id: config.id + '-translit',
-                            },{
-                                xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_baseparam'),
+                                boxLabel: _('seofilter_field_baseparam_more'),
                                 name: 'baseparam',
                                 id: config.id + '-baseparam',
+                            },{
+                                xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_field_active'),
+                                name: 'active',
+                                id: config.id + '-active',
                             }
                         ]
                     }]

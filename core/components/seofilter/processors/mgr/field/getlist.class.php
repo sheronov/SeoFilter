@@ -36,7 +36,11 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
         if ($query) {
             $c->where(array(
                 'name:LIKE' => "%{$query}%",
+                'OR:class:LIKE' => "%{$query}%",
+                'OR:key:LIKE' => "%{$query}%",
+                'OR:alias:LIKE' => "%{$query}%",
             ));
+
         }
 
 

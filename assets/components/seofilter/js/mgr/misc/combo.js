@@ -125,12 +125,20 @@ SeoFilter.combo.Field = function (config) {
         fields: ['id', 'name'],
         pageSize: 20,
         emptyText: _('seofilter_combo_select'),
-        hideMode: 'offsets',
+        allowBlank: false,
         url: SeoFilter.config.connector_url,
         baseParams: {
             action: 'mgr/field/getlist',
-            combo: true
-        }
+            combo: true,
+            id: config.value
+        },
+        tpl: new Ext.XTemplate(''
+            +'<tpl for="."><div class="x-combo-list-item seofilter-field-list-item">'
+            +'<span><small>({id})</small> <b>{name}</b></span>'
+            +'</div></tpl>',{
+            compiled: true
+        }),
+        itemSelector: 'div.seofilter-field-list-item'
     });
     SeoFilter.combo.Field.superclass.constructor.call(this, config);
 };

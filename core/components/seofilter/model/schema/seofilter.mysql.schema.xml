@@ -143,34 +143,6 @@
         <aggregate alias="Multi" class="sfMultiField" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
     </object>
 
-    <object class="sfUrls" table="seofilter_urls" extends="xPDOSimpleObject">
-        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-
-        <field key="old_url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
-        <field key="new_url" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="editedon" dbtype="integer" precision="20" attributes="unsigned" phptype="integer" null="false" default="0" />
-        <field key="createdon" dbtype="integer" precision="20" attributes="unsigned" phptype="integer" null="false" default="0" />
-
-        <field key="count" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
-        <field key="ajax" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
-        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
-        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
-
-        <index alias="multi_id" name="multi_id" primary="false" unique="false" type="BTREE">
-            <column key="multi_id" length="" collation="A" null="false"/>
-        </index>
-        <index alias="old_url" name="old_url" primary="false" unique="false" type="BTREE">
-            <column key="old_url" length="" collation="A" null="false"/>
-        </index>
-        <index alias="new_url" name="new_url" primary="false" unique="false" type="BTREE">
-            <column key="new_url" length="" collation="A" null="false"/>
-        </index>
-        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
-            <column key="active" length="" collation="A" null="false"/>
-        </index>
-
-        <aggregate alias="Multi" class="sfMultiField" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
-    </object>
 
 
     <object class="sfDictionary" table="seofilter_dictionary" extends="xPDOSimpleObject">
@@ -235,6 +207,35 @@
 
         <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
 
+    </object>
+
+    <object class="sfUrls" table="seofilter_urls" extends="xPDOSimpleObject">
+        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+
+        <field key="old_url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="new_url" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="editedon" dbtype="integer" precision="20" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="createdon" dbtype="integer" precision="20" attributes="unsigned" phptype="integer" null="false" default="0" />
+
+        <field key="count" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="ajax" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <index alias="multi_id" name="multi_id" primary="false" unique="false" type="BTREE">
+            <column key="multi_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="old_url" name="old_url" primary="false" unique="false" type="BTREE">
+            <column key="old_url" length="" collation="A" null="false"/>
+        </index>
+        <index alias="new_url" name="new_url" primary="false" unique="false" type="BTREE">
+            <column key="new_url" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
+        <aggregate alias="Multi" class="sfMultiField" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
     </object>
 
 
