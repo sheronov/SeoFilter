@@ -7,10 +7,16 @@ $xpdo_meta_map['sfUrls']= array (
   'fields' => 
   array (
     'multi_id' => 0,
+    'page_id' => 0,
     'old_url' => '',
     'new_url' => '',
-    'editedon' => 0,
-    'createdon' => 0,
+    'editedon' => '0000-00-00 00:00:00',
+    'createdon' => 'CURRENT_TIMESTAMP',
+    'menu_on' => 1,
+    'menutitle' => '',
+    'menuindex' => 0,
+    'link_attributes' => '',
+    'image' => '',
     'count' => 0,
     'ajax' => 0,
     'rank' => 0,
@@ -19,6 +25,15 @@ $xpdo_meta_map['sfUrls']= array (
   'fieldMeta' => 
   array (
     'multi_id' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'attributes' => 'unsigned',
+      'phptype' => 'integer',
+      'null' => false,
+      'default' => 0,
+    ),
+    'page_id' => 
     array (
       'dbtype' => 'integer',
       'precision' => '10',
@@ -45,21 +60,58 @@ $xpdo_meta_map['sfUrls']= array (
     ),
     'editedon' => 
     array (
-      'dbtype' => 'integer',
-      'precision' => '20',
-      'attributes' => 'unsigned',
-      'phptype' => 'integer',
-      'null' => false,
-      'default' => 0,
+      'dbtype' => 'timestamp',
+      'phptype' => 'timestamp',
+      'null' => true,
+      'default' => '0000-00-00 00:00:00',
     ),
     'createdon' => 
     array (
+      'dbtype' => 'timestamp',
+      'phptype' => 'timestamp',
+      'null' => true,
+      'default' => 'CURRENT_TIMESTAMP',
+    ),
+    'menu_on' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
+      'default' => 1,
+    ),
+    'menutitle' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'menuindex' => 
+    array (
       'dbtype' => 'integer',
-      'precision' => '20',
+      'precision' => '10',
       'attributes' => 'unsigned',
       'phptype' => 'integer',
-      'null' => false,
+      'null' => true,
       'default' => 0,
+    ),
+    'link_attributes' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'image' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
     ),
     'count' => 
     array (
@@ -93,12 +145,29 @@ $xpdo_meta_map['sfUrls']= array (
       'dbtype' => 'tinyint',
       'precision' => '1',
       'phptype' => 'boolean',
+      'attributes' => 'unsigned',
       'null' => true,
       'default' => 1,
     ),
   ),
   'indexes' => 
   array (
+    'page_id' => 
+    array (
+      'alias' => 'page_id',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'page_id' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
     'multi_id' => 
     array (
       'alias' => 'multi_id',
@@ -108,6 +177,22 @@ $xpdo_meta_map['sfUrls']= array (
       'columns' => 
       array (
         'multi_id' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'menu_on' => 
+    array (
+      'alias' => 'menu_on',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'menu_on' => 
         array (
           'length' => '',
           'collation' => 'A',
@@ -166,9 +251,9 @@ $xpdo_meta_map['sfUrls']= array (
   ),
   'aggregates' => 
   array (
-    'Multi' => 
+    'Rule' => 
     array (
-      'class' => 'sfMultiField',
+      'class' => 'sfRule',
       'local' => 'multi_id',
       'foreign' => 'id',
       'cardinality' => 'one',

@@ -12,10 +12,6 @@ $xpdo_meta_map['sfDictionary']= array (
     'alias' => '',
     'class' => '',
     'key' => '',
-    'menu_on' => 1,
-    'menutitle' => '',
-    'menuindex' => 0,
-    'link_attributes' => '',
     'value_i' => '',
     'value_r' => '',
     'value_d' => '',
@@ -79,39 +75,6 @@ $xpdo_meta_map['sfDictionary']= array (
       'default' => '',
     ),
     'key' => 
-    array (
-      'dbtype' => 'varchar',
-      'precision' => '255',
-      'phptype' => 'string',
-      'null' => true,
-      'default' => '',
-    ),
-    'menu_on' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => true,
-      'default' => 1,
-    ),
-    'menutitle' => 
-    array (
-      'dbtype' => 'varchar',
-      'precision' => '255',
-      'phptype' => 'string',
-      'null' => true,
-      'default' => '',
-    ),
-    'menuindex' => 
-    array (
-      'dbtype' => 'integer',
-      'precision' => '10',
-      'attributes' => 'unsigned',
-      'phptype' => 'integer',
-      'null' => true,
-      'default' => 0,
-    ),
-    'link_attributes' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -355,22 +318,6 @@ $xpdo_meta_map['sfDictionary']= array (
       'columns' => 
       array (
         'key' => 
-        array (
-          'length' => '',
-          'collation' => 'A',
-          'null' => false,
-        ),
-      ),
-    ),
-    'menu_on' => 
-    array (
-      'alias' => 'menu_on',
-      'primary' => false,
-      'unique' => false,
-      'type' => 'BTREE',
-      'columns' => 
-      array (
-        'menu_on' => 
         array (
           'length' => '',
           'collation' => 'A',

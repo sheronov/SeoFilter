@@ -1,5 +1,5 @@
 <?php
-class sfMultiField extends xPDOSimpleObject {
+class sfRule extends xPDOSimpleObject {
 
     public $config = array();
 
@@ -17,7 +17,7 @@ class sfMultiField extends xPDOSimpleObject {
         $count = 1;
         $q = $this->xpdo->newQuery('sfFieldIds');
         $q->sortby('priority', 'ASC');
-        if($links = $this->getMany('Link',$q)){
+        if($links = $this->getMany('Links',$q)){
             foreach($links as $key => $link) {
 //                if($link->get('where')) {
 //                    $where = 1;  // TODO: сделать проверку для полей из другой таблицы
@@ -36,7 +36,7 @@ class sfMultiField extends xPDOSimpleObject {
                         }
 
                         if($returnArray) {
-                            $words = $field->getMany('Dictionary');
+                            $words = $field->getMany('Words');
                             foreach($words as $word) {
                                 $aliases[$key][] = $word->get('alias');
                             }
@@ -58,6 +58,7 @@ class sfMultiField extends xPDOSimpleObject {
                 }
             }
         }
+        //$this->xpdo->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER: '. print_r($url,1));
         if(!$returnArray) {
             return $url;
         } else {

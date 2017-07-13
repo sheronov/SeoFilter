@@ -290,7 +290,7 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                 , border: false
                 , items: [
                     {
-                        xtype: 'textfield',
+                        xtype: 'seofilter-combo-field',
                         fieldLabel: _('seofilter_dictionary_field_id'),
                         name: 'field_id',
                         readOnly: true,

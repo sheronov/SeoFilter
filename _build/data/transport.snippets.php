@@ -5,8 +5,8 @@
 $snippets = array();
 
 $tmp = array(
-    'SeoFilterTitle' => array(
-        'file' => 'seofiltertitle',
+    'sfLink' => array(
+        'file' => 'sflink',
         'description' => '',
     ),
 );

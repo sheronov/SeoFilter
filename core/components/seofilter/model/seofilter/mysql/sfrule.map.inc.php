@@ -1,16 +1,24 @@
 <?php
-$xpdo_meta_map['sfMultiField']= array (
+$xpdo_meta_map['sfRule']= array (
   'package' => 'seofilter',
   'version' => '1.1',
-  'table' => 'seofilter_multifield',
+  'table' => 'seofilter_rules',
   'extends' => 'xPDOSimpleObject',
   'fields' => 
   array (
     'name' => '',
     'page' => 0,
     'url' => '',
+    'base' => 0,
     'rank' => 0,
     'active' => 1,
+    'title' => '',
+    'h1' => '',
+    'h2' => '',
+    'introtext' => '',
+    'description' => '',
+    'text' => '',
+    'content' => '',
   ),
   'fieldMeta' => 
   array (
@@ -39,6 +47,14 @@ $xpdo_meta_map['sfMultiField']= array (
       'null' => false,
       'default' => '',
     ),
+    'base' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => false,
+      'default' => 0,
+    ),
     'rank' => 
     array (
       'dbtype' => 'integer',
@@ -55,6 +71,58 @@ $xpdo_meta_map['sfMultiField']= array (
       'phptype' => 'boolean',
       'null' => true,
       'default' => 1,
+    ),
+    'title' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'h1' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'h2' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'introtext' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'description' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'text' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'content' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
     ),
   ),
   'indexes' => 
@@ -107,18 +175,26 @@ $xpdo_meta_map['sfMultiField']= array (
         ),
       ),
     ),
+    'base' => 
+    array (
+      'alias' => 'base',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'base' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
   ),
   'composites' => 
   array (
-    'Seo' => 
-    array (
-      'class' => 'sfSeoMeta',
-      'local' => 'id',
-      'foreign' => 'multi_id',
-      'cardinality' => 'one',
-      'owner' => 'local',
-    ),
-    'Link' => 
+    'Links' => 
     array (
       'class' => 'sfFieldIds',
       'local' => 'id',
@@ -126,7 +202,7 @@ $xpdo_meta_map['sfMultiField']= array (
       'cardinality' => 'many',
       'owner' => 'local',
     ),
-    'Url' => 
+    'Urls' => 
     array (
       'class' => 'sfUrls',
       'local' => 'id',

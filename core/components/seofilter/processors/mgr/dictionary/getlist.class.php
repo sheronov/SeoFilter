@@ -49,9 +49,9 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             $c->andCondition(array('class' => $class), '', 1);
         }
 
-  //      $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
-  //      $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
-  //      $c->select('sfField.name as fieldtitle');
+        $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
+        $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
+        $c->select('sfField.name as fieldtitle');
 
         return $c;
     }
@@ -66,16 +66,6 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
     {
 
         $array = $object->toArray();
-
-//        $array['pagetitle'] = '';
-//        if ($page = $array['page']) {
-//            $q = $this->modx->newQuery('modResource', array('id' => $page));
-//            $q->select('pagetitle');
-//            $q->limit(1);
-//            if ($q->prepare() && $q->stmt->execute()) {
-//                $array['pagetitle'] = $q->stmt->fetch(PDO::FETCH_COLUMN);
-//            }
-//        }
 
         $array['actions'] = array();
 

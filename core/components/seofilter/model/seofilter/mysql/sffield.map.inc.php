@@ -2,18 +2,14 @@
 $xpdo_meta_map['sfField']= array (
   'package' => 'seofilter',
   'version' => '1.1',
-  'table' => 'seofilter_field',
+  'table' => 'seofilter_fields',
   'extends' => 'xPDOSimpleObject',
   'fields' => 
   array (
     'name' => '',
     'class' => '',
     'key' => '',
-    'page' => 0,
-    'pages' => '',
     'alias' => '',
-    'priority' => 0,
-    'translit' => 1,
     'hideparam' => 0,
     'valuefirst' => 0,
     'exact' => 1,
@@ -53,47 +49,13 @@ $xpdo_meta_map['sfField']= array (
       'null' => false,
       'default' => '',
     ),
-    'page' => 
-    array (
-      'dbtype' => 'integer',
-      'precision' => '10',
-      'attributes' => 'unsigned',
-      'phptype' => 'integer',
-      'null' => true,
-      'default' => 0,
-    ),
-    'pages' => 
-    array (
-      'dbtype' => 'varchar',
-      'precision' => '255',
-      'phptype' => 'string',
-      'null' => true,
-      'default' => '',
-    ),
     'alias' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
       'phptype' => 'string',
-      'null' => true,
+      'null' => false,
       'default' => '',
-    ),
-    'priority' => 
-    array (
-      'dbtype' => 'integer',
-      'precision' => '10',
-      'attributes' => 'unsigned',
-      'phptype' => 'integer',
-      'null' => false,
-      'default' => 0,
-    ),
-    'translit' => 
-    array (
-      'dbtype' => 'tinyint',
-      'precision' => '1',
-      'phptype' => 'boolean',
-      'null' => false,
-      'default' => 1,
     ),
     'hideparam' => 
     array (
@@ -227,54 +189,6 @@ $xpdo_meta_map['sfField']= array (
         ),
       ),
     ),
-    'alias' => 
-    array (
-      'alias' => 'alias',
-      'primary' => false,
-      'unique' => false,
-      'type' => 'BTREE',
-      'columns' => 
-      array (
-        'alias' => 
-        array (
-          'length' => '',
-          'collation' => 'A',
-          'null' => false,
-        ),
-      ),
-    ),
-    'page' => 
-    array (
-      'alias' => 'page',
-      'primary' => false,
-      'unique' => false,
-      'type' => 'BTREE',
-      'columns' => 
-      array (
-        'page' => 
-        array (
-          'length' => '',
-          'collation' => 'A',
-          'null' => false,
-        ),
-      ),
-    ),
-    'pages' => 
-    array (
-      'alias' => 'pages',
-      'primary' => false,
-      'unique' => false,
-      'type' => 'BTREE',
-      'columns' => 
-      array (
-        'pages' => 
-        array (
-          'length' => '',
-          'collation' => 'A',
-          'null' => false,
-        ),
-      ),
-    ),
     'active' => 
     array (
       'alias' => 'active',
@@ -294,15 +208,7 @@ $xpdo_meta_map['sfField']= array (
   ),
   'composites' => 
   array (
-    'Seo' => 
-    array (
-      'class' => 'sfSeoMeta',
-      'local' => 'id',
-      'foreign' => 'field_id',
-      'cardinality' => 'one',
-      'owner' => 'local',
-    ),
-    'Dictionary' => 
+    'Words' => 
     array (
       'class' => 'sfDictionary',
       'local' => 'id',
@@ -310,7 +216,7 @@ $xpdo_meta_map['sfField']= array (
       'cardinality' => 'many',
       'owner' => 'local',
     ),
-    'Link' => 
+    'Links' => 
     array (
       'class' => 'sfFieldIds',
       'local' => 'id',

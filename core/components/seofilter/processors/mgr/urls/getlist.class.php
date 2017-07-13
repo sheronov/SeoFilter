@@ -37,12 +37,23 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
         $query = trim($this->getProperty('query'));
         if ($query) {
             $c->where(array(
-                'name:LIKE' => "%{$query}%",
+                'old_url:LIKE' => "%{$query}%",
+                'OR:new_url:LIKE' => "%{$query}%",
             ));
         }
 
-        $c->leftJoin('sfMultiField', 'sfMultiField', $this->classKey.'.multi_id = sfMultiField.id');
-        $c->select(array($this->classKey.'.*','sfMultiField.page','sfMultiField.name'));
+        if ($rule = $this->getProperty('rule',null)) {
+            $c->andCondition(array('multi_id' => $rule), '', 1);
+        }
+
+        if ($page = $this->getProperty('page',null)) {
+            $c->andCondition(array('page_id' => $page), '', 1);
+        }
+
+        $c->leftJoin('sfRule', 'sfRule', $this->classKey.'.multi_id = sfRule.id');
+        $c->leftJoin('modResource', 'modResource', $this->classKey.'.page_id = modResource.id');
+        $c->select(array($this->classKey.'.*','sfRule.page','sfRule.name','modResource.pagetitle'));
+
 
         return $c;
     }
@@ -57,16 +68,6 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
     {
 
         $array = $object->toArray();
-
-//        $array['pagetitle'] = '';
-//        if ($page = $array['page']) {
-//            $q = $this->modx->newQuery('modResource', array('id' => $page));
-//            $q->select('pagetitle');
-//            $q->limit(1);
-//            if ($q->prepare() && $q->stmt->execute()) {
-//                $array['pagetitle'] = $q->stmt->fetch(PDO::FETCH_COLUMN);
-//            }
-//        }
 
         $array['actions'] = array();
 

@@ -1,9 +1,9 @@
 <?php
 
-class sfSeoMetaRemoveProcessor extends modObjectProcessor
+class sfRuleRemoveProcessor extends modObjectProcessor
 {
-    public $objectType = 'sfSeoMeta';
-    public $classKey = 'sfSeoMeta';
+    public $objectType = 'sfRule';
+    public $classKey = 'sfRule';
     public $languageTopics = array('seofilter');
     //public $permission = 'remove';
 
@@ -19,13 +19,13 @@ class sfSeoMetaRemoveProcessor extends modObjectProcessor
 
         $ids = $this->modx->fromJSON($this->getProperty('ids'));
         if (empty($ids)) {
-            return $this->failure($this->modx->lexicon('seofilter_seometa_err_ns'));
+            return $this->failure($this->modx->lexicon('seofilter_field_err_ns'));
         }
 
         foreach ($ids as $id) {
             /** @var sfField $object */
             if (!$object = $this->modx->getObject($this->classKey, $id)) {
-                return $this->failure($this->modx->lexicon('seofilter_seometa_err_nf'));
+                return $this->failure($this->modx->lexicon('seofilter_field_err_nf'));
             }
 
             $object->remove();
@@ -36,4 +36,4 @@ class sfSeoMetaRemoveProcessor extends modObjectProcessor
 
 }
 
-return 'sfSeoMetaRemoveProcessor';
+return 'sfRuleRemoveProcessor';

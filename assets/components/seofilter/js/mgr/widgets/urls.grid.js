@@ -183,7 +183,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'multi_id','name', 'old_url', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name','url_preview','page'];
+        return ['id', 'multi_id', 'page_id', 'name', 'old_url', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name','url_preview','page','pagetitle'];
     },
 
     getColumns: function () {
@@ -195,6 +195,12 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         }, {
             header: _('seofilter_url_multi_id'),
             dataIndex: 'name',
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_url_page_id'),
+            dataIndex: 'page_id',
+            renderer: SeoFilter.utils.renderResource,
             sortable: true,
             width: 150,
         }, {
@@ -253,9 +259,45 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         //     handler: this.createField,
         //     scope: this
         // },
-            '->', {
+            {
+                xtype: 'seofilter-combo-rule'
+                ,id: 'tbar-seofilter-combo-rule'
+                ,width: 200
+                ,addall: true
+                ,emptyText: _('seofilter_filter_rule')
+                ,listeners: {
+                    select: {fn: this.filterByRule, scope:this}
+                }
+            },{
+                xtype: 'seofilter-combo-resource'
+                ,id: 'tbar-seofilter-combo-resource'
+                ,width: 200
+                ,addall: true
+                ,emptyText: _('seofilter_filter_resource_or')
+                ,listeners: {
+                    select: {fn: this.filterByResource, scope:this}
+                }
+                ,baseParams: {
+                    action: 'mgr/system/getlist',
+                    combo: true,
+                    rules: true,
+                }
+            },{
+                xtype: 'button'
+                ,id: 'seofilter-filters-clear'
+                ,text: '<i class="icon icon-times"></i>'
+                ,listeners: {
+                    click: {fn: this.clearFilter, scope: this}
+                }
+            }, {
+                xtype:'button'
+                ,id: 'sofilter-clear-counters'
+                ,text:  _('seofilter_clear_counters')
+                ,handler: this.clearCounters
+                ,scope: this
+            }, '->', {
             xtype: 'seofilter-field-search',
-            width: 250,
+            width: 200,
             listeners: {
                 search: {
                     fn: function (field) {
@@ -270,6 +312,45 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                 },
             }
         }];
+    },
+
+    clearCounters: function(confirmed) {
+        MODx.msg.confirm({
+            title: _('seofilter_clear_counters'),
+            text:  _('seofilter_clear_counters_confirm'),
+            url: this.config.url,
+            params: {
+                action: 'mgr/urls/clear'
+            },
+            listeners: {
+                success: {
+                    fn: function () {
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        });
+    },
+
+    filterByRule: function(cb) {
+        this.getStore().baseParams['rule'] = cb.value;
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
+    },
+    filterByResource: function(cb) {
+        this.getStore().baseParams['page'] = cb.value;
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
+    },
+
+    clearFilter: function(btn,e) {
+        var s = this.getStore();
+        s.baseParams['rule'] = '';
+        s.baseParams['page'] = '';
+        Ext.getCmp('tbar-seofilter-combo-rule').setValue('');
+        Ext.getCmp('tbar-seofilter-combo-resource').setValue('');
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
     },
 
     onClick: function (e) {

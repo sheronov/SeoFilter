@@ -1,7 +1,7 @@
-SeoFilter.grid.MultiFields = function (config) {
+SeoFilter.grid.Rules = function (config) {
     config = config || {};
     if (!config.id) {
-        config.id = 'seofilter-grid-multifields';
+        config.id = 'seofilter-grid-rules';
     }
     Ext.applyIf(config, {
         url: SeoFilter.config.connector_url,
@@ -10,7 +10,7 @@ SeoFilter.grid.MultiFields = function (config) {
         tbar: this.getTopBar(config),
         sm: new Ext.grid.CheckboxSelectionModel(),
         baseParams: {
-            action: 'mgr/multifield/getlist'
+            action: 'mgr/rule/getlist'
         },
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
@@ -34,7 +34,7 @@ SeoFilter.grid.MultiFields = function (config) {
         remoteSort: true,
         autoHeight: true,
     });
-    SeoFilter.grid.MultiFields.superclass.constructor.call(this, config);
+    SeoFilter.grid.Rules.superclass.constructor.call(this, config);
 
     // Clear selection on grid refresh
     this.store.on('load', function () {
@@ -43,7 +43,7 @@ SeoFilter.grid.MultiFields = function (config) {
         }
     }, this);
 };
-Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
+Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
     windows: {},
 
     getMenu: function (grid, rowIndex) {
@@ -57,7 +57,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
 
     createField: function (btn, e) {
         var w = MODx.load({
-            xtype: 'seofilter-multifield-window-create',
+            xtype: 'seofilter-rule-window-create',
             id: Ext.id(),
             listeners: {
                 success: {
@@ -84,7 +84,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/get',
+                action: 'mgr/rule/get',
                 id: id
             },
             listeners: {
@@ -95,7 +95,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
                             this.windows.updateField.destroy();
                         }
                         this.windows.updateField = MODx.load({
-                            xtype: 'seofilter-multifield-window-update',
+                            xtype: 'seofilter-rule-window-update',
                             id: Ext.id(),
                             record: r,
                             listeners: {
@@ -123,14 +123,14 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         }
         MODx.msg.confirm({
             title: ids.length > 1
-                ? _('seofilter_multifields_remove')
-                : _('seofilter_multifield_remove'),
+                ? _('seofilter_rules_remove')
+                : _('seofilter_rule_remove'),
             text: ids.length > 1
-                ? _('seofilter_multifields_remove_confirm')
-                : _('seofilter_multifield_remove_confirm'),
+                ? _('seofilter_rules_remove_confirm')
+                : _('seofilter_rule_remove_confirm'),
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/remove',
+                action: 'mgr/rule/remove',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -152,7 +152,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/disable',
+                action: 'mgr/rule/disable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -173,7 +173,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/enable',
+                action: 'mgr/rule/enable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -187,43 +187,54 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle','seo_id'];
+        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle','seo_id'];
     },
 
     getColumns: function () {
         return [{
-            header: _('seofilter_multifield_id'),
+            header: _('seofilter_rule_id'),
             dataIndex: 'id',
             sortable: true,
             width: 50
         }, {
-            header: _('seofilter_multifield_name'),
+            header: _('seofilter_rule_name'),
             dataIndex: 'name',
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_multifield_page'),
+            header: _('seofilter_rule_page'),
             dataIndex: 'page',
             renderer: SeoFilter.utils.renderResource,
             sortable: true,
             width: 150,
         }, {
-            header: _('seofilter_multifield_url'),
+            header: _('seofilter_rule_url'),
             dataIndex: 'url',
             sortable: true,
             width: 250,
+        }, {
+            header: _('seofilter_rule_base'),
+            dataIndex: 'base',
+            sortable: true,
+            renderer: SeoFilter.utils.renderBoolean,
+            width: 250,
+        }, {
+            header: _('seofilter_rule_title'),
+            dataIndex: 'title',
+            sortable: true,
+            width: 250,
         // }, {
-        //     header: _('seofilter_multifield_count'),
+        //     header: _('seofilter_rule_count'),
         //     dataIndex: 'count',
         //     sortable: true,
         //     width: 70,
         // }, {
-        //     header: _('seofilter_multifield_fields'),
+        //     header: _('seofilter_rule_fields'),
         //     dataIndex: 'fields',
         //     sortable: true,
         //     width: 150,
         }, {
-            header: _('seofilter_multifield_active'),
+            header: _('seofilter_rule_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
@@ -240,7 +251,7 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
 
     getTopBar: function () {
         return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_multifield_create'),
+            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_rule_create'),
             handler: this.createField,
             scope: this
         }, '->', {
@@ -305,5 +316,5 @@ Ext.extend(SeoFilter.grid.MultiFields, MODx.grid.Grid, {
         this.getBottomToolbar().changePage(1);
     },
 });
-Ext.reg('seofilter-grid-multifields', SeoFilter.grid.MultiFields);
+Ext.reg('seofilter-grid-rules', SeoFilter.grid.Rules);
 

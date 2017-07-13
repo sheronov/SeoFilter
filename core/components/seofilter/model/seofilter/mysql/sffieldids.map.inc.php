@@ -181,9 +181,9 @@ $xpdo_meta_map['sfFieldIds']= array (
       'cardinality' => 'one',
       'owner' => 'foreign',
     ),
-    'Multi' => 
+    'Rule' => 
     array (
-      'class' => 'sfMultiField',
+      'class' => 'sfRule',
       'local' => 'multi_id',
       'foreign' => 'id',
       'cardinality' => 'one',

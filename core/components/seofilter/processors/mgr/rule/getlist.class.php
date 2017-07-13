@@ -1,9 +1,9 @@
 <?php
 
-class sfSeoMetaGetListProcessor extends modObjectGetListProcessor
+class sfRuleGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'sfSeoMeta';
-    public $classKey = 'sfSeoMeta';
+    public $objectType = 'sfRule';
+    public $classKey = 'sfRule';
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';
     //public $permission = 'list';
@@ -39,6 +39,16 @@ class sfSeoMetaGetListProcessor extends modObjectGetListProcessor
             ));
         }
 
+
+        //if($this->getProperty('page')) {
+
+            $c->leftJoin('modResource', 'modResource', $this->classKey.'.page = modResource.id');
+            $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
+            $c->select($this->modx->getSelectColumns('modResource','modResource','',array('pagetitle')));
+
+        //}
+
+
         return $c;
     }
 
@@ -52,14 +62,6 @@ class sfSeoMetaGetListProcessor extends modObjectGetListProcessor
     {
 
         $array = $object->toArray();
-
-        $array['seofield'] = $array['name'];
-        if($array['field_id']) {
-            $array['seofield'] = '<b>'.$this->modx->lexicon('seofilter_field').'</b>: '.$array['seofield'];
-        }
-        if($array['multi_id']) {
-            $array['seofield'] = '<b>'.$this->modx->lexicon('seofilter_multifield').'</b>: '.$array['seofield'];
-        }
 
 //        $array['pagetitle'] = '';
 //        if ($page = $array['page']) {
@@ -77,41 +79,41 @@ class sfSeoMetaGetListProcessor extends modObjectGetListProcessor
         $array['actions'][] = array(
             'cls' => '',
             'icon' => 'icon icon-edit',
-            'title' => $this->modx->lexicon('seofilter_seometa_update'),
-            //'multiple' => $this->modx->lexicon('seofilter_seometa_update'),
+            'title' => $this->modx->lexicon('seofilter_rule_update'),
+            //'multiple' => $this->modx->lexicon('seofilter_rules_update'),
             'action' => 'updateField',
             'button' => true,
             'menu' => true,
         );
 
-//        if (!$array['active']) {
-//            $array['actions'][] = array(
-//                'cls' => '',
-//                'icon' => 'icon icon-power-off action-green',
-//                'title' => $this->modx->lexicon('seofilter_seometa_enable'),
-//                'multiple' => $this->modx->lexicon('seofilter_seometa_enable'),
-//                'action' => 'enableField',
-//                'button' => true,
-//                'menu' => true,
-//            );
-//        } else {
-//            $array['actions'][] = array(
-//                'cls' => '',
-//                'icon' => 'icon icon-power-off action-gray',
-//                'title' => $this->modx->lexicon('seofilter_seometa_disable'),
-//                'multiple' => $this->modx->lexicon('seofilter_seometa_disable'),
-//                'action' => 'disableField',
-//                'button' => true,
-//                'menu' => true,
-//            );
-//        }
+        if (!$array['active']) {
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-power-off action-green',
+                'title' => $this->modx->lexicon('seofilter_rule_enable'),
+                'multiple' => $this->modx->lexicon('seofilter_rules_enable'),
+                'action' => 'enableField',
+                'button' => true,
+                'menu' => true,
+            );
+        } else {
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-power-off action-gray',
+                'title' => $this->modx->lexicon('seofilter_rule_disable'),
+                'multiple' => $this->modx->lexicon('seofilter_rules_disable'),
+                'action' => 'disableField',
+                'button' => true,
+                'menu' => true,
+            );
+        }
 
         // Remove
         $array['actions'][] = array(
             'cls' => '',
             'icon' => 'icon icon-trash-o action-red',
-            'title' => $this->modx->lexicon('seofilter_seometa_remove'),
-            'multiple' => $this->modx->lexicon('seofilter_seometa_remove'),
+            'title' => $this->modx->lexicon('seofilter_rule_remove'),
+            'multiple' => $this->modx->lexicon('seofilter_rules_remove'),
             'action' => 'removeField',
             'button' => true,
             'menu' => true,
@@ -122,4 +124,4 @@ class sfSeoMetaGetListProcessor extends modObjectGetListProcessor
 
 }
 
-return 'sfSeoMetaGetListProcessor';
+return 'sfRuleGetListProcessor';

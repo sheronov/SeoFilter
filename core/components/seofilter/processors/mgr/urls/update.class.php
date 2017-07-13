@@ -20,6 +20,8 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
             return $this->modx->lexicon('access_denied');
         }
 
+        $this->object->set('editedon',strtotime(date('Y-m-d H:i:s')));
+
         return true;
     }
 

@@ -63,10 +63,8 @@ class SeoFilterHomeManagerController extends modExtraManagerController
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fields.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fieldids.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fieldids.windows.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/multifields.grid.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/multifields.windows.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/seometa.grid.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/seometa.windows.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/rules.grid.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/rules.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/urls.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/urls.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.grid.js');

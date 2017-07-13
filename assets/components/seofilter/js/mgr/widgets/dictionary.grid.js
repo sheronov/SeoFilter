@@ -183,7 +183,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'field_id', 'input', 'value', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle'];
+        return ['id', 'field_id', 'field', 'input', 'value', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle'];
     },
 
     getColumns: function () {
@@ -194,10 +194,9 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             width: 70
         }, {
             header: _('seofilter_dictionary_field_id'),
-            dataIndex: 'field_id',
+            dataIndex: 'fieldtitle',
             sortable: true,
             width: 150,
-            editor: { xtype: 'seofilter-combo-field' ,renderer: true}
         }, {
             header: _('seofilter_dictionary_input'),
             dataIndex: 'input',
@@ -272,7 +271,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                 }
             },{
                 xtype: 'button'
-                ,id: 'seofilter-filters-clear'
+                ,id: 'seofilter-url-filters-clear'
                 ,text: '<i class="icon icon-times"></i>'
                 ,listeners: {
                     click: {fn: this.clearFilter, scope: this}

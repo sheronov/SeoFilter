@@ -11,15 +11,22 @@ class msResourceGetListProcessor extends modObjectGetListProcessor
      */
     public function prepareQueryBeforeCount(xPDOQuery $c)
     {
-        if ($this->getProperty('combo')) {
+
+        if($rules = $this->getProperty('rules')) {
+            $c->rightJoin('sfRule','sfRule',$this->classKey.'.id = sfRule.page');
+            $c->select(array($this->classKey.'.id',$this->classKey.'.pagetitle'));
+            $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER PAGE: '.print_r($this->getProperties(),1));
+        } elseif ($this->getProperty('combo')) {
             $c->select('id,pagetitle');
         }
+        $c->where(array('class_key:!=' => 'msProduct'));
         if ($id = (int)$this->getProperty('id')) {
             $c->where(array('id' => $id));
         }
         if ($query = trim($this->getProperty('query'))) {
             $c->where(array('pagetitle:LIKE' => "%{$query}%"));
         }
+
         return $c;
     }
     /**

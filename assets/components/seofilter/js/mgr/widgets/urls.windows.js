@@ -128,13 +128,6 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
             xtype: 'hidden',
             name: 'id',
             id: config.id + '-id',
-        },{
-            xtype: 'textfield',
-            fieldLabel: _('seofilter_url_multi_id'),
-            name: 'multi_id',
-            id: config.id + '-multi_id',
-            anchor: '99%',
-            allowBlank: false,
         }, {
             layout: 'column',
             border: false,
@@ -145,6 +138,15 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 , defaults: {msgTarget: 'under'}
                 , border: false
                 , items: [{
+                        xtype: 'seofilter-combo-rule',
+                        fieldLabel: _('seofilter_url_multi_id'),
+                        name: 'multi_id',
+                        id: config.id + '-multi_id',
+                        anchor: '99%',
+                        allowBlank: false,
+                        readOnly: true,
+                        style: 'background:#f9f9f9;color:#aaa;',
+                    },{
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_url_old_url'),
                         name: 'old_url',
@@ -156,7 +158,7 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                         xtype: 'numberfield',
                         fieldLabel: _('seofilter_url_count'),
                         name: 'count',
-                        readOnly: true,
+                        //readOnly: true,
                         id: config.id + '-count',
                         anchor: '99%',
                     }
@@ -167,6 +169,16 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 , defaults: {msgTarget: 'under'}
                 , border: false
                 , items: [{
+                        xtype: 'seofilter-combo-resource',
+                        fieldLabel: _('seofilter_url_page_id'),
+                        name: 'page_id',
+                        hiddenName: 'page_id',
+                        id: config.id + '-page_id',
+                        anchor: '99%',
+                        allowBlank: false,
+                        readOnly: true,
+                        style: 'background:#f9f9f9;color:#aaa;',
+                    },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_url_new_url'),
                     name: 'new_url',
@@ -189,7 +201,7 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     fieldLabel: _('seofilter_url_ajax'),
                     name: 'ajax',
                     id: config.id + '-ajax',
-                    readOnly: true,
+                    //readOnly: true,
                     anchor: '99%',
                     }
                 ]

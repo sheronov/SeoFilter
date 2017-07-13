@@ -11,9 +11,9 @@ $tmp = array(
         'value' => '-',
         'area' => 'seofilter_main',
     ),
-    'valuefirst' => array(
-        'xtype' => 'combo-boolean',
-        'value' => false,
+    'base_get' => array(
+        'xtype' => 'textfield',
+        'value' => 'price,page,limit,tpl,sort',
         'area' => 'seofilter_main',
     ),
     'redirect' => array(

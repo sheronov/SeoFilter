@@ -1,9 +1,13 @@
 <?php
 header('Content-Type: application/json; charset=UTF-8');
 define('MODX_API_MODE', true);
-//require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/index.php';
-require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/index.php'; //TODO: удалить после переноса
-
+if (file_exists(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/index.php')) {
+    /** @noinspection PhpIncludeInspection */
+    require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/index.php';
+}
+else {
+    require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/index.php';
+}
 $modx->getService('error', 'error.modError');
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');

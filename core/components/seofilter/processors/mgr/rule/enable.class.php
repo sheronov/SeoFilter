@@ -1,9 +1,9 @@
 <?php
 
-class sfMultiFieldDisableProcessor extends modObjectProcessor
+class sfRuleEnableProcessor extends modObjectProcessor
 {
-    public $objectType = 'sfMultiField';
-    public $classKey = 'sfMultiField';
+    public $objectType = 'sfRule';
+    public $classKey = 'sfRule';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';
 
@@ -19,16 +19,16 @@ class sfMultiFieldDisableProcessor extends modObjectProcessor
 
         $ids = $this->modx->fromJSON($this->getProperty('ids'));
         if (empty($ids)) {
-            return $this->failure($this->modx->lexicon('seofilter_multifield_err_ns'));
+            return $this->failure($this->modx->lexicon('seofilter_rule_err_ns'));
         }
 
         foreach ($ids as $id) {
             /** @var sfField $object */
             if (!$object = $this->modx->getObject($this->classKey, $id)) {
-                return $this->failure($this->modx->lexicon('seofilter_multifield_err_nf'));
+                return $this->failure($this->modx->lexicon('seofilter_rule_err_nf'));
             }
 
-            $object->set('active', false);
+            $object->set('active', true);
             $object->save();
         }
 
@@ -37,4 +37,4 @@ class sfMultiFieldDisableProcessor extends modObjectProcessor
 
 }
 
-return 'sfMultiFieldDisableProcessor';
+return 'sfRuleEnableProcessor';

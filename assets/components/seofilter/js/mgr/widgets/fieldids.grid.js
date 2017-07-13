@@ -8,7 +8,7 @@ SeoFilter.grid.FieldIds = function (config) {
         tbar: this.getTopBar(config),
         sm: new Ext.grid.CheckboxSelectionModel(),
         baseParams: {
-            action: 'mgr/multifield/fieldids/getlist'
+            action: 'mgr/rule/fieldids/getlist'
             ,multi_id: config.record.id
         },
         listeners: {
@@ -38,7 +38,7 @@ SeoFilter.grid.FieldIds = function (config) {
         stateful: true,
         stateId: config.id,
         autosave: true,
-        save_action: 'mgr/multifield/fieldids/updatefromgrid',
+        save_action: 'mgr/rule/fieldids/updatefromgrid',
         plugins: this.getPlugins(config),
         ddGroup: 'dd-ids-grid',
         enableDragDrop: true,
@@ -108,7 +108,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/fieldids/get',
+                action: 'mgr/rule/fieldids/get',
                 id: id
             },
             listeners: {
@@ -149,7 +149,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
                 : _('seofilter_fieldids_remove_confirm'),
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/fieldids/remove',
+                action: 'mgr/rule/fieldids/remove',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -171,7 +171,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/fieldids/disable',
+                action: 'mgr/rule/fieldids/disable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -192,7 +192,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/multifield/fieldids/enable',
+                action: 'mgr/rule/fieldids/enable',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {

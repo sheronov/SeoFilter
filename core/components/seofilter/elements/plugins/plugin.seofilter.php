@@ -6,11 +6,11 @@ switch ($modx->event->name) {
             $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
                     $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
             if (!($SeoFilter instanceof SeoFilter)) break;
-            $q = $modx->newQuery('sfField');
+            $q = $modx->newQuery('sfRule');
 
-            // $q->where(array('pages' => $page)); // для олдного поля
-            $q->where(array('1 = 1 AND FIND_IN_SET('.$page.',pages)'));
-            if($modx->getCount('sfField',$q)) {
+             $q->where(array('page' => $page)); // для олдного поля
+           // $q->where(array('1 = 1 AND FIND_IN_SET('.$page.',pages)'));
+            if($modx->getCount('sfRule',$q)) {
                 if(!$SeoFilter->initialized[$modx->context->key]) {
                     $SeoFilter->initialize($modx->context->key, array('page' => (int)$page));
                 }
@@ -31,12 +31,109 @@ switch ($modx->event->name) {
             $check = $novalue = $page = $fast_search = 0; //переменные для проверки
             $params = array(); //итоговый массив с параметром и значением
             $last_char = ''; //был ли в конце url-а слэш
-
             if (substr($_REQUEST[$alias], -1) == '/') {
                 $last_char = '/';
             }
             $request = trim($_REQUEST[$alias], "/");
             $tmp = explode('/', $request);
+
+
+            $q = $modx->newQuery('sfRule');
+            $q->limit(0);
+            $q->select(array('sfRule.*'));
+            $page_ids = $page_aliases = array();
+            if ($q->prepare() && $q->stmt->execute()) {
+                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $page_ids[$row['id']] = $row['page'];
+                }
+            }
+
+            if(count($page_ids)) {
+                $q = $modx->newQuery('modResource');
+                $q->where(array('id:IN' => array_unique($page_ids)));
+                $q->limit(0);
+                $q->select('id,alias');
+                if ($q->prepare() && $q->stmt->execute()) {
+                    while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $page_aliases[$row['id']] = $row['alias'];
+                    }
+                }
+
+
+                $r_tmp = array_reverse($tmp, 1);
+                $tmp_id = 0;
+                foreach ($r_tmp as $t_key => $t_alias) {
+                    if ($page = array_search($t_alias, $page_aliases)) {
+                        $tmp_id = $t_key;
+                        break;
+                    }
+                }
+                if ($page) {
+                    for ($i = 0; $i <= $tmp_id; $i++) {
+                        array_shift($tmp);
+                    }
+                } else {
+                    if (in_array($site_start, $page_ids)) {
+                        $page = $site_start;  //для тех у кого главная страница сайта - фильтр
+                    }
+                }
+            }
+
+            if($page) {
+                if($url_array = $SeoFilter->findUrlArray(implode('/',$tmp))) {
+                    $old_url = $url_array['old_url'];
+                    $new_url = $url_array['new_url'];
+                    $rule_id = $url_array['multi_id'];
+                    if($new_url && $new_url != implode('/',$tmp)) {
+                        $url = $modx->makeUrl($page) . $new_url;
+                        $modx->sendRedirect($url.$last_char);
+                    }
+                    $tmp = explode('/', $old_url);
+
+                    if($links = $pdo->getCollection('sfFieldIds',array('multi_id'=>$rule_id),array('sortby' => 'priority'))) {
+                        if(count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
+                            foreach($links as $lkey => $link) {
+                                $field = $pdo->getArray('sfField',$link['field_id']);
+                                $alias = $field['alias'];
+                                if($field['hideparam']) {
+                                    if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
+                                        $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                    }
+                                } else {
+                                    $tmp_arr = explode($separator,$tmp[$lkey]);
+                                    $word_alias = '';
+                                    if($field['valuefirst']) {
+                                        $del = array_pop($tmp_arr);
+                                        if($del == $alias) {
+                                            $word_alias = implode($separator,$tmp_arr);
+                                        }
+                                    } else {
+                                        $del = array_shift($tmp_arr);
+                                        if($del == $alias) {
+                                            $word_alias = implode($separator,$tmp_arr);
+                                        }
+                                    }
+                                    if($word_alias && $word = $pdo->getArray('sfDictionary', array('alias' => $word_alias))) {
+                                        $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                    }
+                                }
+                            }
+                            $fast_search = true;
+                            $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$params));
+                            $meta = $SeoFilter->getRuleMeta($params,$rule_id,0);
+                            $modx->setPlaceholders($meta,'sf.');
+                            $modx->sendForward($page);
+                        }
+                    }
+
+                }
+            }
+
+
+
+
+
+            /*
 
             $q = $modx->newQuery('sfField');
             $q->limit(0);
@@ -53,15 +150,15 @@ switch ($modx->event->name) {
                 }
             }
 
-            $q = $modx->newQuery('sfMultiField');
+            $q = $modx->newQuery('sfRule');
             $q->limit(0);
-            $q->select(array('sfMultiField.*'));
+            $q->select(array('sfRule.*'));
             if ($q->prepare() && $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     $pageids[] = $row['page'];
                 }
             }
-            // TODO: возможно будут случаи, когда захотят видеть пересечение только на одной странице, без участия в ней параметров (пример - сделать страницу Тёплых складов в Московской области) связаано с TODO в sfmultifield.class.php
+            // TODO: возможно будут случаи, когда захотят видеть пересечение только на одной странице, без участия в ней параметров (пример - сделать страницу Тёплых складов в Московской области) связаано с TODO в sfrule.class.php
 
 
             if (count($tmp)) {
@@ -157,7 +254,8 @@ switch ($modx->event->name) {
                         }
                         $fast_search = true;
                         $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$findparams));
-                        $meta = $SeoFilter->getMultiMeta($findparams,$page);
+                        $rule_id = $SeoFilter->findRule(array_keys($findparams),$page);
+                        $meta = $SeoFilter->getRuleMeta($findparams,$rule_id,0);
                         $modx->setPlaceholders($meta,'sf.');
                         $modx->sendForward($page);
                     }
@@ -323,6 +421,8 @@ switch ($modx->event->name) {
                 $modx->setPlaceholders($meta,'sf.');
                 $modx->sendForward($page);
             }
+
+            */
         }
         break;
 }

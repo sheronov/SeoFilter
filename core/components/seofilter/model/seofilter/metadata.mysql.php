@@ -4,10 +4,9 @@ $xpdo_meta_map = array (
   'xPDOSimpleObject' => 
   array (
     0 => 'sfField',
-    1 => 'sfMultiField',
+    1 => 'sfRule',
     2 => 'sfFieldIds',
-    3 => 'sfSeoMeta',
+    3 => 'sfDictionary',
     4 => 'sfUrls',
-    5 => 'sfDictionary',
   ),
 );

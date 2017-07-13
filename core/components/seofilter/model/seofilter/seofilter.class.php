@@ -30,6 +30,7 @@ class SeoFilter
         $connectorUrl = $assetsUrl . 'connector.php';
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
         $redirect  = $this->modx->getOption('seofilter_redirect', null, 1, true);
+        $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
         $site_start = $this->modx->context->getOption('site_start', 1);
         $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
 
@@ -79,6 +80,7 @@ class SeoFilter
             'redirect' => $redirect,
             'site_start' => $site_start,
             'charset' => $charset,
+            'base_get' => $base_get,
 
             'title' => $title,
             'description' => $description,
@@ -121,21 +123,12 @@ class SeoFilter
         $this->config['ctx'] = $ctx;
 
         $config = $this->makePlaceholders($this->config);
-        if ($css = trim($this->modx->getOption('seofilter_frontend_css',null,$this->config['cssUrl'].'web/default.css',true))) {
-           // $this->modx->regClientCSS(str_replace($config['pl'], $config['vl'], $css));
-        }
         if ($js = trim($this->modx->getOption('seofilter_frontend_js',null,$this->config['jsUrl'].'web/default.js',true))) {
             $this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
 
             if($this->config['page']) {
-                $q = $this->modx->newQuery('sfField');
-                $q->limit(0);
-                $q->where(array('1 = 1 AND FIND_IN_SET('.$this->config['page'].',pages)'));
-                //$q->where(array('page' => $this->config['page']));
-                $q->select(array('DISTINCT sfField.alias'));
-                if($q->prepare() && $q->stmt->execute()) {
-                    $this->config['aliases'] = $q->stmt->fetchALL(PDO::FETCH_COLUMN);
-                }
+                $aliases = $this->fieldsAliases($this->config['page'],1);
+                $this->config['aliases'] = $aliases;
                 $this->config['url'] = $this->modx->makeUrl($this->config['page'],$ctx,'','full');
             }
 
@@ -166,6 +159,50 @@ class SeoFilter
         }
         $this->initialized[$ctx] = true;
         return true;
+    }
+
+    public function fieldsAliases($page = 0,$firstAliases = 0,$rule_id = 0) {
+        $aliases = array();
+        $q = $this->modx->newQuery('sfRule');
+        $q->limit(0);
+        //$q->where(array('1 = 1 AND FIND_IN_SET('.$this->config['page'].',pages)'));
+        if($page) {
+            $q->where(array('page' => $page));
+        }
+        if($rule_id) {
+            $q->where(array('id'=>$rule_id));
+        }
+        $q->select('id');
+        if($q->prepare() && $q->stmt->execute()) {
+            $fields = array();
+            $rules_id = $q->stmt->fetchALL(PDO::FETCH_COLUMN);
+            foreach($rules_id as $rule_id) {
+                $q = $this->modx->newQuery('sfFieldIds');
+                $q->where(array('multi_id'=>$rule_id));
+                if($firstAliases) {
+                    $q->sortby('priority','ASC');
+                    $q->limit(1);
+                }
+                $q->select('field_id');
+                if($q->prepare() && $q->stmt->execute()) {
+                    while($row = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
+                        $fields[] = $row;
+                    }
+                }
+            }
+            if(count($fields)) {
+                $q = $this->modx->newQuery('sfField');
+                $q->limit(0);
+                $q->where(array('id:IN' => array_unique($fields)));
+                $q->select('id,alias');
+                if($q->prepare() && $q->stmt->execute()) {
+                    while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $aliases[$row['id']] = $row['alias'];
+                    }
+                }
+            }
+        }
+        return $aliases;
     }
 
     /**
@@ -210,71 +247,68 @@ class SeoFilter
         return '?'.implode('&',$urls);
     }
 
-    public function process($action, $data = array())
-    {
+    public function process($action, $data = array()) {
+        // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
         $diff = array();
         $params = $copyparams = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
+
         if(count($params))
             $diff = array_flip(array_diff(array_keys($params),$aliases));
-        $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($diff,1));
         if(count($diff)) {
-            foreach($diff as $dif => $dff) {
+            foreach($diff as $dif => $dff)
                 unset($copyparams[$dif]);
-            }
             $diff = array_diff_key($params,$copyparams);
             $params = array_intersect_key($params,$copyparams);
         }
-        // TODO: тут надо бы сократить велосипед
+        //нахождение первичного параметра
         switch ($action) {
             case 'getmeta':
-                if(count($params) > 1) {
-                    $multi_value = $multi_base = 0;
-                    $baseparam = $this->findBaseParam($params);
+                $find = 0;
+                $meta = array();
+                if(count($params)) { //тут проверяет, были ли переданы первичные алиасы в правилах. если их нет, то и правил нет)
+                    $params = $copyparams = $data['data'];
+                    $all_aliases = $this->fieldsAliases($pageId,0);
+                    $diff2 = array_flip(array_diff(array_keys($params),$all_aliases));
+                    if(count($diff2)) {
+                        foreach($diff2 as $dif => $dff) {
+                            unset($copyparams[$dif]);
+                        }
+                        $diff2 = array_diff_key($params,$copyparams);
+                        $params = array_intersect_key($params,$copyparams);
+                    }
+                    $real_diff = array_diff(array_keys($diff2),explode(',',$this->config['base_get']));
+                    $diff = $diff2;
                     foreach($params as $param => $value) {
                         if(count(explode(',',$value)) > 1) {
                             $multi_value = 1;
-                            if(isset($baseparam[$param])) {
-                                $multi_base = 1;
-                            }
+                            $diff[$param] = $value;
+                            unset($params[$param]);
+                            //TODO: когда нибудь можно сделать, чтобы правило работало, даже с двумя значениями одного параметра, а то и тремя :)
                         }
                     }
-                    //$this->modx->log(modx::LOG_LEVEL_ERROR, '$meta = '.print_r($meta,1));
-                    if(!$multi_value) {
-                        $meta = $this->getMultiMeta($params,$pageId,1);
-                        $meta['find'] = 1;
-                    } else {
-                        if(!$multi_base) {
-                            $meta = $this->getFieldMeta($baseparam,$pageId);
-                            //$this->modx->log(modx::LOG_LEVEL_ERROR, '$meta = '.print_r($meta,1));
-                            $meta['url'] = $meta['url'].$this->multiUrl(array_diff($params,$baseparam),0);
-                            $meta['find'] = 1;
-                        } else {
-                            $meta = $this->getPageMeta($pageId);
-                            $meta['url'] = $this->getHashUrl($params);
-                            $meta['find'] = 0;
-                        }
 
-                    }
-                } elseif(count($params) == 1) {
-                    $params_copy = $params;
-                    $shift = array_shift($params_copy);
-                    if(count(explode(',',$shift)) > 1) {
-                        $meta = $this->getPageMeta($pageId);
-                        $meta['url'] = $this->getHashUrl($params);
-                        $meta['find'] = 0;
-                    } else {
-                        $meta = $this->getFieldMeta($params,$pageId);
-                        $meta['find'] = 1;
-                    }
-                    foreach($params as $param => $value) {
-                        if(!$value) {
-                            $meta['url'] = $this->getHashUrl($params);
+                    if(count($params)) {
+                        $params_keys = array_keys($params);
+                        $rule_id = $this->findRule($params_keys,$pageId);
+
+                        if($rule_id) {
+                            $rule_array = $this->pdo->getArray('sfRule',$rule_id);
+                            $rule_base = $rule_array['base'];
+                            if((count($real_diff) && $rule_base) || !count($real_diff)) {
+                                $meta = $this->getRuleMeta($params,$rule_id,1);
+                                $meta['find'] = $find = 1;
+
+                            } else {
+                                $meta['find'] = $find = 0;
+                                $diff = $data['data'];
+                            }
+                            $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
                         }
                     }
-                } else {
+                }
+                if(!$find) {
                     $meta = $this->getPageMeta($pageId);
                     $meta['find'] = 0;
                 }
@@ -285,7 +319,6 @@ class SeoFilter
                     } else {
                         $meta['url'] = $meta['url'] . $this->getHashUrl($diff);
                     }
-
                 }
 
 
@@ -312,6 +345,79 @@ class SeoFilter
         return $this->config['json_response']
             ? $this->modx->toJSON($response)
             : $response;
+    }
+
+    public function findRule($params_keys = array(), $page_id = 0) {
+        $rule_id = 0;
+        $q = $this->modx->newQuery('sfField');
+        $q->limit(0);
+        $q->where(array('alias:IN' => $params_keys));
+        $q->select(array('id'));
+        if($q->prepare() && $q->stmt->execute()) {
+            if($fields_id = $q->stmt->fetchALL(PDO::FETCH_COLUMN)) {
+                $rule_id = $this->findRuleIdByFields($fields_id,$page_id);
+            }
+        }
+
+        return $rule_id;
+    }
+
+    public function getRuleMeta($params, $rule_id = 0,$ajax = 0) {
+        $seo_system = array('id','field_id','multi_id','name','rank','active','class');
+        $seo_array = array('title','h1','h2','description','introtext','text','content');
+        $meta = array();
+        $fields = array();
+        $word_array = array();
+        $aliases = array();
+
+        foreach ($params as $param => $input) {
+            if ($field = $this->modx->getObject('sfField', array('alias' => $param))) {
+                $field_id = $field->get('id');
+                $fields[] = $field_id;
+                if ($word = $this->pdo->getArray('sfDictionary', array('input'=>$input,'field_id'=>$field_id))) {
+                    foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
+                        $word_array[str_replace('value',$field->get('alias'),$tmp_key)] = $tmp_array;
+                    }
+                    $aliases[$param] = $word['alias'];
+                } else {
+                    $value = $field->getValueByInput($input);
+
+                    $processorProps = array(
+                        'class' => $field->get('class'),
+                        'key' => $field->get('key'),
+                        'field_id' => $field_id,
+                        'value' => $value,
+                        'input' => $input,
+                    );
+                    $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
+                    $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                    if ($response->isError()) {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                    }
+                    if($word = $response->response['object']) {
+                        foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
+                            $word_array[str_replace('value',$field->get('alias'),$tmp_key)] = $tmp_array;
+                        }
+                        $aliases[$param] = $word['alias'];
+                    }
+
+                }
+            }
+        }
+
+        if ($seo = $this->pdo->getArray('sfRule', $rule_id)) {
+            $seo_array = array_intersect_key($seo, array_flip($seo_array));
+            foreach ($seo_array as $tag => $text) {
+                if ($text) {
+                    $tpl = '@INLINE ' . $text;
+                    $meta[$tag] = $this->pdo->getChunk($tpl, $word_array);
+                }
+            }
+        }
+
+        $meta['url'] = $this->multiUrl($aliases,$rule_id,$ajax);
+
+        return $meta;
     }
 
     public function getPageMeta($page_id) {
@@ -350,101 +456,8 @@ class SeoFilter
         return $meta;
     }
 
-    public function getFieldMeta($params, $page_id = 0) {
-        $seo_system = array('id','field_id','multi_id','name','rank','active','class');
-        $meta = array();
-        if(count($params)) {
-            foreach ($params as $param => $value) {
-                if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
-                    $word_array = array();
-                    if ($word = $this->pdo->getArray('sfDictionary', array('input'=>$value,'field_id'=>$field['id']))) {
-                        $word_array = array_diff_key($word, array_flip($seo_system));
-                        $meta['url'] = $this->fieldUrl($word['alias'],$field);
-                    }
 
-                    if ($seo = $this->pdo->getArray('sfSeoMeta', array('field_id'=>$field['id']))) {
-                        $seo_array = array_diff_key($seo, array_flip($seo_system));
-                        foreach ($seo_array as $tag => $text) {
-                            if ($text) {
-                                $tpl = '@INLINE ' . $text;
-                                $meta[$tag] = $this->pdo->getChunk($tpl, $word_array);
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-        return $meta;
-    }
-
-    public function findBaseParam($params) {
-        $baseparam = array();
-        foreach ($params as $param => $value) {
-            if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
-                if ($field['baseparam']) {
-                    $baseparam[$param] = $value;
-                    break;
-                }
-            }
-        }
-        return $baseparam;
-    }
-
-    public function getMultiMeta($params, $page_id = 0,$ajax = 0) {
-        $seo_system = array('id','field_id','multi_id','name','rank','active','class');
-        $meta = array();
-        $fields = array();
-        $word_array = array();
-        $aliases = array();
-        $find_multi = 0;
-        $baseparam = $this->findBaseParam($params);
-
-        foreach ($params as $param => $value) {
-            if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
-                $fields[] = $field['id'];
-                if ($word = $this->pdo->getArray('sfDictionary', array('input'=>$value,'field_id'=>$field['id']))) {
-                    foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
-                        $word_array[str_replace('value',$field['alias'],$tmp_key)] = $tmp_array;
-                    }
-                    $aliases[$param] = $word['alias'];
-                }
-            }
-        }
-
-
-        if($find_multi = $this->findMultiIdByFields($fields,$page_id)) {
-            if ($seo = $this->pdo->getArray('sfSeoMeta', array('multi_id'=>$find_multi))) {
-                $seo_array = array_diff_key($seo, array_flip($seo_system));
-                foreach ($seo_array as $tag => $text) {
-                    if ($text) {
-                        $tpl = '@INLINE ' . $text;
-                        $meta[$tag] = $this->pdo->getChunk($tpl, $word_array);
-                    }
-                }
-
-            }
-        }
-       //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
-       //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($params,1));
-        if(!$find_multi && !$meta) {
-            if(count($baseparam) == 1) {
-                $meta = $this->getFieldMeta($baseparam);
-                $meta['url'] = $meta['url'].$this->multiUrl(array_diff($params,$baseparam),0);
-            } else {
-                $meta = $this->getPageMeta($page_id);
-                $meta['url'] = $this->multiUrl($params,0);
-            }
-        } else {
-            $meta['url'] = $this->multiUrl($aliases,$find_multi,$ajax);
-        }
-      //  $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($aliases,1));
-
-
-        return $meta;
-    }
-
-    public function findMultiIdByFields($fields = array(),$page_id = 0) {
+    public function findRuleIdByFields($fields = array(),$page_id = 0) {
         $multi_id = 0;
         $max_priority = count($fields);
         if($max_priority) {
@@ -473,7 +486,7 @@ class SeoFilter
                             $multi_id = $rows[0];
                         } else {
                             foreach($rows as $row) {
-                                if($marray = $this->pdo->getArray('sfMultiField', array('id'=>$row,'page' => $page_id))) {
+                                if($marray = $this->pdo->getArray('sfRule', array('id'=>$row,'page' => $page_id))) {
                                     $multi_id = $marray['id'];
                                 }
                             }
@@ -532,7 +545,7 @@ class SeoFilter
     public function multiUrl($aliases = array(),$multi_id = 0,$ajax = 0) {
         $url = '';
         if($multi_id) {
-            if($marray = $this->pdo->getArray('sfMultiField',$multi_id)) {
+            if($marray = $this->pdo->getArray('sfRule',$multi_id)) {
                 $tpl = '@INLINE ' . $marray['url'];
                 $url = $this->pdo->getChunk($tpl, $aliases);
                 if($url_array = $this->pdo->getArray('sfUrls',array('old_url'=>$url))) {

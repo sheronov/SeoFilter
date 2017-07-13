@@ -19,20 +19,6 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
         if (!$this->checkPermissions()) {
             return $this->modx->lexicon('access_denied');
         }
-        $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
-        $processorProps = $this->getProperties();
-        $processorProps['field_id'] = $processorProps['id'];
-        if($processorProps['id'] = $processorProps['seo_id']) {
-            $action = 'mgr/seometa/update';
-        } else {
-            $action = 'mgr/seometa/create';
-        }
-
-        $otherProps = array('processors_path' => $path . 'processors/');
-        $response = $this->modx->runProcessor($action, $processorProps, $otherProps);
-        if ($response->isError()) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
-        }
 
         return parent::beforeSave();
     }

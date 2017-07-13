@@ -30,23 +30,13 @@ SeoFilter.panel.Home = function (config) {
                     cls: 'main-wrapper',
                 }]
             },{
-                title: _('seofilter_multifields'),
+                title: _('seofilter_rules'),
                 layout: 'anchor',
                 items: [{
-                    html: _('seofilter_multifields_intro'),
+                    html: _('seofilter_rules_intro'),
                     cls: 'panel-desc',
                 }, {
-                    xtype: 'seofilter-grid-multifields',
-                    cls: 'main-wrapper',
-                }]
-            },{
-                title: _('seofilter_seometas'),
-                layout: 'anchor',
-                items: [{
-                    html: _('seofilter_seometas_intro'),
-                    cls: 'panel-desc',
-                }, {
-                    xtype: 'seofilter-grid-seometas',
+                    xtype: 'seofilter-grid-rules',
                     cls: 'main-wrapper',
                 }]
             },{

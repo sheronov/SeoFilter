@@ -8,7 +8,7 @@ SeoFilter.window.CreateFieldIds = function (config) {
         width: 450,
         autoHeight: true,
         url: SeoFilter.config.connector_url,
-        action: 'mgr/multifield/fieldids/create',
+        action: 'mgr/rule/fieldids/create',
         bodyStyle: 'padding-top:10px;',
         fields: this.getFields(config),
         keys: [{
@@ -97,7 +97,7 @@ SeoFilter.window.UpdateFieldIds = function (config) {
         width: 450,
         autoHeight: true,
         url: SeoFilter.config.connector_url,
-        action: 'mgr/multifield/fieldids/update',
+        action: 'mgr/rule/fieldids/update',
         fields: this.getFields(config),
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {

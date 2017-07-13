@@ -33,7 +33,6 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
     {
        // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
 
-
         $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
         $field = $this->object;
         $class = $field->get('class');
@@ -41,7 +40,6 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
         $values = array();
 
         if($class && $key) {
-
             $processorProps = array(
                 'class' => $class,
                 'key' => $key,

@@ -5,7 +5,7 @@ $properties = array();
 $tmp = array(
     'tpl' => array(
         'type' => 'textfield',
-        'value' => 'tpl.SeoFilter.item',
+        'value' => '@INLINE <a href="/{$link}">{$value}</a>',
     ),
     'sortby' => array(
         'type' => 'textfield',

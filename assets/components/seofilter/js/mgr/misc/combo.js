@@ -144,3 +144,34 @@ SeoFilter.combo.Field = function (config) {
 };
 Ext.extend(SeoFilter.combo.Field, MODx.combo.ComboBox);
 Ext.reg('seofilter-combo-field', SeoFilter.combo.Field);
+
+SeoFilter.combo.Rule = function (config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'multi_id',
+        hiddenName: 'multi_id',
+        displayField: 'name',
+        valueField: 'id',
+        editable: true,
+        fields: ['id', 'name'],
+        pageSize: 20,
+        emptyText: _('seofilter_combo_select'),
+        allowBlank: false,
+        url: SeoFilter.config.connector_url,
+        baseParams: {
+            action: 'mgr/rule/getlist',
+            combo: true,
+            id: config.value
+        },
+        tpl: new Ext.XTemplate(''
+            +'<tpl for="."><div class="x-combo-list-item seofilter-rule-list-item">'
+            +'<span><small>({id})</small> <b>{name}</b></span>'
+            +'</div></tpl>',{
+            compiled: true
+        }),
+        itemSelector: 'div.seofilter-rule-list-item'
+    });
+    SeoFilter.combo.Rule.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.combo.Rule, MODx.combo.ComboBox);
+Ext.reg('seofilter-combo-rule', SeoFilter.combo.Rule);

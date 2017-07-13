@@ -1,9 +1,9 @@
 <?php
 
-class sfSeoMetaGetProcessor extends modObjectGetProcessor
+class sfRuleGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'sfSeoMeta';
-    public $classKey = 'sfSeoMeta';
+    public $objectType = 'sfRule';
+    public $classKey = 'sfRule';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';
 
@@ -23,6 +23,7 @@ class sfSeoMetaGetProcessor extends modObjectGetProcessor
         return parent::process();
     }
 
+
 }
 
-return 'sfSeoMetaGetProcessor';
+return 'sfRuleGetProcessor';

@@ -25,3 +25,5 @@ $_lang['setting_seofilter_morpher_username'] = 'Логин к сервису mor
 $_lang['setting_seofilter_morpher_username_desc'] = 'Если указать, будет больше вариантов склонения, включая где, куда, откуда';
 $_lang['setting_seofilter_morpher_password'] = 'Пароль к сервису morpher.ru';
 $_lang['setting_seofilter_morpher_password_desc'] = 'Пароль к логину на morpher.ru';
+$_lang['setting_seofilter_base_get'] = 'Параметры, не влияющие на мета-теги';
+$_lang['setting_seofilter_base_get_desc'] = 'GET-параметры, не влияющие на мета-теги. По-умолчанию "price,page,limit,tpl,sort"';
