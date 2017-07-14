@@ -28,47 +28,16 @@ if($rule_id) {
     $fields = array_flip($aliases);
 
     foreach($sf_tags as $param => $input) {
-        $word = array();
-        $q = $modx->newQuery('sfDictionary');
-        $q->limit(1);
-        $q->where(array('field_id'=> $fields[$param],'input'=>$input));
-        if($modx->getCount('sfDictionary',$q)) {
-            $q->select(array('sfDictionary.*'));
-            if ($q->prepare() && $q->stmt->execute()) {
-                $word = $q->stmt->fetch(PDO::FETCH_ASSOC);
-            }
-        } else {
-            if($field = $modx->getObject('sfField',array('alias'=>$param))) {
-                $value = $field->getValueByInput($input);
-                $processorProps = array(
-                    'class' => $field->get('class'),
-                    'key' => $field->get('key'),
-                    'field_id' => $field->get('id'),
-                    'value' => $value,
-                    'input' => $input,
-                );
-                $otherProps = array('processors_path' => $SeoFilter->config['corePath'] . 'processors/');
-                $response = $modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                if ($response->isError()) {
-                    $modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
-                } else {
-                    $word = $response->response['object'];
-                }
-            }
+        $word = $SeoFilter->getWordArray($input,$fields[$param]);
+        foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
+            $word_array[str_replace('value',$param,$tmp_key)] = $tmp_array;
         }
-        if(count($word)) {
-            foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
-                $word_array[str_replace('value',$param,$tmp_key)] = $tmp_array;
-
-            }
-            $word_array['value'] = $word['value'];
-            $word_array[$param.'_input'] = $word['input'];
-            $word_array[$param.'_alias'] = $word['alias'];
-            unset($word_array['alias']);
-            $word_aliases[$param] = $word['alias'];
-        }
+        $word_array['value'] = $word['value'];
+        $word_array[$param.'_input'] = $word['input'];
+        $word_array[$param.'_alias'] = $word['alias'];
+        unset($word_array['alias']);
+        $word_aliases[$param] = $word['alias'];
     }
-
 
     $q = $modx->newQuery('sfRule',$rule_id);
     $q->limit(1);
@@ -78,7 +47,16 @@ if($rule_id) {
         $page_id = $row['page'];
         $url_mask = '@INLINE '.$row['url'];
         $url_add = $pdo->getChunk($url_mask,$word_aliases);
+        $url_array = $SeoFilter->findUrlArray($url_add,$page_id);
+        if(count($url_array)) {
+            if($url_array['new_url']) {
+                $url_add = $url_array['new_url'];
+            }
+        } else {
+            $url_array = $SeoFilter->newUrl($url_add,$rule_id,$page_id,0);
+        }
         $url = $modx->makeUrl($page_id) . mb_strtolower($url_add);
+
 
         $output = $pdo->getChunk($tpl,array_merge(array('link'=>$url),$word_array));
         return $output;

@@ -17,12 +17,72 @@ switch ($modx->event->name) {
             }
         }
         break;
+    case 'OnDocFormSave':
+        $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
+        if($sf_classes &&!in_array($resource->get('class_key'),explode(',',$sf_classes)))
+            break;
+        $sf_templates = $modx->getOption('seofilter_templates', null, '', true);
+        if($sf_templates && !in_array($resource->get('template'),explode(',',$sf_templates)))
+            break;
+
+        $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
+                $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+        $pdo = $SeoFilter->pdo;
+        if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
+
+        $r_array = $resource->toArray();
+
+        $fields = $pdo->getCollection('sfField');
+        foreach($fields as $field) {
+            $key = $field['key'];
+            $input = '';
+            switch ($field['class']) {
+                case 'msProductOption':
+                    $input = $r_array['options'][$key];
+                    break;
+                case 'msProductData':
+                case 'modResource':
+                    $input = $r_array[$key];
+                    break;
+                case 'modTemplateVar':
+                    $input = $resource->getTVValue($key);
+                    break;
+                case 'msVendor':
+                    $input = $r_array['vendor.id'];
+                    break;
+                default:
+                    break;
+            }
+            if(is_array($input)) {
+                foreach($input as $inp) {
+                    $word_array = $SeoFilter->getWordArray($inp,$field['id']);
+                }
+            } else {
+                if(strpos($input,'||')) {
+                    foreach(explode('||',$input) as $inp) {
+                        $word_array = $SeoFilter->getWordArray($inp,$field['id']);
+                    }
+                } elseif(strpos($input,',')) {
+                    foreach(explode(',',$input) as $inp) {
+                        $word_array = $SeoFilter->getWordArray($inp,$field['id']);
+                    }
+                } else {
+                    $word_array = $SeoFilter->getWordArray($input,$field['id']);
+                }
+            }
+
+        }
+
+        //$modx->log(modx::LOG_LEVEL_ERROR, print_r($resource->toArray(),1));
+
+        break;
     case 'OnPageNotFound':
         $time = microtime(true);
         $alias = $modx->context->getOption('request_param_alias', 'q');
         if (isset($_REQUEST[$alias])) {
             /** @var SeoFilter $SeoFilter */
-            $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null, $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+            $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
+                    $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
             $pdo = $SeoFilter->pdo;
             if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
             $separator = $SeoFilter->config['separator'];
@@ -80,7 +140,7 @@ switch ($modx->event->name) {
             }
 
             if($page) {
-                if($url_array = $SeoFilter->findUrlArray(implode('/',$tmp))) {
+                if($url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
                     $old_url = $url_array['old_url'];
                     $new_url = $url_array['new_url'];
                     $rule_id = $url_array['multi_id'];
@@ -120,12 +180,48 @@ switch ($modx->event->name) {
                             }
                             $fast_search = true;
                             $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$params));
-                            $meta = $SeoFilter->getRuleMeta($params,$rule_id,0);
+                            $meta = $SeoFilter->getRuleMeta($params,$rule_id,$page,0);
                             $modx->setPlaceholders($meta,'sf.');
                             $modx->sendForward($page);
                         }
                     }
 
+                } else {
+                    $field_aliases = $SeoFilter->fieldsAliases($page);
+                    $fields = $pdo->getCollection('sfField',array('id:IN'=>array_keys($field_aliases)));
+                    foreach($tmp as $tvar) {
+                        foreach ($fields as $field) {
+                            $alias = $field['alias'];
+                            if ($field['hideparam']) {
+                                $value = $tvar;
+                            } elseif ($field['valuefirst']) {
+                                $value = explode($separator,$tvar)[0];
+                            } else {
+                                $value = explode($separator,$tvar)[1];
+                            }
+                            $w = $modx->newQuery('sfDictionary');
+                            $w->where(array('alias'=>$value,'class'=>$field['class'],'key'=>$field['key'],'field_id'=>$field['id']));
+                            $w->limit(1);
+                            $w->select('input');
+                            if($modx->getCount('sfDictionary',$w)) {
+                                if($w->prepare() && $w->stmt->execute()) {
+                                    $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $w->stmt->fetch(PDO::FETCH_COLUMN);
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    if(count($tmp) == count($params)) {
+                        $fast_search = true;
+                        $rule_id = $SeoFilter->findRule(array_keys($params), $page);
+                        $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
+                        $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0, 1);
+                        $modx->setPlaceholders($meta, 'sf.');
+                        $modx->sendForward($page);
+                    } else {
+                        //TODO: тут типо сеоштуки можно сделать, переадресацию на страницу выше
+                    }
                 }
             }
 

@@ -20,14 +20,6 @@ class sfFieldGetProcessor extends modObjectGetProcessor
             return $this->failure($this->modx->lexicon('access_denied'));
         }
 
-        if($seo = $this->modx->getObject('sfSeoMeta',array('field_id'=>$this->object->get('id')))) {
-            $seo_array = $seo->toArray();
-            $seo_array['seo_id'] = $seo_array['id'];
-            unset($seo_array['id']);
-            foreach($seo_array as $seo_key => $seo_value) {
-                $this->object->set($seo_key,$seo_value);
-            }
-        }
 
         return parent::process();
     }

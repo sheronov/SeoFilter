@@ -297,7 +297,7 @@ class SeoFilter
                             $rule_array = $this->pdo->getArray('sfRule',$rule_id);
                             $rule_base = $rule_array['base'];
                             if((count($real_diff) && $rule_base) || !count($real_diff)) {
-                                $meta = $this->getRuleMeta($params,$rule_id,1);
+                                $meta = $this->getRuleMeta($params,$rule_id,$pageId,1);
                                 $meta['find'] = $find = 1;
 
                             } else {
@@ -362,7 +362,7 @@ class SeoFilter
         return $rule_id;
     }
 
-    public function getRuleMeta($params, $rule_id = 0,$ajax = 0) {
+    public function getRuleMeta($params, $rule_id = 0,$page_id = 0 ,$ajax = 0,$new = 0) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class');
         $seo_array = array('title','h1','h2','description','introtext','text','content');
         $meta = array();
@@ -370,38 +370,16 @@ class SeoFilter
         $word_array = array();
         $aliases = array();
 
+
         foreach ($params as $param => $input) {
             if ($field = $this->modx->getObject('sfField', array('alias' => $param))) {
                 $field_id = $field->get('id');
                 $fields[] = $field_id;
-                if ($word = $this->pdo->getArray('sfDictionary', array('input'=>$input,'field_id'=>$field_id))) {
-                    foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
-                        $word_array[str_replace('value',$field->get('alias'),$tmp_key)] = $tmp_array;
-                    }
-                    $aliases[$param] = $word['alias'];
-                } else {
-                    $value = $field->getValueByInput($input);
-
-                    $processorProps = array(
-                        'class' => $field->get('class'),
-                        'key' => $field->get('key'),
-                        'field_id' => $field_id,
-                        'value' => $value,
-                        'input' => $input,
-                    );
-                    $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
-                    $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                    if ($response->isError()) {
-                        $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
-                    }
-                    if($word = $response->response['object']) {
-                        foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
-                            $word_array[str_replace('value',$field->get('alias'),$tmp_key)] = $tmp_array;
-                        }
-                        $aliases[$param] = $word['alias'];
-                    }
-
+                $word = $this->getWordArray($input,$field_id);
+                foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
+                    $word_array[str_replace('value',$field->get('alias'),$tmp_key)] = $tmp_array;
                 }
+                $aliases[$param] = $word['alias'];
             }
         }
 
@@ -415,9 +393,41 @@ class SeoFilter
             }
         }
 
-        $meta['url'] = $this->multiUrl($aliases,$rule_id,$ajax);
+        $meta['url'] = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new);
 
         return $meta;
+    }
+
+    public function getWordArray($input = '', $field_id = 0) {
+        $word = array();
+        $q = $this->modx->newQuery('sfDictionary');
+        $q->limit(1);
+        $q->where(array('field_id'=> $field_id,'input'=>$input));
+        if($this->modx->getCount('sfDictionary',$q)) {
+            $q->select(array('sfDictionary.*'));
+            if ($q->prepare() && $q->stmt->execute()) {
+                $word = $q->stmt->fetch(PDO::FETCH_ASSOC);
+            }
+        } else {
+            if($field = $this->modx->getObject('sfField',$field_id)) {
+                $value = $field->getValueByInput($input);
+                $processorProps = array(
+                    'class' => $field->get('class'),
+                    'key' => $field->get('key'),
+                    'field_id' => $field->get('id'),
+                    'value' => $value,
+                    'input' => $input,
+                );
+                $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
+                $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                if ($response->isError()) {
+                    $this->modx->log(modX::LOG_LEVEL_ERROR, print_r($response->response,1));
+                } else {
+                    $word = $response->response['object'];
+                }
+            }
+        }
+        return $word;
     }
 
     public function getPageMeta($page_id) {
@@ -506,12 +516,35 @@ class SeoFilter
         }
     }
 
-    public function findUrlArray($url = '') {
-        if($url_array = $this->pdo->getArray('sfUrls',array('old_url'=>$url,'OR:new_url:='=>$url))) {
+    public function findUrlArray($url = '',$page = 0) {
+        if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page,'old_url'=>$url,'OR:new_url:='=>$url))) {
             return $url_array;
         } else {
             return array();
         }
+    }
+
+    public function newUrl($old_url = '',$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0) {
+        $url = array();
+        if($ajax) {
+            $new = $ajax;
+        }
+        $processorProps = array(
+            'old_url' => $old_url,
+            'multi_id' => $multi_id,
+            'page_id' => $page_id,
+            'ajax' => $ajax,
+            'count' => $new
+        );
+        $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
+        $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
+        if ($response->isError()) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+        } else {
+            $url = $response->response['object'];
+        }
+
+        return $url;
     }
 
     public function addUrlCount($url_id = 0, $filter = 0) {
@@ -542,17 +575,19 @@ class SeoFilter
         return $url;
     }
 
-    public function multiUrl($aliases = array(),$multi_id = 0,$ajax = 0) {
+    public function multiUrl($aliases = array(),$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0) {
         $url = '';
         if($multi_id) {
             if($marray = $this->pdo->getArray('sfRule',$multi_id)) {
                 $tpl = '@INLINE ' . $marray['url'];
                 $url = $this->pdo->getChunk($tpl, $aliases);
-                if($url_array = $this->pdo->getArray('sfUrls',array('old_url'=>$url))) {
+                if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page_id,'old_url'=>$url))) {
                     if($url_array['new_url']) {
                         $url = $url_array['new_url'];
                     }
                     $this->addUrlCount($url_array['id'],$ajax);
+                } else {
+                    $url_array = $this->newUrl($url,$multi_id,$page_id,$ajax,$new);
                 }
             }
         } else {

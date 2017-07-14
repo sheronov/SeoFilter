@@ -11,6 +11,7 @@ $tmp = array(
         'events' => array(
             'OnPageNotFound' => array(),
             'OnLoadWebDocument' => array(),
+            'OnDocFormSave' => array()
         )
     )
 );

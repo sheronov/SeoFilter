@@ -18,9 +18,9 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
         $input = trim($this->getProperty('input'));
         $field_id = $this->getProperty('field_id');
         if (empty($input)) {
-            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_seometa_err_input'));
+            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_dictionary_err_input'));
         } elseif ($this->modx->getCount($this->classKey, array('input' => $input,'field_id'=>$field_id))) {
-            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_seometa_err_ae'));
+            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_dictionary_err_ae'));
         }
 
 

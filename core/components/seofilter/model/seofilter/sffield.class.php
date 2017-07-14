@@ -49,7 +49,7 @@ class sfField extends xPDOSimpleObject {
         }
         if($this->get('hideparam')) {
             $url = $value;
-        } else if ($this->get('valuefirst')) {
+        } elseif ($this->get('valuefirst')) {
             $url = $value.$separator.$alias;
         } else {
             $url = $alias.$separator.$value;

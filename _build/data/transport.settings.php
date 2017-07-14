@@ -46,6 +46,16 @@ $tmp = array(
         'value' => '',
         'area' => 'seofilter_main',
     ),
+    'classes' => array(
+        'xtype' => 'textfield',
+        'value' => 'msProduct',
+        'area' => 'seofilter_main',
+    ),
+    'templates' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
     'title' => array(
         'xtype' => 'textfield',
         'value' => 'pagetitle',
