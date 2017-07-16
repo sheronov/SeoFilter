@@ -48,6 +48,9 @@
         <field key="url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="base" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
 
+        <field key="count_parents" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="count_where" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+
         <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 

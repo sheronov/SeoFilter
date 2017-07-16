@@ -56,6 +56,11 @@ $tmp = array(
         'value' => '',
         'area' => 'seofilter_main',
     ),
+    'count' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_main',
+    ),
     'title' => array(
         'xtype' => 'textfield',
         'value' => 'pagetitle',

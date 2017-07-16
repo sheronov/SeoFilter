@@ -222,18 +222,18 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             dataIndex: 'alias',
             sortable: true,
             width: 150,
-        }, {
+        //}, {
         //     header: _('seofilter_field_translit'),
         //     dataIndex: 'translit',
         //     renderer: SeoFilter.utils.renderBoolean,
         //     sortable: false,
         //     width: 75,
         // }, {
-            header: _('seofilter_field_baseparam'),
-            dataIndex: 'baseparam',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: false,
-            width: 75,
+        //     header: _('seofilter_field_baseparam'),
+        //     dataIndex: 'baseparam',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: false,
+        //     width: 75,
         }, {
             header: _('seofilter_field_hideparam'),
             dataIndex: 'hideparam',

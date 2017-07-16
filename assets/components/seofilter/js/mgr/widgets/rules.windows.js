@@ -61,7 +61,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     border: false,
                     anchor: '100%',
                     items: [{
-                        columnWidth: .5
+                        columnWidth: .7
                         , layout: 'form'
                         , defaults: {msgTarget: 'under'}
                         , border: false
@@ -75,10 +75,11 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                             }
                         ]
                     }, {
-                        columnWidth: .5
+                        columnWidth: .3
                         , layout: 'form'
                         , defaults: {msgTarget: 'under'}
                         , border: false
+                        , style: 'padding-top:20px;text-align:right;'
                         , items: [
                             {
                                 xtype: 'xcheckbox',
@@ -125,9 +126,13 @@ SeoFilter.window.UpdateRule = function (config) {
 
     SeoFilter.window.UpdateRule.superclass.constructor.call(this, config)
 };
-Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
 
+Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
     getFields: function (config) {
+        var xtype_count = 'hidden';
+        if(SeoFilter.config.count_childrens) {
+            xtype_count = 'textfield';
+        }
         return {
             xtype: 'modx-tabs'
             ,deferredRender: false
@@ -175,8 +180,13 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             , layout: 'form'
                             , defaults: {msgTarget: 'under'}
                             , border: false
-                            , items: [
-                                {
+                            , items: [{
+                                    xtype: xtype_count,
+                                    fieldLabel: _('seofilter_rule_count_where'),
+                                    name: 'count_where',
+                                    id: config.id + '-count_where',
+                                    anchor: '99%',
+                                },{
                                     xtype: 'seofilter-combo-resource',
                                     fieldLabel: _('seofilter_field_page'),
                                     name: 'page',
@@ -189,15 +199,20 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             , layout: 'form'
                             , defaults: {msgTarget: 'under'}
                             , border: false
-                            , style: 'padding-top:20px;text-align:right;'
-                            , items: [
-                                {
+                            , style: 'text-align:right;'
+                            , items: [{
+                                    xtype: xtype_count,
+                                    fieldLabel: _('seofilter_rule_count_parents'),
+                                    name: 'count_parents',
+                                    style: 'margin-bottom:20px;',
+                                    id: config.id + '-count_parents',
+                                    anchor: '99%',
+                                }, {
                                     xtype: 'xcheckbox',
                                     boxLabel: _('seofilter_field_active'),
                                     name: 'active',
                                     id: config.id + '-active',
-                                }
-                            ]
+                            }]
                         }]
                     }]
                 }, {

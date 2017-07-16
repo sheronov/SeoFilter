@@ -90,7 +90,7 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         $q->select($xpdo_id.','.$xpdo_name);
                         if ($q->prepare() && $q->stmt->execute()) {
                             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                                $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($row,1));
+                                //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($row,1));
                                 $values[$row[$xpdo_id]] = $row[$xpdo_name];
                             }
                         }

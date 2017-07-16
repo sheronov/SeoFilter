@@ -103,6 +103,9 @@ $_lang['seofilter_rule_remove_confirm'] = 'Вы уверены, что хоти�
 $_lang['seofilter_rules_remove_confirm'] = 'Вы уверены, что хотите удалить эти правила?';
 $_lang['seofilter_rule_active'] = 'Включено';
 
+$_lang['seofilter_rule_count_parents'] = 'Parents (для подсчёта)';
+$_lang['seofilter_rule_count_where'] = 'Условия для подсчёта ресурсов (в JSON формате)';
+
 $_lang['seofilter_rule_err_name'] = 'Вы должны указать имя правила.';
 $_lang['seofilter_rule_err_ae'] = 'Правило с таким именем уже существует.';
 $_lang['seofilter_rule_err_nf'] = 'Правило не найдено.';
@@ -124,10 +127,7 @@ $_lang['seofilter_seometa_description'] = 'Описание';
 $_lang['seofilter_seometa_introtext'] = 'Вводный текст';
 $_lang['seofilter_seometa_text'] = 'Текстовое поле';
 $_lang['seofilter_seometa_content'] = 'Контент';
-
 $_lang['seofilter_seometa_create'] = 'Добавить значения';
-
-
 $_lang['seofilter_seometa_update'] = 'Изменить SEO поля';
 $_lang['seofilter_seometa_enable'] = 'Включить SEO';
 $_lang['seofilter_seometa_disable'] = 'Отключить SEO';

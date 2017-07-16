@@ -10,6 +10,8 @@ $xpdo_meta_map['sfRule']= array (
     'page' => 0,
     'url' => '',
     'base' => 0,
+    'count_parents' => '',
+    'count_where' => '',
     'rank' => 0,
     'active' => 1,
     'title' => '',
@@ -54,6 +56,22 @@ $xpdo_meta_map['sfRule']= array (
       'phptype' => 'boolean',
       'null' => false,
       'default' => 0,
+    ),
+    'count_parents' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'count_where' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
     ),
     'rank' => 
     array (

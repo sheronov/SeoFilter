@@ -31,13 +31,14 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
     {
         $id = (int)$this->getProperty('id');
         $name = trim($this->getProperty('value'));
+        $field_id = (int)$this->getProperty('field_id');
         if (empty($id)) {
             return $this->modx->lexicon('seofilter_dictionary_err_ns');
         }
 
         if (empty($name)) {
             $this->modx->error->addField('value', $this->modx->lexicon('seofilter_dictionary_err_name'));
-        } elseif ($this->modx->getCount($this->classKey, array('value' => $name, 'id:!=' => $id))) {
+        } elseif ($this->modx->getCount($this->classKey, array('value' => $name, 'field_id'=>$field_id, 'id:!=' => $id))) {
             $this->modx->error->addField('value', $this->modx->lexicon('seofilter_dictionary_err_ae'));
         }
 
