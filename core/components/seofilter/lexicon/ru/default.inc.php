@@ -104,7 +104,7 @@ $_lang['seofilter_rules_remove_confirm'] = 'Вы уверены, что хоти
 $_lang['seofilter_rule_active'] = 'Включено';
 
 $_lang['seofilter_rule_count_parents'] = 'Parents (для подсчёта)';
-$_lang['seofilter_rule_count_where'] = 'Условия для подсчёта ресурсов (в JSON формате)';
+$_lang['seofilter_rule_count_where'] = 'Доп. условие для подсчёта ресурсов (в JSON формате)';
 
 $_lang['seofilter_rule_err_name'] = 'Вы должны указать имя правила.';
 $_lang['seofilter_rule_err_ae'] = 'Правило с таким именем уже существует.';

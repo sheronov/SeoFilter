@@ -19,10 +19,10 @@ switch ($modx->event->name) {
         break;
     case 'OnDocFormSave':
         $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
-        if($sf_classes &&!in_array($resource->get('class_key'),explode(',',$sf_classes)))
+        if($sf_classes &&!in_array($resource->get('class_key'),array_map('trim', explode(',',$sf_classes))))
             break;
         $sf_templates = $modx->getOption('seofilter_templates', null, '', true);
-        if($sf_templates && !in_array($resource->get('template'),explode(',',$sf_templates)))
+        if($sf_templates && !in_array($resource->get('template'),array_map('trim', explode(',',$sf_templates))))
             break;
 
         $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
@@ -59,11 +59,11 @@ switch ($modx->event->name) {
                 }
             } else {
                 if(strpos($input,'||')) {
-                    foreach(explode('||',$input) as $inp) {
+                    foreach(array_map('trim', explode('||',$input)) as $inp) {
                         $word_array = $SeoFilter->getWordArray($inp,$field['id']);
                     }
                 } elseif(strpos($input,',')) {
-                    foreach(explode(',',$input) as $inp) {
+                    foreach(array_map('trim', explode(',',$input)) as $inp) {
                         $word_array = $SeoFilter->getWordArray($inp,$field['id']);
                     }
                 } else {
@@ -178,11 +178,18 @@ switch ($modx->event->name) {
                                     }
                                 }
                             }
-                            $fast_search = true;
-                            $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$params));
-                            $meta = $SeoFilter->getRuleMeta($params,$rule_id,$page,0);
-                            $modx->setPlaceholders($meta,'sf.');
-                            $modx->sendForward($page);
+                            if(count($params)) {
+                                $fast_search = true;
+                                $SeoFilter->initialize($modx->context->key,array('page'=>$page,'params'=>$params));
+                                $meta = $SeoFilter->getRuleMeta($params,$rule_id,$page,0);
+                                $modx->setPlaceholders($meta,'sf.');
+                                $modx->sendForward($page);
+                            } else {
+                                if($url = $modx->getObject('sfUrls',array('page_id'=>$page,'old_url'=>$old_url,'multi_id'=>$rule_id))) {
+                                    $url->set('active',0);
+                                    $url->save();
+                                }
+                            }
                         }
                     }
 

@@ -213,16 +213,12 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             sortable: true,
             width: 250,
         }, {
-            header: _('seofilter_rule_base'),
-            dataIndex: 'base',
-            sortable: true,
-            renderer: SeoFilter.utils.renderBoolean,
-            width: 250,
-        }, {
+
             header: _('seofilter_rule_title'),
             dataIndex: 'title',
             sortable: true,
             width: 250,
+
         // }, {
         //     header: _('seofilter_rule_count'),
         //     dataIndex: 'count',
@@ -233,6 +229,12 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
         //     dataIndex: 'fields',
         //     sortable: true,
         //     width: 150,
+        }, {
+            header: _('seofilter_rule_base'),
+            dataIndex: 'base',
+            sortable: true,
+            renderer: SeoFilter.utils.renderBoolean,
+            width: 75,
         }, {
             header: _('seofilter_rule_active'),
             dataIndex: 'active',

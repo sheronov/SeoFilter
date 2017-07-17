@@ -61,6 +61,21 @@ $tmp = array(
         'value' => false,
         'area' => 'seofilter_main',
     ),
+    'choose' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
+    'snippet' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
+    'select' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
     'title' => array(
         'xtype' => 'textfield',
         'value' => 'pagetitle',

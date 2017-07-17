@@ -5,8 +5,8 @@ SeoFilter.window.CreateRule = function (config) {
     }
     Ext.applyIf(config, {
         title: _('seofilter_rule_create'),
-        width: 550,
-        autoHeight: true,
+        width: 650,
+        autoHeight: false,
         url: SeoFilter.config.connector_url,
         action: 'mgr/rule/create',
         bodyStyle: 'padding-top:10px;',
@@ -22,6 +22,10 @@ SeoFilter.window.CreateRule = function (config) {
 Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
 
     getFields: function (config) {
+        var xtype_count = 'hidden';
+        if(SeoFilter.config.count_childrens) {
+            xtype_count = 'textfield';
+        }
         return {
             xtype: 'modx-tabs'
             ,deferredRender: false
@@ -65,8 +69,13 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                         , layout: 'form'
                         , defaults: {msgTarget: 'under'}
                         , border: false
-                        , items: [
-                            {
+                        , items: [{
+                                xtype: xtype_count,
+                                fieldLabel: _('seofilter_rule_count_where'),
+                                name: 'count_where',
+                                id: config.id + '-count_where',
+                                anchor: '99%',
+                            }, {
                                 xtype: 'seofilter-combo-resource',
                                 fieldLabel: _('seofilter_field_page'),
                                 name: 'page',
@@ -79,9 +88,15 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                         , layout: 'form'
                         , defaults: {msgTarget: 'under'}
                         , border: false
-                        , style: 'padding-top:20px;text-align:right;'
-                        , items: [
-                            {
+                        , style: 'text-align:right;'
+                        , items: [{
+                                xtype: xtype_count,
+                                fieldLabel: _('seofilter_rule_count_parents'),
+                                name: 'count_parents',
+                                style: 'margin-bottom:20px;',
+                                id: config.id + '-count_parents',
+                                anchor: '99%',
+                            }, {
                                 xtype: 'xcheckbox',
                                 boxLabel: _('seofilter_field_active'),
                                 name: 'active',
@@ -92,8 +107,70 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 }]
             }, {
                 title: _('seofilter_seo')
-                , xtype: 'displayfield'
-                , html: _('seofilter_seo_after_save')
+                ,hideMode: 'offsets'
+                ,layout: 'form'
+                ,border:false
+                ,style: 'margin-top:-10px;padding-bottom:5px;'
+                ,items: [{
+                    html: _('seofilter_multiseo_intro'),
+                    cls: 'panel-desc',
+                },{
+                    xtype: 'hidden',
+                    name: 'seo_id',
+                    id: config.id + '-seo_id',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_title'),
+                    name: 'title',
+                    id: config.id + '-title',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_h1'),
+                    name: 'h1',
+                    id: config.id + '-h1',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_seometa_h2'),
+                    name: 'h2',
+                    id: config.id + '-h2',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_description'),
+                    name: 'description',
+                    id: config.id + '-description',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_introtext'),
+                    name: 'introtext',
+                    id: config.id + '-introtext',
+                    anchor: '99%',
+                },{
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_text'),
+                    name: 'text',
+                    id: config.id + '-text',
+                    anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    heght:300,
+                    fieldLabel: _('seofilter_seometa_content'),
+                    name: 'content',
+                    id: config.id + '-content',
+                    listeners: {
+                        render: function () {
+                            window.setTimeout(function() {
+                                MODx.ux.Ace.replaceComponent(config.id+'-content', 'text/x-smarty', 1);
+                                MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
+                                Ext.getCmp(config.id+'-content').setHeight(200);
+                            }, 100);
+                        }
+                    },
+                    anchor: '99%'
+                }]
             }]
         };
     },
@@ -133,6 +210,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
         if(SeoFilter.config.count_childrens) {
             xtype_count = 'textfield';
         }
+
         return {
             xtype: 'modx-tabs'
             ,deferredRender: false
@@ -265,29 +343,22 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     id: config.id + '-text',
                     anchor: '99%',
                 }, {
-                    //xtype: 'textarea',
+                    xtype: 'textarea',
                     heght:300,
-                    cls: 'modx-richtext',
                     fieldLabel: _('seofilter_seometa_content'),
-                    name: 'contenttext',
-                    id: config.id + '-contenttext',
-                    xtype: 'htmleditor',
-                    enableFont:false,
-                    enableColors: false,
-                    enableFontSize : false,
-                    // listeners: {
-                    //     render: function () {
-                    //         console.log(MODx);
-                    //         if(MODx.loadRTE) {
-                    //             window.setTimeout(function() {
-                    //                 MODx.loadRTE(config.id + '-content'); // id поля
-                    //             }, 300);
-                    //         }
-                    //     },
-                    // },
-                    anchor: '99%',
-                }
-                ]
+                    name: 'content',
+                    id: config.id + '-content',
+                    listeners: {
+                        render: function () {
+                            window.setTimeout(function() {
+                                MODx.ux.Ace.replaceComponent(config.id+'-content', 'text/x-smarty', 1);
+                                MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
+                                Ext.getCmp(config.id+'-content').setHeight(200);
+                            }, 100);
+                        }
+                    },
+                    anchor: '99%'
+                }]
             }]
         };
     },
@@ -297,3 +368,4 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
 
 });
 Ext.reg('seofilter-rule-window-update', SeoFilter.window.UpdateRule);
+

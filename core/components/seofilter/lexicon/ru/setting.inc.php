@@ -30,7 +30,14 @@ $_lang['setting_seofilter_base_get_desc'] = 'GET-параметры, не вли
 
 $_lang['setting_seofilter_count'] = 'Подсчитывать потомков';
 $_lang['setting_seofilter_count_desc'] = 'По-умолчанию нет. Если да, то будет доступен плейсхолдер {$count} в SEO шаблонах';
+$_lang['setting_seofilter_choose'] = 'Отдельные выборки по ключам';
+$_lang['setting_seofilter_choose_desc'] = 'Можно указать несколько значений, через запятую, например: "price". Перемножит на настройку выбранных полей ресурса. Для использования в SEO шаблонах';
+$_lang['setting_seofilter_select'] = 'Какие поля ресурса выбирать';
+$_lang['setting_seofilter_select_desc'] = 'Например: "msProduct.id,msProductData.price", Доступный поля msProduct и msProductData. Образуют плейсхолдеры: min_price_id, min_price_price, max_price_id,max_price_price и т.д.';
+
 $_lang['setting_seofilter_templates'] = 'Шаблоны ресурсов для отслеживания';
 $_lang['setting_seofilter_templates_desc'] = 'Для работы плагина по добавлению значений в SEO словарь после сохранения ресурса';
 $_lang['setting_seofilter_classes'] = 'Class_key ресурсов для отслеживания';
 $_lang['setting_seofilter_classes_desc'] = 'По умолчанию "msProduct". Для работы плагина по добавлению значений в SEO словарь после сохранения ресурса';
+$_lang['setting_seofilter_snippet'] = 'Сниппет для подготовки/обработки слов для мета-тегов';
+$_lang['setting_seofilter_snippet_desc'] = 'prepareSnippet принимает массив слов($row), id правила($rule_id), и страницы($page_id), а также $pdoTools. Должен вернуть serialize($row) !';
