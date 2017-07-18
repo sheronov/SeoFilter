@@ -71,11 +71,11 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
 
         $array['actions'] = array();
 
-        if(($array['old_url'] || $array['new_url']) && $array['page']) {
+        if(($array['old_url'] || $array['new_url']) && $array['page_id']) {
             if(!($addurl = $array['new_url'])) {
                 $addurl = $array['old_url'];
             }
-            $array['url_preview'] = $this->modx->makeUrl($array['page']).$addurl;
+            $array['url_preview'] = $this->modx->makeUrl($array['page_id']).$addurl;
         }
 
         if (!empty($array['url_preview'])) {

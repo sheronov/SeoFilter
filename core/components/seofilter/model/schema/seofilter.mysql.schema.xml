@@ -190,6 +190,17 @@
         <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" attributes="unsigned" null="true" default="1"/>
 
+        <field key="params" dbtype="text" phptype="json" null="true" default=""/>
+
+        <field key="seo_custom" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
+        <field key="title" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
+        <field key="h1" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
+        <field key="h2" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="introtext" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="text" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="text" phptype="string" null="true" default=""/>
+
         <index alias="page_id" name="page_id" primary="false" unique="false" type="BTREE">
             <column key="page_id" length="" collation="A" null="false"/>
         </index>

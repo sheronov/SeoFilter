@@ -20,7 +20,7 @@ $sf_tags = array_diff_key($scriptProperties,array_flip($system_settings));
 
 $output = '';
 
-$modx->log(modx::LOG_LEVEL_ERROR, print_r(array_diff_key($scriptProperties,array_flip($system_settings)),1));
+//$modx->log(modx::LOG_LEVEL_ERROR, print_r(array_diff_key($scriptProperties,array_flip($system_settings)),1));
 if($rule_id) {
     $word_array = $word_aliases = array();
     $aliases = $SeoFilter->fieldsAliases(0,0,$rule_id);

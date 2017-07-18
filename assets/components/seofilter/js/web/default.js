@@ -14,8 +14,21 @@ jQuery(document).ready(function ($) {
                     aliases: this.config.aliases,
                 },
                 success: function(response) {
+
                     var url = hash;
                     var origin = seoFilter.config.url || document.location.pathname;
+
+                    //для frontendmanager
+                    if(response.data.seo_id) {
+                        if($(document).find('.fm-seofilter').length) {
+                            $(document).find('.fm-seofilter').attr('data-id',response.data.rule_id).data('id',response.data.seo_id);
+                            $(document).find('.fm-seofilter').show();
+                        }
+                    } else {
+                        if($(document).find('.fm-seofilter').length) {
+                            $(document).find('.fm-seofilter').hide();
+                        }
+                    }
 
                     if(response.data.title) {
                         if (seoFilter.config.replacebefore) {

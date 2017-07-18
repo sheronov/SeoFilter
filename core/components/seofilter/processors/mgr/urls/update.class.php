@@ -46,6 +46,21 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
         return parent::beforeSet();
     }
 
+    public function cleanup()
+    {
+        $url = '';
+        if ($this->getProperty('frame')) {
+            $array = $this->object->toArray();
+            //$this->modx->log(modX::LOG_LEVEL_ERROR, print_r($this->getProperties(), 1));
+            if (($array['old_url'] || $array['new_url']) && $array['page_id']) {
+                if (!($addurl = $array['new_url'])) {
+                    $addurl = $array['old_url'];
+                }
+                $url = $this->modx->makeUrl($array['page_id'], '', '', 'full') . $addurl;
+            }
+        }
+        return $this->success($url, $this->object);
+    }
 }
 
 return 'sfUrlsUpdateProcessor';

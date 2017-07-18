@@ -447,10 +447,11 @@ class SeoFilter
                     $meta[$tag] = $this->pdo->getChunk($tpl, $word_array);
                 }
             }
+            $meta['rule_id'] = $rule_id;
         }
-
-        $meta['url'] = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new);
-
+        $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new);
+        $meta['url'] = $url_array['url'];
+        $meta['seo_id'] = $url_array['id'];
 
         return $meta;
     }
@@ -781,30 +782,33 @@ class SeoFilter
     }
 
     public function multiUrl($aliases = array(),$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0) {
-        $url = '';
+        $url = array();
         if($multi_id) {
             if($marray = $this->pdo->getArray('sfRule',$multi_id)) {
                 $tpl = '@INLINE ' . $marray['url'];
-                $url = $this->pdo->getChunk($tpl, $aliases);
-                if($url_array = $this->pdo->getArray('sfUrls',array('active'=>1,'page_id'=>$page_id,'old_url'=>$url))) {
+                $url['url'] = $this->pdo->getChunk($tpl, $aliases);
+                if($url_array = $this->pdo->getArray('sfUrls',array('active'=>1,'page_id'=>$page_id,'old_url'=>$url['url']))) {
                     if($url_array['new_url']) {
-                        $url = $url_array['new_url'];
+                        $url['url'] = $url_array['new_url'];
                     }
+                    $url['id'] = $url_array['id'];
                     $this->addUrlCount($url_array['id'],$ajax);
                 } else {
-                    $url_array = $this->newUrl($url,$multi_id,$page_id,$ajax,$new);
+                    $url_array = $this->newUrl($url['url'],$multi_id,$page_id,$ajax,$new);
+                    $url['id'] = $url_array['id'];
                 }
+
             }
         } else {
             $total = 1;
             $count = count($aliases);
             foreach($aliases as $param => $alias) {
                 if($total == 1) {
-                    $url .= '?';
+                    $url['url'] .= '?';
                 }
-                $url .= $param.'='.$alias;
+                $url['url'] .= $param.'='.$alias;
                 if($total != $count) {
-                    $url .= '&';
+                    $url['url'] .= '&';
                 }
                 $total++;
             }
