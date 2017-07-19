@@ -234,3 +234,8 @@ $_lang['seofilter_filter_rule'] = 'Выберите правило';
 $_lang['seofilter_filter_resource_or'] = 'или выберите страницу';
 $_lang['seofilter_clear_counters'] = 'Сбросить счётчики';
 $_lang['seofilter_clear_counters_confirm'] = 'Вы уверены что хотите сбросить все счётчики?';
+
+$_lang['seofilter_url_seoedit'] = 'Изменить SEO';
+$_lang['seofilter_url_seoedit_intro'] = 'Здесь вы можете индивидуально изменять meta-теги, url-адрес страницы и очистить счётчики.';
+
+$_lang['seofilter_seo_custom'] = 'Использовать индивидуальные мета-теги';

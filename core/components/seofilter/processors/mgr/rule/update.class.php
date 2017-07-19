@@ -51,7 +51,11 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
         $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
         $multi_id = $this->object->get('id');
         $page_id = $this->object->get('page');
-        $urls = $this->object->generateUrl(1);
+        $urls_array = $this->object->generateUrl(1);
+        $urls = array();
+        foreach($urls_array as $ukey => $uarr) {
+            $urls[$ukey] = $uarr['url'];
+        }
         $url_objs = $this->modx->getCollection('sfUrls',array('multi_id'=>$this->object->id));
         if(count($url_objs)) {
             $old_urls = array();
@@ -67,16 +71,20 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
             $urls = array_diff($urls,$old_urls);
             //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($urls,1));
         }
-        foreach($urls as $url) {
-            $processorProps = array(
-                'multi_id' => $multi_id,
-                'old_url' => $url,
-                'page_id' => $page_id
-            );
-            $otherProps = array('processors_path' => $path . 'processors/');
-            $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
-            if ($response->isError()) {
-                $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+        foreach($urls_array as $url) {
+            if(in_array($url['url'],$urls)) {
+                //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($url,1));
+                $processorProps = array(
+                    'multi_id' => $multi_id,
+                    'old_url' => $url['url'],
+                    'page_id' => $page_id,
+                    'field_word' => $url['field_word']
+                );
+                $otherProps = array('processors_path' => $path . 'processors/');
+                $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
+                if ($response->isError()) {
+                    $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                }
             }
         }
        // $muiltifield = $this->object;

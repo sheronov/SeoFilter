@@ -81,6 +81,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 name: 'page',
                                 id: config.id + '-page',
                                 anchor: '99%',
+                                allowBlank: false,
                             }
                         ]
                     }, {
@@ -114,10 +115,6 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 ,items: [{
                     html: _('seofilter_multiseo_intro'),
                     cls: 'panel-desc',
-                },{
-                    xtype: 'hidden',
-                    name: 'seo_id',
-                    id: config.id + '-seo_id',
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_title'),
@@ -268,6 +265,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                                     xtype: 'seofilter-combo-resource',
                                     fieldLabel: _('seofilter_field_page'),
                                     name: 'page',
+                                    allowBlank: false,
                                     id: config.id + '-page',
                                     anchor: '99%',
                                 }
@@ -302,10 +300,6 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                 ,items: [{
                     html: _('seofilter_multiseo_intro'),
                     cls: 'panel-desc',
-                },{
-                    xtype: 'hidden',
-                    name: 'seo_id',
-                    id: config.id + '-seo_id',
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_title'),

@@ -1,8 +1,6 @@
 SeoFilter.page.Seoedit = function (config) {
     config = config || {};
     Ext.applyIf(config, {
-        //url: SeoFilter.config.connector_url,
-        //action: 'mgr/urls/update',
         formpanel: 'seofilter-panel-seoedit',
         id: 'modx-page-seoedit',
         components: [{
@@ -19,20 +17,6 @@ Ext.extend(SeoFilter.page.Seoedit, MODx.Component, {
 
     cancel: function(btn,e) {
         var fp = Ext.getCmp(this.config.formpanel);
-        console.log(fp);
-        // if (fp && fp.isDirty()) {
-        //     Ext.Msg.confirm(_('warning'),_('resource_cancel_dirty_confirm'),function(e) {
-        //         if (e == 'yes') {
-        //             fp.warnUnsavedChanges = false;
-        //             MODx.releaseLock(MODx.request.id);
-        //             MODx.sleep(400);
-        //             MODx.loadPage('?');
-        //         }
-        //     },this);
-        // } else {
-        //     MODx.releaseLock(MODx.request.id);
-        //     MODx.loadPage('?');
-        // }
         MODx.loadPage('?');
     },
 

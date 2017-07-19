@@ -342,6 +342,17 @@ $xpdo_meta_map['sfDictionary']= array (
       ),
     ),
   ),
+  'composites' => 
+  array (
+    'FieldWords' => 
+    array (
+      'class' => 'sfFieldWord',
+      'local' => 'id',
+      'foreign' => 'word_id',
+      'cardinality' => 'many',
+      'owner' => 'local',
+    ),
+  ),
   'aggregates' => 
   array (
     'Field' => 

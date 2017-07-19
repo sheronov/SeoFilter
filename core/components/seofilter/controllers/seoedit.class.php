@@ -69,16 +69,6 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/utils.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/combo.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fields.grid.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fields.windows.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fieldids.grid.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fieldids.windows.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/rules.grid.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/rules.windows.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/urls.grid.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/urls.windows.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.grid.js');
-        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/seoedit.panel.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/sections/seoedit.js');
         $this->addHtml('<script type="text/javascript">

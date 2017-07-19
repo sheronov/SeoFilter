@@ -787,7 +787,7 @@ class SeoFilter
             if($marray = $this->pdo->getArray('sfRule',$multi_id)) {
                 $tpl = '@INLINE ' . $marray['url'];
                 $url['url'] = $this->pdo->getChunk($tpl, $aliases);
-                if($url_array = $this->pdo->getArray('sfUrls',array('active'=>1,'page_id'=>$page_id,'old_url'=>$url['url']))) {
+                if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page_id,'old_url'=>$url['url']))) {
                     if($url_array['new_url']) {
                         $url['url'] = $url_array['new_url'];
                     }

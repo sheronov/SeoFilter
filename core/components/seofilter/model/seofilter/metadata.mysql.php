@@ -8,5 +8,6 @@ $xpdo_meta_map = array (
     2 => 'sfFieldIds',
     3 => 'sfDictionary',
     4 => 'sfUrls',
+    5 => 'sfUrlWord',
   ),
 );

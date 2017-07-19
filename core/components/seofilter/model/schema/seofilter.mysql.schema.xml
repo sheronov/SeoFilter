@@ -38,7 +38,7 @@
 
         <composite alias="Words" class="sfDictionary" local="id" foreign="field_id" cardinality="many" owner="local" />
         <composite alias="Links" class="sfFieldIds" local="id" foreign="field_id" cardinality="many" owner="local" />
-
+        <composite alias="FieldWords" class="sfFieldWord" local="id" foreign="field_id" cardinality="many" owner="local" />
     </object>
 
 
@@ -114,6 +114,9 @@
     </object>
 
 
+
+
+
     <object class="sfDictionary" table="seofilter_dictionary" extends="xPDOSimpleObject">
         <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
         <field key="input" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
@@ -167,7 +170,7 @@
         </index>
 
         <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
-
+        <composite alias="FieldWords" class="sfFieldWord" local="id" foreign="word_id" cardinality="many" owner="local" />
     </object>
 
     <object class="sfUrls" table="seofilter_urls" extends="xPDOSimpleObject">
@@ -192,7 +195,7 @@
 
         <field key="params" dbtype="text" phptype="json" null="true" default=""/>
 
-        <field key="seo_custom" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
+        <field key="custom" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
         <field key="title" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
         <field key="h1" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
         <field key="h2" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
@@ -210,6 +213,9 @@
         <index alias="menu_on" name="menu_on" primary="false" unique="false" type="BTREE">
             <column key="menu_on" length="" collation="A" null="false"/>
         </index>
+        <index alias="custom" name="custom" primary="false" unique="false" type="BTREE">
+            <column key="custom" length="" collation="A" null="false"/>
+        </index>
         <index alias="old_url" name="old_url" primary="false" unique="false" type="BTREE">
             <column key="old_url" length="" collation="A" null="false"/>
         </index>
@@ -221,9 +227,33 @@
         </index>
 
         <aggregate alias="Rule" class="sfRule" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
+        <composite alias="FieldWords" class="sfFieldWord" local="id" foreign="url_id" cardinality="many" owner="local" />
     </object>
 
 
+    <object class="sfUrlWord" table="seofilter_urlwords" extends="xPDOSimpleObject">
+        <field key="url_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="word_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+
+        <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <index alias="word_id" name="word_id" primary="false" unique="false" type="BTREE">
+            <column key="word_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="field_id" name="field_id" primary="false" unique="false" type="BTREE">
+            <column key="field_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="url_id" name="url_id" primary="false" unique="false" type="BTREE">
+            <column key="url_id" length="" collation="A" null="false"/>
+        </index>
+
+        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Word" class="sfRule" local="word_id" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Url" class="sfUrls" local="url_id" foreign="id" cardinality="one" owner="foreign" />
+
+    </object>
 
 
 </model>

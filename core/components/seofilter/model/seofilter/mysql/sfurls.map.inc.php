@@ -21,6 +21,15 @@ $xpdo_meta_map['sfUrls']= array (
     'ajax' => 0,
     'rank' => 0,
     'active' => 1,
+    'params' => '',
+    'custom' => 0,
+    'title' => '',
+    'h1' => '',
+    'h2' => '',
+    'introtext' => '',
+    'description' => '',
+    'text' => '',
+    'content' => '',
   ),
   'fieldMeta' => 
   array (
@@ -149,6 +158,73 @@ $xpdo_meta_map['sfUrls']= array (
       'null' => true,
       'default' => 1,
     ),
+    'params' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'json',
+      'null' => true,
+      'default' => '',
+    ),
+    'custom' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => false,
+      'default' => 0,
+    ),
+    'title' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'h1' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'h2' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'introtext' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'description' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'text' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'content' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
   ),
   'indexes' => 
   array (
@@ -193,6 +269,22 @@ $xpdo_meta_map['sfUrls']= array (
       'columns' => 
       array (
         'menu_on' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'custom' => 
+    array (
+      'alias' => 'custom',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'custom' => 
         array (
           'length' => '',
           'collation' => 'A',
@@ -247,6 +339,17 @@ $xpdo_meta_map['sfUrls']= array (
           'null' => false,
         ),
       ),
+    ),
+  ),
+  'composites' => 
+  array (
+    'FieldWords' => 
+    array (
+      'class' => 'sfFieldWord',
+      'local' => 'id',
+      'foreign' => 'url_id',
+      'cardinality' => 'many',
+      'owner' => 'local',
     ),
   ),
   'aggregates' => 
