@@ -33,20 +33,13 @@ class sfUrlWordGetListProcessor extends modObjectGetListProcessor
     public function prepareQueryBeforeCount(xPDOQuery $c)
     {
         // Выбираем только нужные записи
-        $c->where(array('multi_id' => $this->getProperty('multi_id')));
+        $c->where(array('url_id' => $this->getProperty('url_id')));
         // И присоединяем свойства пользователей
-        $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
-//        $c->leftJoin('modUserProfile', 'modUserProfile', 'sxSubscriber.user_id = modUserProfile.internalKey');
-//
+       $c->leftJoin('sfDictionary', 'sfDictionary', $this->classKey.'.word_id = sfDictionary.id');
+       $c->leftJoin('sfField', 'sfField', 'sfDictionary.field_id = sfField.id');
         $c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
-        $c->select('sfField.name');
+        $c->select('sfField.name as field_name, sfField.alias as field_alias, sfDictionary.value as word_name, sfDictionary.alias as word_alias');
 
-        $query = trim($this->getProperty('query'));
-        if ($query) {
-            $c->where(array(
-                'name:LIKE' => "%{$query}%",
-            ));
-        }
 
         return $c;
     }
@@ -78,7 +71,7 @@ class sfUrlWordGetListProcessor extends modObjectGetListProcessor
         $array['actions'][] = array(
             'cls' => '',
             'icon' => 'icon icon-edit',
-            'title' => $this->modx->lexicon('seofilter_fieldids_update'),
+            'title' => $this->modx->lexicon('seofilter_url_word_update'),
             //'multiple' => $this->modx->lexicon('seofilter_fieldids_update'),
             'action' => 'updateUrlWord',
             'button' => true,
@@ -108,15 +101,15 @@ class sfUrlWordGetListProcessor extends modObjectGetListProcessor
 //        }
 
         // Remove
-        $array['actions'][] = array(
-            'cls' => '',
-            'icon' => 'icon icon-trash-o action-red',
-            'title' => $this->modx->lexicon('seofilter_fieldids_remove'),
-            'multiple' => $this->modx->lexicon('seofilter_fieldids_remove'),
-            'action' => 'removeUrlWord',
-            'button' => true,
-            'menu' => true,
-        );
+//        $array['actions'][] = array(
+//            'cls' => '',
+//            'icon' => 'icon icon-trash-o action-red',
+//            'title' => $this->modx->lexicon('seofilter_fieldids_remove'),
+//            'multiple' => $this->modx->lexicon('seofilter_fieldids_remove'),
+//            'action' => 'removeUrlWord',
+//            'button' => true,
+//            'menu' => true,
+//        );
 
         return $array;
     }

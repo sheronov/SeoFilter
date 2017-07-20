@@ -344,9 +344,9 @@ $xpdo_meta_map['sfDictionary']= array (
   ),
   'composites' => 
   array (
-    'FieldWords' => 
+    'UrlWords' => 
     array (
-      'class' => 'sfFieldWord',
+      'class' => 'sfUrlWord',
       'local' => 'id',
       'foreign' => 'word_id',
       'cardinality' => 'many',

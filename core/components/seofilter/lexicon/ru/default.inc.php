@@ -201,6 +201,7 @@ $_lang['seofilter_url_createdon'] = 'Создано';
 $_lang['seofilter_url_count'] = 'Переходов';
 $_lang['seofilter_url_ajax'] = 'Из них переходов через фильтр';
 $_lang['seofilter_url_active'] = 'Активно';
+$_lang['seofilter_url_custom'] = 'Мета-теги';
 $_lang['seofilter_url_active_more'] = 'Активно (если нет, то будет отдавать 404)';
 $_lang['seofilter_url_err_url'] = 'Не задан URL адрес для ссылки!';
 $_lang['seofilter_url_err_ae'] = 'Ссылка с таким адресом уже существует!';
@@ -214,6 +215,18 @@ $_lang['seofilter_urls_remove'] = 'Удалить URL';
 $_lang['seofilter_urls_remove_confirm'] = 'Вы уверены, что хотите удалить эти адреса? Страницы будут не доступны';
 $_lang['seofilter_url_remove_confirm'] = 'Вы уверены, что хотите удалить этот адрес? Страница будет не доступна';
 $_lang['seofilter_multiseo_intro'] = 'Синтаксис для двух и более полей: {$alias1}, {$alias2}, где "aliasX" - это синоним поля, прописанный в полях фильтра. На первой вкладке в поле URL адреса как-раз они прописаны. Падежи добавляются так: {$alias1_r} и т.д. За обработку отвечает Fenom.';
+
+$_lang['seofilter_url_urlword'] = 'Таблица доступных слов';
+$_lang['seofilter_urlword_word_edit'] = 'Изменение слова коснётся всех адресов, связанных с ним!';
+$_lang['seofilter_urlword_word_id'] = 'Id';
+$_lang['seofilter_urlword_field_id'] = 'ID поля';
+$_lang['seofilter_urlword_field_name'] = 'Поле';
+$_lang['seofilter_urlword_field_alias'] = 'Синоним в мета-тегах';
+$_lang['seofilter_urlword_word_name'] = 'Слово';
+$_lang['seofilter_urlword_word_alias'] = 'Синоним в url';
+$_lang['seofilter_urlword_priority'] = 'Приоритет';
+$_lang['seofilter_url_word_update'] = 'Изменить слово';
+
 
 $_lang['seofilter_field_xpdo'] = 'Значение в другой таблице';
 $_lang['seofilter_field_xpdo_package'] = 'Компонент, например customextra';

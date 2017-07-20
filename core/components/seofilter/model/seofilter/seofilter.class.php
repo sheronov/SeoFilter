@@ -422,6 +422,8 @@ class SeoFilter
         }
 
 
+        $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new);
+
         if ($seo = $this->pdo->getArray('sfRule', $rule_id)) {
 
             if($seo['count_parents']) {
@@ -440,7 +442,13 @@ class SeoFilter
 
             $word_array = $this->prepareRow($word_array,$page_id,$rule_id);
 
-            $seo_array = array_intersect_key($seo, array_flip($seo_array));
+            if($url_array['custom']) {
+                $seo_array = array_intersect_key($url_array, array_flip($seo_array));
+            } else {
+                $seo_array = array_intersect_key($seo, array_flip($seo_array));
+            }
+
+
             foreach ($seo_array as $tag => $text) {
                 if ($text) {
                     $tpl = '@INLINE ' . $text;
@@ -449,7 +457,7 @@ class SeoFilter
             }
             $meta['rule_id'] = $rule_id;
         }
-        $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new);
+
         $meta['url'] = $url_array['url'];
         $meta['seo_id'] = $url_array['id'];
 
@@ -515,9 +523,13 @@ class SeoFilter
         }
 
         if($min_max) {
-            $min_max_array = array();
-            $count_choose = array_map('trim', explode(',',$this->config['count_choose']));
-            $count_select = array_map('trim', explode(',',$this->config['count_select']));
+            $min_max_array = $count_choose = $count_select = array();
+            if($this->config['count_choose']) {
+                $count_choose = array_map('trim', explode(',',$this->config['count_choose']));
+            }
+            if($this->config['count_select']) {
+                $count_select = array_map('trim', explode(',',$this->config['count_select']));
+            }
 
             foreach($count_choose as $choose) {
                 foreach(array('max'=>'DESC','min'=>'ASC') as $m=>$sort) {
@@ -786,16 +798,19 @@ class SeoFilter
         if($multi_id) {
             if($marray = $this->pdo->getArray('sfRule',$multi_id)) {
                 $tpl = '@INLINE ' . $marray['url'];
-                $url['url'] = $this->pdo->getChunk($tpl, $aliases);
-                if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page_id,'old_url'=>$url['url']))) {
+               // $url['url'] = $this->pdo->getChunk($tpl, $aliases);
+                $url_link = $this->pdo->getChunk($tpl, $aliases);
+                if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page_id,'old_url'=>$url_link))) {
+                    $url = $url_array;
                     if($url_array['new_url']) {
                         $url['url'] = $url_array['new_url'];
+                    } else {
+                        $url['url'] = $url_link;
                     }
-                    $url['id'] = $url_array['id'];
                     $this->addUrlCount($url_array['id'],$ajax);
                 } else {
-                    $url_array = $this->newUrl($url['url'],$multi_id,$page_id,$ajax,$new);
-                    $url['id'] = $url_array['id'];
+                    $url = $this->newUrl($url_link,$multi_id,$page_id,$ajax,$new);
+                    $url['url'] = $url_link;
                 }
 
             }

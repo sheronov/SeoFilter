@@ -112,17 +112,9 @@ $xpdo_meta_map['sfUrlWord']= array (
   ),
   'aggregates' => 
   array (
-    'Field' => 
-    array (
-      'class' => 'sfField',
-      'local' => 'field_id',
-      'foreign' => 'id',
-      'cardinality' => 'one',
-      'owner' => 'foreign',
-    ),
     'Word' => 
     array (
-      'class' => 'sfRule',
+      'class' => 'sfDictionary',
       'local' => 'word_id',
       'foreign' => 'id',
       'cardinality' => 'one',

@@ -38,7 +38,6 @@
 
         <composite alias="Words" class="sfDictionary" local="id" foreign="field_id" cardinality="many" owner="local" />
         <composite alias="Links" class="sfFieldIds" local="id" foreign="field_id" cardinality="many" owner="local" />
-        <composite alias="FieldWords" class="sfFieldWord" local="id" foreign="field_id" cardinality="many" owner="local" />
     </object>
 
 
@@ -170,7 +169,7 @@
         </index>
 
         <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
-        <composite alias="FieldWords" class="sfFieldWord" local="id" foreign="word_id" cardinality="many" owner="local" />
+        <composite alias="UrlWords" class="sfUrlWord" local="id" foreign="word_id" cardinality="many" owner="local" />
     </object>
 
     <object class="sfUrls" table="seofilter_urls" extends="xPDOSimpleObject">
@@ -227,7 +226,7 @@
         </index>
 
         <aggregate alias="Rule" class="sfRule" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
-        <composite alias="FieldWords" class="sfFieldWord" local="id" foreign="url_id" cardinality="many" owner="local" />
+        <composite alias="UrlWords" class="sfUrlWord" local="id" foreign="url_id" cardinality="many" owner="local" />
     </object>
 
 
@@ -249,8 +248,7 @@
             <column key="url_id" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
-        <aggregate alias="Word" class="sfRule" local="word_id" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Word" class="sfDictionary" local="word_id" foreign="id" cardinality="one" owner="foreign" />
         <aggregate alias="Url" class="sfUrls" local="url_id" foreign="id" cardinality="one" owner="foreign" />
 
     </object>

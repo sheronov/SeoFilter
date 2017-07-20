@@ -343,9 +343,9 @@ $xpdo_meta_map['sfUrls']= array (
   ),
   'composites' => 
   array (
-    'FieldWords' => 
+    'UrlWords' => 
     array (
-      'class' => 'sfFieldWord',
+      'class' => 'sfUrlWord',
       'local' => 'id',
       'foreign' => 'url_id',
       'cardinality' => 'many',

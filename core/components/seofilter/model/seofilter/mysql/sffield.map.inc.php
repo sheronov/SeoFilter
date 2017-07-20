@@ -224,13 +224,5 @@ $xpdo_meta_map['sfField']= array (
       'cardinality' => 'many',
       'owner' => 'local',
     ),
-    'FieldWords' => 
-    array (
-      'class' => 'sfFieldWord',
-      'local' => 'id',
-      'foreign' => 'field_id',
-      'cardinality' => 'many',
-      'owner' => 'local',
-    ),
   ),
 );

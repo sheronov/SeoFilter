@@ -20,10 +20,10 @@ SeoFilter.panel.Seoedit = function (config) {
         }
         ,hideMode: 'offsets',
         items: [{
-            html: '<h2>' + _('seofilter') + '</h2>',
-            cls: '',
-            style: {margin: '15px 0'}
-        }, {
+        //     html: '<h2>' + _('seofilter') + '</h2>',
+        //     cls: '',
+        //     style: {margin: '15px 0'}
+        // }, {
             xtype: 'modx-tabs',
             defaults: {border: false, autoHeight: true},
             border: true,
@@ -52,8 +52,6 @@ SeoFilter.panel.Seoedit = function (config) {
     });
     SeoFilter.panel.Seoedit.superclass.constructor.call(this, config);
     this.getForm().setValues(this.config.record);
-    this.getForm().setValues({'active':parseInt(this.config.record.active)});
-    this.getForm().setValues({'custom':parseInt(this.config.record.custom)});
 };
 Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
     initialized: false
@@ -133,7 +131,6 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     id: 'seoedit-custom',
                 }]
             }]
-
         },{
             layout:'column',
             border: false,
@@ -145,6 +142,14 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                 ,border:false
                 ,enableKeyEvents: true
                 ,items: [{
+                    html: '<b>' + _('seofilter_url_urlword') + '</b>' + ' <span style="float:right;">'+ _('seofilter_urlword_word_edit') +'</span>',
+                    cls: '',
+                    style: {margin: '10px 0 5px',color: '#555'}
+                }, {
+                    title: _('seofilter_url_urlword')
+                    , xtype: 'seofilter-grid-urlword'
+                    , record: config.record
+                }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_title'),
                     name: 'title',
@@ -256,6 +261,8 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     name: 'createdon',
                     id: 'seoedit-createdon',
                     anchor: '99%',
+                    readOnly: true,
+                    style: 'background:#f9f9f9;color:#999;',
 
                 }]
             }, {
@@ -286,6 +293,8 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     name: 'editedon',
                     id: 'seoedit-editedon',
                     anchor: '99%',
+                    readOnly: true,
+                    style: 'background:#f9f9f9;color:#999;',
                 }]
             }]
 

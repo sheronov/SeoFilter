@@ -20,6 +20,20 @@ class sfUrlsGetProcessor extends modObjectGetProcessor
             return $this->failure($this->modx->lexicon('access_denied'));
         }
 
+        if (!$this->object->get('custom')) {
+            if($rule = $this->modx->getObject('sfRule',$this->object->get('multi_id'))) {
+                $this->object->set('title',$rule->get('title'));
+                $this->object->set('h1',$rule->get('h1'));
+                $this->object->set('h2',$rule->get('h2'));
+                $this->object->set('description',$rule->get('description'));
+                $this->object->set('introtext',$rule->get('introtext'));
+                $this->object->set('text',$rule->get('text'));
+                $this->object->set('content',$rule->get('content'));
+            }
+        }
+//        $this->object->set('title','Hello world!');
+//        $this->object->set('introtext','Hello world2!');
+
         return parent::process();
     }
 
