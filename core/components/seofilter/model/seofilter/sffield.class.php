@@ -96,4 +96,10 @@ class sfField extends xPDOSimpleObject {
         return $value;
     }
 
+    public function updateMask() {
+
+
+        return true;
+    }
+
 }

@@ -132,13 +132,13 @@
         <field key="value_p" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_o" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
-        <field key="values_i" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="values_r" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="values_d" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="values_v" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="values_t" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="values_p" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="values_o" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="m_value_i" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="m_value_r" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="m_value_d" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="m_value_v" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="m_value_t" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="m_value_p" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="m_value_o" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
         <field key="value_in" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_to" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>

@@ -29,6 +29,8 @@ class sfRule extends xPDOSimpleObject {
                     if($alias = $field->get('alias')) {
                         if($field->get('hideparam')) {
                             $url .= '{$'.$alias.'}/';
+                        } elseif($field->get('valuefirst')){
+                            $url .= '{$'.$alias.'}' . $separator . $alias. '/';
                         } else {
                             $url .= $alias . $separator . '{$'.$alias.'}/';
                         }

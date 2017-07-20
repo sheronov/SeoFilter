@@ -27,20 +27,20 @@ class sfDictionary extends xPDOSimpleObject {
                     $this->set('value_from', $value['откуда']);
                 if($value['множественное']) {
                     if ($values = (array)$value['множественное']) {
-                        if ($values['И'] && !$this->get('values_i'))
-                            $this->set('values_i', $values['И']);
-                        if ($values['Р'] && !$this->get('values_r'))
-                            $this->set('values_r', $values['Р']);
-                        if ($values['Д'] && !$this->get('values_d'))
-                            $this->set('values_d', $values['Д']);
-                        if ($values['В'] && !$this->get('values_v'))
-                            $this->set('values_v', $values['В']);
-                        if ($values['Т'] && !$this->get('values_t'))
-                            $this->set('values_t', $values['Т']);
-                        if ($values['П'] && !$this->get('values_p'))
-                            $this->set('values_p', $values['П']);
-                        if ($values['П-о'] && !$this->get('values_o'))
-                            $this->set('values_o', $values['П-о']);
+                        if ($values['И'] && !$this->get('m_value_i'))
+                            $this->set('m_value_i', $values['И']);
+                        if ($values['Р'] && !$this->get('m_value_r'))
+                            $this->set('m_value_r', $values['Р']);
+                        if ($values['Д'] && !$this->get('m_value_d'))
+                            $this->set('m_value_d', $values['Д']);
+                        if ($values['В'] && !$this->get('m_value_v'))
+                            $this->set('m_value_v', $values['В']);
+                        if ($values['Т'] && !$this->get('m_value_t'))
+                            $this->set('m_value_t', $values['Т']);
+                        if ($values['П'] && !$this->get('m_value_p'))
+                            $this->set('m_value_p', $values['П']);
+                        if ($values['П-о'] && !$this->get('m_value_o'))
+                            $this->set('m_value_o', $values['П-о']);
                     }
                 }
             }

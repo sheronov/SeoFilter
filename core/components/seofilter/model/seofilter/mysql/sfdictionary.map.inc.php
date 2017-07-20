@@ -19,13 +19,13 @@ $xpdo_meta_map['sfDictionary']= array (
     'value_t' => '',
     'value_p' => '',
     'value_o' => '',
-    'values_i' => '',
-    'values_r' => '',
-    'values_d' => '',
-    'values_v' => '',
-    'values_t' => '',
-    'values_p' => '',
-    'values_o' => '',
+    'm_value_i' => '',
+    'm_value_r' => '',
+    'm_value_d' => '',
+    'm_value_v' => '',
+    'm_value_t' => '',
+    'm_value_p' => '',
+    'm_value_o' => '',
     'value_in' => '',
     'value_to' => '',
     'value_from' => '',
@@ -138,7 +138,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'values_i' => 
+    'm_value_i' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -146,7 +146,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'values_r' => 
+    'm_value_r' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -154,7 +154,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'values_d' => 
+    'm_value_d' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -162,7 +162,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'values_v' => 
+    'm_value_v' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -170,7 +170,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'values_t' => 
+    'm_value_t' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -178,7 +178,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'values_p' => 
+    'm_value_p' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
@@ -186,7 +186,7 @@ $xpdo_meta_map['sfDictionary']= array (
       'null' => true,
       'default' => '',
     ),
-    'values_o' => 
+    'm_value_o' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',

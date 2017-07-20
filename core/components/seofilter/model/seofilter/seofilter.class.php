@@ -540,8 +540,10 @@ class SeoFilter
                     $q->select($count_select);
                     $q->sortby($choose,$sort);
                     if($q->prepare() && $q->stmt->execute()) {
-                        foreach($q->stmt->fetch(PDO::FETCH_ASSOC) as $key => $value) {
-                            $min_max_array[$m.'_'.$choose.'_'.$key] = $value;
+                        if($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                            foreach ($row as $key => $value) {
+                                $min_max_array[$m . '_' . $choose . '_' . $key] = $value;
+                            }
                         }
                     }
                 }

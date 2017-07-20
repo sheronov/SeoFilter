@@ -58,6 +58,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     name: 'alias',
                     id: config.id + '-alias',
                     anchor: '99%',
+                    allowBlank:false,
                 }
                 ]
             },{
@@ -248,6 +249,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     name: 'alias',
                     id: config.id + '-alias',
                     anchor: '99%',
+                    allowBlank:false,
                 }
                 ]
             },{

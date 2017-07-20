@@ -42,6 +42,32 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
             $this->modx->error->addField('value', $this->modx->lexicon('seofilter_dictionary_err_ae'));
         }
 
+        if($this->getProperty('alias') != $this->object->get('alias')) {
+            $this->object->set('alias',$this->getProperty('alias')); //fix
+            $this->object->save();
+            $urlwords = $this->object->getMany('UrlWords');
+            foreach($urlwords as $urlword) {
+                if($url = $urlword->getOne('Url')) {
+                    $priorities = array();
+                    if($rule = $url->getOne('Rule')) {
+                        $q = $this->modx->newQuery('sfFieldIds');
+                        $q->sortby('priority', 'ASC');
+                        $q->where(array('multi_id'=>$rule->get('id')));
+                        //  $q->leftJoin('sfField','sfField','sfFieldIds.field_id = sfField.id');
+                        $q->select('sfFieldIds.field_id,sfFieldIds.priority');
+                        if($q->prepare() && $q->stmt->execute()) {
+                            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                                $priorities[$row['priority']] = $row['field_id'];
+                            }
+                        }
+                    }
+                    $new_url = $url->updateUrl($priorities);
+                    //$this->modx->log(modX::LOG_LEVEL_ERROR, 'SEOFILTER URL: '.$new_url);
+                }
+            }
+        }
+
+
         return parent::beforeSet();
     }
 }

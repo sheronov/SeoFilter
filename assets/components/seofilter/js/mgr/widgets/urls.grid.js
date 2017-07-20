@@ -253,7 +253,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     },
 
     viewPage: function () {
-        console.log(this);
+        //console.log(this);
         window.open(this.menu.record['url_preview']);
         return false;
     },
