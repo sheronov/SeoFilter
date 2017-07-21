@@ -57,7 +57,7 @@ switch ($modx->event->name) {
                 foreach($input as $inp) {
                     $word_array = $SeoFilter->getWordArray($inp,$field['id']);
                 }
-            } else {
+            } elseif($input) {
                 if(strpos($input,'||')) {
                     foreach(array_map('trim', explode('||',$input)) as $inp) {
                         $word_array = $SeoFilter->getWordArray($inp,$field['id']);

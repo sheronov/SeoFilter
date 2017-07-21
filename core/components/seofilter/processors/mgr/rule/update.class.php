@@ -56,7 +56,7 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
         foreach($urls_array as $ukey => $uarr) {
             $urls[$ukey] = $uarr['url'];
         }
-        $url_objs = $this->modx->getCollection('sfUrls',array('multi_id'=>$this->object->id));
+        $url_objs = $this->modx->getCollection('sfUrls',array('multi_id'=>$multi_id));
         if(count($url_objs)) {
             $old_urls = array();
             foreach($url_objs as $url_obj) {

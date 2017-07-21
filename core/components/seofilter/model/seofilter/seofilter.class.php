@@ -289,17 +289,17 @@ class SeoFilter
             $diff = array_diff_key($params,$copyparams);
             $params = array_intersect_key($params,$copyparams);
         }
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($params,1));
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($params,1));
+        //$this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter: '. print_r($diff,1));
         //нахождение первичного параметра
         switch ($action) {
             case 'getmeta':
                 $find = 0;
+                $base_get = array_map('trim', explode(',',$this->config['base_get']));
                 $rule_count = 0;
                 $meta = array();
                 if(count($params)) { //тут проверяет, были ли переданы первичные алиасы в правилах. если их нет, то и правил нет)
                     $params = $copyparams = $data['data'];
-                    $all_aliases = $this->fieldsAliases($pageId,0,count($params));
+                    $all_aliases = $this->fieldsAliases($pageId,0,count(array_diff_key($params,array_flip($base_get))));
                     $diff2 = array_flip(array_diff(array_keys($params),$all_aliases));
                     if(count($diff2)) {
                         foreach($diff2 as $dif => $dff) {
@@ -308,9 +308,11 @@ class SeoFilter
                         $diff2 = array_diff_key($params,$copyparams);
                         $params = array_intersect_key($params,$copyparams);
                     }
-                    $real_diff = array_diff(array_keys($diff2),array_map('trim', explode(',',$this->config['base_get'])));
+                    $real_diff = array_diff(array_keys($diff2),$base_get);
                     $diff = $diff2;
-                    //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($params,1));
+//                    $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter: realdiff '. print_r($real_diff,1));
+//                    $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter: diff '. print_r($diff,1));
+//                    $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter: params '. print_r($params,1));
                     foreach($params as $param => $value) {
                         if(count(array_map('trim', explode(',',$value))) > 1) {
                             $multi_value = 1;
@@ -586,20 +588,22 @@ class SeoFilter
             }
         } else {
             if($field = $this->modx->getObject('sfField',$field_id)) {
-                $value = $field->getValueByInput($input);
-                $processorProps = array(
-                    'class' => $field->get('class'),
-                    'key' => $field->get('key'),
-                    'field_id' => $field->get('id'),
-                    'value' => $value,
-                    'input' => $input,
-                );
-                $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
-                $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                if ($response->isError()) {
-                    $this->modx->log(modX::LOG_LEVEL_ERROR, print_r($response->response,1));
-                } else {
-                    $word = $response->response['object'];
+                if($input && $value = $field->getValueByInput($input)) {
+                    $processorProps = array(
+                        'class' => $field->get('class'),
+                        'key' => $field->get('key'),
+                        'field_id' => $field->get('id'),
+                        'value' => $value,
+                        'input' => $input,
+                    );
+                    $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
+                    $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                    if ($response->isError()) {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, print_r($response->response, 1));
+                    } else {
+                        $word = $response->response['object'];
+                        
+                    }
                 }
             }
         }
