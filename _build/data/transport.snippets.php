@@ -7,7 +7,11 @@ $snippets = array();
 $tmp = array(
     'sfLink' => array(
         'file' => 'sflink',
-        'description' => '',
+        'description' => 'This snippet need params: rule_id and params for this rule_id. Snippet return link to SEO page. Read the docs.',
+    ),
+    'sfWord' => array(
+        'file' => 'sfword',
+        'description' => 'This snippet-modifier need params: input and options or field_id for find in sfDictionary. Snippet return array word(alias,value).',
     ),
 );
 

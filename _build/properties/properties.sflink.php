@@ -3,31 +3,23 @@
 $properties = array();
 
 $tmp = array(
-    'tpl' => array(
+    'tpl_link' => array(
         'type' => 'textfield',
         'value' => '@INLINE <a href="/{$link}">{$value}</a>',
     ),
-    'sortby' => array(
-        'type' => 'textfield',
-        'value' => 'name',
-    ),
-    'sortdir' => array(
-        'type' => 'list',
-        'options' => array(
-            array('text' => 'ASC', 'value' => 'ASC'),
-            array('text' => 'DESC', 'value' => 'DESC'),
-        ),
-        'value' => 'ASC',
-    ),
-    'limit' => array(
-        'type' => 'numberfield',
-        'value' => 10,
-    ),
-    'outputSeparator' => array(
-        'type' => 'textfield',
-        'value' => "\n",
-    ),
     'toPlaceholder' => array(
+        'type' => 'combo-boolean',
+        'value' => false,
+    ),
+    'rule_id' => array(
+        'type' => 'textfield',
+        'value' => 0,
+    ),
+    'rules_id' => array(
+        'type' => 'textfield',
+        'value' => '',
+    ),
+    'return_link' => array(
         'type' => 'combo-boolean',
         'value' => false,
     ),
