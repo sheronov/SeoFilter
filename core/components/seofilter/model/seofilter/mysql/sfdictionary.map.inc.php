@@ -29,6 +29,7 @@ $xpdo_meta_map['sfDictionary']= array (
     'value_in' => '',
     'value_to' => '',
     'value_from' => '',
+    'editedon' => '0000-00-00 00:00:00',
     'active' => 1,
   ),
   'fieldMeta' => 
@@ -217,6 +218,13 @@ $xpdo_meta_map['sfDictionary']= array (
       'phptype' => 'string',
       'null' => true,
       'default' => '',
+    ),
+    'editedon' => 
+    array (
+      'dbtype' => 'timestamp',
+      'phptype' => 'timestamp',
+      'null' => true,
+      'default' => '0000-00-00 00:00:00',
     ),
     'active' => 
     array (

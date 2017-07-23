@@ -45,6 +45,7 @@ class sfDictionary extends xPDOSimpleObject {
                 }
             }
         }
+        $this->set('editedon',strtotime(date('Y-m-d H:i:s')));
         return parent::save($cacheFlag);
     }
 

@@ -170,6 +170,7 @@ $_lang['seofilter_dictionary_m_value_o'] = 'О ком, о чём во множ. 
 $_lang['seofilter_dictionary_value_to'] = 'Куда';
 $_lang['seofilter_dictionary_value_in'] = 'Где';
 $_lang['seofilter_dictionary_value_from'] = 'Откуда';
+$_lang['seofilter_dictionary_editedon'] = 'Отредактировано';
 
 $_lang['seofilter_dictionary_decline'] = 'Склонения по падежам';
 $_lang['seofilter_dictionary_decline_desc'] = 'Склонения по падежам для русского, украинского и казахского языка';

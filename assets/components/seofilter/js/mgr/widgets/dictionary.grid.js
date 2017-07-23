@@ -183,7 +183,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'field_id', 'field', 'input', 'value', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle'];
+        return ['id', 'field_id', 'field', 'input', 'value', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle','editedon'];
     },
 
     getColumns: function () {
@@ -213,22 +213,12 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             sortable: true,
             width: 150,
         }, {
-        //     header: _('seofilter_dictionary_class'),
-        //     dataIndex: 'class',
-        //     sortable: true,
-        //     width: 150,
-        // }, {
-        //     header: _('seofilter_dictionary_key'),
-        //     dataIndex: 'key',
-        //     sortable: true,
-        //     width: 150,
-        // }, {
-        //     header: _('seofilter_dictionary_menu_on'),
-        //     dataIndex: 'menu_on',
-        //     sortable: true,
-        //     renderer: SeoFilter.utils.renderBoolean,
-        //     width: 70,
-        // }, {
+            header: _('seofilter_url_editedon'),
+            dataIndex: 'editedon',
+            sortable: true,
+            renderer: SeoFilter.utils.formatDate,
+            width: 100,
+        }, {
             header: _('seofilter_dictionary_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,

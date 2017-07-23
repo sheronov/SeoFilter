@@ -143,6 +143,7 @@
         <field key="value_in" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_to" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_from" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
 
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 

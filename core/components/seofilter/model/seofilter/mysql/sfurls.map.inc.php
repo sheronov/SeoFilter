@@ -12,7 +12,7 @@ $xpdo_meta_map['sfUrls']= array (
     'new_url' => '',
     'editedon' => '0000-00-00 00:00:00',
     'createdon' => 'CURRENT_TIMESTAMP',
-    'menu_on' => 1,
+    'menu_on' => 0,
     'menutitle' => '',
     'menuindex' => 0,
     'link_attributes' => '',
@@ -87,7 +87,7 @@ $xpdo_meta_map['sfUrls']= array (
       'precision' => '1',
       'phptype' => 'boolean',
       'null' => true,
-      'default' => 1,
+      'default' => 0,
     ),
     'menutitle' => 
     array (
