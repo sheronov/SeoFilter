@@ -181,7 +181,7 @@
         <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
         <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP" />
 
-        <field key="menu_on" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="menu_on" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
         <field key="menutitle" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
         <field key="menuindex" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
         <field key="link_attributes" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
