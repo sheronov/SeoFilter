@@ -173,6 +173,7 @@ $_lang['seofilter_dictionary_value_from'] = 'Откуда';
 
 $_lang['seofilter_dictionary_decline'] = 'Склонения по падежам';
 $_lang['seofilter_dictionary_decline_desc'] = 'Склонения по падежам для русского, украинского и казахского языка';
+$_lang['seofilter_dictionary_decline_desc_save'] = 'Склонения по падежам будут доступны после сохранения';
 $_lang['seofilter_dictionary_err_input'] = 'Ошибка, не введёно вводное слово для словаря';
 $_lang['seofilter_dictionary_err_ae'] = 'Ошибка, уже есть такое слово для этого поля';
 
@@ -181,7 +182,7 @@ $_lang['seofilter_fieldids_id'] = 'Id';
 $_lang['seofilter_fieldids_field_id'] = 'Поле';
 $_lang['seofilter_fieldids_multi_id'] = 'Правило';
 $_lang['seofilter_fieldids_priority'] = 'Порядок (можно изменять в таблицы перетаскиванием полей)';
-$_lang['seofilter_fieldids_where'] = 'Условие (для создания конкретных страниц)';
+$_lang['seofilter_fieldids_where'] = 'Условие (для создания конкретных страниц) - пока не работает';
 $_lang['seofilter_fieldids_compare'] = 'Сравнение';
 $_lang['seofilter_fieldids_value'] = 'Значение';
 $_lang['seofilter_fieldids_condition'] = 'Where';
@@ -202,14 +203,20 @@ $_lang['seofilter_url_count'] = 'Переходов';
 $_lang['seofilter_url_ajax'] = 'Из них переходов через фильтр';
 $_lang['seofilter_url_active'] = 'Активно';
 $_lang['seofilter_url_custom'] = 'Мета-теги';
-$_lang['seofilter_url_active_more'] = 'Активно (если нет, то будет отдавать 404)';
+$_lang['seofilter_url_active_more'] = 'Активно (если нет, то будет отдавать ошибку 404)';
 $_lang['seofilter_url_err_url'] = 'Не задан URL адрес для ссылки!';
 $_lang['seofilter_url_err_ae'] = 'Ссылка с таким адресом уже существует!';
-
+$_lang['seofilter_url_menu'] = 'Меню';
+$_lang['seofilter_url_menu_on'] = 'Показывать в меню';
+$_lang['seofilter_url_menutitle'] = 'Пункт меню';
+$_lang['seofilter_url_link_attributes'] = 'Атрибуты ссылки';
+$_lang['seofilter_url_menuindex'] = 'Позиция в меню';
+$_lang['seofilter_url_image'] = 'Текстовое поле, изображение например';
 
 $_lang['seofilter_url_create'] = 'Добавить URL';
 $_lang['seofilter_url_update'] = 'Изменить URL';
-$_lang['seofilter_url_disable'] = 'Отключить URL (будет 404)';
+$_lang['seofilter_url_enanle'] = 'Включить URL';
+$_lang['seofilter_url_disable'] = 'Отключить URL (будет 404 ошибка)';
 $_lang['seofilter_url_remove'] = 'Удалить URL';
 $_lang['seofilter_urls_remove'] = 'Удалить URL';
 $_lang['seofilter_urls_remove_confirm'] = 'Вы уверены, что хотите удалить эти адреса? Страницы будут не доступны';

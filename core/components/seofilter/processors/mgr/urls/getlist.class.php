@@ -68,14 +68,35 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
     {
 
         $array = $object->toArray();
-
         $array['actions'] = array();
 
         if(($array['old_url'] || $array['new_url']) && $array['page_id']) {
             if(!($addurl = $array['new_url'])) {
                 $addurl = $array['old_url'];
             }
+
             $array['url_preview'] = $this->modx->makeUrl($array['page_id']).$addurl;
+
+            if(!$array['active']) {
+                $addurl = array();
+
+                $q = $this->modx->newQuery('sfUrlWord');
+                $q->sortby('priority','ASC');
+                $q->leftJoin('sfField','sfField','sfUrlWord.field_id = sfField.id');
+                $q->leftJoin('sfDictionary','sfDictionary','sfUrlWord.word_id = sfDictionary.id');
+                $q->where(array('sfUrlWord.url_id'=>(int)$array['id']));
+                $q->select('sfUrlWord.id, sfField.id as field_id, sfField.alias as field_alias, sfField.hideparam, sfField.valuefirst, sfDictionary.input as word_input, sfDictionary.id as word_id, sfDictionary.alias as word_alias');
+                if($q->prepare() && $q->stmt->execute()) {
+                    while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $addurl[] = $row['field_alias'].'='.$row['word_input'];
+                    }
+                }
+                if(count($addurl)) {
+                    $array['url_preview'] = $this->modx->makeUrl($array['page_id']) . '?' . implode('&', $addurl);
+                }
+               // $this->modx->log(modX::LOG_LEVEL_ERROR,print_r($addurl,1));
+            }
+
         }
 
         if (!empty($array['url_preview'])) {

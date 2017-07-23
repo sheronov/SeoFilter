@@ -305,6 +305,58 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
             boxLabel: _('seofilter_url_active_more'),
             name: 'active',
             id: config.id + '-active',
+        }, {
+            xtype: 'xcheckbox',
+            boxLabel: _('seofilter_url_menu_on'),
+            name: 'menu_on',
+            id: config.id + '-menu_on',
+            listeners: {
+                check: SeoFilter.utils.handleChecked,
+                afterrender: SeoFilter.utils.handleChecked
+            }
+        }, {
+            layout: 'column'
+            , defaults: {msgTarget: 'under'}
+            , border: false
+            , anchor: '99%'
+            , items: [{
+                columnWidth: .65
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_menutitle'),
+                    name: 'menutitle',
+                    id: config.id + '-menutitle',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_image'),
+                    name: 'image',
+                    id: config.id + '-image',
+                    anchor: '99%',
+                }]
+            },{
+                columnWidth: .35
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_link_attributes'),
+                    name: 'link_attributes',
+                    id: config.id + '-link_attributes',
+                    anchor: '99%',
+                },{
+                    xtype: 'numberfield',
+                    fieldLabel: _('seofilter_url_menuindex'),
+                    name: 'menuindex',
+                    id: config.id + '-menuindex',
+                    anchor: '99%',
+
+                }]
+            }]
         }];
     },
 

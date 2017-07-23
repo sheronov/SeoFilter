@@ -424,7 +424,7 @@ class SeoFilter
         }
 
 
-        $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new);
+        $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new,$params);
 
         if ($seo = $this->pdo->getArray('sfRule', $rule_id)) {
 
@@ -444,11 +444,16 @@ class SeoFilter
 
             $word_array = $this->prepareRow($word_array,$page_id,$rule_id);
 
-            if($url_array['custom']) {
-                $seo_array = array_intersect_key($url_array, array_flip($seo_array));
+            if($url_array['nourl']) {
+               // $seo_array = $this->getPageMeta($page_id);
             } else {
-                $seo_array = array_intersect_key($seo, array_flip($seo_array));
+                if($url_array['custom']) {
+                    $seo_array = array_intersect_key($url_array, array_flip($seo_array));
+                } else {
+                    $seo_array = array_intersect_key($seo, array_flip($seo_array));
+                }
             }
+
 
 
             foreach ($seo_array as $tag => $text) {
@@ -602,7 +607,7 @@ class SeoFilter
                         $this->modx->log(modX::LOG_LEVEL_ERROR, print_r($response->response, 1));
                     } else {
                         $word = $response->response['object'];
-                        
+
                     }
                 }
             }
@@ -733,7 +738,7 @@ class SeoFilter
     }
 
     public function findMultiId($url = '') {
-        if($url_array = $this->pdo->getArray('sfUrls',array('active'=>1,'old_url'=>$url,'OR:new_url:='=>$url))) {
+        if($url_array = $this->pdo->getArray('sfUrls',array('old_url'=>$url,'OR:new_url:='=>$url))) {
             return $url_array['multi_id'];
         } else {
             return 0;
@@ -741,7 +746,7 @@ class SeoFilter
     }
 
     public function findUrlArray($url = '',$page = 0) {
-        if($url_array = $this->pdo->getArray('sfUrls',array('active'=>1,'page_id'=>$page,'old_url'=>$url,'OR:new_url:='=>$url))) {
+        if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page,'old_url'=>$url,'OR:new_url:='=>$url))) {
             return $url_array;
         } else {
             return array();
@@ -799,7 +804,7 @@ class SeoFilter
         return $url;
     }
 
-    public function multiUrl($aliases = array(),$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0) {
+    public function multiUrl($aliases = array(),$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0,$params = array()) {
         $url = array();
         if($multi_id) {
             if($marray = $this->pdo->getArray('sfRule',$multi_id)) {
@@ -807,13 +812,32 @@ class SeoFilter
                // $url['url'] = $this->pdo->getChunk($tpl, $aliases);
                 $url_link = $this->pdo->getChunk($tpl, $aliases);
                 if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page_id,'old_url'=>$url_link))) {
-                    $url = $url_array;
-                    if($url_array['new_url']) {
-                        $url['url'] = $url_array['new_url'];
+                    if($url_array['active']) {
+                        $url = $url_array;
+                        if ($url_array['new_url']) {
+                            $url['url'] = $url_array['new_url'];
+                        } else {
+                            $url['url'] = $url_link;
+                        }
+                        $this->addUrlCount($url_array['id'], $ajax);
                     } else {
-                        $url['url'] = $url_link;
+//                        $total = 1;
+//                        $count = count($aliases);
+//                        $aliases = array_intersect_key($params,$aliases);
+//                        foreach($aliases as $param => $alias) {
+//                            if($total == 1) {
+//                                $url['url'] .= '?';
+//                            }
+//                            $url['url'] .= $param.'='.$alias;
+//                            if($total != $count) {
+//                                $url['url'] .= '&';
+//                            }
+//                            $total++;
+//                        }
+                        $url['custom'] = $url_array['custom'];
+                        $url['id'] = $url_array['id'];
+                        $url['nourl'] = 1;
                     }
-                    $this->addUrlCount($url_array['id'],$ajax);
                 } else {
                     $url = $this->newUrl($url_link,$multi_id,$page_id,$ajax,$new);
                     $url['url'] = $url_link;

@@ -183,7 +183,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'multi_id', 'page_id', 'name', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name','url_preview','page','pagetitle'];
+        return ['id', 'multi_id', 'page_id', 'name', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name','url_preview','page','pagetitle','menu_on','menutitle','menuindex','image','link_attributes'];
     },
 
     getColumns: function () {
@@ -239,6 +239,12 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         }, {
             header: _('seofilter_url_custom'),
             dataIndex: 'custom',
+            renderer: SeoFilter.utils.renderBoolean,
+            sortable: true,
+            width: 75,
+        }, {
+            header: _('seofilter_url_menu'),
+            dataIndex: 'menu_on',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
             width: 75,

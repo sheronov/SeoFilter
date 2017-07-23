@@ -15,7 +15,7 @@ class msResourceGetListProcessor extends modObjectGetListProcessor
         if($rules = $this->getProperty('rules')) {
             $c->rightJoin('sfRule','sfRule',$this->classKey.'.id = sfRule.page');
             $c->select(array($this->classKey.'.id',$this->classKey.'.pagetitle'));
-            $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER PAGE: '.print_r($this->getProperties(),1));
+            //$this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER PAGE: '.print_r($this->getProperties(),1));
         } elseif ($this->getProperty('combo')) {
             $c->select('id,pagetitle');
         }

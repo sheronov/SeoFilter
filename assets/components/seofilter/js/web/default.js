@@ -47,7 +47,7 @@ jQuery(document).ready(function ($) {
                         }
                     }
 
-                    console.log(response);
+                    //console.log(response);
 
                     if(response.data.description) {$(seoFilter.config.jdescription).attr("content", response.data.description);}
                     if(response.data.h1) {$(seoFilter.config.jh1).html(response.data.h1);}

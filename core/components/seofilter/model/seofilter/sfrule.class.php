@@ -21,7 +21,7 @@ class sfRule extends xPDOSimpleObject {
         if($links = $this->getMany('Links',$q)){
             foreach($links as $key => $link) {
 //                if($link->get('where')) {
-//                    $where = 1;  // TODO: сделать проверку для полей из другой таблицы
+//                    $where = 1;  // TODO: на будущее сделать проверку для полей из другой таблицы
 //                }
                 if($field = $link->getOne('Field')) {
                     $field_id = $field->get('id');

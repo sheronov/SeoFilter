@@ -245,13 +245,11 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     },
 
     getTopBar: function () {
-        return [
-            //  {
-            //     text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_dictionary_create'),
-            //     handler: this.createField,
-            //     scope: this
-            // },
-            {
+        return [{
+                text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_dictionary_create'),
+                handler: this.createField,
+                scope: this
+            }, {
                 xtype: 'seofilter-combo-field'
                 ,id: 'tbar-seofilter-combo-field'
                 ,width: 200
@@ -260,15 +258,15 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                 ,listeners: {
                     select: {fn: this.filterByField, scope:this}
                 }
-            },{
-                xtype: 'seofilter-combo-class'
-                ,id: 'tbar-seofilter-combo-class'
-                ,width: 200
-                ,addall: true
-                ,emptyText: _('seofilter_filter_class_or')
-                ,listeners: {
-                    select: {fn: this.filterByClass, scope:this}
-                }
+            // },{
+            //     xtype: 'seofilter-combo-class'
+            //     ,id: 'tbar-seofilter-combo-class'
+            //     ,width: 200
+            //     ,addall: true
+            //     ,emptyText: _('seofilter_filter_class_or')
+            //     ,listeners: {
+            //         select: {fn: this.filterByClass, scope:this}
+            //     }
             },{
                 xtype: 'button'
                 ,id: 'seofilter-url-filters-clear'
@@ -310,9 +308,9 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     clearFilter: function(btn,e) {
         var s = this.getStore();
         s.baseParams['field'] = '';
-        s.baseParams['class'] = '';
+       // s.baseParams['class'] = '';
         Ext.getCmp('tbar-seofilter-combo-field').setValue('');
-        Ext.getCmp('tbar-seofilter-combo-class').setValue('');
+        //Ext.getCmp('tbar-seofilter-combo-class').setValue('');
         this.getBottomToolbar().changePage(1);
         this.refresh();
     },

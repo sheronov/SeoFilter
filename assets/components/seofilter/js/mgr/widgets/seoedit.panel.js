@@ -297,7 +297,55 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     style: 'background:#f9f9f9;color:#999;',
                 }]
             }]
+        }, {
+            xtype: 'xcheckbox',
+            boxLabel: _('seofilter_url_menu_on'),
+            name: 'menu_on',
+            id: 'seoedit-menu_on',
 
+        }, {
+            layout: 'column'
+            , defaults: {msgTarget: 'under'}
+            , border: false
+            , anchor: '99%'
+            , items: [{
+                columnWidth: .65
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_menutitle'),
+                    name: 'menutitle',
+                    id: 'seoedit-menutitle',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_image'),
+                    name: 'image',
+                    id: 'seoedit-image',
+                    anchor: '99%',
+                }]
+            },{
+                columnWidth: .35
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_url_link_attributes'),
+                    name: 'link_attributes',
+                    id: 'seoedit-link_attributes',
+                    anchor: '99%',
+                },{
+                    xtype: 'numberfield',
+                    fieldLabel: _('seofilter_url_menuindex'),
+                    name: 'menuindex',
+                    id: 'seoedit-menuindex',
+                    anchor: '99%',
+
+                }]
+            }]
         }];
     }
 });
