@@ -191,12 +191,12 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             header: _('seofilter_dictionary_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 70
+            width: 50
         }, {
             header: _('seofilter_dictionary_field_id'),
             dataIndex: 'fieldtitle',
             sortable: true,
-            width: 150,
+            width: 120,
         }, {
             header: _('seofilter_dictionary_input'),
             dataIndex: 'input',
@@ -223,13 +223,13 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
-            width: 75,
+            width: 50,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
             sortable: false,
-            width: 100,
+            width: 75,
             id: 'actions'
         }];
     },

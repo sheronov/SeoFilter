@@ -539,9 +539,18 @@ class SeoFilter
             }
 
             foreach($count_choose as $choose) {
+                if(strpos($choose,'=')) {
+                    $choose_alias = explode('=',$choose)[1];
+                    $choose = explode('=',$choose)[0];
+                } else {
+                    $choose_alias = $choose;
+                }
                 foreach(array('max'=>'DESC','min'=>'ASC') as $m=>$sort) {
                     $q = $this->modx->newQuery('msProduct');
                     $q->innerJoin('msProductData','msProductData','msProduct.id = msProductData.id');
+                    if($m == 'min') {
+                        $where = array_merge($where,array('msProductData.'.$choose.':>'=>0));
+                    }
                     $q->where($where);
                     $q->limit(1);
                     $q->select($count_select);
@@ -549,7 +558,7 @@ class SeoFilter
                     if($q->prepare() && $q->stmt->execute()) {
                         if($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                             foreach ($row as $key => $value) {
-                                $min_max_array[$m . '_' . $choose . '_' . $key] = $value;
+                                $min_max_array[$m . '_' . $choose_alias . '_' . $key] = $value;
                             }
                         }
                     }

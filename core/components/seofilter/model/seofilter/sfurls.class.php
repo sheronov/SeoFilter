@@ -54,6 +54,7 @@ class sfUrls extends xPDOSimpleObject {
 //               // $this->xpdo->log(modX::LOG_LEVEL_ERROR,print_r($urlword->toArray(),1));
 //            }
 //        }
+        $this->set('editedon',strtotime(date('Y-m-d H:i:s')));
         $this->set('old_url',implode('/',$new_url));
         $this->save();
       //  $this->xpdo->log(modX::LOG_LEVEL_ERROR,print_r($this->toArray(),1));

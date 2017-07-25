@@ -174,52 +174,72 @@ switch ($modx->event->name) {
                         if ($url_array['menu_on']) {
                             $menutitle = $url_array['menutitle'];
                         }
-                        if ($links = $pdo->getCollection('sfFieldIds', array('multi_id' => $rule_id), array('sortby' => 'priority'))) {
-                            if (count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
-                                foreach ($links as $lkey => $link) {
-                                    $field = $pdo->getArray('sfField', $link['field_id']);
-                                    $alias = $field['alias'];
-                                    if ($field['hideparam']) {
-                                        if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
-                                            $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
-                                            if (!$menutitle) $menutitle = $word['value'];
-                                        }
-                                    } else {
-                                        $tmp_arr = explode($separator, $tmp[$lkey]);
-                                        $word_alias = '';
-                                        if ($field['valuefirst']) {
-                                            $del = array_pop($tmp_arr);
-                                            if ($del == $alias) {
-                                                $word_alias = implode($separator, $tmp_arr);
-                                            }
-                                        } else {
-                                            $del = array_shift($tmp_arr);
-                                            if ($del == $alias) {
-                                                $word_alias = implode($separator, $tmp_arr);
-                                            }
-                                        }
-                                        if ($word_alias && $word = $pdo->getArray('sfDictionary', array('alias' => $word_alias))) {
-                                            $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
-                                            if (!$menutitle) $menutitle = $word['value'];
-                                        }
 
-                                    }
-                                }
-                                if (count($params)) {
-                                    $fast_search = true;
-                                    $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
-                                    $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0);
-                                    $meta['menutitle'] = $menutitle;
-                                    $modx->setPlaceholders($meta, 'sf.');
-                                    $modx->sendForward($page);
-                                } else {
-                                    if ($url = $modx->getObject('sfUrls', array('page_id' => $page, 'old_url' => $old_url, 'multi_id' => $rule_id))) {
-                                        $url->set('active', 0);
-                                        $url->save();
-                                    }
-                                }
+
+                        $q = $modx->newQuery('sfUrlWord');
+                        $q->sortby('priority','ASC');
+                        $q->leftJoin('sfField','sfField','sfUrlWord.field_id = sfField.id');
+                        $q->leftJoin('sfDictionary','sfDictionary','sfUrlWord.word_id = sfDictionary.id');
+                        $q->where(array('sfUrlWord.url_id'=>$url_array['id']));
+                        $q->select('sfUrlWord.id, sfField.id as field_id, sfField.alias as field_alias, sfDictionary.value as word_value, sfDictionary.input as word_input, sfDictionary.alias as word_alias');
+                        if($q->prepare() && $q->stmt->execute()) {
+                            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                                $_GET[$row['field_alias']] = $_REQUEST[$row['field_alias']] = $params[$row['field_alias']] = $row['word_input'];
+                                if (!$menutitle) $menutitle = $row['word_value'];
                             }
                         }
+
+                        if (!count($params) && $links = $pdo->getCollection('sfFieldIds', array('multi_id' => $rule_id), array('sortby' => 'priority'))) {
+                            if (count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
+                                foreach ($links as $lkey => $link) {
+                                    if($field = $pdo->getArray('sfField', $link['field_id'])) {
+                                        $alias = $field['alias'];
+                                        if ($field['hideparam']) {
+                                            if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
+                                                $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                if (!$menutitle) $menutitle = $word['value'];
+                                            }
+                                        } else {
+                                            $tmp_arr = explode($separator, $tmp[$lkey]);
+                                            $word_alias = '';
+                                            if ($field['valuefirst']) {
+                                                $del = array_pop($tmp_arr);
+                                                if ($del == $alias) {
+                                                    $word_alias = implode($separator, $tmp_arr);
+                                                }
+                                            } else {
+                                                $del = array_shift($tmp_arr);
+                                                if ($del == $alias) {
+                                                    $word_alias = implode($separator, $tmp_arr);
+                                                }
+                                            }
+                                            if ($word_alias && $word = $pdo->getArray('sfDictionary', array('alias' => $word_alias, 'field_id' => $field['id']))) {
+                                                $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                if (!$menutitle) $menutitle = $word['value'];
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+
+                        if (count($params)) {
+                            $fast_search = true;
+                            $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
+                            $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0);
+                            $meta['menutitle'] = $menutitle;
+                            $modx->setPlaceholders($meta, 'sf.');
+                            $modx->sendForward($page);
+                        } else {
+                            if ($url = $modx->getObject('sfUrls', array('page_id' => $page, 'old_url' => $old_url, 'multi_id' => $rule_id))) {
+                                $url->set('active', 0);
+                                $url->save();
+                            }
+                        }
+
                     } else {
                         $modx->setPlaceholder('sf.seo_id',$url_array['id']);
                     }
