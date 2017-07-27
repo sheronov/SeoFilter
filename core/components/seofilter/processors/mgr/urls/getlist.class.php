@@ -34,6 +34,8 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
      */
     public function prepareQueryBeforeCount(xPDOQuery $c)
     {
+        $this->modx->log(modX::LOG_LEVEL_ERROR,print_r($this->getProperties(),1));
+
         $query = trim($this->getProperty('query'));
         if ($query) {
             $c->where(array(
@@ -49,6 +51,16 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
         if ($page = $this->getProperty('page',null)) {
             $c->andCondition(array('page_id' => $page), '', 1);
         }
+
+        if ($field = $this->getProperty('field',null)) {
+            $cond = $this->classKey.'.id = sfUrlWord.url_id AND sfUrlWord.field_id = '.$field;
+            if ($word = $this->getProperty('word',null)) {
+                $cond .= ' AND sfUrlWord.word_id = '.$word;
+            }
+            $c->innerJoin('sfUrlWord','sfUrlWord',$cond);
+        }
+
+
 
         $c->leftJoin('sfRule', 'sfRule', $this->classKey.'.multi_id = sfRule.id');
         $c->leftJoin('modResource', 'modResource', $this->classKey.'.page_id = modResource.id');

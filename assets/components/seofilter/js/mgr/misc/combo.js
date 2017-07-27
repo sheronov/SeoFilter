@@ -175,3 +175,41 @@ SeoFilter.combo.Rule = function (config) {
 };
 Ext.extend(SeoFilter.combo.Rule, MODx.combo.ComboBox);
 Ext.reg('seofilter-combo-rule', SeoFilter.combo.Rule);
+
+
+SeoFilter.combo.Word = function (config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'word_id',
+        hiddenName: 'word_id',
+        displayField: 'value',
+        valueField: 'id',
+        editable: true,
+        fields: ['id', 'value'],
+        pageSize: 20,
+        emptyText: _('seofilter_combo_select'),
+        allowBlank: false,
+        url: SeoFilter.config.connector_url,
+        baseParams: {
+            action: 'mgr/dictionary/getlist',
+            combo: true,
+            id: config.value
+        },
+        tpl: new Ext.XTemplate(''
+            +'<tpl for="."><div class="x-combo-list-item seofilter-word-list-item">'
+            +'<span><small>({id})</small> <b>{value}</b></span>'
+            +'</div></tpl>',{
+            compiled: true
+        }),
+        itemSelector: 'div.seofilter-word-list-item'
+    });
+    SeoFilter.combo.Word.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.combo.Word, MODx.combo.ComboBox, {
+    val: null
+    , reload: function (value) {
+        this.val = value;
+        this.getStore().reload({params: this.baseParams});
+    }
+});
+Ext.reg('seofilter-combo-word', SeoFilter.combo.Word);
