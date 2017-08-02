@@ -59,7 +59,7 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
                             //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К удалению: '. print_r($del_urls,1));
                             if($del_urls) {
                                 $removed = $this->modx->removeCollection('sfUrls',array('old_url:IN'=>$del_urls));
-                                $this->modx->log(modX::LOG_LEVEL_ERROR, 'URLs deleted: '. print_r($removed,1));
+                                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] URLs deleted: '. print_r($removed,1));
                             }
                             $urls = array_diff($urls,$old_urls);
                             //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($urls,1));
@@ -76,7 +76,7 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
                                 $otherProps = array('processors_path' => $path . 'processors/');
                                 $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
                                 if ($response->isError()) {
-                                    $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                                    $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter]' .  $response->getMessage());
                                 }
                             }
                         }

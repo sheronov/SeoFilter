@@ -113,6 +113,48 @@ SeoFilter.combo.Class = function (config) {
 Ext.extend(SeoFilter.combo.Class, MODx.combo.ComboBox);
 Ext.reg('seofilter-combo-class', SeoFilter.combo.Class);
 
+var compares = [
+    [1, _('seofilter_compare_in')],
+    [2, _('seofilter_compare_notin')],
+    [3, _('seofilter_compare_larger')],
+    [4, _('seofilter_compare_less')],
+    [5, _('seofilter_compare_range')]
+];
+SeoFilter.combo.Compare = function (config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'compare',
+        hiddenName: 'compare',
+        displayField: 'compare',
+        valueField: 'cmp',
+        editable: true,
+        store: new Ext.data.SimpleStore({
+            id:0,
+            fields:
+                [
+                    'cmp',   //числовое значение - номер элемента
+                    'compare' //текст
+                ],
+            data:compares
+        }),
+        // fields: ['id', 'pagetitle'],
+        pageSize: 20,
+        emptyText: _('seofilter_combo_select'),
+        hideMode: 'offsets',
+        mode: 'local',
+        forceSelection: false,
+
+        // url: SeoFilter.config.connector_url,
+        // baseParams: {
+        //     action: 'mgr/system/getlist',
+        //     combo: true
+        // }
+    });
+    SeoFilter.combo.Compare.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.combo.Compare, MODx.combo.ComboBox);
+Ext.reg('seofilter-combo-compare', SeoFilter.combo.Compare);
+
 
 SeoFilter.combo.Field = function (config) {
     config = config || {};

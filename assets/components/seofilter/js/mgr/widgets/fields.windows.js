@@ -144,20 +144,19 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     id: config.id + '-xpdo_name',
                     anchor: '99%',
                 }]
-            },{
-                columnWidth: 1
-                ,layout:'form'
-                ,defaults: { msgTarget: 'under' }
-                ,border:false
-                ,items: [{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_field_xpdo_where'),
-                    name: 'xpdo_where',
-                    id: config.id + '-xpdo_where',
-                    anchor: '99%',
-                    style:'margin-bottom:15px;'
-                }
-                ]
+            // },{
+            //     columnWidth: 1
+            //     ,layout:'form'
+            //     ,defaults: { msgTarget: 'under' }
+            //     ,border:false
+            //     ,items: [{
+            //         xtype: 'textfield',
+            //         fieldLabel: _('seofilter_field_xpdo_where'),
+            //         name: 'xpdo_where',
+            //         id: config.id + '-xpdo_where',
+            //         anchor: '99%',
+            //         style:'margin-bottom:15px;'
+            //     }]
             }]
         }]
     },
@@ -339,20 +338,19 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     id: config.id + '-xpdo_name',
                     anchor: '99%',
                 }]
-            },{
-                columnWidth: 1
-                ,layout:'form'
-                ,defaults: { msgTarget: 'under' }
-                ,border:false
-                ,items: [{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_field_xpdo_where'),
-                    name: 'xpdo_where',
-                    id: config.id + '-xpdo_where',
-                    anchor: '99%',
-                    style:'margin-bottom:15px;'
-                }
-                ]
+            // },{
+            //     columnWidth: 1
+            //     ,layout:'form'
+            //     ,defaults: { msgTarget: 'under' }
+            //     ,border:false
+            //     ,items: [{
+            //         xtype: 'textfield',
+            //         fieldLabel: _('seofilter_field_xpdo_where'),
+            //         name: 'xpdo_where',
+            //         id: config.id + '-xpdo_where',
+            //         anchor: '99%',
+            //         style:'margin-bottom:15px;'
+            //     }]
             }]
         }]
     },

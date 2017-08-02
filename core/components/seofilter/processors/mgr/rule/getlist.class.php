@@ -39,6 +39,9 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
             ));
         }
 
+        if ($page = $this->getProperty('page',null)) {
+            $c->andCondition(array('page' => $page), '', 1);
+        }
 
         //if($this->getProperty('page')) {
 

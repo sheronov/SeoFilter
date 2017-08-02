@@ -241,7 +241,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                         style: 'background:#f9f9f9;color:#aaa;',
                         id: config.id + '-url',
                         anchor: '99%',
-                    }, {
+                    },{
                         xtype: 'xcheckbox',
                         boxLabel: _('seofilter_rule_base_more'),
                         name: 'base',
@@ -275,21 +275,25 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             , layout: 'form'
                             , defaults: {msgTarget: 'under'}
                             , border: false
-                            , style: 'text-align:right;'
                             , items: [{
                                     xtype: xtype_count,
                                     fieldLabel: _('seofilter_rule_count_parents'),
                                     name: 'count_parents',
-                                    style: 'margin-bottom:20px;',
                                     id: config.id + '-count_parents',
                                     anchor: '99%',
                                 }, {
-                                    xtype: 'xcheckbox',
-                                    boxLabel: _('seofilter_field_active'),
-                                    name: 'active',
-                                    id: config.id + '-active',
+                                    xtype: 'numberfield',
+                                    fieldLabel: _('seofilter_rule_rank'),
+                                    name: 'rank',
+                                    id: config.id + '-rank',
+                                    anchor: '99%',
                             }]
                         }]
+                    }, {
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_field_active'),
+                        name: 'active',
+                        id: config.id + '-active',
                     }]
                 }, {
                 title: _('seofilter_seo')

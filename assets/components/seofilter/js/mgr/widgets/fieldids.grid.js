@@ -206,7 +206,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id','field_id','name','multi_id','priority','where','compare','value','condition','compare_string','condition_bool','actions','active'];
+        return ['id','field_id','name','multi_id','priority','where','compare','value','condition','alias','compare_string','condition_bool','actions','active'];
     },
 
     getColumns: function () {
@@ -217,6 +217,10 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             // },{
             header: _('seofilter_fieldids_field_id'),
             dataIndex: 'name',
+            width: 200
+        },{
+            header: _('seofilter_fieldids_alias'),
+            dataIndex: 'alias',
             width: 200
         },{
             header: _('seofilter_fieldids_priority'),

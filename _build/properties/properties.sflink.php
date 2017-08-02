@@ -3,26 +3,14 @@
 $properties = array();
 
 $tmp = array(
-    'tpl_link' => array(
-        'type' => 'textfield',
-        'value' => '@INLINE <a href="/{$link}">{$value}</a>',
-    ),
-    'toPlaceholder' => array(
-        'type' => 'combo-boolean',
-        'value' => false,
-    ),
-    'rule_id' => array(
-        'type' => 'textfield',
-        'value' => 0,
-    ),
-    'rules_id' => array(
+    'tpl' => array(
         'type' => 'textfield',
         'value' => '',
     ),
-    'return_link' => array(
-        'type' => 'combo-boolean',
-        'value' => false,
-    ),
+    'toPlaceholder' => array(
+        'type' => 'textfield',
+        'value' => '',
+    )
 );
 
 foreach ($tmp as $k => $v) {

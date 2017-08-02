@@ -187,7 +187,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle','seo_id'];
+        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle','editedon', 'seo_id'];
     },
 
     getColumns: function () {
@@ -211,24 +211,18 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             header: _('seofilter_rule_url'),
             dataIndex: 'url',
             sortable: true,
-            width: 250,
+            width: 200,
         }, {
-
             header: _('seofilter_rule_title'),
             dataIndex: 'title',
             sortable: true,
-            width: 250,
-
-        // }, {
-        //     header: _('seofilter_rule_count'),
-        //     dataIndex: 'count',
-        //     sortable: true,
-        //     width: 70,
-        // }, {
-        //     header: _('seofilter_rule_fields'),
-        //     dataIndex: 'fields',
-        //     sortable: true,
-        //     width: 150,
+            width: 200,
+        }, {
+            header: _('seofilter_rule_editedon'),
+            dataIndex: 'editedon',
+            sortable: true,
+            renderer: SeoFilter.utils.formatDate,
+            width: 100,
         }, {
             header: _('seofilter_rule_base'),
             dataIndex: 'base',
@@ -239,6 +233,11 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             header: _('seofilter_rule_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
+            sortable: true,
+            width: 75,
+        }, {
+            header: _('seofilter_rule_rank'),
+            dataIndex: 'rank',
             sortable: true,
             width: 75,
         }, {
@@ -256,6 +255,27 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_rule_create'),
             handler: this.createField,
             scope: this
+        },{
+            xtype: 'seofilter-combo-resource'
+            ,id: 'tbar-seofilter-combo-resource'
+            ,width: 200
+            ,addall: true
+            ,emptyText: _('seofilter_filter_resource')
+            ,listeners: {
+                select: {fn: this.filterByResource, scope:this}
+            }
+            ,baseParams: {
+                action: 'mgr/system/getlist',
+                combo: true,
+                rules: true
+            }
+        },{
+            xtype: 'button'
+            ,id: 'seofilter-filters-clearres'
+            ,text: '<i class="icon icon-times"></i>'
+            ,listeners: {
+                click: {fn: this.clearFilter, scope: this}
+            }
         }, '->', {
             xtype: 'seofilter-field-search',
             width: 250,
@@ -274,6 +294,22 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             }
         }];
     },
+
+    filterByResource: function(cb) {
+        this.getStore().baseParams['page'] = cb.value;
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
+    },
+
+    clearFilter: function(btn,e) {
+        var s = this.getStore();
+        s.baseParams['page'] = '';
+        Ext.getCmp('tbar-seofilter-combo-resource').setValue('');
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
+    },
+
+
 
     onClick: function (e) {
         var elem = e.getTarget();

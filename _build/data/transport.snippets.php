@@ -7,7 +7,7 @@ $snippets = array();
 $tmp = array(
     'sfLink' => array(
         'file' => 'sflink',
-        'description' => 'This snippet need params: rule_id and params for this rule_id. Snippet return link to SEO page. Read the docs.',
+        'description' => 'This snippet need params: rules and params for this rules_id. Snippet return link to SEO page. Read the docs.',
     ),
     'sfWord' => array(
         'file' => 'sfword',

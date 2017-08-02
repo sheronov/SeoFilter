@@ -146,24 +146,6 @@ switch ($modx->event->name) {
                         $new_url = $url_array['new_url'];
                         $rule_id = $url_array['multi_id'];
 
-//                    if(!$url_array['active']) {
-//                        $addurl = array();
-//                        $q = $modx->newQuery('sfUrlWord');
-//                        $q->sortby('priority','ASC');
-//                        $q->leftJoin('sfField','sfField','sfUrlWord.field_id = sfField.id');
-//                        $q->leftJoin('sfDictionary','sfDictionary','sfUrlWord.word_id = sfDictionary.id');
-//                        $q->where(array('sfUrlWord.url_id'=>(int)$url_array['id']));
-//                        $q->select('sfUrlWord.id, sfField.id as field_id, sfField.alias as field_alias, sfField.hideparam, sfField.valuefirst, sfDictionary.input as word_input, sfDictionary.id as word_id, sfDictionary.alias as word_alias');
-//                        if($q->prepare() && $q->stmt->execute()) {
-//                            while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-//                                $addurl[] = $row['field_alias'].'='.$row['word_input'];
-//                            }
-//                        }
-//                        if(count($addurl)) {
-//                            $url = $modx->makeUrl($page) . '?'. implode('&',$addurl);
-//                            $modx->sendRedirect($url);
-//                        }
-//                    }
                         if ($new_url && $new_url != implode('/', $tmp)) {
                             $url = $modx->makeUrl($page) . $new_url;
                             $modx->sendRedirect($url . $last_char);
@@ -189,42 +171,47 @@ switch ($modx->event->name) {
                             }
                         }
 
-                        if (!count($params) && $links = $pdo->getCollection('sfFieldIds', array('multi_id' => $rule_id), array('sortby' => 'priority'))) {
-                            if (count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
-                                foreach ($links as $lkey => $link) {
-                                    if($field = $pdo->getArray('sfField', $link['field_id'])) {
-                                        $alias = $field['alias'];
-                                        if ($field['hideparam']) {
-                                            if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
-                                                $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
-                                                if (!$menutitle) $menutitle = $word['value'];
-                                            }
-                                        } else {
-                                            $tmp_arr = explode($separator, $tmp[$lkey]);
-                                            $word_alias = '';
-                                            if ($field['valuefirst']) {
-                                                $del = array_pop($tmp_arr);
-                                                if ($del == $alias) {
-                                                    $word_alias = implode($separator, $tmp_arr);
+                        $q = $modx->newQuery('sfFieldIds');
+                        $q->where(array('multi_id'=>$rule_id));
+                        $url_fields = $modx->getCount('sfFieldIds',$q);
+
+                        if ((count($params) != $url_fields)) { //Доп проверка на изменения в базе
+                            if($links = $pdo->getCollection('sfFieldIds', array('multi_id' => $rule_id), array('sortby' => 'priority'))) {
+                                if (count($tmp) == count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
+                                    foreach ($links as $lkey => $link) {
+                                        if ($field = $pdo->getArray('sfField', $link['field_id'])) {
+                                            $alias = $field['alias'];
+                                            if ($field['hideparam']) {
+                                                if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
+                                                    $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                    if (!$menutitle) $menutitle = $word['value'];
                                                 }
                                             } else {
-                                                $del = array_shift($tmp_arr);
-                                                if ($del == $alias) {
-                                                    $word_alias = implode($separator, $tmp_arr);
+                                                $tmp_arr = explode($separator, $tmp[$lkey]);
+                                                $word_alias = '';
+                                                if ($field['valuefirst']) {
+                                                    $del = array_pop($tmp_arr);
+                                                    if ($del == $alias) {
+                                                        $word_alias = implode($separator, $tmp_arr);
+                                                    }
+                                                } else {
+                                                    $del = array_shift($tmp_arr);
+                                                    if ($del == $alias) {
+                                                        $word_alias = implode($separator, $tmp_arr);
+                                                    }
                                                 }
-                                            }
-                                            if ($word_alias && $word = $pdo->getArray('sfDictionary', array('alias' => $word_alias, 'field_id' => $field['id']))) {
-                                                $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
-                                                if (!$menutitle) $menutitle = $word['value'];
-                                            }
+                                                if ($word_alias && $word = $pdo->getArray('sfDictionary', array('alias' => $word_alias, 'field_id' => $field['id']))) {
+                                                    $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                    if (!$menutitle) $menutitle = $word['value'];
+                                                }
 
+                                            }
                                         }
                                     }
-                                }
 
+                                }
                             }
                         }
-
 
                         if (count($params)) {
                             $fast_search = true;
@@ -272,7 +259,8 @@ switch ($modx->event->name) {
 
                     if(count($tmp) == count($params)) {
                         $fast_search = true;
-                        $rule_id = $SeoFilter->findRule(array_keys($params), $page);
+                        //$rule_id = $SeoFilter->findRule(array_keys($params), $page);
+                        $rule_id = $SeoFilter->findRuleId($page,$params);
                         $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
                         $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0, 1);
                         $modx->setPlaceholders($meta, 'sf.');

@@ -34,7 +34,6 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
      */
     public function prepareQueryBeforeCount(xPDOQuery $c)
     {
-        $this->modx->log(modX::LOG_LEVEL_ERROR,print_r($this->getProperties(),1));
 
         $query = trim($this->getProperty('query'));
         if ($query) {

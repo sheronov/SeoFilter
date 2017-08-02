@@ -1,5 +1,5 @@
 <?php
-$data = array();
+$output = '';
 if(isset($options)) {
     $field_id = (int)$options;
 }
@@ -10,19 +10,19 @@ if(isset($input) && isset($field_id)) {
     $q->limit(1);
     $q->select('value,alias');
     if ($q->prepare() && $q->stmt->execute()) {
-        $data = $q->stmt->fetch(PDO::FETCH_ASSOC);
+        $output = $q->stmt->fetch(PDO::FETCH_ASSOC);
 
     }
     if(isset($tpl)) {
         $pdo = $modx->getService('pdoTools');
         if (!($pdo instanceof pdoTools))
-            return '';
-        if(isset($data['value']) && isset($data['alias'])) {
-            return $pdo->getChunk($tpl,array('value'=>$data['value'],'alias'=>$data['alias']));
+            $output = '';
+        if(isset($output['value']) && isset($output['alias'])) {
+            $output = $pdo->getChunk($tpl,array('value'=>$output['value'],'alias'=>$output['alias']));
         } else {
-            return '';
+            $output = '';
         }
     }
 
 }
-return $data;
+return $output;

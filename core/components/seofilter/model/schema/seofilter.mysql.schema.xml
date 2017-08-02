@@ -29,7 +29,7 @@
         <index alias="key" name="key" primary="false" unique="false" type="BTREE">
             <column key="key" length="" collation="A" null="false"/>
         </index>
-        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+        <index alias="alias" name="alias" primary="false" unique="false" type="BTREE">
             <column key="alias" length="" collation="A" null="false"/>
         </index>
         <index alias="active" name="active" primary="false" unique="false" type="BTREE">
@@ -53,6 +53,7 @@
         <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
+        <field key="link" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
         <field key="title" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
         <field key="h1" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
         <field key="h2" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
@@ -60,6 +61,9 @@
         <field key="description" dbtype="text" phptype="string" null="true" default=""/>
         <field key="text" dbtype="text" phptype="string" null="true" default=""/>
         <field key="content" dbtype="text" phptype="string" null="true" default=""/>
+
+
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
 
         <index alias="url" name="url" primary="false" unique="false" type="BTREE">
             <column key="url" length="" collation="A" null="false"/>

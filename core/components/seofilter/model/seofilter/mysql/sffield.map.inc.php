@@ -189,6 +189,22 @@ $xpdo_meta_map['sfField']= array (
         ),
       ),
     ),
+    'alias' => 
+    array (
+      'alias' => 'alias',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'alias' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
     'active' => 
     array (
       'alias' => 'active',

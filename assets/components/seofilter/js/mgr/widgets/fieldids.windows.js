@@ -58,7 +58,7 @@ Ext.extend(SeoFilter.window.CreateFieldIds, MODx.Window, {
                 ,defaults: { msgTarget: 'under' }
                 ,border:false
                 ,items: [{
-                    xtype: 'textfield',
+                    xtype: 'seofilter-combo-compare',
                     fieldLabel: _('seofilter_fieldids_compare'),
                     name: 'compare',
                     id: config.id + '-compare',
@@ -69,12 +69,12 @@ Ext.extend(SeoFilter.window.CreateFieldIds, MODx.Window, {
                     name: 'value',
                     id: config.id + '-value',
                     anchor: '99%',
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_fieldids_condition'),
-                    name: 'condition',
-                    id: config.id + '-condition',
-                    anchor: '99%',
+                // }, {
+                //     xtype: 'textfield',
+                //     fieldLabel: _('seofilter_fieldids_condition'),
+                //     name: 'condition',
+                //     id: config.id + '-condition',
+                //     anchor: '99%',
                 }]
             }]
         }];
@@ -151,7 +151,7 @@ Ext.extend(SeoFilter.window.UpdateFieldIds, MODx.Window, {
                 ,defaults: { msgTarget: 'under' }
                 ,border:false
                 ,items: [{
-                    xtype: 'textfield',
+                    xtype: 'seofilter-combo-compare',
                     fieldLabel: _('seofilter_fieldids_compare'),
                     name: 'compare',
                     id: config.id + '-compare',
@@ -162,12 +162,12 @@ Ext.extend(SeoFilter.window.UpdateFieldIds, MODx.Window, {
                     name: 'value',
                     id: config.id + '-value',
                     anchor: '99%',
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_fieldids_condition'),
-                    name: 'condition',
-                    id: config.id + '-condition',
-                    anchor: '99%',
+                // }, {
+                //     xtype: 'textfield',
+                //     fieldLabel: _('seofilter_fieldids_condition'),
+                //     name: 'condition',
+                //     id: config.id + '-condition',
+                //     anchor: '99%',
                 }]
             }]
         }];

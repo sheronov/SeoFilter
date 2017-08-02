@@ -14,6 +14,7 @@ $xpdo_meta_map['sfRule']= array (
     'count_where' => '',
     'rank' => 0,
     'active' => 1,
+    'link' => '',
     'title' => '',
     'h1' => '',
     'h2' => '',
@@ -21,6 +22,7 @@ $xpdo_meta_map['sfRule']= array (
     'description' => '',
     'text' => '',
     'content' => '',
+    'editedon' => '0000-00-00 00:00:00',
   ),
   'fieldMeta' => 
   array (
@@ -90,6 +92,14 @@ $xpdo_meta_map['sfRule']= array (
       'null' => true,
       'default' => 1,
     ),
+    'link' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
     'title' => 
     array (
       'dbtype' => 'varchar',
@@ -141,6 +151,13 @@ $xpdo_meta_map['sfRule']= array (
       'phptype' => 'string',
       'null' => true,
       'default' => '',
+    ),
+    'editedon' => 
+    array (
+      'dbtype' => 'timestamp',
+      'phptype' => 'timestamp',
+      'null' => true,
+      'default' => '0000-00-00 00:00:00',
     ),
   ),
   'indexes' => 

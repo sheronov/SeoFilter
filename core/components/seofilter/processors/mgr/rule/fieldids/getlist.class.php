@@ -39,7 +39,7 @@ class sfFieldIdsGetListProcessor extends modObjectGetListProcessor
 //        $c->leftJoin('modUserProfile', 'modUserProfile', 'sxSubscriber.user_id = modUserProfile.internalKey');
 //
         $c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
-        $c->select('sfField.name');
+        $c->select('sfField.name,sfField.alias');
 
         $query = trim($this->getProperty('query'));
         if ($query) {

@@ -156,7 +156,7 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                     $processorProps['value'] = $word;
                     $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                     if ($response->isError()) {
-                        $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
                     }
                 }
             } else {
@@ -207,7 +207,7 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                         if($input[$key] && $value) {
                             $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                             if ($response->isError()) {
-                                $this->modx->log(modX::LOG_LEVEL_ERROR, $response->getMessage());
+                                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
                             }
                         }
                     }

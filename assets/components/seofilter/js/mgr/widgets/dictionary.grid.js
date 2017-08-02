@@ -241,7 +241,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                 scope: this
             }, {
                 xtype: 'seofilter-combo-field'
-                ,id: 'tbar-seofilter-combo-field'
+                ,id: 'tbar-seofilter-combo-field2'
                 ,width: 200
                 ,addall: true
                 ,emptyText: _('seofilter_filter_field')
@@ -299,7 +299,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         var s = this.getStore();
         s.baseParams['field'] = '';
        // s.baseParams['class'] = '';
-        Ext.getCmp('tbar-seofilter-combo-field').setValue('');
+        Ext.getCmp('tbar-seofilter-combo-field2').setValue('');
         //Ext.getCmp('tbar-seofilter-combo-class').setValue('');
         this.getBottomToolbar().changePage(1);
         this.refresh();
