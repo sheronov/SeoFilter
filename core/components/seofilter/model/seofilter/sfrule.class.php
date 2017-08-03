@@ -12,7 +12,7 @@ class sfRule extends xPDOSimpleObject {
 
 
     /**
-     * Returns true url for rwo and more filterm params
+     * Returns true url for filter params
      *
      * @param int $returnArray = 0
      *
@@ -70,7 +70,6 @@ class sfRule extends xPDOSimpleObject {
 
                             $words = $field->getMany('Words',$q);
                             foreach($words as $word) {
-                                //$this->xpdo->log(modX::LOG_LEVEL_ERROR,print_r($word->toArray(),1));
                                 $all_array = array(
                                     'url' => $word->get('alias'),
                                     'field_word' => array(array(
@@ -101,7 +100,6 @@ class sfRule extends xPDOSimpleObject {
                 }
             }
         }
-        //$this->xpdo->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER: '. print_r($url,1));
         if(!$returnArray) {
             return $url;
         } else {
@@ -114,7 +112,6 @@ class sfRule extends xPDOSimpleObject {
                     $urls_array = $this->matrixmult($urls_array,$urls[$i]);
                 }
             }
-            //$this->xpdo->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER: '. print_r($urls_array,1));
             return $urls_array;
 
         }

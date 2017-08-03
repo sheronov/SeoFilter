@@ -196,7 +196,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             header: _('seofilter_dictionary_field_id'),
             dataIndex: 'fieldtitle',
             sortable: true,
-            width: 120,
+            width: 125,
         }, {
             header: _('seofilter_dictionary_input'),
             dataIndex: 'input',

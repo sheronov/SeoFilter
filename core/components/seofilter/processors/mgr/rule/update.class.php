@@ -87,9 +87,6 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
                 }
             }
         }
-       // $muiltifield = $this->object;
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($muiltifield->makeUrl(),1));
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
         return parent::afterSave();
     }
 }

@@ -1,9 +1,11 @@
 <?php
+/** @var array $scriptProperties */
 $output = '';
 if(isset($options)) {
     $field_id = (int)$options;
 }
 if(isset($input) && isset($field_id)) {
+    $tpl = $modx->getOption('tpl', $scriptProperties, '');
     $class_key = 'sfDictionary';
     $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
     $q = $modx->newQuery('sfDictionary',array('field_id' => $field_id,'input'=>$input));
@@ -34,10 +36,10 @@ if(isset($input) && isset($field_id)) {
             }
         }
     }
-    if(isset($tpl)) {
+    if($tpl) {
         $pdo = $modx->getService('pdoTools');
         if (!($pdo instanceof pdoTools))
-            $output = '';
+            return '';
         if(isset($output['value']) && isset($output['alias'])) {
             $output = $pdo->getChunk($tpl,array('value'=>$output['value'],'alias'=>$output['alias']));
         } else {

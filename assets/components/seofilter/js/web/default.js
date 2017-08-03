@@ -1,6 +1,7 @@
 jQuery(document).ready(function ($) {
     var seoFilter = {
         config : seoFilterConfig || {},
+        count :  Object.keys(seoFilterConfig.params).length || 0,
         ajax_post: function (array,hash,browser) {
             $.ajax({
                 type: 'POST',
@@ -19,35 +20,48 @@ jQuery(document).ready(function ($) {
                     var origin = seoFilter.config.url || document.location.pathname;
 
                     //для frontendmanager
-                    if(response.data.seo_id) {
-                        if($(document).find('.fm-seofilter').length) {
-                            $(document).find('.fm-seofilter').attr('data-id',response.data.rule_id).data('id',response.data.seo_id);
+                    if($(document).find('.fm-seofilter').length) {
+                        var fm_link = $(document).find('.fm-seofilter');
+                        if(response.data.seo_id) {
+                            fm_link.attr('href',fm_link.data('url')+response.data.seo_id);
                             $(document).find('.fm-seofilter').show();
-                        }
-                    } else {
-                        if($(document).find('.fm-seofilter').length) {
+                        } else {
                             $(document).find('.fm-seofilter').hide();
                         }
                     }
 
                     if(response.data.title) {
+                        var newtitle = response.data.title.toString();
                         if (seoFilter.config.replacebefore) {
                             var separator = seoFilter.config.replaceseparator || ' / ';
                             var title = $('title').text();
-                            //console.log(title.indexOf(separator));
                             var arr_title = title.split(separator);
                             if (arr_title.length > 1) {
-                                arr_title[0] = response.data.title;
+                                if(!seoFilter.count && response.data.seo_id) {
+                                    arr_title.unshift(newtitle);
+                                    seoFilter.count++;
+                                } else {
+                                    if(arr_title[1].toString() === newtitle) {
+                                        var shift = arr_title.shift()
+                                        seoFilter.count = 0;
+                                    } else {
+                                        arr_title[0] = newtitle;
+                                    }
+                                }
                                 $(seoFilter.config.jtitle).text(arr_title.join(separator));
                             } else {
-                                $(seoFilter.config.jtitle).text(response.data.title);
+                                if(response.data.seo_id) {
+                                    arr_title.unshift(newtitle);
+                                    seoFilter.count++;
+                                    $(seoFilter.config.jtitle).text(arr_title.join(separator));
+                                } else {
+                                    $(seoFilter.config.jtitle).text(newtitle);
+                                }
                             }
                         } else {
-                            $(seoFilter.config.jtitle).text(response.data.title);
+                            $(seoFilter.config.jtitle).text(newtitle);
                         }
                     }
-
-                    //console.log(response);
 
                     if(response.data.description) {$(seoFilter.config.jdescription).attr("content", response.data.description);}
                     if(response.data.h1) {$(seoFilter.config.jh1).html(response.data.h1);}
@@ -63,7 +77,6 @@ jQuery(document).ready(function ($) {
                     else {
                         window.location.hash = url.substr(1);
                     }
-                    //console.log(response);
                 },
                 error: function (response) {
                     //console.log(response);
@@ -84,19 +97,10 @@ jQuery(document).ready(function ($) {
 
             for (var i in vars) {
                 if (vars.hasOwnProperty(i)) {
-                    // if(aliases.indexOf(i) != -1) {
-                    //     if(count || origin[origin.length-1] != '/') {
-                    //         hash += '/' + i + seoFilter.config.separator + vars[i];
-                    //     } else {
-                    //         hash += i + seoFilter.config.separator + vars[i];
-                    //     }
-                    //     count++;
-                    // } else {
-                        hash += '&' + i + '=' + vars[i];
-                    //}
+                    hash += '&' + i + '=' + vars[i];
                 }
             }
-            //console.log(document.location.pathname);
+
             if (!this.oldbrowser()) {
                 if (hash.length != 0) {
                     if(count) {

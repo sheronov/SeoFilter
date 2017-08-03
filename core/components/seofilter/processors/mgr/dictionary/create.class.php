@@ -13,7 +13,6 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
      */
     public function beforeSet()
     {
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
 
         $input = trim($this->getProperty('input'));
         $field_id = $this->getProperty('field_id');
@@ -29,8 +28,6 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
 
     public function beforeSave()
     {
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->getProperties(),1));
-       // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
         if($this->object->get('value') && !$this->object->get('alias')) {
             $this->object->set('alias', modResource::filterPathSegment($this->modx, $this->object->get('value')));
         }
@@ -66,7 +63,6 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
                         }
                         foreach($urls_array as $url) {
                             if(in_array($url['url'],$urls)) {
-                                //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($url,1));
                                 $processorProps = array(
                                     'multi_id' => $rule->get('id'),
                                     'old_url' => $url['url'],
@@ -84,10 +80,7 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
                 }
             }
         }
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->toArray(),1));
-       // if($value = $this->object->get('value')) {
-            //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($this->object->translit($value),1));
-       // }
+
         return parent::afterSave();
     }
 

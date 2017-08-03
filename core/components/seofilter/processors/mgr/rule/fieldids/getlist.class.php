@@ -32,12 +32,8 @@ class sfFieldIdsGetListProcessor extends modObjectGetListProcessor
      */
     public function prepareQueryBeforeCount(xPDOQuery $c)
     {
-        // Выбираем только нужные записи
         $c->where(array('multi_id' => $this->getProperty('multi_id')));
-        // И присоединяем свойства пользователей
         $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
-//        $c->leftJoin('modUserProfile', 'modUserProfile', 'sxSubscriber.user_id = modUserProfile.internalKey');
-//
         $c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
         $c->select('sfField.name,sfField.alias');
 
@@ -62,16 +58,6 @@ class sfFieldIdsGetListProcessor extends modObjectGetListProcessor
 
         $array = $object->toArray();
 
-//        $array['pagetitle'] = '';
-//        if ($page = $array['page']) {
-//            $q = $this->modx->newQuery('modResource', array('id' => $page));
-//            $q->select('pagetitle');
-//            $q->limit(1);
-//            if ($q->prepare() && $q->stmt->execute()) {
-//                $array['pagetitle'] = $q->stmt->fetch(PDO::FETCH_COLUMN);
-//            }
-//        }
-
         $array['actions'] = array();
 
         // Edit
@@ -84,28 +70,6 @@ class sfFieldIdsGetListProcessor extends modObjectGetListProcessor
             'button' => true,
             'menu' => true,
         );
-
-//        if (!$array['active']) {
-//            $array['actions'][] = array(
-//                'cls' => '',
-//                'icon' => 'icon icon-power-off action-green',
-//                'title' => $this->modx->lexicon('seofilter_fieldids_enable'),
-//                'multiple' => $this->modx->lexicon('seofilter_fieldids_enable'),
-//                'action' => 'enableFieldIds',
-//                'button' => true,
-//                'menu' => true,
-//            );
-//        } else {
-//            $array['actions'][] = array(
-//                'cls' => '',
-//                'icon' => 'icon icon-power-off action-gray',
-//                'title' => $this->modx->lexicon('seofilter_fieldids_disable'),
-//                'multiple' => $this->modx->lexicon('seofilter_fieldids_disable'),
-//                'action' => 'disableFieldIds',
-//                'button' => true,
-//                'menu' => true,
-//            );
-//        }
 
         // Remove
         $array['actions'][] = array(

@@ -190,68 +190,45 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             header: _('seofilter_field_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 70
+            width: 50
         }, {
             header: _('seofilter_field_name'),
             dataIndex: 'name',
             sortable: true,
-            width: 150,
-        // }, {
-        //     header: _('seofilter_field_page'),
-        //     dataIndex: 'page',
-        //     renderer: SeoFilter.utils.renderResource,
-        //     sortable: true,
-        //     width: 150,
-        // }, {
-        //     header: _('seofilter_field_pages'),
-        //     dataIndex: 'pages',
-        //     sortable: true,
-        //     width: 150,
+            width: 140,
         }, {
             header: _('seofilter_field_class'),
             dataIndex: 'class',
             sortable: true,
-            width: 150,
+            width: 140,
         }, {
             header: _('seofilter_field_key'),
             dataIndex: 'key',
             sortable: true,
-            width: 150,
+            width: 140,
         }, {
             header: _('seofilter_field_alias'),
             dataIndex: 'alias',
             sortable: true,
-            width: 150,
-        //}, {
-        //     header: _('seofilter_field_translit'),
-        //     dataIndex: 'translit',
-        //     renderer: SeoFilter.utils.renderBoolean,
-        //     sortable: false,
-        //     width: 75,
-        // }, {
-        //     header: _('seofilter_field_baseparam'),
-        //     dataIndex: 'baseparam',
-        //     renderer: SeoFilter.utils.renderBoolean,
-        //     sortable: false,
-        //     width: 75,
+            width: 140,
         }, {
             header: _('seofilter_field_hideparam'),
             dataIndex: 'hideparam',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
-            width: 75
+            width: 50
         }, {
             header: _('seofilter_field_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
-            width: 75,
+            width: 50,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
             sortable: false,
-            width: 100,
+            width: 90,
             id: 'actions'
         }];
     },

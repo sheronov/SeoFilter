@@ -28,6 +28,8 @@ class SeoFilter
         );
         $actionUrl = $assetsUrl . 'action.php';
         $connectorUrl = $assetsUrl . 'connector.php';
+        $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
+        $replace = $this->modx->getOption('seofilter_replace', null, 1, true);
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
         $redirect  = $this->modx->getOption('seofilter_redirect', null, 1, true);
         $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
@@ -41,7 +43,7 @@ class SeoFilter
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
         $text = $this->modx->getOption('seofilter_text', null, '', true);
         $content= $this->modx->getOption('seofilter_content', null, 'content', true);
-        $pagetpl = $this->modx->getOption('seofilter_pagetpl',null,'@INLINE [[%seofilter_page]] [[+page]] [[%seofilter_from]] [[+pageCount]]',true);
+        $pagetpl = $this->modx->getOption('seofilter_pagetpl',null,'@INLINE / [[%seofilter_page]] [[+page]]',true);
 
         $count_childrens = $this->modx->getOption('seofilter_count',null,0,true);
         $count_choose = $this->modx->getOption('seofilter_choose',null,'',true);
@@ -80,6 +82,8 @@ class SeoFilter
             'processorsPath' => $corePath . 'processors/',
 
             'params' => array(),
+            'ajax' => $ajax,
+            'replace' => $replace,
             'separator' => $separator,
             'redirect' => $redirect,
             'site_start' => $site_start,
@@ -131,40 +135,44 @@ class SeoFilter
         $this->config = array_merge($this->config, $scriptProperties);
         $this->config['ctx'] = $ctx;
 
-        $config = $this->makePlaceholders($this->config);
-        if ($js = trim($this->modx->getOption('seofilter_frontend_js',null,$this->config['jsUrl'].'web/default.js',true))) {
-            $this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
+        if($this->config['ajax']) {
+            $config = $this->makePlaceholders($this->config);
+            if ($js = trim($this->modx->getOption('seofilter_frontend_js', null, $this->config['jsUrl'] . 'web/default.js', true))) {
+                $this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
 
-            if($this->config['page']) {
-                $aliases = $this->fieldsAliases($this->config['page'],1);
-                $this->config['aliases'] = $aliases;
-                $this->config['url'] = $this->modx->makeUrl($this->config['page'],$ctx,'','full');
+                if ($this->config['page']) {
+                    $aliases = $this->fieldsAliases($this->config['page'], 1);
+                    $this->config['aliases'] = $aliases;
+                    $this->config['url'] = $this->modx->makeUrl($this->config['page'], $ctx, '', 'full');
+                }
+
+
+                $data = json_encode(array(
+                    'jsUrl' => $this->config['jsUrl'] . 'web/',
+                    'actionUrl' => $this->config['actionUrl'],
+                    'ctx' => $ctx,
+                    'page' => $this->config['page'],
+                    'params' => $this->config['params'],
+                    'aliases' => $this->config['aliases'],
+                    'separator' => $this->config['separator'],
+                    'redirect' => $this->config['redirect'],
+                    'url' => $this->config['url'],
+                    //'pagetpl' => str_replace(array('[[+', ']]', '{$'), array('{', '}', '{'), $this->pdo->getChunk($this->config['pagetpl'])),
+                    'replacebefore' => $this->config['replacebefore'],
+                    'replaceseparator' => $this->config['replaceseparator'],
+                    'jtitle' => $this->config['jtitle'],
+                    'jdescription' => $this->config['jdescription'],
+                    'jintrotext' => $this->config['jintrotext'],
+                    'jh1' => $this->config['jh1'],
+                    'jh2' => $this->config['jh2'],
+                    'jtext' => $this->config['jtext'],
+                    'jcontent' => $this->config['jcontent'],
+                ), true);
+
+                $this->modx->regClientStartupScript(
+                    '<script type="text/javascript">seoFilterConfig = ' . $data . ';</script>', true
+                );
             }
-
-            $data = json_encode(array(
-                'jsUrl' => $this->config['jsUrl'] . 'web/',
-                'actionUrl' => $this->config['actionUrl'],
-                'ctx' => $ctx,
-                'page' => $this->config['page'],
-                'params' => $this->config['params'],
-                'aliases' => $this->config['aliases'],
-                'separator' => $this->config['separator'],
-                'redirect' => $this->config['redirect'],
-                'url' => $this->config['url'],
-                'pagetpl' => str_replace(array('[[+', ']]', '{$'), array('{', '}', '{'), $this->pdo->getChunk($this->config['pagetpl'])),
-                'replacebefore' => $this->config['replacebefore'],
-                'replaceseparator' => $this->config['replaceseparator'],
-                'jtitle' => $this->config['jtitle'],
-                'jdescription' => $this->config['jdescription'],
-                'jintrotext' => $this->config['jintrotext'],
-                'jh1' => $this->config['jh1'],
-                'jh2' => $this->config['jh2'],
-                'jtext' => $this->config['jtext'],
-                'jcontent' => $this->config['jcontent'],
-            ), true);
-            $this->modx->regClientStartupScript(
-                '<script type="text/javascript">seoFilterConfig = ' . $data . ';</script>', true
-            );
         }
         $this->initialized[$ctx] = true;
         return true;
@@ -233,9 +241,6 @@ class SeoFilter
         if($page) {
             $q->where(array('active'=>1, 'page' => $page));
         }
-//        if($rule_id) {
-//            $q->where(array('id'=>$rule_id));
-//        }
         $q->select('id,base');
         if($q->prepare() && $q->stmt->execute()) {
             $fields = $delfields = array();
@@ -251,7 +256,6 @@ class SeoFilter
                     $q->limit(1);
                 }
 
-                //$q->groupby('multi_id');
                     $q->select('field_id');
                     $fcount = $this->modx->getCount('sfFieldIds',$q);
                     if ($q->prepare() && $q->stmt->execute()) {
@@ -268,8 +272,6 @@ class SeoFilter
                 //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($fields,1));
             }
             $fields = array_diff($fields,$delfields);
-            //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($fields,1));
-            //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($delfields,1));
             if(count($fields)) {
                 $q = $this->modx->newQuery('sfField');
                 $q->limit(0);
@@ -328,7 +330,6 @@ class SeoFilter
     }
 
     public function process($action, $data = array()) {
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($data,1));
         $diff = array();
         $params = $copyparams = $data['data'];
         $pageId = $data['pageId'];
@@ -343,7 +344,6 @@ class SeoFilter
             $params = array_intersect_key($params,$copyparams);
         }
         //нахождение первичного параметра
-        //$this->modx->log(modX::LOG_LEVEL_ERROR, 'SEOFilter: params  ' . print_r($params, 1));
 
         switch ($action) {
             case 'getmeta':
@@ -390,58 +390,6 @@ class SeoFilter
                     } else {
                         $diff = array_merge($diff,array_merge($base_params,$diff_params));
                     }
-//DEPRECATED CODE
-//
-//                    $params = $copyparams = $data['data'];
-//                    $all_aliases = $this->fieldsAliases($pageId,0,count(array_diff_key($params,array_flip($base_get))));
-//
-//                    $diff2 = array_flip(array_diff(array_keys($params),$all_aliases));
-//
-//
-//                    $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter $all_aliases: '. print_r($all_aliases,1));
-//
-//
-//                    if(count($diff2)) {
-//                        foreach($diff2 as $dif => $dff) {
-//                            unset($copyparams[$dif]);
-//                        }
-//                        $diff2 = array_diff_key($params,$copyparams);
-//                        $params = array_intersect_key($params,$copyparams);
-//                    }
-//                    $real_diff = array_diff(array_keys($diff2),$base_get);
-//                    $diff = $diff2;
-////                    $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter: realdiff '. print_r($real_diff,1));
-////                    $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter: diff '. print_r($diff,1));
-////                    $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFilter: params '. print_r($params,1));
-//
-//
-//                    if(count($params)) {
-//                        $params_keys = array_keys($params);
-//                        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($params,1));
-//                        //$rule_id = $this->findRule($params_keys,$pageId);
-//
-//                        if($rule_id) {
-//                            $rule_array = $this->pdo->getArray('sfRule',$rule_id);
-//                            $rule_base = $rule_array['base'];
-//                            if((count($real_diff) && $rule_base) || !count($real_diff)) {
-//                                $meta = $this->getRuleMeta($params,$rule_id,$pageId,1);
-//                                if(count($meta['diff'])) {
-//                                    $diff = array_merge($diff,$meta['diff']);
-//                                }
-//                                $meta['find'] = $find = 1;
-//
-//                            } else {
-//                                $meta['find'] = $find = 0;
-//                                $diff = $data['data'];
-//                            }
-//                           // $this->modx->log(modx::LOG_LEVEL_ERROR, print_r($meta,1));
-//                        } else {
-//
-//                            //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($diff,1));
-//                            //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($params,1));
-//                            $diff = array_merge($diff,$params);
-//                        }
-//                    }
                 }
                 if(!$find) {
                     $meta = $this->getPageMeta($pageId);
@@ -519,7 +467,6 @@ class SeoFilter
 
         $page_aliases = $this->pageAliases($page_id,array_keys($first_params));
 
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER: '.print_r($page_aliases,1));
         foreach($page_aliases as $rule => $ralias) {
             $sort = $ralias['sort'];
             $base = $ralias['base'];
@@ -535,8 +482,6 @@ class SeoFilter
 
         $count = count($rule_aliases);
 
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, $rule_id.' SEOFILTER params: '.print_r($params,1));
-
         foreach($rule_aliases as $rule=>$rarray) {
             $fields = $rarray['fields'];
             if($rarray['base']) {
@@ -544,112 +489,59 @@ class SeoFilter
                    continue;
                 }
             } else {
-                if(count($params_keys) != count($rarray['field'])) {
-                    if(count(array_diff($params_keys,array_keys($fields)))) {
-                        continue;
-                    }
+                if(count($params_keys) != count(array_keys($fields))) {
+                    continue;
+                }
+                if(count(array_diff(array_keys($fields),$params_keys))) {
+                    continue;
                 }
             }
             if(count($fields) > $rid_count) {
-                $check = 1;
+                $check = 0;
                 foreach ($fields as $alias => $row) {
+                    if(!in_array($alias,$params_keys)) {
+                        continue;
+                    }
                     if($row['where'] && $row['compare']) {
                         $value = $row['value'];
                         $values = explode(',', $value);
-                        $check = 0; //прошёл проверку
                         $get_param = $params[$alias];
                         switch ($row['compare']) { //Обратный механизм поиска
                             case 1:
                                 if(in_array($get_param,$values))
-                                    $check = 1;
+                                    $check++;
                                 break;
                             case 2:
                                 if(!in_array($get_param,$values))
-                                    $check = 1;
+                                    $check++;
                                 break;
                             case 3:
                                 if($get_param < $value)
-                                    $check = 1;
+                                    $check++;
                                 break;
                             case 4:
                                 if($get_param < $value)
-                                    $check = 1;
+                                    $check++;
                                 break;
                             case 5:
                                 if($get_param > $values[0] && $get_param < $values[1])
-                                    $check = 1;
+                                    $check++;
                                 break;
                         }
 
+                    } else {
+                        $check++;
                     }
                 }
-                if($check) {
+                if($check == count($fields)) {
                     $rid_count = count($fields);
                     $rule_id = $rule;
+                } else {
+                    $rid_count = $rule_id = 0;
                 }
             }
         }
 
-//        foreach($rule_aliases as $rule=>$rarray) {
-//            if($rarray['base']) {
-//                if(!count(array_diff($rarray['fields'],$params_keys))) {
-//                    if(count($rarray['fields']) > $rid_count) {
-//                        $rid_count = count($rarray['fields']);
-//                        $rule_id = $rule;
-//                    }
-//                   // break;
-//                }
-//            } else {
-//                if(count($params_keys) == count($rarray['field'])) {
-//                    if(!count(array_diff($params_keys,$rarray['fields']))) {
-//                        if(count($rarray['fields']) > $rid_count) {
-//                            $rid_count = count($rarray['fields']);
-//                            $rule_id = $rule;
-//                        }
-//                       // break;
-//                    }
-//                }
-//            }
-//        }
-
-        //$this->modx->log(modx::LOG_LEVEL_ERROR, $rule_id.' SEOFILTER 3: '.print_r($rule_aliases,1));
-
-
-//        if(!$rule_id = $this->findRule(array_merge(array_keys($first_params),array_keys($other_params)),$page_id)) {
-//            foreach ($first_params as $param => $value) {
-//                if($rule_id = $this->findRule(array_merge(array($param),array_keys($other_params)),$page_id)) {
-//                   $rule_array = $this->pdo->getArray('sfRule',array('id'=>$rule_id));
-//                   if($rule_array['base']) {
-//                       $find[$rule_id] = $rule_array;
-//                   } else {
-//                       $rule_id = 0;
-//                   }
-//                }
-//            }
-//            if(!$rule_id) {
-//                foreach ($first_params as $param => $value) {
-//                    if($rule_id = $this->findRule(array($param),$page_id)) {
-//                        $rule_array = $this->pdo->getArray('sfRule',array('id'=>$rule_id));
-//                        if($rule_array['base']) {
-//                            $find[$rule_id] = $rule_array;
-//                        } else {
-//                            $rule_id = 0;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-//        if(count($find)) {
-//            usort($find, function ($a, $b) {
-//                if ($a['rank'] === $b['rank'])
-//                    return 0;
-//                return $a['rank'] > $b['rank'] ? 1 : -1;
-//            });
-//            $rule_id = $find[0]['id'];
-//        }
-
- //       $this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER find: '.print_r($find,1));
 
         return $rule_id;
     }
@@ -951,20 +843,6 @@ class SeoFilter
                 }
 
                 foreach(array('max'=>'DESC','min'=>'ASC') as $m=>$sort) {
-//                    $q = $this->modx->newQuery('msProduct');
-//                    $q->innerJoin('msProductData','msProductData','msProduct.id = msProductData.id');
-//
-//                    $q->where($where);
-//                    $q->limit(1);
-//                    $q->select($count_select);
-//                    $q->sortby($choose,$sort);
-//                    if($q->prepare() && $q->stmt->execute()) {
-//                        if($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-//                            foreach ($row as $key => $value) {
-//                                $min_max_array[$m . '_' . $choose_alias . '_' . $key] = $value;
-//                            }
-//                        }
-//                    }
                     if($m == 'min') {
                         $where = array_merge($where,array($sortby.':>'=>0));
                     }
@@ -994,7 +872,6 @@ class SeoFilter
 
             return $min_max_array;
         } else {
-            //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($where,1));
 
             $this->pdo->setConfig(array(
                 'showLog' => 0,
@@ -1181,7 +1058,9 @@ class SeoFilter
     }
 
 
-
+    /**
+     * DEPRECATED METHOD
+     */
     public function fieldUrl($value = '', $field = array()) {
         if(!$alias = $field['alias']) {
             $alias = $field['key'];
@@ -1213,19 +1092,6 @@ class SeoFilter
                         }
                         $this->addUrlCount($url_array['id'], $ajax);
                     } else {
-//                        $total = 1;
-//                        $count = count($aliases);
-//                        $aliases = array_intersect_key($params,$aliases);
-//                        foreach($aliases as $param => $alias) {
-//                            if($total == 1) {
-//                                $url['url'] .= '?';
-//                            }
-//                            $url['url'] .= $param.'='.$alias;
-//                            if($total != $count) {
-//                                $url['url'] .= '&';
-//                            }
-//                            $total++;
-//                        }
                         $url['custom'] = $url_array['custom'];
                         $url['id'] = $url_array['id'];
                         $url['nourl'] = 1;

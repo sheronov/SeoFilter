@@ -61,16 +61,6 @@ class sfFieldGetListProcessor extends modObjectGetListProcessor
 
         $array = $object->toArray();
 
-//        $array['pagetitle'] = '';
-//        if ($page = $array['page']) {
-//            $q = $this->modx->newQuery('modResource', array('id' => $page));
-//            $q->select('pagetitle');
-//            $q->limit(1);
-//            if ($q->prepare() && $q->stmt->execute()) {
-//                $array['pagetitle'] = $q->stmt->fetch(PDO::FETCH_COLUMN);
-//            }
-//        }
-
         $array['actions'] = array();
 
         // Edit

@@ -4,9 +4,7 @@ SeoFilter
 Author: Evgeniy Sheronov <webrush@bk.ru>
 --------------------
 
-SeoFilter for Minishop2 & mSearch2 on MODx Revolution.
+SeoFilter for Minishop2 & mSearch2 and not only for MODX Revolution.
+https://modx.pro/components/12921-the-announcement-seofilter-ncseo-for-mfilter2-and-not-only/
 
-Feel free to suggest ideas/improvements/bugs on GitHub:
-http://github.com/justtop1/SeoFilter/issues
-
-WebSite: http://webrush.ru/
+Link for Full Documentation in next release.

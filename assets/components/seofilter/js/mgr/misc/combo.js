@@ -102,11 +102,6 @@ SeoFilter.combo.Class = function (config) {
         mode: 'local',
         forceSelection: false,
 
-        // url: SeoFilter.config.connector_url,
-        // baseParams: {
-        //     action: 'mgr/system/getlist',
-        //     combo: true
-        // }
     });
     SeoFilter.combo.Class.superclass.constructor.call(this, config);
 };
@@ -143,12 +138,6 @@ SeoFilter.combo.Compare = function (config) {
         hideMode: 'offsets',
         mode: 'local',
         forceSelection: false,
-
-        // url: SeoFilter.config.connector_url,
-        // baseParams: {
-        //     action: 'mgr/system/getlist',
-        //     combo: true
-        // }
     });
     SeoFilter.combo.Compare.superclass.constructor.call(this, config);
 };

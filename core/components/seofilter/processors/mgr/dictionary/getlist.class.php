@@ -80,28 +80,6 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             'button' => true,
             'menu' => true,
         );
-//
-//        if (!$array['active']) {
-//            $array['actions'][] = array(
-//                'cls' => '',
-//                'icon' => 'icon icon-power-off action-green',
-//                'title' => $this->modx->lexicon('seofilter_dictionary_enable'),
-//                'multiple' => $this->modx->lexicon('seofilter_dictionary_enable'),
-//                'action' => 'enableField',
-//                'button' => true,
-//                'menu' => true,
-//            );
-//        } else {
-//            $array['actions'][] = array(
-//                'cls' => '',
-//                'icon' => 'icon icon-power-off action-gray',
-//                'title' => $this->modx->lexicon('seofilter_dictionary_disable'),
-//                'multiple' => $this->modx->lexicon('seofilter_dictionary_disable'),
-//                'action' => 'disableField',
-//                'button' => true,
-//                'menu' => true,
-//            );
-//        }
 
         // Remove
         $array['actions'][] = array(

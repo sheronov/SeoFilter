@@ -191,7 +191,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             header: _('seofilter_url_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 70
+            width: 50
         }, {
             header: _('seofilter_url_multi_id'),
             dataIndex: 'name',
@@ -274,7 +274,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             {
                 xtype: 'seofilter-combo-rule'
                 ,id: 'tbar-seofilter-combo-rule'
-                ,width: 150
+                ,width: 200
                 ,addall: true
                 ,emptyText: _('seofilter_filter_rule')
                 ,listeners: {
@@ -289,42 +289,25 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                 ,listeners: {
                     select: {
                         fn: function (ele, rec, idx) {
-                            //console.log(ele,rec,idx);
                             this.filterByField(ele);
-                            var words = Ext.getCmp('tbar-seofilter-combo-word');
-                            Ext.state.Manager.set('tbar-seofilter-combo-field', ele.value);
-                            //this.switchStateComboPreset(presets);
-                            words.baseParams.field = ele.getValue();
-                            words.reload();
-                            //words.setValue('');
-
+                            //var words = Ext.getCmp('tbar-seofilter-combo-word');
+                            //Ext.state.Manager.set('tbar-seofilter-combo-field', ele.value);
+                           // words.baseParams.field = ele.getValue();
+                            //words.reload();
                         }, scope: this
                     }
                 }
-            },{
-                xtype: 'seofilter-combo-word'
-                ,id: 'tbar-seofilter-combo-word'
-                ,width: 150
-                ,addall: true
-                ,emptyText: _('seofilter_combo_select')
-                ,listeners: {
-                    select: {fn: this.filterByWord, scope:this}
-                }
-                ,field:  Ext.getCmp('tbar-seofilter-combo-field') ? Ext.getCmp('tbar-seofilter-combo-field').getValue() : (Ext.state.Manager.get('tbar-seofilter-combo-field') ? Ext.state.Manager.get('tbar-seofilter-combo-field') : 0)
             // },{
-            //     xtype: 'seofilter-combo-resource'
-            //     ,id: 'tbar-seofilter-combo-resource'
+            //     xtype: 'seofilter-combo-word'
+            //     ,id: 'tbar-seofilter-combo-word'
             //     ,width: 150
             //     ,addall: true
-            //     ,emptyText: _('seofilter_filter_resource_or')
+            //     ,emptyText: _('seofilter_combo_select')
             //     ,listeners: {
-            //         select: {fn: this.filterByResource, scope:this}
+            //         select: {fn: this.filterByWord, scope:this}
             //     }
-            //     ,baseParams: {
-            //         action: 'mgr/system/getlist',
-            //         combo: true,
-            //         rules: true,
-            //     }
+            //     ,field:  Ext.getCmp('tbar-seofilter-combo-field') ? Ext.getCmp('tbar-seofilter-combo-field').getValue() : (Ext.state.Manager.get('tbar-seofilter-combo-field') ? Ext.state.Manager.get('tbar-seofilter-combo-field') : 0)
+
             },{
                 xtype: 'button'
                 ,id: 'seofilter-filters-clear'
@@ -401,8 +384,8 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         s.baseParams['rule'] = '';
        // s.baseParams['page'] = '';
         s.baseParams['field'] = '';
-        s.baseParams['word'] = '';
-        Ext.getCmp('tbar-seofilter-combo-word').setValue('');
+        //s.baseParams['word'] = '';
+       // Ext.getCmp('tbar-seofilter-combo-word').setValue('');
         Ext.getCmp('tbar-seofilter-combo-rule').setValue('');
        // Ext.getCmp('tbar-seofilter-combo-resource').setValue('');
         Ext.getCmp('tbar-seofilter-combo-field').setValue('');

@@ -26,11 +26,11 @@ $tmp = array(
         'value' => true,
         'area' => 'seofilter_main',
     ),
-    'replace' => array(
-        'xtype' => 'combo-boolean',
-        'value' => true,
-        'area' => 'seofilter_main',
-    ),
+//    'replace' => array(
+//        'xtype' => 'combo-boolean',
+//        'value' => true,
+//        'area' => 'seofilter_main',
+//    ),
     'decline' => array(
         'xtype' => 'combo-boolean',
         'value' => false,
@@ -111,24 +111,24 @@ $tmp = array(
         'value' => 'content',
         'area' => 'seofilter_seo',
     ),
-    'pagetpl' => array(
-        'xtype' => 'textfield',
-        'value' => '@INLINE [[%seofilter_page]] [[+page]] [[%seofilter_from]] [[+pageCount]]',
-        'area' => 'seofilter_seo',
-    ),
-    'jtitle' => array(
-        'xtype' => 'textfield',
-        'value' => 'title',
-        'area' => 'seofilter_jquery',
-    ),
+//    'pagetpl' => array(
+//        'xtype' => 'textfield',
+//        'value' => '@INLINE / [[%seofilter_page]] [[+page]]',
+//        'area' => 'seofilter_seo',
+//    ),
     'replacebefore' => array(
         'xtype' => 'combo-boolean',
-        'value' => true,
+        'value' => false,
         'area' => 'seofilter_jquery',
     ),
     'replaceseparator' => array(
         'xtype' => 'textfield',
         'value' => ' / ',
+        'area' => 'seofilter_jquery',
+    ),
+    'jtitle' => array(
+        'xtype' => 'textfield',
+        'value' => 'title',
         'area' => 'seofilter_jquery',
     ),
     'jdescription' => array(

@@ -92,22 +92,6 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
             }
         }
 
-//        if(($this->getProperty('hideparam') != $this->object->get('hideparam')) || ($this->getProperty('valuefirst') != $this->object->get('valuefirst'))) {
-//
-//            $this->object->set('hideparam',(int)$this->getProperty('hideparam')); //fix
-//            $this->object->set('valuefirst',(int)$this->getProperty('valuefirst')); //fix
-//            $this->object->save();
-//            if($fieldids = $this->object->getMany('Links')) {
-//                foreach ($fieldids as $fieldid) {
-//                    if ($rule = $fieldid->getOne('Rule')) {
-//                        $rule->set('url',$rule->generateUrl());
-//                        $rule->save();
-//                    }
-//                }
-//            }
-//        }
-
-
         return parent::beforeSet();
     }
 
