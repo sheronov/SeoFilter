@@ -187,7 +187,7 @@ $_lang['seofilter_fieldids_multi_id'] = 'Правило';
 $_lang['seofilter_fieldids_priority'] = 'Порядок (можно изменять в таблицы перетаскиванием полей)';
 $_lang['seofilter_fieldids_where'] = 'Условие (для создания конкретных страниц)';
 $_lang['seofilter_fieldids_compare'] = 'Операция сравнения';
-$_lang['seofilter_fieldids_value'] = 'Значение (несколько через запятую)';
+$_lang['seofilter_fieldids_value'] = 'Значение (в словаре - запросы, несколько через запятую)';
 $_lang['seofilter_fieldids_condition'] = 'Where';
 
 $_lang['seofilter_fieldids_update'] = 'Изменить условия';
