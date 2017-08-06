@@ -124,7 +124,7 @@ if (!function_exists('downloadPackage')) {
 }
 
 $packages = array(
-    'pdoTools' => '2.3.2-pl',
+    'pdoTools' => '2.5.4-pl',
 );
 $success = false;
 

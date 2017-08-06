@@ -16,11 +16,11 @@ $tmp = array(
         'value' => 'price,page,limit,tpl,sort',
         'area' => 'seofilter_main',
     ),
-    'redirect' => array(
-        'xtype' => 'combo-boolean',
-        'value' => true,
-        'area' => 'seofilter_main',
-    ),
+//    'redirect' => array(
+//        'xtype' => 'combo-boolean',
+//        'value' => true,
+//        'area' => 'seofilter_main',
+//    ),
     'ajax' => array(
         'xtype' => 'combo-boolean',
         'value' => true,
@@ -59,12 +59,12 @@ $tmp = array(
     'count' => array(
         'xtype' => 'combo-boolean',
         'value' => false,
-        'area' => 'seofilter_main',
+        'area' => 'seofilter_count',
     ),
     'choose' => array(
         'xtype' => 'textfield',
         'value' => '',
-        'area' => 'seofilter_main',
+        'area' => 'seofilter_count',
     ),
     'snippet' => array(
         'xtype' => 'textfield',
@@ -74,7 +74,7 @@ $tmp = array(
     'select' => array(
         'xtype' => 'textfield',
         'value' => '',
-        'area' => 'seofilter_main',
+        'area' => 'seofilter_count',
     ),
     'title' => array(
         'xtype' => 'textfield',

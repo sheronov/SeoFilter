@@ -165,18 +165,6 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                         id: config.id + '-alias',
                         description: '{$alias}',
                         anchor: '99%',
-                    // },{
-                    //     xtype: 'textfield',
-                    //     fieldLabel: _('seofilter_dictionary_class'),
-                    //     name: 'class',
-                    //     id: config.id + '-class',
-                    //     anchor: '99%',
-                    // }, {
-                    //     xtype: 'textfield',
-                    //     fieldLabel: _('seofilter_dictionary_key'),
-                    //     name: 'key',
-                    //     id: config.id + '-key',
-                    //     anchor: '99%',
                     }
                 ]
             }]
@@ -206,20 +194,6 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                     //     id: config.id + '-value_i',
                     //     anchor: '99%',
                     // },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_dictionary_value_to'),
-                        description: '{$value_to}',
-                        name: 'value_to',
-                        id: config.id + '-value_to',
-                        anchor: '99%',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_dictionary_value_in'),
-                        description: '{$value_in}',
-                        name: 'value_in',
-                        id: config.id + '-value_in',
-                        anchor: '99%',
-                    },{
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_dictionary_value_r'),
                         description: '{$value_r}',
@@ -261,6 +235,20 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                         name: 'value_o',
                         id: config.id + '-value_o',
                         anchor: '99%',
+                        }, {
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_in'),
+                        description: '{$value_in}',
+                        name: 'value_in',
+                        id: config.id + '-value_in',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_to'),
+                        description: '{$value_to}',
+                        name: 'value_to',
+                        id: config.id + '-value_to',
+                        anchor: '99%',
                     }
                 ]
             }, {
@@ -269,13 +257,6 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                 , defaults: {msgTarget: 'under'}
                 , border: false
                 , items: [{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_dictionary_value_from'),
-                        name: 'value_from',
-                        description: '{$value_from}',
-                        id: config.id + '-value_from',
-                        anchor: '99%',
-                    },{
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_dictionary_m_value_i'),
                         name: 'm_value_i',
@@ -317,12 +298,19 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                         description: '{$m_value_p}',
                         id: config.id + '-m_value_p',
                         anchor: '99%',
-                    },{
+                        }, {
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_dictionary_m_value_o'),
                         name: 'm_value_o',
                         description: '{$m_value_o}',
                         id: config.id + '-m_value_o',
+                        anchor: '99%',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_dictionary_value_from'),
+                        name: 'value_from',
+                        description: '{$value_from}',
+                        id: config.id + '-value_from',
                         anchor: '99%',
                     }
                 ]

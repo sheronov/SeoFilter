@@ -31,7 +31,6 @@ switch ($modx->event->name) {
         if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
 
         $r_array = $resource->toArray();
-
         $fields = $pdo->getCollection('sfField');
         foreach($fields as $field) {
             $key = $field['key'];
@@ -39,6 +38,8 @@ switch ($modx->event->name) {
             switch ($field['class']) {
                 case 'msProductOption':
                     $input = $r_array['options'][$key];
+                    if(!$input)
+                        $input = $r_array[$key];
                     break;
                 case 'msProductData':
                 case 'modResource':
@@ -229,7 +230,6 @@ switch ($modx->event->name) {
                     }
                 }
             }
-
         }
         break;
 }

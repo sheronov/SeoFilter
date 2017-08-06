@@ -86,7 +86,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                 $addurl = $array['old_url'];
             }
 
-            $array['url_preview'] = $this->modx->makeUrl($array['page_id']).$addurl;
+            $array['url_preview'] = $this->modx->makeUrl($array['page_id'],'','','full').$addurl;
 
             if(!$array['active']) {
                 $addurl = array();
@@ -103,7 +103,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                     }
                 }
                 if(count($addurl)) {
-                    $array['url_preview'] = $this->modx->makeUrl($array['page_id']) . '?' . implode('&', $addurl);
+                    $array['url_preview'] = $this->modx->makeUrl($array['page_id'],'','','full') . '?' . implode('&', $addurl);
                 }
                // $this->modx->log(modX::LOG_LEVEL_ERROR,print_r($addurl,1));
             }

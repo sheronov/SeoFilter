@@ -3,6 +3,7 @@
 $_lang['area_seofilter_main'] = 'Основные';
 $_lang['area_seofilter_seo'] = 'Поля для подстановки по умолчанию';
 $_lang['area_seofilter_jquery'] = 'jQuery селекторы для подстановки через AJAX';
+$_lang['area_seofilter_count'] = 'Подсчёты и выборки';
 
 
 $_lang['setting_seofilter_ajax'] = 'Изменять теги, заголовки через AJAX';
@@ -27,10 +28,10 @@ $_lang['setting_seofilter_base_get_desc'] = 'GET-параметры, не вли
 
 $_lang['setting_seofilter_count'] = 'Подсчитывать потомков';
 $_lang['setting_seofilter_count_desc'] = 'По умолчанию нет. Если да, то будет доступен плейсхолдер {$count} в SEO шаблонах';
-$_lang['setting_seofilter_choose'] = 'Отдельные выборки по ключам';
-$_lang['setting_seofilter_choose_desc'] = 'Можно указать несколько значений, через запятую, например: "price". Перемножит на настройку выбранных полей ресурса. Для использования в SEO шаблонах';
+$_lang['setting_seofilter_choose'] = 'Выборки по полям ресурса';
+$_lang['setting_seofilter_choose_desc'] = 'Например: "msProductData.price". Несколько значений, через запятую. Перемножится как {choose} с полями из select и образует: min_price_{select}, max_price_{select}. Синонимы через "=", например "msProductData.old_price=op"';
 $_lang['setting_seofilter_select'] = 'Какие поля ресурса выбирать';
-$_lang['setting_seofilter_select_desc'] = 'Например: "msProduct.id,msProductData.price", Доступный поля msProduct и msProductData. Образуют плейсхолдеры: min_price_id, min_price_price, max_price_id,max_price_price и т.д.';
+$_lang['setting_seofilter_select_desc'] = 'Например: "id,msProductData.price". Образуют плейсхолдеры: min_{choose}_id, min_{choose}_price, max_{choose}_price и т.д. Допустимы синонимы "msProductData.old_price as old"';
 
 $_lang['setting_seofilter_templates'] = 'Шаблоны ресурсов для отслеживания';
 $_lang['setting_seofilter_templates_desc'] = 'Для работы плагина по добавлению значений в SEO словарь после сохранения ресурса';

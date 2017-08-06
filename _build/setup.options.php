@@ -33,10 +33,10 @@ $output = '';
 if (!$exists) {
     switch ($modx->getOption('manager_language')) {
         case 'ru':
-            $output = 'Этот компонент требует <b>pdoTools</b> для быстрой работы сниппетов.<br/>Он будет автоматически скачан и установлен.';
+            $output = 'Этот компонент требует <b>pdoTools</b> для работы!.<br/>Он будет автоматически скачан и установлен.';
             break;
         default:
-            $output = 'This component requires <b>pdoTools</b> for fast work of snippets.<br/><br/>It will be downloaded and installed automatically.';
+            $output = 'This component requires <b>pdoTools</b> for normal work!<br/><br/>It will be downloaded and installed automatically.';
     }
 }
 

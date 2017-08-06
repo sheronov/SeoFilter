@@ -8,6 +8,7 @@ if (file_exists(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/index.
 else {
     require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/index.php';
 }
+$response = array();
 $modx->getService('error', 'error.modError');
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');
@@ -27,8 +28,9 @@ $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofi
 if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') {
     $modx->sendRedirect($modx->makeUrl($modx->getOption('site_start'), '', '', 'full'));
 } elseif (empty($_REQUEST['sf_action'])) {
-    echo $SeoFilter->error('sf_err_action_ns');
+    $response =  $SeoFilter->error('sf_err_action_ns');
 } else {
-    echo $SeoFilter->process($_REQUEST['sf_action'], $_REQUEST);
+    $response =  $SeoFilter->process($_REQUEST['sf_action'], $_REQUEST);
 }
-@session_write_close();
+//@session_write_close();
+exit($response);

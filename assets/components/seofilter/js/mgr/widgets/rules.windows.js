@@ -34,7 +34,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 title: _('seofilter_rule')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
-                ,bodyStyle: 'margin-top:-10px;padding-bottom:5px;'
+                ,bodyStyle: 'padding-bottom:5px;'
                 ,border:false
                 ,items: [{
                     xtype: 'textfield',
@@ -115,7 +115,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 ,hideMode: 'offsets'
                 ,layout: 'form'
                 ,border:false
-                ,style: 'margin-top:-10px;padding-bottom:5px;'
+                ,style: 'padding-bottom:5px;'
                 ,items: [{
                     html: _('seofilter_multiseo_intro'),
                     cls: 'panel-desc',
@@ -220,7 +220,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                 title: _('seofilter_rule')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
-                ,bodyStyle: 'margin-top:-10px;padding-bottom:5px;'
+                ,bodyStyle: 'padding-bottom:5px;'
                 ,border:false
                 ,items: [{
                         xtype: 'hidden',
@@ -304,7 +304,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                 ,hideMode: 'offsets'
                 ,layout: 'form'
                 ,border:false
-                ,style: 'margin-top:-10px;padding-bottom:5px;'
+                ,style: 'padding-bottom:5px;'
                 ,items: [{
                     html: _('seofilter_multiseo_intro'),
                     cls: 'panel-desc',

@@ -2,7 +2,7 @@
 include_once 'setting.inc.php';
 
 $_lang['seofilter'] = 'SeoFilter';
-$_lang['seofilter_menu_desc'] = 'Управление ЧПУ и SEO для mFilter2';
+$_lang['seofilter_menu_desc'] = 'Управление ЧПУ и SEO для фильтров';
 $_lang['seofilter_intro_msg'] = 'Вы можете выделять сразу несколько предметов при помощи Shift или Ctrl.';
 
 
@@ -33,7 +33,7 @@ $_lang['seofilter_field_page'] = 'Страница';
 $_lang['seofilter_field_pages'] = 'Страницы';
 $_lang['seofilter_field_pages_more'] = 'ID страниц (несколько через запятую)';
 $_lang['seofilter_field_class'] = 'Класс';
-$_lang['seofilter_field_class_more'] = 'Выберите класс (или впишите свой)';
+$_lang['seofilter_field_class_more'] = 'Выберите класс';
 $_lang['seofilter_field_key'] = 'Ключ';
 $_lang['seofilter_field_alias'] = 'Синоним';
 $_lang['seofilter_field_dont'] = 'Не обрабатывать';
