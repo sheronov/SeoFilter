@@ -23,7 +23,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
 
     getFields: function (config) {
         var xtype_count = 'hidden';
-        if(SeoFilter.config.count_childrens) {
+        if(SeoFilter.config.count_childrens!=0) {
             xtype_count = 'textfield';
         }
         return {
@@ -47,14 +47,14 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     title: _('seofilter_fieldids')
                     , xtype: 'displayfield'
                     , html: _('seofilter_fieldids_after_save')
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_rule_url_more'),
-                    name: 'url',
-                    readOnly: true,
-                    style: 'background:#f9f9f9;color:#aaa;',
-                    id: config.id + '-url',
-                    anchor: '99%',
+                // }, {
+                //     xtype: 'textfield',
+                //     fieldLabel: _('seofilter_rule_url_more'),
+                //     name: 'url',
+                //     readOnly: true,
+                //     style: 'background:#f9f9f9;color:#aaa;',
+                //     id: config.id + '-url',
+                //     anchor: '99%',
                 }, {
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_rule_base_more'),
@@ -208,7 +208,7 @@ SeoFilter.window.UpdateRule = function (config) {
 Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
     getFields: function (config) {
         var xtype_count = 'hidden';
-        if(SeoFilter.config.count_childrens) {
+        if(SeoFilter.config.count_childrens!=0) {
             xtype_count = 'textfield';
         }
 
@@ -236,6 +236,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     }, {
                        title: _('seofilter_rule_fields')
                         ,xtype: 'seofilter-grid-fieldids'
+                        ,id: config.id+'_gridfield'
                         ,record: config.record.object
                     },{
                         xtype: 'textfield',

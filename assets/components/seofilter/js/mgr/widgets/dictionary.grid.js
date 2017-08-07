@@ -63,6 +63,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                 success: {
                     fn: function () {
                         this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
 
                     }, scope: this,
                 }
@@ -99,6 +100,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                                 success: {
                                     fn: function () {
                                         this.refresh();
+                                        Ext.getCmp('seofilter-grid-urls').refresh();
                                     }, scope: this
                                 }
                             }

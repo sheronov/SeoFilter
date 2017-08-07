@@ -27,6 +27,7 @@ SeoFilter.panel.Home = function (config) {
                     cls: 'panel-desc',
                 }, {
                     xtype: 'seofilter-grid-fields',
+                    id: 'seofilter-grid-fields',
                     cls: 'main-wrapper',
                 }]
             },{
@@ -37,6 +38,7 @@ SeoFilter.panel.Home = function (config) {
                     cls: 'panel-desc',
                 }, {
                     xtype: 'seofilter-grid-rules',
+                    id: 'seofilter-grid-rules',
                     cls: 'main-wrapper',
                 }]
             },{
@@ -47,6 +49,7 @@ SeoFilter.panel.Home = function (config) {
                     cls: 'panel-desc',
                 }, {
                     xtype: 'seofilter-grid-dictionaries',
+                    id: 'seofilter-grid-dictionaries',
                     cls: 'main-wrapper',
                 }]
             },{
@@ -57,6 +60,7 @@ SeoFilter.panel.Home = function (config) {
                     cls: 'panel-desc',
                 }, {
                     xtype: 'seofilter-grid-urls',
+                    id: 'seofilter-grid-urls',
                     cls: 'main-wrapper',
                 }]
             }]

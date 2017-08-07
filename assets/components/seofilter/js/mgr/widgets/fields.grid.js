@@ -63,6 +63,9 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
                 success: {
                     fn: function () {
                         this.refresh();
+                        Ext.getCmp('seofilter-grid-dictionaries').refresh();
+                        Ext.getCmp('seofilter-grid-rules').refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
                 }
             }
@@ -98,6 +101,9 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
                                 success: {
                                     fn: function () {
                                         this.refresh();
+                                        Ext.getCmp('seofilter-grid-dictionaries').refresh();
+                                        Ext.getCmp('seofilter-grid-rules').refresh();
+                                        Ext.getCmp('seofilter-grid-urls').refresh();
                                     }, scope: this
                                 }
                             }
@@ -132,6 +138,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
                 success: {
                     fn: function () {
                         this.refresh();
+                        Ext.getCmp('seofilter-grid-dictionaries').refresh();
                     }, scope: this
                 }
             }

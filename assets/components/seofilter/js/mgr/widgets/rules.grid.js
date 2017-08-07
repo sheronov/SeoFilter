@@ -63,6 +63,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
                 success: {
                     fn: function () {
                         this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
                 }
             }
@@ -90,10 +91,10 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             listeners: {
                 success: {
                     fn: function (r) {
-                        if(this.windows.updateField) {
-                            this.windows.updateField.close();
-                            this.windows.updateField.destroy();
-                        }
+                        // if(this.windows.updateField) {
+                        //     this.windows.updateField.close();
+                        //     this.windows.updateField.destroy();
+                        // }
                         this.windows.updateField = MODx.load({
                             xtype: 'seofilter-rule-window-update',
                             id: Ext.id(),
@@ -102,6 +103,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
                                 success: {
                                     fn: function () {
                                         this.refresh();
+                                        Ext.getCmp('seofilter-grid-urls').refresh();
                                     }, scope: this
                                 }
                             }
