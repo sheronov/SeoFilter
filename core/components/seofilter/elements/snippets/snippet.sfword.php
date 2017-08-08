@@ -13,7 +13,6 @@ if(isset($input) && isset($field_id)) {
     $q->select('value,alias');
     if ($q->prepare() && $q->stmt->execute()) {
         $output = $q->stmt->fetch(PDO::FETCH_ASSOC);
-
     }
     if(!$output) {
         if($field = $modx->getObject('sfField',$field_id)) {

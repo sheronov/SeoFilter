@@ -609,6 +609,9 @@ class SeoFilter
                         $word_array[$tmp_key] = $tmp_array;
                     }
                     $word_array[str_replace('value',$alias,$tmp_key)] = $tmp_array;
+                    $word_array[$alias.'_input'] = $word_array['input'];
+                    $word_array[$alias.'_alias'] = $word_array['alias'];
+                    $word_array['m_'.$alias] = $word_array['m_'.$alias.'_i'];
                 }
 
                 $aliases[$param] = $word['alias'];
@@ -676,6 +679,8 @@ class SeoFilter
         }
 
         $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new,$field_word);
+
+        $this->modx->log(modx::LOG_LEVEL_ERROR,print_r($word_array,1));
 
         if ($seo = $this->pdo->getArray('sfRule', array('id'=>$rule_id,'active'=>1))) {
 

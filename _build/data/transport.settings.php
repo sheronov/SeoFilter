@@ -93,7 +93,7 @@ $tmp = array(
     ),
     'h1' => array(
         'xtype' => 'textfield',
-        'value' => 'longtitle',
+        'value' => 'pagetitle',
         'area' => 'seofilter_seo',
     ),
     'h2' => array(
