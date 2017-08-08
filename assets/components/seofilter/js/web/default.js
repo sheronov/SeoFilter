@@ -24,9 +24,9 @@ jQuery(document).ready(function ($) {
                         var fm_link = $(document).find('.fm-seofilter');
                         if(response.data.seo_id) {
                             fm_link.attr('href',fm_link.data('url')+response.data.seo_id);
-                            $(document).find('.fm-seofilter').show();
+                            $(document).find('.fm-seofilter').removeClass('hidden');
                         } else {
-                            $(document).find('.fm-seofilter').hide();
+                            $(document).find('.fm-seofilter').addClass('hidden');
                         }
                     }
 
