@@ -680,8 +680,6 @@ class SeoFilter
 
         $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new,$field_word);
 
-        $this->modx->log(modx::LOG_LEVEL_ERROR,print_r($word_array,1));
-
         if ($seo = $this->pdo->getArray('sfRule', array('id'=>$rule_id,'active'=>1))) {
 
             if($seo['count_parents']) {

@@ -55,7 +55,13 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                 if ($q->prepare() && $q->stmt->execute()) {
                     $row = $q->stmt->fetch(PDO::FETCH_ASSOC);
                     if($row['elements']) {
-                        $pre = explode('||',$row['elements']);
+                        if(strpos($row['elements'],'||')) {
+                            $pre = array_map('trim', explode('||',$row['elements']));
+                        } elseif(strpos($row['elements'],',')) {
+                            $pre = array_map('trim', explode(',',$row['elements']));
+                        } else {
+                            $pre = array($row['elements']);
+                        }
                     }
                     if($tv_id = $row['id']) {
                         $q = $this->modx->newQuery('modTemplateVarResource');
@@ -63,7 +69,14 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         $q->select(array('DISTINCT modTemplateVarResource.value'));
                         if ($q->prepare() && $q->stmt->execute()) {
                             while($row = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
-                                $tvvalues = array_unique(array_merge($tvvalues,explode('||',$row)));
+                                if(strpos($row,'||')) {
+                                    $row_arr = array_map('trim', explode('||',$row));
+                                } elseif(strpos($row,',')) {
+                                    $row_arr = array_map('trim', explode(',',$row));
+                                } else {
+                                    $row_arr = array($row);
+                                }
+                                $tvvalues = array_unique(array_merge($tvvalues,$row_arr));
                             }
                         }
                     }
@@ -119,13 +132,22 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         if ($class == 'msVendor') {
                             $value = $input['name'];
                         }
-                        //$this->modx->log(modX::LOG_LEVEL_ERROR, print_r($input, 1));
-                        $processorProps['input'] = $input[$key];
-                        $processorProps['value'] = $value;
-                        if($input[$key] && $value) {
-                            $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                            if ($response->isError()) {
-                                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                        if(strpos($value,'||')) {
+                            $value_arr = array_map('trim', explode('||',$value));
+                        } elseif(strpos($value,',')) {
+                            $value_arr = array_map('trim', explode(',',$value));
+                        } else {
+                            $value_arr = array($value);
+                        }
+                        foreach($value_arr as $value) {
+                            //$this->modx->log(modX::LOG_LEVEL_ERROR, print_r($input, 1));
+                            $processorProps['input'] = $input[$key];
+                            $processorProps['value'] = $value;
+                            if ($input[$key] && $value) {
+                                $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                                if ($response->isError()) {
+                                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                                }
                             }
                         }
                     }
