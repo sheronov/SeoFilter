@@ -9,7 +9,6 @@ SeoFilter.window.CreateRule = function (config) {
         autoHeight: false,
         url: SeoFilter.config.connector_url,
         action: 'mgr/rule/create',
-        bodyStyle: 'padding-top:10px;',
         fields: this.getFields(config),
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
@@ -57,9 +56,9 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 //     anchor: '99%',
                 }, {
                     xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_rule_base_more'),
-                    name: 'base',
-                    id: config.id + '-base',
+                    boxLabel: _('seofilter_rule_relinks'),
+                    name: 'relinks',
+                    id: config.id + '-relinks',
                 },{
                     layout: 'column',
                     border: false,
@@ -82,6 +81,11 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 id: config.id + '-page',
                                 anchor: '99%',
                                 allowBlank: false,
+                            }, {
+                                xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_rule_base_more'),
+                                name: 'base',
+                                id: config.id + '-base',
                             }
                         ]
                     }, {
@@ -101,14 +105,14 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 name: 'rank',
                                 id: config.id + '-rank',
                                 anchor: '99%',
+                            }, {
+                                xtype: 'xcheckbox',
+                                boxLabel: _('seofilter_field_active'),
+                                name: 'active',
+                                id: config.id + '-active',
                             }
                         ]
                     }]
-                }, {
-                    xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_field_active'),
-                    name: 'active',
-                    id: config.id + '-active',
                 }]
             }, {
                 title: _('seofilter_seo')
@@ -247,10 +251,17 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                         id: config.id + '-url',
                         anchor: '99%',
                     },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_rule_link_tpl'),
+                        name: 'link_tpl',
+                        id: config.id + '-link_tpl',
+                        anchor: '99%',
+                    },{
                         xtype: 'xcheckbox',
-                        boxLabel: _('seofilter_rule_base_more'),
-                        name: 'base',
-                        id: config.id + '-base',
+                        boxLabel: _('seofilter_rule_relinks'),
+                        name: 'relinks',
+                        id: config.id + '-relinks',
+
                     },{
                         layout: 'column',
                         border: false,
@@ -273,8 +284,12 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                                     allowBlank: false,
                                     id: config.id + '-page',
                                     anchor: '99%',
-                                }
-                            ]
+                                }, {
+                                    xtype: 'xcheckbox',
+                                    boxLabel: _('seofilter_rule_base_more'),
+                                    name: 'base',
+                                    id: config.id + '-base',
+                                }]
                         }, {
                             columnWidth: .3
                             , layout: 'form'
@@ -292,13 +307,14 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                                     name: 'rank',
                                     id: config.id + '-rank',
                                     anchor: '99%',
+                                }, {
+                                    xtype: 'xcheckbox',
+                                    boxLabel: _('seofilter_field_active'),
+                                    name: 'active',
+                                    id: config.id + '-active',
                             }]
                         }]
-                    }, {
-                        xtype: 'xcheckbox',
-                        boxLabel: _('seofilter_field_active'),
-                        name: 'active',
-                        id: config.id + '-active',
+
                     }]
                 }, {
                 title: _('seofilter_seo')
@@ -372,3 +388,53 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
 });
 Ext.reg('seofilter-rule-window-update', SeoFilter.window.UpdateRule);
 
+
+SeoFilter.window.duplicateRule = function (config) {
+    config = config || {};
+
+    Ext.applyIf(config, {
+        title: _('seofilter_rule_duplicate'),
+        width: 600,
+        url: SeoFilter.config.connector_url,
+        action: 'mgr/rule/duplicate',
+        fields: this.getFields(config),
+        keys: [{
+            key: Ext.EventObject.ENTER, shift: true, fn: function () {
+                this.submit()
+            }, scope: this
+        }]
+    });
+    SeoFilter.window.duplicateRule.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.window.duplicateRule, MODx.Window, {
+    getFields: function (config) {
+        return [{
+            xtype: 'hidden',
+            anchor: '99%',
+            name: 'id',
+        }, {
+            fieldLabel: _('seofilter_rule_name'),
+            xtype: 'textfield',
+            anchor: '99%',
+            name: 'name',
+            allowBlank: false,
+        }, {
+            fieldLabel: _('seofilter_rule_page'),
+            xtype: 'seofilter-combo-resource',
+            anchor: '99%',
+            name: 'page',
+            allowBlank: false,
+        }, {
+            boxLabel: _('seofilter_rule_copy_fields'),
+            xtype: 'xcheckbox',
+            anchor: '99%',
+            name: 'copy_fields',
+        }, {
+            boxLabel: _('seofilter_rule_active'),
+            xtype: 'xcheckbox',
+            anchor: '99%',
+            name: 'active',
+        }];
+    },
+});
+Ext.reg('seofilter-window-copy-rule', SeoFilter.window.duplicateRule);

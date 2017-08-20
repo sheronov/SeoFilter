@@ -91,6 +91,13 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
             submitValue: true,
             value: config.record.id
         }, {
+            xtype: 'textfield',
+            fieldLabel: _('seofilter_url_link'),
+            name: 'link',
+            id: 'seoedit-link',
+            anchor: '99%',
+            value: config.record.link
+        },{
             layout: 'column',
             border: false,
             anchor: '100%',

@@ -50,7 +50,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         var ids = this._getSelectedIds();
 
         var row = grid.getStore().getAt(rowIndex);
-        var menu = SeoFilter.utils.getMenu(row.data['actions'], this, ids);
+        var menu = SeoFilter.utils.getMenu(row.data['menuon'].concat(row.data['actions']), this, ids);
 
         this.addContextMenuItem(menu);
     },
@@ -182,8 +182,53 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         })
     },
 
+    disableMenu: function () {
+        var ids = this._getSelectedIds();
+        if (!ids.length) {
+            return false;
+        }
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: {
+                action: 'mgr/urls/menuoff',
+                ids: Ext.util.JSON.encode(ids),
+            },
+            listeners: {
+                success: {
+                    fn: function () {
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        })
+    },
+
+
+    enableMenu: function () {
+        var ids = this._getSelectedIds();
+        if (!ids.length) {
+            return false;
+        }
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: {
+                action: 'mgr/urls/menuon',
+                ids: Ext.util.JSON.encode(ids),
+            },
+            listeners: {
+                success: {
+                    fn: function () {
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        })
+    },
+
+
+
     getFields: function () {
-        return ['id', 'multi_id', 'page_id', 'name', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','multi_name','url_preview','page','pagetitle','menu_on','menutitle','menuindex','image','link_attributes'];
+        return ['id', 'multi_id', 'page_id', 'name', 'link', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','menuon','multi_name','url_preview','page','pagetitle','menu_on','menutitle','menuindex','image','link_attributes'];
     },
 
     getColumns: function () {
@@ -192,6 +237,21 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             dataIndex: 'id',
             sortable: true,
             width: 50
+        }, {
+            header: _('seofilter_url_link'),
+            dataIndex: 'link',
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_url_old_url'),
+            dataIndex: 'old_url',
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('seofilter_url_new_url'),
+            dataIndex: 'new_url',
+            sortable: true,
+            width: 150,
         }, {
             header: _('seofilter_url_multi_id'),
             dataIndex: 'name',
@@ -203,16 +263,6 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             renderer: SeoFilter.utils.renderResource,
             sortable: true,
             width: 100,
-        }, {
-            header: _('seofilter_url_old_url'),
-            dataIndex: 'old_url',
-            sortable: true,
-            width: 150,
-        }, {
-            header: _('seofilter_url_new_url'),
-            dataIndex: 'new_url',
-            sortable: true,
-            width: 150,
         }, {
             header: _('seofilter_url_editedon'),
             dataIndex: 'editedon',
@@ -245,9 +295,14 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         }, {
             header: _('seofilter_url_menu'),
             dataIndex: 'menu_on',
-            renderer: SeoFilter.utils.renderBoolean,
+            // editor: {
+            //     xtype: 'combo-boolean',
+            //     renderer: 'boolean'
+            // },
+            renderer: SeoFilter.utils.renderMenuOn,
             sortable: true,
-            width: 75,
+            width: 60,
+            id:'menuon'
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',

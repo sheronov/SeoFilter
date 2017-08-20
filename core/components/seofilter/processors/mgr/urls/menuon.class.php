@@ -1,6 +1,6 @@
 <?php
 
-class sfUrlsEnableProcessor extends modObjectProcessor
+class sfUrlsMenuOnProcessor extends modObjectProcessor
 {
     public $objectType = 'sfUrls';
     public $classKey = 'sfUrls';
@@ -28,7 +28,7 @@ class sfUrlsEnableProcessor extends modObjectProcessor
                 return $this->failure($this->modx->lexicon('seofilter_url_err_nf'));
             }
 
-            $object->set('active', true);
+            $object->set('menu_on', true);
             $object->save();
         }
 
@@ -37,4 +37,4 @@ class sfUrlsEnableProcessor extends modObjectProcessor
 
 }
 
-return 'sfUrlsEnableProcessor';
+return 'sfUrlsMenuOnProcessor';

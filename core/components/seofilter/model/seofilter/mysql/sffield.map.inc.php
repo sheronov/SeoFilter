@@ -14,6 +14,7 @@ $xpdo_meta_map['sfField']= array (
     'valuefirst' => 0,
     'exact' => 1,
     'baseparam' => 0,
+    'slider' => 0,
     'xpdo' => 0,
     'xpdo_package' => '',
     'xpdo_class' => '',
@@ -87,6 +88,14 @@ $xpdo_meta_map['sfField']= array (
       'precision' => '1',
       'phptype' => 'boolean',
       'null' => false,
+      'default' => 0,
+    ),
+    'slider' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
       'default' => 0,
     ),
     'xpdo' => 

@@ -39,6 +39,7 @@ class SeoFilter
         $title = $this->modx->getOption('seofilter_title', null, 'pagetitle', true);
         $description = $this->modx->getOption('seofilter_description', null, 'description', true);
         $introtext = $this->modx->getOption('seofilter_introtext', null, 'introtext', true);
+        $link = $this->modx->getOption('seofilter_link', null, 'link', true);
         $h1 = $this->modx->getOption('seofilter_h1', null, 'longtitle', true);
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
         $text = $this->modx->getOption('seofilter_text', null, '', true);
@@ -53,6 +54,7 @@ class SeoFilter
         $replacebefore = $this->modx->getOption('seofilter_replacebefore', null, 1, true);
         $replaceseparator = $this->modx->getOption('seofilter_replaceseparator', null, ' / ', true);
         $jtitle = $this->modx->getOption('seofilter_jtitle', null, 'title', true);
+        $jlink = $this->modx->getOption('seofilter_jlink', null, '.sf_link', true);
         $jdescription = $this->modx->getOption('seofilter_jdescription', null, 'meta[name="description"]', true);
         $jintrotext = $this->modx->getOption('seofilter_jintrotext', null, '.sf_introtext', true);
         $jh1 = $this->modx->getOption('seofilter_jh1', null, '.sf_h1', true);
@@ -98,6 +100,7 @@ class SeoFilter
             'title' => $title,
             'description' => $description,
             'introtext' => $introtext,
+            'link' => $link,
             'h1' => $h1,
             'h2' => $h2,
             'text' => $text,
@@ -109,6 +112,7 @@ class SeoFilter
             'jtitle' => $jtitle,
             'jdescription' => $jdescription,
             'jintrotext' => $jintrotext,
+            'jlink' => $jlink,
             'jh1' => $jh1,
             'jh2' => $jh2,
             'jtext' => $jtext,
@@ -144,6 +148,12 @@ class SeoFilter
                     $aliases = $this->fieldsAliases($this->config['page'], 1);
                     $this->config['aliases'] = $aliases;
                     $this->config['url'] = $this->modx->makeUrl($this->config['page'], $ctx, '', 'full');
+
+                    $q = $this->modx->newQuery('sfFieldIds');
+                    $q->rightJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id');
+                    $q->rightJoin('sfField','sfField','sfField.id = sfFieldIds.field_id');
+                    $q->where(array('sfField.slider'=>1,'sfRule.page'=>$this->config['page']));
+                    $this->config['slider'] = $this->modx->getCount('sfField',$q);
                 }
 
 
@@ -154,6 +164,7 @@ class SeoFilter
                     'page' => $this->config['page'],
                     'params' => $this->config['params'],
                     'aliases' => $this->config['aliases'],
+                    'slider' => $this->config['slider'],
                     'separator' => $this->config['separator'],
                     'redirect' => $this->config['redirect'],
                     'url' => $this->config['url'],
@@ -161,6 +172,7 @@ class SeoFilter
                     'replacebefore' => $this->config['replacebefore'],
                     'replaceseparator' => $this->config['replaceseparator'],
                     'jtitle' => $this->config['jtitle'],
+                    'jlink' => $this->config['jlink'],
                     'jdescription' => $this->config['jdescription'],
                     'jintrotext' => $this->config['jintrotext'],
                     'jh1' => $this->config['jh1'],
@@ -331,7 +343,7 @@ class SeoFilter
 
     public function process($action, $data = array()) {
         $diff = array();
-        $params = $copyparams = $data['data'];
+        $original_params = $params = $copyparams = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
 
@@ -358,14 +370,24 @@ class SeoFilter
 
                     foreach($base_params as $param => $value) {
                         if(count(array_map('trim', explode(',',$value))) > 1) {
-                            $diff[$param] = $value;
-                            unset($base_params[$param]);
+                            $q = $this->modx->newQuery('sfDictionary');
+                            $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
+                            $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
+                            if(!$this->modx->getCount('sfDictionary',$q)) {
+                                $diff[$param] = $value;
+                                unset($base_params[$param]);
+                            }
+
                         }
                     }
                     foreach($diff_params as $param => $value) {
                         if(count(array_map('trim', explode(',',$value))) > 1) {
-                            $diff[$param] = $value;
-                            unset($diff_params[$param]);
+                            $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
+                            $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
+                            if(!$this->modx->getCount('sfDictionary',$q)) {
+                                $diff[$param] = $value;
+                                unset($base_params[$param]);
+                            }
                         }
                     }
 
@@ -376,7 +398,7 @@ class SeoFilter
                         $rule_array = $this->pdo->getArray('sfRule',array('id'=>$rule_id,'active'=>1));
                         $rule_base = $rule_array['base'];
                         if((count($diff_fields) && $rule_base) || !count($diff_fields)) {
-                            $meta = $this->getRuleMeta(array_intersect_key(array_merge($base_params,$diff_params),array_flip($rule_fields)),$rule_id,$pageId,1);
+                            $meta = $this->getRuleMeta(array_intersect_key(array_merge($base_params,$diff_params),array_flip($rule_fields)),$rule_id,$pageId,1,0,$original_params);
                             if(count($meta['diff'])) {
                                 $diff = array_merge($diff,$meta['diff']);
                             }
@@ -590,9 +612,9 @@ class SeoFilter
         return $this->modx->getCount('sfFieldIds',$q);
     }
 
-    public function getRuleMeta($params = array(), $rule_id = 0,$page_id = 0 ,$ajax = 0,$new = 0) {
+    public function getRuleMeta($params = array(), $rule_id = 0,$page_id = 0 ,$ajax = 0,$new = 0,$original_params = array()) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class','editedon','key');
-        $seo_array = array('title','h1','h2','description','introtext','text','content');
+        $seo_array = array('title','h1','h2','description','introtext','text','content','link');
         $meta = $fields = $word_array = $aliases = $fields_key = $field_word = array();
         $countFields = $this->countRuleFields($rule_id);
         $diff_params = array();
@@ -618,6 +640,7 @@ class SeoFilter
                 $fields_key[$alias]['class'] = $field->get('class');
                 $fields_key[$alias]['key']= $field->get('key');
                 $fields_key[$alias]['exact'] = $field->get('exact');
+                $fields_key[$alias]['slider'] = $field->get('slider');
 
                 $field_word[$field_id] = $word['id'];
 
@@ -671,7 +694,7 @@ class SeoFilter
            // if($rule_id = $this->findRule($params_keys,$page_id))
             if($rule_id = $this->findRuleId($page_id,$params_keys))
             {
-                $meta = $this->getRuleMeta($params,$rule_id,$page_id,1);
+                $meta = $this->getRuleMeta($params,$rule_id,$page_id,1,$new,$original_params);
                 $meta['diff'] = $diff_params;
                 return $meta;
             }
@@ -689,11 +712,11 @@ class SeoFilter
             }
 
             if($this->config['count_choose'] && $this->config['count_select']) {
-                $min_max_array = $this->getRuleCount($params, $fields_key, $parents, $seo['count_where'],1);
+                $min_max_array = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where'],1);
                 $word_array = array_merge($min_max_array,$word_array);
-                $word_array['count'] = $this->getRuleCount($params, $fields_key, $parents, $seo['count_where']);
+                $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
             } elseif($this->config['count_childrens']) {
-                $word_array['count'] = $this->getRuleCount($params, $fields_key, $parents, $seo['count_where']);
+                $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
             }
 
             $word_array = $this->prepareRow($word_array,$parents,$rule_id);
@@ -728,6 +751,7 @@ class SeoFilter
         }
         $meta['url'] = $url_array['url'];
         $meta['seo_id'] = $url_array['id'];
+        $meta['link'] = $url_array['link'];
 
         return $meta;
     }
@@ -737,22 +761,46 @@ class SeoFilter
         $innerJoin = array();
         $addTVs = array();
         $fields_where = array();
+        $params_keys = array_diff(array_keys($params), array_keys($fields_key));
+
+        foreach($params_keys as $param) {
+            if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
+                $alias = $field['alias'];
+                $fields_key[$alias]['class'] = $field['class'];
+                $fields_key[$alias]['key'] = $field['key'];
+                $fields_key[$alias]['exact'] = $field['exact'];
+                $fields_key[$alias]['slider'] = $field['slider'];
+            }
+        }
+
+        if(count(array_diff(array_keys($params), array_keys($fields_key)))) {
+            $this->modx->log(modx::LOG_LEVEL_ERROR,"[SeoFilter] don't known this fields. Please add this fields to the first tab in component (Fields)".print_r(array_diff(array_keys($params), array_keys($fields_key)),1));
+        }
+
 
         foreach($fields_key as $field_alias => $field) {
             switch ($field['class']) {
                 case 'msProductData':
-                    if($field['exact']) {
-                        $fields_where[$field['class'].'.'.$field['key']] = $params[$field_alias];
-                    } else {
-                        $fields_where[$field['class'].'.'.$field['key'].':LIKE'] = '%'.$params[$field_alias].'%';
-                    }
-                    $innerJoin['msProductData'] =  array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
-                    break;
                 case 'modResource':
-                    if($field['exact']) {
-                        $fields_where[$field['class'].'.'.$field['key']] = $params[$field_alias];
+                case 'msProductOption':
+                    $fw = $field['class'].'.'.$field['key'];
+                    if ($field['class'] == 'msProductData') {
+                        $innerJoin['msProductData'] =  array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
+                    }
+                    if ($field['class'] == 'msProductOption') {
+                        $innerJoin['msProductOption'] =  array('class' => 'msProductOption', 'on' => 'msProductOption.product_id = modResource.id');
+                        $fields_where[$field['class'].'.key'] = $field['key'];
+                        $fw = $field['class'] . '.value';
+                    }
+                    if($field['slider']) {
+                        $slider = explode(',',$params[$field_alias]);
+                        $fields_where[$fw.':>='] = $slider[0];
+                        if($slider[1]) {
+                            $fields_where[$fw.':<='] = $slider[1];
+                        }
                     } else {
-                        $fields_where[$field['class'].'.'.$field['key'].':LIKE'] = '%'.$params[$field_alias].'%';
+                        $values = explode(',',$params[$field_alias]);
+                        $fields_where[$fw.':IN'] = $values;
                     }
                     break;
                 case 'modTemplateVar':
@@ -763,15 +811,6 @@ class SeoFilter
                         $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
                     }
                     break;
-                case 'msProductOption':
-                    $innerJoin['msProductOption'] =  array('class' => 'msProductOption', 'on' => 'msProductOption.product_id = modResource.id');
-                    $fields_where[$field['class'].'.key'] = $field['key'];
-                    if($field['exact']) {
-                        $fields_where[$field['class'] . '.value'] = $params[$field_alias];
-                    } else {
-                        $fields_where[$field['class'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
-                    }
-                    break;
                 case 'msVendor':
                     $innerJoin['msProductData'] =  array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
                     $innerJoin['msVendor'] = array('class'=>'msVendor','on'=>'msVendor.id = msProductData.vendor');
@@ -780,6 +819,8 @@ class SeoFilter
                 default:
                     break;
             }
+
+
 
         }
         $addTVs = implode(',',$addTVs);
@@ -939,7 +980,8 @@ class SeoFilter
             'h1'=>$this->config['h1'],
             'h2'=>$this->config['h2'],
             'text'=>$this->config['text'],
-            'content'=>$this->config['content']
+            'content'=>$this->config['content'],
+            'link'=>$this->config['link'],
         );
         $meta = array();
 
@@ -980,7 +1022,7 @@ class SeoFilter
                 );
             });
             $tmp = $this->modx->runSnippet($name, array_merge($this->config, array(
-                'row' => $row,
+                'row' => serialize($row),
                 'input' => $row['input'] ? $row['input'] : 0,
                 'seoFilter' => $this,
                 'pdoTools' => $this->pdo,
@@ -1099,6 +1141,7 @@ class SeoFilter
                         $url['id'] = $url_array['id'];
                         $url['nourl'] = 1;
                     }
+                    $url['link'] = $url_array['link'];
                 } else {
                     $field_words = array();
                     foreach($field_word as $field_id => $word_id) {

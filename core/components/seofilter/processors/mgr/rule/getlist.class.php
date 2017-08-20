@@ -89,6 +89,16 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
             'menu' => true,
         );
 
+        // Duplicate
+        $array['actions'][] = array(
+            'cls' => '',
+            'icon' => 'icon icon-files-o',
+            'title' => $this->modx->lexicon('seofilter_rule_duplicate'),
+            'action' => 'duplicateRule',
+            'button' => true,
+            'menu' => true,
+        );
+
         if (!$array['active']) {
             $array['actions'][] = array(
                 'cls' => '',

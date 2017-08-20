@@ -189,7 +189,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'pages','class', 'key', 'alias', 'translit', 'baseparam', 'priority', 'active', 'rank', 'actions','pagetitle','exact','valuefirst','hideparam'];
+        return ['id', 'name', 'page', 'pages','class', 'key', 'alias', 'translit', 'baseparam', 'priority', 'active', 'rank', 'actions','pagetitle','slider','exact','valuefirst','hideparam'];
     },
 
     getColumns: function () {

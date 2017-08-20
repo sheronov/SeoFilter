@@ -9,6 +9,7 @@ $xpdo_meta_map['sfRule']= array (
     'name' => '',
     'page' => 0,
     'url' => '',
+    'link_tpl' => '',
     'base' => 0,
     'count_parents' => '',
     'count_where' => '',
@@ -44,6 +45,14 @@ $xpdo_meta_map['sfRule']= array (
       'default' => 0,
     ),
     'url' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => false,
+      'default' => '',
+    ),
+    'link_tpl' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',

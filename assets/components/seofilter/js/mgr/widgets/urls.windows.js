@@ -27,6 +27,12 @@ Ext.extend(SeoFilter.window.CreateUrls, MODx.Window, {
             border: false,
             anchor: '100%',
             items: [{
+                xtype: 'textfield',
+                fieldLabel: _('seofilter_url_link'),
+                name: 'link',
+                id: config.id + '-link',
+                anchor: '99%',
+            },{
                 columnWidth: .5
                 , layout: 'form'
                 , defaults: {msgTarget: 'under'}
@@ -128,6 +134,12 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
             name: 'id',
             id: config.id + '-id',
         }, {
+            xtype: 'textfield',
+            fieldLabel: _('seofilter_url_link'),
+            name: 'link',
+            id: config.id + '-link',
+            anchor: '99%',
+        },{
             layout: 'column',
             border: false,
             anchor: '99%',

@@ -8,7 +8,6 @@ switch ($modx->event->name) {
                     $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
             if (!($SeoFilter instanceof SeoFilter)) break;
             $q = $modx->newQuery('sfRule');
-
             $q->where(array('page' => $page)); // Одно правило для одной страницы!
             if($modx->getCount('sfRule',$q)) {
                 if(!$SeoFilter->initialized[$modx->context->key]) {
@@ -33,42 +32,44 @@ switch ($modx->event->name) {
         $r_array = $resource->toArray();
         $fields = $pdo->getCollection('sfField');
         foreach($fields as $field) {
-            $key = $field['key'];
-            $input = '';
-            switch ($field['class']) {
-                case 'msProductOption':
-                    $input = $r_array['options'][$key];
-                    if(!$input)
+            if($field['active'] && !$field['slider']) {
+                $key = $field['key'];
+                $input = '';
+                switch ($field['class']) {
+                    case 'msProductOption':
+                        $input = $r_array['options'][$key];
+                        if (!$input)
+                            $input = $r_array[$key];
+                        break;
+                    case 'msProductData':
+                    case 'modResource':
                         $input = $r_array[$key];
-                    break;
-                case 'msProductData':
-                case 'modResource':
-                    $input = $r_array[$key];
-                    break;
-                case 'modTemplateVar':
-                    $input = $resource->getTVValue($key);
-                    break;
-                case 'msVendor':
-                    $input = $r_array['vendor.id'];
-                    break;
-                default:
-                    break;
-            }
-            if(is_array($input)) {
-                foreach($input as $inp) {
-                    $word_array = $SeoFilter->getWordArray($inp,$field['id']);
+                        break;
+                    case 'modTemplateVar':
+                        $input = $resource->getTVValue($key);
+                        break;
+                    case 'msVendor':
+                        $input = $r_array['vendor.id'];
+                        break;
+                    default:
+                        break;
                 }
-            } elseif($input) {
-                if(strpos($input,'||')) {
-                    foreach(array_map('trim', explode('||',$input)) as $inp) {
-                        $word_array = $SeoFilter->getWordArray($inp,$field['id']);
+                if (is_array($input)) {
+                    foreach ($input as $inp) {
+                        $word_array = $SeoFilter->getWordArray($inp, $field['id']);
                     }
-                } elseif(strpos($input,',')) {
-                    foreach(array_map('trim', explode(',',$input)) as $inp) {
-                        $word_array = $SeoFilter->getWordArray($inp,$field['id']);
+                } elseif ($input) {
+                    if (strpos($input, '||')) {
+                        foreach (array_map('trim', explode('||', $input)) as $inp) {
+                            $word_array = $SeoFilter->getWordArray($inp, $field['id']);
+                        }
+                    } elseif (strpos($input, ',')) {
+                        foreach (array_map('trim', explode(',', $input)) as $inp) {
+                            $word_array = $SeoFilter->getWordArray($inp, $field['id']);
+                        }
+                    } else {
+                        $word_array = $SeoFilter->getWordArray($input, $field['id']);
                     }
-                } else {
-                    $word_array = $SeoFilter->getWordArray($input,$field['id']);
                 }
             }
 

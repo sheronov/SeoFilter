@@ -8,6 +8,7 @@ $xpdo_meta_map['sfUrls']= array (
   array (
     'multi_id' => 0,
     'page_id' => 0,
+    'name' => '',
     'old_url' => '',
     'new_url' => '',
     'editedon' => '0000-00-00 00:00:00',
@@ -50,6 +51,14 @@ $xpdo_meta_map['sfUrls']= array (
       'phptype' => 'integer',
       'null' => false,
       'default' => 0,
+    ),
+    'name' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => false,
+      'default' => '',
     ),
     'old_url' => 
     array (

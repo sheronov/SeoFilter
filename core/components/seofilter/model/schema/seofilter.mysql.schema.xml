@@ -12,6 +12,7 @@
         <field key="valuefirst" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
         <field key="exact" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="1"/>
         <field key="baseparam" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
+        <field key="slider" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
 
         <field key="xpdo" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
         <field key="xpdo_package" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
@@ -45,6 +46,7 @@
         <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="" />
         <field key="url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="link_tpl" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="base" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
 
         <field key="count_parents" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
@@ -181,6 +183,8 @@
         <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
         <field key="page_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
 
+        <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="link" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="old_url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="new_url" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />

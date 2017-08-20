@@ -1,6 +1,6 @@
 /* Grid */
 .seofilter-grid-row-disabled { font-style: italic; opacity: .6; color: #555; }
-.x-grid3-col-actions { padding: 3px 0 3px 5px; }
+.x-grid3-col-actions,.x-grid3-col-menuon { padding: 3px 0 3px 5px; }
 /* Actions */
 .action-red { color: darkred !important; }
 .action-green { color: darkgreen !important; }

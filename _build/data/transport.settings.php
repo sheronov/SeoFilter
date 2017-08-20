@@ -91,6 +91,11 @@ $tmp = array(
         'value' => 'introtext',
         'area' => 'seofilter_seo',
     ),
+    'link' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_seo',
+    ),
     'h1' => array(
         'xtype' => 'textfield',
         'value' => 'pagetitle',
@@ -139,6 +144,11 @@ $tmp = array(
     'jintrotext' => array(
         'xtype' => 'textfield',
         'value' => '.sf_introtext',
+        'area' => 'seofilter_jquery',
+    ),
+    'jlink' => array(
+        'xtype' => 'textfield',
+        'value' => '.sf_link',
         'area' => 'seofilter_jquery',
     ),
     'jh1' => array(

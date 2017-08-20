@@ -80,6 +80,29 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
 
         $array = $object->toArray();
         $array['actions'] = array();
+        $array['menuon'] = array();
+
+        if (!$array['menu_on']) {
+            $array['menuon'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-toggle-off action-gray',
+                'title' => $this->modx->lexicon('seofilter_menu_enable'),
+                'multiple' => $this->modx->lexicon('seofilter_menu_enable'),
+                'action' => 'enableMenu',
+                'button' => true,
+                'menu' => true,
+            );
+        } else {
+            $array['menuon'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-toggle-on action-green',
+                'title' => $this->modx->lexicon('seofilter_menu_disable'),
+                'multiple' => $this->modx->lexicon('seofilter_menu_disable'),
+                'action' => 'disableMenu',
+                'button' => true,
+                'menu' => true,
+            );
+        }
 
         if(($array['old_url'] || $array['new_url']) && $array['page_id']) {
             if(!($addurl = $array['new_url'])) {

@@ -82,11 +82,11 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     name: 'exact',
                     id: config.id + '-exact',
                 },{
-                //     xtype: 'xcheckbox',
-                //     boxLabel: _('seofilter_field_baseparam_more'),
-                //     name: 'baseparam',
-                //     id: config.id + '-baseparam',
-                // },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_field_slider'),
+                    name: 'slider',
+                    id: config.id + '-slider',
+                },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),
                     name: 'active',
@@ -271,16 +271,11 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     boxLabel: _('seofilter_field_exact'),
                     name: 'exact',
                     id: config.id + '-exact',
-                    // },{
-                    //     xtype: 'xcheckbox',
-                    //     boxLabel: _('seofilter_field_translit'),
-                    //     name: 'translit',
-                    //     id: config.id + '-translit',
-                    // },{
-                    // xtype: 'xcheckbox',
-                    // boxLabel: _('seofilter_field_baseparam_more'),
-                    // name: 'baseparam',
-                    // id: config.id + '-baseparam',
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_field_slider'),
+                    name: 'slider',
+                    id: config.id + '-slider',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),

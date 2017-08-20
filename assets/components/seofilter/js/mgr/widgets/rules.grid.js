@@ -188,8 +188,30 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
         })
     },
 
+
+    duplicateRule: function (btn,e) {
+        var r = this.menu.record;
+        var w = MODx.load({
+            // id: 'seofilter-window-copy-rule',
+            id: Ext.id(),
+            xtype: 'seofilter-window-copy-rule',
+            listeners: {
+                success: {
+                    fn: function () {
+                        this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
+                    }, scope: this
+                }
+            }
+        });
+        var f = w.fp.getForm();
+        f.reset();
+        f.setValues({id: r.id, name: _('seofilter_copy')+r.name});
+        w.show(e.target);
+    },
+
     getFields: function () {
-        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','pagetitle','editedon', 'seo_id'];
+        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','link_tpl','pagetitle','editedon', 'seo_id'];
     },
 
     getColumns: function () {
@@ -214,6 +236,11 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             dataIndex: 'url',
             sortable: true,
             width: 125,
+        }, {
+            header: _('seofilter_rule_link_tpl'),
+            dataIndex: 'link_tpl',
+            sortable: true,
+            width: 100,
         }, {
             header: _('seofilter_rule_title'),
             dataIndex: 'title',

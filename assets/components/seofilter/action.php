@@ -32,5 +32,5 @@ if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'
 } else {
     $response =  $SeoFilter->process($_REQUEST['sf_action'], $_REQUEST);
 }
-//@session_write_close();
+@session_write_close();
 exit($response);

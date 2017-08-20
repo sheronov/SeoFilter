@@ -1,6 +1,6 @@
 <?php
 class sfRule extends xPDOSimpleObject {
-
+    var $SeoFilter;
     public $config = array();
 
 
@@ -10,6 +10,11 @@ class sfRule extends xPDOSimpleObject {
         return parent::save($cacheFlag);
     }
 
+    public function __construct(xPDO $xpdo)
+    {
+        parent::__construct($xpdo);
+        $this->SeoFilter = $this->xpdo->getService('SeoFilter');
+    }
 
     /**
      * Returns true url for filter params
@@ -19,6 +24,11 @@ class sfRule extends xPDOSimpleObject {
      * @return string
      */
     public function generateUrl($returnArray = 0) {
+        //TODO:: сделать последний пункт по обновлению
+        $link_tpl = $this->get('link_tpl');
+        $seo_system = array('id','field_id','multi_id','name','rank','active','class','editedon','key');
+
+//        $this->xpdo->log(modx::LOG_LEVEL_ERROR,$this->SeoFilter->pdo->getChunk($link_tpl, array('class'=>"A")));
         $separator = $this->xpdo->getOption('seofilter_separator', null, '-', true);
         $url = '';
         $urls = array();
@@ -27,6 +37,7 @@ class sfRule extends xPDOSimpleObject {
         $q = $this->xpdo->newQuery('sfFieldIds');
         $q->sortby('priority', 'ASC');
         if($links = $this->getMany('Links',$q)){
+            $countFields = count($links);
             foreach($links as $key => $link) {
                 if($field = $link->getOne('Field')) {
                     $field_id = $field->get('id');
@@ -70,8 +81,21 @@ class sfRule extends xPDOSimpleObject {
 
                             $words = $field->getMany('Words',$q);
                             foreach($words as $word) {
+                                $word_arr = $word->toArray();
+                                $word_array = array();
+                                foreach(array_diff_key($word_arr, array_flip($seo_system)) as $tmp_key => $tmp_array) {
+                                    if($countFields == 1) {
+                                        $word_array[$tmp_key] = $tmp_array;
+                                    }
+                                    $word_array[str_replace('value',$alias,$tmp_key)] = $tmp_array;
+                                    $word_array[$alias.'_input'] = $word_array['input'];
+                                    $word_array[$alias.'_alias'] = $word_array['alias'];
+                                    $word_array['m_'.$alias] = $word_array['m_'.$alias.'_i'];
+                                }
                                 $all_array = array(
                                     'url' => $word->get('alias'),
+                                    'link' => $link_tpl,
+                                    'word_array' => $word_array,
                                     'field_word' => array(array(
                                         'field_id' => $field_id,
                                         'word_id' => $word->get('id'),
@@ -83,7 +107,9 @@ class sfRule extends xPDOSimpleObject {
                             }
                             foreach($aliases[$key] as $akey => $avalue) {
                                 if($field->get('hideparam')) {
-                                     $add_url = $avalue['url'].'/';
+                                    $add_url = $avalue['url'] . '/';
+                                } elseif($field->get('valuefirst')){
+                                    $add_url =  $avalue['url'] . $separator .$alias.'/';
                                 } else {
                                      $add_url = $alias . $separator .$avalue['url'].'/';
                                 }
@@ -112,6 +138,11 @@ class sfRule extends xPDOSimpleObject {
                     $urls_array = $this->matrixmult($urls_array,$urls[$i]);
                 }
             }
+            foreach($urls_array as $key=> $url_array) {
+                $urls_array[$key]['link'] = $this->SeoFilter->pdo->getChunk('@INLINE '.$url_array['link'], $url_array['word_array']);
+                unset($urls_array[$key]['word_array']);
+            }
+            $this->xpdo->log(modx::LOG_LEVEL_ERROR,print_r($urls_array,1));
             return $urls_array;
 
         }
@@ -127,6 +158,8 @@ class sfRule extends xPDOSimpleObject {
             for($j=0;$j<$c;$j++){
                 $arr = array(
                     'url' => $a1[$i]['url'] . $a2[$j]['url'],
+                    'link' => $a1[$i]['link'],
+                    'word_array' => array_merge($a1[$i]['word_array'],$a2[$j]['word_array']),
                     'field_word' => array_merge($a1[$i]['field_word'],$a2[$j]['field_word']),
                 );
                 //$a3[] = $a1[$i] . $a2[$j];
