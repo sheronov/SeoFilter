@@ -24,11 +24,9 @@ class sfRule extends xPDOSimpleObject {
      * @return string
      */
     public function generateUrl($returnArray = 0) {
-        //TODO:: сделать последний пункт по обновлению
         $link_tpl = $this->get('link_tpl');
         $seo_system = array('id','field_id','multi_id','name','rank','active','class','editedon','key');
 
-//        $this->xpdo->log(modx::LOG_LEVEL_ERROR,$this->SeoFilter->pdo->getChunk($link_tpl, array('class'=>"A")));
         $separator = $this->xpdo->getOption('seofilter_separator', null, '-', true);
         $url = '';
         $urls = array();
@@ -142,7 +140,6 @@ class sfRule extends xPDOSimpleObject {
                 $urls_array[$key]['link'] = $this->SeoFilter->pdo->getChunk('@INLINE '.$url_array['link'], $url_array['word_array']);
                 unset($urls_array[$key]['word_array']);
             }
-            $this->xpdo->log(modx::LOG_LEVEL_ERROR,print_r($urls_array,1));
             return $urls_array;
 
         }

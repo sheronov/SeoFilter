@@ -343,9 +343,11 @@ class SeoFilter
 
     public function process($action, $data = array()) {
         $diff = array();
-        $original_params = $params = $copyparams = $data['data'];
+        $params = $copyparams = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
+        $base_get = array_map('trim', explode(',',$this->config['base_get']));
+        $original_params = array_diff_key($params,array_flip($base_get));
 
         if(count($params))
             $diff = array_flip(array_diff(array_keys($params),$aliases));
@@ -360,7 +362,7 @@ class SeoFilter
         switch ($action) {
             case 'getmeta':
                 $find = 0;
-                $base_get = array_map('trim', explode(',',$this->config['base_get']));
+
                 $rule_count = 0;
                 $meta = array();
                 if(count($params)) { //тут проверяет, были ли переданы первичные алиасы в правилах. если их нет, то и правил нет)
@@ -830,6 +832,8 @@ class SeoFilter
         } else {
             $where = $fields_where;
         }
+
+        $this->modx->log(modx::LOG_LEVEL_ERROR,print_r($where,1));
 
         if($min_max) {
             $select = $min_max_array = $count_choose = $count_select = array();

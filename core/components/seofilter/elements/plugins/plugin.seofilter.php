@@ -78,13 +78,16 @@ switch ($modx->event->name) {
         break;
     case 'OnPageNotFound':
         $time = microtime(true);
-        $alias = $modx->context->getOption('request_param_alias', 'q');
+        $alias = $del_get = $modx->context->getOption('request_param_alias', 'q');
+
         if (isset($_REQUEST[$alias])) {
             /** @var SeoFilter $SeoFilter */
             $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
                     $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
             $pdo = $SeoFilter->pdo;
             if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
+
+            $base_get = array_map('trim', explode(',',$SeoFilter->config['base_get']));
             $separator = $SeoFilter->config['separator'];
             $site_start = $SeoFilter->config['site_start'];
             $charset = $SeoFilter->config['charset'];
@@ -213,9 +216,11 @@ switch ($modx->event->name) {
                         }
 
                         if (count($params)) {
+
+                            $original_params = array_diff_key(array_merge($params,$_GET),array_flip(array_merge(array($del_get),$base_get)));
                             $fast_search = true;
                             $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
-                            $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0);
+                            $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);
                             $meta['menutitle'] = $menutitle;
                             $modx->setPlaceholders($meta, 'sf.');
                             $modx->sendForward($page);
