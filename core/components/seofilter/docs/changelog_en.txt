@@ -1,5 +1,9 @@
 Changelog for SeoFilter.
 
+1.2.1-beta
+==============
+- Added support for values from other tables for TV fields
+
 1.2.0-beta
 ==============
 - Added work for the work of fields-sliders (inexpensive goods, etc.)

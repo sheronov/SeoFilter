@@ -47,6 +47,25 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                 );
                 $otherProps = array('processors_path' => $path . 'processors/');
 
+                if ($field->get('xpdo')) {
+                    $xpdo_id = $field->get('xpdo_id');
+                    $xpdo_name = $field->get('xpdo_name');
+                    if ($xpdo_class = $field->get('xpdo_class')) {
+                        if ($package = $field->get('xpdo_package')) {
+                            $this->modx->addPackage($package, $this->modx->getOption('core_path') . 'components/' . $package . '/model/');
+                        }
+                        $q = $this->modx->newQuery($xpdo_class);
+                        $q->select($xpdo_id . ',' . $xpdo_name);
+                        if ($q->prepare() && $q->stmt->execute()) {
+                            while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                                //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($row,1));
+                                $values[$row[$xpdo_id]] = $row[$xpdo_name];
+                            }
+                        }
+
+                    }
+                }
+
                 if ($class == 'modTemplateVar') {
                     $tvvalues = $pre = array();
                     $q = $this->modx->newQuery($class, array('name' => $key));
@@ -83,8 +102,13 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     }
                     $words = array_unique(array_merge($tvvalues, $pre));
                     foreach ($words as $word) {
+                        if ($field->get('xpdo')) {
+                            $value = $values[$word];
+                        } else {
+                            $value = $word;
+                        }
                         $processorProps['input'] = $word;
-                        $processorProps['value'] = $word;
+                        $processorProps['value'] = $value;
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                         if ($response->isError()) {
                             $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
@@ -92,24 +116,6 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     }
                 } else {
 
-                    if ($field->get('xpdo')) {
-                        $xpdo_id = $field->get('xpdo_id');
-                        $xpdo_name = $field->get('xpdo_name');
-                        if ($xpdo_class = $field->get('xpdo_class')) {
-                            if ($package = $field->get('xpdo_package')) {
-                                $this->modx->addPackage($package, $this->modx->getOption('core_path') . 'components/' . $package . '/model/');
-                            }
-                            $q = $this->modx->newQuery($xpdo_class);
-                            $q->select($xpdo_id . ',' . $xpdo_name);
-                            if ($q->prepare() && $q->stmt->execute()) {
-                                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                                    //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($row,1));
-                                    $values[$row[$xpdo_id]] = $row[$xpdo_name];
-                                }
-                            }
-
-                        }
-                    }
 
                     $q = $this->modx->newQuery($class);
                     $q->limit(0);
