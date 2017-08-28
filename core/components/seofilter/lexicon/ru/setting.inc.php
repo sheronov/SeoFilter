@@ -38,7 +38,7 @@ $_lang['setting_seofilter_templates_desc'] = 'Для работы плагина
 $_lang['setting_seofilter_classes'] = 'Class_key ресурсов для отслеживания';
 $_lang['setting_seofilter_classes_desc'] = 'По умолчанию "msProduct". Для работы плагина по добавлению значений в SEO словарь после сохранения ресурса';
 $_lang['setting_seofilter_snippet'] = 'Сниппет для подготовки/обработки слов для мета-тегов';
-$_lang['setting_seofilter_snippet_desc'] = 'prepareSnippet принимает массив слов($row), id правила($rule_id), и страницы($page_id), а также $pdoTools. Должен вернуть serialize($row) !';
+$_lang['setting_seofilter_snippet_desc'] = 'prepareSnippet принимает массив слов serialize($row), id правила($rule_id), и страницы($page_id), а также $pdoTools. Должен вернуть $row!';
 
 $_lang['setting_seofilter_jcontent'] = 'jQuery-селектор для поля: Контент';
 $_lang['setting_seofilter_jcontent_desc'] = 'По умолчанию ".sf_content"';

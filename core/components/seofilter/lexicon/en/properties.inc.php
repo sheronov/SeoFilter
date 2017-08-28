@@ -1,8 +1,9 @@
 <?php
 
-$_lang['seofilter_prop_limit'] = 'The number of Items to limit per page.';
-$_lang['seofilter_prop_outputSeparator'] = 'A string to separate each row with.';
-$_lang['seofilter_prop_sortBy'] = 'The field to sort by.';
-$_lang['seofilter_prop_sortDir'] = 'The direction to sort by.';
-$_lang['seofilter_prop_tpl'] = 'The chunk to use for each row of Items.';
-$_lang['seofilter_prop_toPlaceholder'] = 'If set, will output the content to the placeholder specified in this property, rather than outputting the content directly.';
+$_lang['seofilter_prop_limit'] = 'Limit the output of items on a page.';
+$_lang['seofilter_prop_outputSeparator'] = 'Line output Separator.';
+$_lang['seofilter_prop_sortBy'] = 'Sort field.';
+$_lang['seofilter_prop_sortDir'] = 'Sort direction.';
+$_lang['seofilter_prop_tpl'] = 'Chunk for result (you can use INLINE).';
+$_lang['seofilter_prop_rules'] = 'List of search rules (several rules by commos).';
+$_lang['seofilter_prop_toPlaceholder'] = 'If this option is specified, the result will be saved to placeholder instead of a direct output on the page.';

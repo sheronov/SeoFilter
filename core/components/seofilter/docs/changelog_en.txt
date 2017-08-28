@@ -1,0 +1,86 @@
+Changelog for SeoFilter.
+
+1.2.0-beta
+==============
+- Added work for the work of fields-sliders (inexpensive goods, etc.)
+- Fixed some bugs in js and in the class
+- Automatic generation of names for new links when adding new words
+- Lexicon component translated into English
+- Removed from the class by default, so that there is no substitution on empty js fields
+
+1.1.3-beta
+==============
+- Added copying rules
+- Templates for the name of the link and tick to regenerate
+- Changed the mechanism for calculating descendants and samples
+- Adding rules with the inclusion of fields-sliders (price, etc.)
+- Two new settings for the name of the link
+
+1.1.2-beta
+==============
+- Fixed working with TV-fields
+
+1.1.1-beta
+==============
+- Neighboring tabs are now automatically updated
+- Small fixes
+
+1.1.0-beta
+==============
+- Fixed Lexicons
+- Fixed js-file for processing headers
+- Removed unnecessary comments
+- Small bugs and bugs fixed
+
+1.0.10-beta
+==============
+- Added conditions for the fields in the rule to create certain pages
+- Added a field editedon for the rule and a combobox with a page selection
+- Corrected the counting of min / max samples by TV values
+- Powerful code upgrade in the rule search logic, priorities for rules
+- Added snfpet sfLink for creating links by several rules
+
+1.0.9-beta
+==============
+- New comboboxes in the dictionary, by field and value for faster searching for the right addresses
+
+1.0.8-beta
+==============
+- Added a column with editing date for the dictionary
+
+1.0.7-beta
+==============
+- Returned the addition of a word to the dictionary, so it's more convenient
+- I made a normal 404 page for non-existent pages (from the admin you can check the page by get-parameters)
+
+1.0.6-beta
+==============
+- Output for editing in the URL windows items related to the display of the menu
+
+1.0.5-beta
+==============
+- Added a control for editing unique meta tags from the frontend for each page
+- Added a new class for linking URLs with fields and words
+- Now after editing the field, words are updated with all related data
+
+1.0.4-beta
+==============
+- Added the function of selecting the minimum and maximum values.
+- Added prepareSnippet for substitution of processed values ​​in meta tags
+
+1.0.3-beta
+==============
+- Error correction
+- Added the count function. Activate in settings. Count in the placeholder
+
+1.0.2-beta
+==============
+- The component's logic is rewritten
+
+1.0.1-beta
+==============
+- Added work with all fields
+
+1.0.0-beta
+==============
+- First Release

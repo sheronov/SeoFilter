@@ -54,11 +54,11 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 //     style: 'background:#f9f9f9;color:#aaa;',
                 //     id: config.id + '-url',
                 //     anchor: '99%',
-                }, {
-                    xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_rule_relinks'),
-                    name: 'relinks',
-                    id: config.id + '-relinks',
+                // }, {
+                //     xtype: 'xcheckbox',
+                //     boxLabel: _('seofilter_rule_relinks'),
+                //     name: 'relinks',
+                //     id: config.id + '-relinks',
                 },{
                     layout: 'column',
                     border: false,

@@ -31,7 +31,7 @@ jQuery(document).ready(function ($) {
 
                     if(response.data.title) {
                         var newtitle = response.data.title.toString();
-                        if (seoFilter.config.replacebefore) {
+                        if (parseInt(seoFilter.config.replacebefore)) {
                             var separator = seoFilter.config.replaceseparator || ' / ';
                             var title = $('title').text();
                             var arr_title = title.split(separator);
@@ -114,7 +114,7 @@ jQuery(document).ready(function ($) {
             seoFilter.ajax_post(vars, hash, browser);
         };
 
-        if (seoFilterConfig.slider) {
+        if (parseInt(seoFilterConfig.slider)) {
             mSearch2.handleSlider = function () {
                 if (!$(mSearch2.options.slider).length) {
                     return false;

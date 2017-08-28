@@ -43,7 +43,7 @@ $_lang['seofilter_field_baseparam_more'] = 'Базовый параметр (о�
 $_lang['seofilter_field_urltpl'] = 'Шаблон url';
 $_lang['seofilter_field_priority'] = 'Приоритет';
 $_lang['seofilter_field_method'] = 'Как обрабатывать значения';
-$_lang['seofilter_field_exact'] = 'Точное вхожение (строгий поиск)';
+$_lang['seofilter_field_exact'] = 'Точное вхождение (строгий поиск)';
 $_lang['seofilter_field_valuefirst'] = 'Значение перед параметром';
 $_lang['seofilter_field_hideparam'] = 'Скрывать параметр в url';
 $_lang['seofilter_field_slider'] = 'Поле типа "Слайдер" (number фильтры)';
@@ -106,7 +106,7 @@ $_lang['seofilter_rules_remove_confirm'] = 'Вы уверены, что хоти
 $_lang['seofilter_rule_link_tpl'] = 'Шаблон для названия ссылки (синтаксис как в SEO)';
 $_lang['seofilter_rule_duplicate'] = 'Сделать копию';
 $_lang['seofilter_rule_copy'] = 'Копирование правила';
-$_lang['seofilter_copy'] = 'Копия ';
+$_lang['seofilter_copy'] = 'Копия';
 $_lang['seofilter_rule_copy_fields'] = 'Копировать добавленные поля';
 $_lang['seofilter_rule_relinks'] = 'Перегенерировать названия ссылок';
 

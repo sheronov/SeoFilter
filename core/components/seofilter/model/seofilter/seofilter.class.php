@@ -36,15 +36,15 @@ class SeoFilter
         $site_start = $this->modx->context->getOption('site_start', 1);
         $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
 
-        $title = $this->modx->getOption('seofilter_title', null, 'pagetitle', true);
-        $description = $this->modx->getOption('seofilter_description', null, 'description', true);
-        $introtext = $this->modx->getOption('seofilter_introtext', null, 'introtext', true);
-        $link = $this->modx->getOption('seofilter_link', null, 'link', true);
-        $h1 = $this->modx->getOption('seofilter_h1', null, 'longtitle', true);
+        $title = $this->modx->getOption('seofilter_title', null, '', true);
+        $description = $this->modx->getOption('seofilter_description', null, '', true);
+        $introtext = $this->modx->getOption('seofilter_introtext', null, '', true);
+        $link = $this->modx->getOption('seofilter_link', null, '', true);
+        $h1 = $this->modx->getOption('seofilter_h1', null, '', true);
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
         $text = $this->modx->getOption('seofilter_text', null, '', true);
-        $content= $this->modx->getOption('seofilter_content', null, 'content', true);
-        $pagetpl = $this->modx->getOption('seofilter_pagetpl',null,'@INLINE / [[%seofilter_page]] [[+page]]',true);
+        $content= $this->modx->getOption('seofilter_content', null, '', true);
+        $pagetpl = $this->modx->getOption('seofilter_pagetpl',null,'',true);
 
         $count_childrens = $this->modx->getOption('seofilter_count',null,0,true);
         $count_choose = $this->modx->getOption('seofilter_choose',null,'',true);
@@ -53,14 +53,14 @@ class SeoFilter
 
         $replacebefore = $this->modx->getOption('seofilter_replacebefore', null, 1, true);
         $replaceseparator = $this->modx->getOption('seofilter_replaceseparator', null, ' / ', true);
-        $jtitle = $this->modx->getOption('seofilter_jtitle', null, 'title', true);
-        $jlink = $this->modx->getOption('seofilter_jlink', null, '.sf_link', true);
-        $jdescription = $this->modx->getOption('seofilter_jdescription', null, 'meta[name="description"]', true);
-        $jintrotext = $this->modx->getOption('seofilter_jintrotext', null, '.sf_introtext', true);
-        $jh1 = $this->modx->getOption('seofilter_jh1', null, '.sf_h1', true);
-        $jh2 = $this->modx->getOption('seofilter_jh2', null, '.sf_h2', true);
-        $jtext = $this->modx->getOption('seofilter_jtext', null, '.sf_text', true);
-        $jcontent = $this->modx->getOption('seofilter_jcontent', null, '.sf_content', true);
+        $jtitle = $this->modx->getOption('seofilter_jtitle', null, '', true);
+        $jlink = $this->modx->getOption('seofilter_jlink', null, '', true);
+        $jdescription = $this->modx->getOption('seofilter_jdescription', null, '', true);
+        $jintrotext = $this->modx->getOption('seofilter_jintrotext', null, '', true);
+        $jh1 = $this->modx->getOption('seofilter_jh1', null, '', true);
+        $jh2 = $this->modx->getOption('seofilter_jh2', null, '', true);
+        $jtext = $this->modx->getOption('seofilter_jtext', null, '', true);
+        $jcontent = $this->modx->getOption('seofilter_jcontent', null, '', true);
 
 
         $this->pdo = $this->modx->getService('pdoFetch');
@@ -342,12 +342,17 @@ class SeoFilter
     }
 
     public function process($action, $data = array()) {
-        $diff = array();
+        $diff = $original_params = array();
         $params = $copyparams = $data['data'];
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
         $base_get = array_map('trim', explode(',',$this->config['base_get']));
-        $original_params = array_diff_key($params,array_flip($base_get));
+
+        if($params) {
+            $original_params = array_diff_key($params,array_flip($base_get));
+        }
+
+
 
         if(count($params))
             $diff = array_flip(array_diff(array_keys($params),$aliases));
@@ -370,25 +375,69 @@ class SeoFilter
                     $diff_params = array_diff_key($diff,array_flip($base_get));
                     $diff = array_diff_key($diff,$diff_params);
 
+
                     foreach($base_params as $param => $value) {
                         if(count(array_map('trim', explode(',',$value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
                             $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
                             if(!$this->modx->getCount('sfDictionary',$q)) {
-                                $diff[$param] = $value;
-                                unset($base_params[$param]);
+                                $find_range = 0;
+
+                                $c = $this->modx->newQuery('sfField');
+                                $c->where(array('sfField.alias'=>$param,'sfField.slider'=>1));
+                                if($this->modx->getCount('sfField',$c)) {
+                                    $values = array_map('trim', explode(',',$value));
+                                    $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id');
+                                    $c->select('sfField.id,sfDictionary.input');
+                                    if($c->prepare() && $c->stmt->execute()) {
+                                        foreach($c->stmt->fetchAll(PDO::FETCH_ASSOC) as $inp) {
+                                            $i_values = array_map('trim',explode(',',$inp['input']));
+                                            if($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
+                                                $find_range = 1;
+//                                                unset($base_params[$param]);
+//                                                $base_params[$param] = $inp['input'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if(!$find_range) {
+                                    $diff[$param] = $value;
+                                    unset($base_params[$param]);
+                                }
                             }
 
                         }
                     }
                     foreach($diff_params as $param => $value) {
                         if(count(array_map('trim', explode(',',$value))) > 1) {
+                            $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
                             $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
                             if(!$this->modx->getCount('sfDictionary',$q)) {
-                                $diff[$param] = $value;
-                                unset($base_params[$param]);
+                                $find_range = 0;
+                                $c = $this->modx->newQuery('sfField');
+                                $c->where(array('sfField.alias'=>$param,'sfField.slider'=>1));
+                                if($this->modx->getCount('sfField',$c)) {
+                                    $values = array_map('trim', explode(',',$value));
+                                    $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id');
+                                    $c->select('sfField.id,sfDictionary.input');
+                                    if($c->prepare() && $c->stmt->execute()) {
+                                        foreach($c->stmt->fetchAll(PDO::FETCH_ASSOC) as $inp) {
+                                            $i_values = array_map('trim',explode(',',$inp['input']));
+                                            if($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
+                                                $find_range = 1;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if(!$find_range) {
+                                    $diff[$param] = $value;
+                                    unset($diff_params[$param]);
+                                }
                             }
                         }
                     }
@@ -484,6 +533,8 @@ class SeoFilter
         } else {
             $params = array_merge($first_params,$other_params);
         }
+
+
 
         $rule_id = $rid = $rid_count = 0;
         $diff = $find = $rule_aliases = array();
@@ -627,24 +678,26 @@ class SeoFilter
                 $field_id = $field->get('id');
                 $alias = $field->get('alias');
                 $fields[] = $field_id;
-                $word = $this->getWordArray($input,$field_id);
-                foreach(array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
-                    if($countFields == 1) {
-                        $word_array[$tmp_key] = $tmp_array;
+
+                if($word = $this->getWordArray($input,$field_id,$field->get('slider'))) {
+                    foreach (array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
+                        if ($countFields == 1) {
+                            $word_array[$tmp_key] = $tmp_array;
+                        }
+                        $word_array[str_replace('value', $alias, $tmp_key)] = $tmp_array;
+                        $word_array[$alias . '_input'] = $word_array['input'];
+                        $word_array[$alias . '_alias'] = $word_array['alias'];
+                        $word_array['m_' . $alias] = $word_array['m_' . $alias . '_i'];
                     }
-                    $word_array[str_replace('value',$alias,$tmp_key)] = $tmp_array;
-                    $word_array[$alias.'_input'] = $word_array['input'];
-                    $word_array[$alias.'_alias'] = $word_array['alias'];
-                    $word_array['m_'.$alias] = $word_array['m_'.$alias.'_i'];
+
+                    $aliases[$param] = $word['alias'];
+                    $fields_key[$alias]['class'] = $field->get('class');
+                    $fields_key[$alias]['key'] = $field->get('key');
+                    $fields_key[$alias]['exact'] = $field->get('exact');
+                    $fields_key[$alias]['slider'] = $field->get('slider');
+
+                    $field_word[$field_id] = $word['id'];
                 }
-
-                $aliases[$param] = $word['alias'];
-                $fields_key[$alias]['class'] = $field->get('class');
-                $fields_key[$alias]['key']= $field->get('key');
-                $fields_key[$alias]['exact'] = $field->get('exact');
-                $fields_key[$alias]['slider'] = $field->get('slider');
-
-                $field_word[$field_id] = $word['id'];
 
                 $q = $this->modx->newQuery('sfFieldIds');
                 $q->sortby('priority', 'ASC');
@@ -833,7 +886,7 @@ class SeoFilter
             $where = $fields_where;
         }
 
-        $this->modx->log(modx::LOG_LEVEL_ERROR,print_r($where,1));
+        //$this->modx->log(modx::LOG_LEVEL_ERROR,print_r($where,1));
 
         if($min_max) {
             $select = $min_max_array = $count_choose = $count_select = array();
@@ -942,37 +995,56 @@ class SeoFilter
         }
     }
 
-    public function getWordArray($input = '', $field_id = 0) {
+    public function getWordArray($input = '', $field_id = 0,$slider = 0) {
         $word = array();
         $q = $this->modx->newQuery('sfDictionary');
-        $q->limit(1);
-        $q->where(array('field_id'=> $field_id,'input'=>$input));
-        if($this->modx->getCount('sfDictionary',$q)) {
-            $q->select(array('sfDictionary.*'));
-            if ($q->prepare() && $q->stmt->execute()) {
-                $word = $q->stmt->fetch(PDO::FETCH_ASSOC);
+        if($slider) {
+            $values = array_map('trim',explode(',',$input));
+            $q->where(array('field_id'=>$field_id));
+            $q->limit(0);
+            if($this->modx->getCount('sfDictionary',$q)) {
+                $q->select(array('sfDictionary.*'));
+                if ($q->prepare() && $q->stmt->execute()) {
+                    while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $i_values = array_map('trim',explode(',',$row['input']));
+                        if($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
+                            $word = $row;
+                            break;
+                        }
+                    }
+                }
             }
         } else {
-            if($field = $this->modx->getObject('sfField',$field_id)) {
-                if($input && $value = $field->getValueByInput($input)) {
-                    $processorProps = array(
-                        'class' => $field->get('class'),
-                        'key' => $field->get('key'),
-                        'field_id' => $field->get('id'),
-                        'value' => $value,
-                        'input' => $input,
-                    );
-                    $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
-                    $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                    if ($response->isError()) {
-                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '. print_r($response->response, 1));
-                    } else {
-                        $word = $response->response['object'];
+            $q->limit(1);
+            $q->where(array('field_id'=> $field_id,'input'=>$input));
+            if($this->modx->getCount('sfDictionary',$q)) {
+                $q->select(array('sfDictionary.*'));
+                if ($q->prepare() && $q->stmt->execute()) {
+                    $word = $q->stmt->fetch(PDO::FETCH_ASSOC);
+                }
+            } else {
+                if($field = $this->modx->getObject('sfField',$field_id)) {
+                    if($input && $value = $field->getValueByInput($input)) {
+                        $processorProps = array(
+                            'class' => $field->get('class'),
+                            'key' => $field->get('key'),
+                            'field_id' => $field->get('id'),
+                            'value' => $value,
+                            'input' => $input,
+                        );
+                        $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
+                        $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                        if ($response->isError()) {
+                            $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '. print_r($response->response, 1));
+                        } else {
+                            $word = $response->response['object'];
 
+                        }
                     }
                 }
             }
         }
+
         return $word;
     }
 
@@ -1128,9 +1200,13 @@ class SeoFilter
         $url = array();
         if($multi_id) {
             if($rule = $this->pdo->getArray('sfRule', array('id'=>$multi_id,'active'=>1))) {
-                $tpl = '@INLINE ' . $rule['url'];
+ //               $tpl = '@INLINE ' . $rule['url'];
                // $url['url'] = $this->pdo->getChunk($tpl, $aliases);
-                $url_link = $this->pdo->getChunk($tpl, $aliases);
+ //               $url_link = $this->pdo->getChunk($tpl, $aliases);
+                $url_link = $rule['url'];
+                foreach($aliases as $key => $value) {
+                    $url_link = str_replace('{$'.$key.'}',$value,$url_link);
+                }
                 if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page_id,'old_url'=>$url_link))) {
                     if($url_array['active']) {
                         $url = $url_array;

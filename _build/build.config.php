@@ -4,11 +4,11 @@
 define('PKG_NAME', 'SeoFilter');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
 
-define('PKG_VERSION', '1.1.3');
+define('PKG_VERSION', '1.2.0');
 define('PKG_RELEASE', 'beta');
 define('PKG_AUTO_INSTALL', true);
 define('PKG_NAMESPACE_PATH', '{core_path}components/' . PKG_NAME_LOWER . '/');
-//define('PKG_NAMESPACE_PATH', '{base_path}'.PKG_NAME.'/core/components/'.PKG_NAME_LOWER.'/'); /
+//define('PKG_NAMESPACE_PATH', '{base_path}'.PKG_NAME.'/core/components/'.PKG_NAME_LOWER.'/');
 
 
 // define paths
