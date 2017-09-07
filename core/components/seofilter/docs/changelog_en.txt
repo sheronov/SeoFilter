@@ -1,5 +1,14 @@
 Changelog for SeoFilter.
 
+1.2.2-beta
+==============
+- Added support for JSON fields, including tvSuperSelect
+- Priority changed for onDocFormSave event to support TVSS
+- Added work with any container suffixes (/,.html, etc)
+- Added a setting for adding your suffix to the generated pages
+- Added redirect to the correct suffix
+- Added a setting with the name of the pagination option, to send the page number to the SEO-texts
+
 1.2.1-beta
 ==============
 - Added support for values from other tables for TV fields

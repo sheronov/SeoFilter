@@ -79,3 +79,10 @@ $_lang['setting_seofilter_text'] = 'Поле, где хранится Текст
 $_lang['setting_seofilter_text_desc'] = 'По умолчанию "". Можно указывать любые поля ресурса или TV-поля так, как они называются.';
 $_lang['setting_seofilter_title'] = 'Поле, где хранится Заголовок страницы';
 $_lang['setting_seofilter_title_desc'] = 'По умолчанию "pagetitle". Можно указывать любые поля ресурса или TV-поля так, как они называются.';
+
+$_lang['setting_seofilter_url_suffix'] = 'Окончание для сгенерированных страниц через SeoFilter.';
+$_lang['setting_seofilter_url_suffix_desc'] = 'По умолчанию пусто. Такое окончание будет подставляться через AJAX и в ссылках в меню и т.д. Например "/" или ".html"';
+$_lang['setting_seofilter_url_redirect'] = 'Перенаправлять на страницу с правильным окончанием';
+$_lang['setting_seofilter_url_redirect_desc'] = 'По умолчанию "Нет". Если да, то будет перенаправлять на страницу с верным окончанием.';
+$_lang['setting_seofilter_page_key'] = 'Имя переменной пагинации в каталоге, обычно "page" для передачи номера страницы в SEO-тексты';
+$_lang['setting_seofilter_page_key_desc'] = 'Если указать, то в SEO-шаблонах будет доступен плейсхолдер {$page_number}, а также плейсхолдер по имени - если имя pagе, то будет {$page}.';

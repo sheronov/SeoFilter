@@ -31,10 +31,12 @@ class SeoFilter
         $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
         $replace = $this->modx->getOption('seofilter_replace', null, 1, true);
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
-        $redirect  = $this->modx->getOption('seofilter_redirect', null, 1, true);
         $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
         $site_start = $this->modx->context->getOption('site_start', 1);
         $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
+        $container_suffix = $this->modx->getOption('container_suffix',null,'/');
+        $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);
+        $redirect  = $this->modx->getOption('seofilter_url_redirect', null, 0, true);
 
         $title = $this->modx->getOption('seofilter_title', null, '', true);
         $description = $this->modx->getOption('seofilter_description', null, '', true);
@@ -45,6 +47,7 @@ class SeoFilter
         $text = $this->modx->getOption('seofilter_text', null, '', true);
         $content= $this->modx->getOption('seofilter_content', null, '', true);
         $pagetpl = $this->modx->getOption('seofilter_pagetpl',null,'',true);
+        $page_key = $this->modx->getOption('seofilter_page_key',null,'',true);
 
         $count_childrens = $this->modx->getOption('seofilter_count',null,0,true);
         $count_choose = $this->modx->getOption('seofilter_choose',null,'',true);
@@ -91,6 +94,8 @@ class SeoFilter
             'site_start' => $site_start,
             'charset' => $charset,
             'base_get' => $base_get,
+            'container_suffix'=>$container_suffix,
+            'url_suffix' => $url_suffix,
 
             'count_childrens' => $count_childrens,
             'count_choose' => $count_choose,
@@ -106,6 +111,8 @@ class SeoFilter
             'text' => $text,
             'content' => $content,
             'pagetpl' => $pagetpl,
+            'page_key' => $page_key,
+            'page_number' => 1,
 
             'replacebefore' => $replacebefore,
             'replaceseparator' => $replaceseparator,
@@ -147,7 +154,18 @@ class SeoFilter
                 if ($this->config['page']) {
                     $aliases = $this->fieldsAliases($this->config['page'], 1);
                     $this->config['aliases'] = $aliases;
-                    $this->config['url'] = $this->modx->makeUrl($this->config['page'], $ctx, '', 'full');
+                    $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', 'full');
+                    $c_suffix = $this->config['container_suffix'];
+
+                    if($c_suffix) {
+                        if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix))) {
+                            $page_url = substr($page_url,0,-strlen($c_suffix));
+                        }
+                    }
+                    if (substr($page_url, -1) == '/') {
+                        $page_url = substr($page_url, 0, -1);
+                    }
+                    $this->config['url'] = $page_url;
 
                     $q = $this->modx->newQuery('sfFieldIds');
                     $q->rightJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id');
@@ -347,6 +365,12 @@ class SeoFilter
         $pageId = $data['pageId'];
         $aliases = $data['aliases'];
         $base_get = array_map('trim', explode(',',$this->config['base_get']));
+        $page_key = 1;
+
+        if($this->config['page_key'] && isset($params[$this->config['page_key']])) {
+            $page_key = $params[$this->config['page_key']];
+            $this->config['page_number'] = $page_key;
+        }
 
         if($params) {
             $original_params = array_diff_key($params,array_flip($base_get));
@@ -467,6 +491,12 @@ class SeoFilter
                 if(!$find) {
                     $meta = $this->getPageMeta($pageId);
                     $meta['find'] = 0;
+                }
+
+                if($meta['url']) {
+                    $meta['url'] = '/'.$meta['url'].$this->config['url_suffix'];
+                } else {
+                    $meta['url'] = $this->config['container_suffix'];
                 }
 
                 if(count($diff)) {
@@ -673,6 +703,7 @@ class SeoFilter
         $diff_params = array();
         $check = 0;
 
+
         foreach ($params as $param => $input) {
             if ($field = $this->modx->getObject('sfField', array('alias' => $param))) {
                 $field_id = $field->get('id');
@@ -774,6 +805,15 @@ class SeoFilter
                 $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
             }
 
+            if($this->config['page_key']) {
+                $word_array['page_number'] = $word_array[$this->config['page_key']] = $this->config['page_number'];
+            }
+
+            foreach(array('id','page','page_id') as $pkey) {
+                if (!isset($word_array[$pkey])) {
+                    $word_array[$pkey] = $page_id;
+                }
+            }
             $word_array = $this->prepareRow($word_array,$parents,$rule_id);
 
             if($url_array['nourl']) {
@@ -785,7 +825,6 @@ class SeoFilter
                     $seo_array = array_intersect_key($seo, array_flip($seo_array));
                 }
             }
-
 
             foreach ($seo_array as $tag => $text) {
                 if ($text) {

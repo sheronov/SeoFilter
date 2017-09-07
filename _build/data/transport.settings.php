@@ -16,11 +16,6 @@ $tmp = array(
         'value' => 'price,page,limit,tpl,sort',
         'area' => 'seofilter_main',
     ),
-//    'redirect' => array(
-//        'xtype' => 'combo-boolean',
-//        'value' => true,
-//        'area' => 'seofilter_main',
-//    ),
     'ajax' => array(
         'xtype' => 'combo-boolean',
         'value' => true,
@@ -31,6 +26,7 @@ $tmp = array(
 //        'value' => true,
 //        'area' => 'seofilter_main',
 //    ),
+
     'decline' => array(
         'xtype' => 'combo-boolean',
         'value' => false,
@@ -54,6 +50,21 @@ $tmp = array(
     'templates' => array(
         'xtype' => 'textfield',
         'value' => '',
+        'area' => 'seofilter_main',
+    ),
+    'page_key' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
+    'url_suffix' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
+    'url_redirect' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
         'area' => 'seofilter_main',
     ),
     'count' => array(

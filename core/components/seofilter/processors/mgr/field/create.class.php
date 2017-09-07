@@ -88,12 +88,17 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                             $q->select(array('DISTINCT modTemplateVarResource.value'));
                             if ($q->prepare() && $q->stmt->execute()) {
                                 while ($row = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
-                                    if (strpos($row, '||')) {
-                                        $row_arr = array_map('trim', explode('||', $row));
-                                    } elseif (strpos($row, ',')) {
-                                        $row_arr = array_map('trim', explode(',', $row));
+                                    $result = json_decode($row) ;
+                                    if(json_last_error() === JSON_ERROR_NONE) {
+                                        $row_arr = $result;
                                     } else {
-                                        $row_arr = array($row);
+                                        if (strpos($row, '||')) {
+                                            $row_arr = array_map('trim', explode('||', $row));
+                                        } elseif (strpos($row, ',')) {
+                                            $row_arr = array_map('trim', explode(',', $row));
+                                        } else {
+                                            $row_arr = array($row);
+                                        }
                                     }
                                     $tvvalues = array_unique(array_merge($tvvalues, $row_arr));
                                 }
@@ -115,8 +120,6 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         }
                     }
                 } else {
-
-
                     $q = $this->modx->newQuery($class);
                     $q->limit(0);
                     if ($class == 'msProductOption') {

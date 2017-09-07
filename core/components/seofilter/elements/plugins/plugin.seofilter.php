@@ -30,6 +30,15 @@ switch ($modx->event->name) {
         if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
 
         $r_array = $resource->toArray();
+//        $modx->log(modx::LOG_LEVEL_ERROR,'SeoFilter  = ' . print_r($r_array,1));
+//        $modx->log(modx::LOG_LEVEL_ERROR,'SeoFilter DATA = ' . print_r($resource->Data->toArray(),1));
+        $tv_names = array();
+        if($tvs = $resource->getMany('TemplateVars')) {
+            foreach($tvs as $tv) {
+                $tv_names[$tv->get('name')] = $tv->get('id');
+            }
+        }
+
         $fields = $pdo->getCollection('sfField');
         foreach($fields as $field) {
             if($field['active'] && !$field['slider']) {
@@ -46,7 +55,10 @@ switch ($modx->event->name) {
                         $input = $r_array[$key];
                         break;
                     case 'modTemplateVar':
-                        $input = $resource->getTVValue($key);
+                        if(in_array($key,array_keys($tv_names))) {
+                            $input = $resource->getTVValue($key);
+                            //$modx->log(modx::LOG_LEVEL_ERROR,$field['name'] .' = ' . print_r($input,1));
+                        }
                         break;
                     case 'msVendor':
                         $input = $r_array['vendor.id'];
@@ -54,6 +66,12 @@ switch ($modx->event->name) {
                     default:
                         break;
                 }
+
+                $result = json_decode($input) ;
+                if(json_last_error() === JSON_ERROR_NONE) {
+                    $input = $result;
+                }
+
                 if (is_array($input)) {
                     foreach ($input as $inp) {
                         $word_array = $SeoFilter->getWordArray($inp, $field['id']);
@@ -87,6 +105,10 @@ switch ($modx->event->name) {
             $pdo = $SeoFilter->pdo;
             if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
 
+            $container_suffix = $SeoFilter->config['container_suffix'];
+            $url_suffix = $SeoFilter->config['url_suffix'];
+            $url_redirect = $SeoFilter->config['redirect'];
+
             $base_get = array_map('trim', explode(',',$SeoFilter->config['base_get']));
             $separator = $SeoFilter->config['separator'];
             $site_start = $SeoFilter->config['site_start'];
@@ -94,11 +116,28 @@ switch ($modx->event->name) {
             $check = $novalue = $page = $fast_search = 0; //переменные для проверки
             $params = array(); //итоговый массив с параметром и значением
             $last_char = ''; //был ли в конце url-а слэш
-            if (substr($_REQUEST[$alias], -1) == '/') {
-                $last_char = '/';
+//            if (substr($_REQUEST[$alias], -1) == '/') {
+//                $last_char = '/';
+//            }
+
+            $request = trim($_REQUEST[$alias]);
+
+            if ($url_suffix) {
+                if (strpos($request, $url_suffix, strlen($request) - strlen($url_suffix))) {
+                    $request = substr($request, 0, -strlen($url_suffix));
+                    $last_char = $url_suffix; //был ли суффикс в конце
+
+                }
+            } elseif ($url_redirect) {
+                if (substr($_REQUEST[$alias], -1) == '/') {
+                    $last_char = '/';
+                }
             }
-            $request = trim($_REQUEST[$alias], "/");
+
+            $request = trim($request, "/");
+
             $tmp = explode('/', $request);
+
 
 
             $q = $modx->newQuery('sfRule');
@@ -111,6 +150,7 @@ switch ($modx->event->name) {
                 }
             }
 
+
             if(count($page_ids)) {
                 $q = $modx->newQuery('modResource');
                 $q->where(array('id:IN' => array_unique($page_ids)));
@@ -122,9 +162,9 @@ switch ($modx->event->name) {
                     }
                 }
 
-
                 $r_tmp = array_reverse($tmp, 1);
                 $tmp_id = 0;
+
                 foreach ($r_tmp as $t_key => $t_alias) {
                     if ($page = array_search($t_alias, $page_aliases)) {
                         $tmp_id = $t_key;
@@ -142,6 +182,8 @@ switch ($modx->event->name) {
                 }
             }
 
+
+
             if($page) {
                 if($url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
                     if($url_array['active']) {
@@ -149,9 +191,22 @@ switch ($modx->event->name) {
                         $new_url = $url_array['new_url'];
                         $rule_id = $url_array['multi_id'];
 
-                        if ($new_url && $new_url != implode('/', $tmp)) {
-                            $url = $modx->makeUrl($page) . $new_url;
-                            $modx->sendRedirect($url . $last_char);
+                        if ($new_url && ($new_url != implode('/', $tmp))) {
+                            $url = $modx->makeUrl($page);
+                            if ($container_suffix) {
+                                if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
+                                    $url = substr($url, 0, -strlen($container_suffix));
+                                }
+                            }
+                            $modx->sendRedirect($url .'/'. $new_url . $url_suffix);
+                        } elseif($url_redirect && ($url_suffix != $last_char)) {
+                            $url = $modx->makeUrl($page);
+                            if ($container_suffix) {
+                                if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
+                                    $url = substr($url, 0, -strlen($container_suffix));
+                                }
+                            }
+                            $modx->sendRedirect($url .'/'. implode('/', $tmp) . $url_suffix);
                         }
 
                         $tmp = explode('/', $old_url);
@@ -214,6 +269,7 @@ switch ($modx->event->name) {
                                 }
                             }
                         }
+
 
                         if (count($params)) {
 

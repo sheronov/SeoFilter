@@ -79,3 +79,10 @@ $_lang['setting_seofilter_text'] = 'Field where the text field is stored';
 $_lang['setting_seofilter_text_desc'] = 'Default "". You can specify any of the resource fields or the TV fields as they are called.';
 $_lang['setting_seofilter_title'] = 'The field where the pagetitle is stored';
 $_lang['setting_seofilter_title_desc'] = 'Default "pagetitle". You can specify any of the resource fields or the TV fields as they are called.';
+
+$_lang['setting_seofilter_url_suffix'] = 'The suffix for generated pages through SeoFilter.';
+$_lang['setting_seofilter_url_suffix_desc'] = 'The default is empty. Such an ending will be substituted through AJAX and in the links to the menu, etc. For example, "/" or ".html"';
+$_lang['setting_seofilter_url_redirect'] = 'Redirect to a page with the correct suffix';
+$_lang['setting_seofilter_url_redirect_desc'] = 'The default is "No". If so, it will redirect to the page with the correct url suffix.';
+$_lang['setting_seofilter_page_key'] = 'The name of the pagination variable, usually "page", for the page number in SEO-texts';
+$_lang['setting_seofilter_page_key_desc'] = 'If you specify, then in the SEO-templates will be available placeholder {$ page_number}, as well as a placeholder by name - if the name is pagе, it will be {$ page}.';
