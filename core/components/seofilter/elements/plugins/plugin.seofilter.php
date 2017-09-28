@@ -137,8 +137,7 @@ switch ($modx->event->name) {
             $request = trim($request, "/");
 
             $tmp = explode('/', $request);
-
-
+            $r_tmp = array();
 
             $q = $modx->newQuery('sfRule');
             $q->limit(0);
@@ -182,9 +181,11 @@ switch ($modx->event->name) {
                 }
             }
 
-
-
             if($page) {
+                $url = $modx->makeUrl($page,$modx->context->key,'',-1);
+                if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
+                    break;
+                }
                 if($url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
                     if($url_array['active']) {
                         $old_url = $url_array['old_url'];
@@ -192,7 +193,6 @@ switch ($modx->event->name) {
                         $rule_id = $url_array['multi_id'];
 
                         if ($new_url && ($new_url != implode('/', $tmp))) {
-                            $url = $modx->makeUrl($page);
                             if ($container_suffix) {
                                 if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
                                     $url = substr($url, 0, -strlen($container_suffix));
@@ -200,7 +200,6 @@ switch ($modx->event->name) {
                             }
                             $modx->sendRedirect($url .'/'. $new_url . $url_suffix);
                         } elseif($url_redirect && ($url_suffix != $last_char)) {
-                            $url = $modx->makeUrl($page);
                             if ($container_suffix) {
                                 if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
                                     $url = substr($url, 0, -strlen($container_suffix));

@@ -13,6 +13,14 @@ $tmp = array(
         'file' => 'sfword',
         'description' => 'This snippet-modifier need params: input and options or field_id for find in sfDictionary. Snippet return array word(alias,value).',
     ),
+    'sfMenu' => array(
+        'file' => 'sfmenu',
+        'description' => 'This snippet make menu from virtual urls on page. You may select rules or parents... Read the docs.',
+    ),
+    'sfSitemap' => array(
+        'file' => 'sfsitemap',
+        'description' => 'This snippet make sitemap from virtual pages... Read the docs.',
+    ),
 );
 
 foreach ($tmp as $k => $v) {

@@ -913,10 +913,8 @@ class SeoFilter
                 default:
                     break;
             }
-
-
-
         }
+
         $addTVs = implode(',',$addTVs);
 
         if($count_where) {
@@ -1008,7 +1006,6 @@ class SeoFilter
 
                 }
             }
-
 
             return $min_max_array;
         } else {

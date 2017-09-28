@@ -1,5 +1,13 @@
 Changelog for SeoFilter.
 
+1.3.0-beta
+==============
+- Added sfMenu snippet to form menu with resource counting
+- Added snippet sfSitemap for sitemap generation
+- Completely rewriting snippet sfLink - much faster and more convenient
+- Corrected the work of the plug-in with nesting of pages
+- Added a new class to work with the menu
+
 1.2.2-beta
 ==============
 - Added support for JSON fields, including tvSuperSelect
