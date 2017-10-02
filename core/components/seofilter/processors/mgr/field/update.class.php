@@ -157,7 +157,11 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                                 while ($row = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
                                     $result = json_decode($row) ;
                                     if(json_last_error() === JSON_ERROR_NONE) {
-                                        $row_arr = $result;
+                                        if(is_array($result)) {
+                                            $row_arr = $result;
+                                        } else {
+                                            $row_arr = array($result);
+                                        }
                                     } else {
                                         if (strpos($row, '||')) {
                                             $row_arr = array_map('trim', explode('||', $row));

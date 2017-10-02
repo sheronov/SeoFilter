@@ -900,9 +900,9 @@ class sfMenu
 
         if (isset($this->config['hereId'])) {
             $parents= $this->findParents($tree,(int)$this->config['hereId']);
-            $this->modx->log(1,print_r($parents,1));
+//            $this->modx->log(1,print_r($parents,1));
             $this->parents = $parents;
-            $this->modx->log(1,print_r($this->parents,1));
+//            $this->modx->log(1,print_r($this->parents,1));
         }
 
 

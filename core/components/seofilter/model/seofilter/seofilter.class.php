@@ -894,7 +894,9 @@ class SeoFilter
                         }
                     } else {
                         $values = explode(',',$params[$field_alias]);
-                        $fields_where[$fw.':IN'] = $values;
+                        if(!isset($count_where[$fw])) {
+                            $fields_where[$fw.':IN'] = $values;
+                        }
                     }
                     break;
                 case 'modTemplateVar':

@@ -3,6 +3,12 @@
 $path = $modx->getOption('seofilter_core_path', $scriptProperties,
         $modx->getOption('core_path') . 'components/seofilter/').'model/';
 if ($sfClass = $modx->loadClass('seofilter.sfmenu',$path, false, true)) {
+    if((int)$scriptProperties['relative'] && (int)$modx->getPlaceholder('sf.seo_id')) {
+        $scriptProperties['double'] = 1;
+        $scriptProperties['nesting'] = 1;
+        $scriptProperties['groupbyrule'] = 0;
+        $scriptProperties['hideSubMenus'] = 1;
+    }
     $sfMenu = new sfMenu($modx, $scriptProperties);
 } else {
     return false;
@@ -25,13 +31,6 @@ if (!empty($countchildren)) {
     $scriptProperties['countChildren'] = $countchildren;
 }
 
-
-if((int)$scriptProperties['relative'] && (int)$modx->getPlaceholder('sf.seo_id')) {
-    $scriptProperties['double'] = 1;
-    $scriptProperties['nesting'] = 1;
-    $scriptProperties['groupbyrule'] = 0;
-    $scriptProperties['hideSubMenus'] = 1;
-}
 
 if (empty($scriptProperties['cache_key'])) {
     $scriptProperties['cache_key'] = 'sfmenu/' . sha1(serialize($scriptProperties));

@@ -38,7 +38,8 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
         $query = trim($this->getProperty('query'));
         if ($query) {
             $c->where(array(
-                'old_url:LIKE' => "%{$query}%",
+                'link:LIKE' => "%{$query}%",
+                'OR:old_url:LIKE' => "%{$query}%",
                 'OR:new_url:LIKE' => "%{$query}%",
             ));
         }

@@ -1,5 +1,11 @@
 Changelog for SeoFilter.
 
+1.3.1-beta
+==============
+- Minor corrections on TV-fields
+- Removed forgotten from the menu output to the log
+- Changed the path search in action.php
+
 1.3.0-beta
 ==============
 - Added sfMenu snippet to form menu with resource counting

@@ -1,11 +1,10 @@
 <?php
 header('Content-Type: application/json; charset=UTF-8');
 define('MODX_API_MODE', true);
-if (file_exists(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/index.php')) {
+if (!file_exists(dirname(dirname(dirname(dirname(__FILE__)))) . '/index.php')) {
     /** @noinspection PhpIncludeInspection */
     require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/index.php';
-}
-else {
+} else {
     require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/index.php';
 }
 $response = array();
