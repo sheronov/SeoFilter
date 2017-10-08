@@ -211,7 +211,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','link_tpl','pagetitle','editedon', 'seo_id'];
+        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','link_tpl','pagetitle','editedon', 'seo_id','properties'];
     },
 
     getColumns: function () {

@@ -58,6 +58,7 @@ class SeoFilterHomeManagerController extends modExtraManagerController
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/seofilter.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/utils.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/combo.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/combobox.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fields.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/fields.windows.js');

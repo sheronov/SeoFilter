@@ -21,6 +21,7 @@ class sfMenu
     {
         $this->modx = &$modx;
 
+
         $config = array_merge(
             array(
                 'firstClass' => 'first',
@@ -40,6 +41,9 @@ class sfMenu
                 'return' => 'data',
             )
         );
+
+        $config['container_suffix'] = $this->modx->getOption('container_suffix',null,'/');
+        $config['url_suffix'] = $this->modx->getOption('seofilter_url_suffix',null,'',true);
 
         if (empty($config['tplInner']) && !empty($config['tplOuter'])) {
             $config['tplInner'] = $config['tplOuter'];
@@ -269,7 +273,19 @@ class sfMenu
         if($q->prepare() && $q->stmt->execute()) {
             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $url = $row['new_url']?:$row['old_url'];
-                $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
+                $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
+                $c_suffix = $this->config['container_suffix'];
+                $u_suffix = $this->config['url_suffix'];
+                if($c_suffix) {
+                    if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix))) {
+                        $page_url = substr($page_url,0,-strlen($c_suffix));
+                    }
+                }
+                if (substr($page_url, -1) != '/') {
+                    $page_url .= '/';
+                }
+               // $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
+                $url = $page_url.$url.$u_suffix;
                 $name = $row['menutitle']?:$row['link'];
                 $row['url'] = $url;
                 $row['name'] = $name;
@@ -900,9 +916,7 @@ class sfMenu
 
         if (isset($this->config['hereId'])) {
             $parents= $this->findParents($tree,(int)$this->config['hereId']);
-//            $this->modx->log(1,print_r($parents,1));
             $this->parents = $parents;
-//            $this->modx->log(1,print_r($this->parents,1));
         }
 
 

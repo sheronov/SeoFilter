@@ -156,7 +156,6 @@ class SeoFilter
                     $this->config['aliases'] = $aliases;
                     $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', 'full');
                     $c_suffix = $this->config['container_suffix'];
-
                     if($c_suffix) {
                         if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix))) {
                             $page_url = substr($page_url,0,-strlen($c_suffix));
@@ -833,6 +832,24 @@ class SeoFilter
                 }
             }
             $meta['rule_id'] = $rule_id;
+            if($seo['properties'] && isset($seo['properties']['values'])) {
+                $properties = array();
+                $array_word = array();
+                foreach($word_array as $key => $val) {
+                    $array_word['$'.$key] = "'".$val."'";
+                }
+                uksort($array_word, function($a,$b) {
+                    if(strlen($a) == strlen($b)) {
+                        return 0;
+                    } else {
+                        return strlen($a) < strlen($b);
+                    }
+                });
+                foreach($seo['properties']['values'] as $value) {
+                    $properties[] = str_replace(array_keys($array_word),array_values($array_word),$value);
+                }
+                $meta['properties'] = $properties;
+            }
         }
         $diff = array();
         if(count($url_array['diff'])) {

@@ -181,8 +181,15 @@ switch ($modx->event->name) {
                 }
             }
 
+
             if($page) {
                 $url = $modx->makeUrl($page,$modx->context->key,'',-1);
+                $c_suffix = $SeoFilter->config['container_suffix'];
+                if($c_suffix) {
+                    if(strpos($url,$c_suffix,strlen($url)-strlen($c_suffix))) {
+                        $url = substr($url,0,-strlen($c_suffix));
+                    }
+                }
                 if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
                     break;
                 }
@@ -277,6 +284,9 @@ switch ($modx->event->name) {
                             $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
                             $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);
                             $meta['menutitle'] = $menutitle;
+                            if(isset($meta['properties'])) {
+                                $meta['properties'] = $modx->toJSON($meta['properties']);
+                            }
                             $modx->setPlaceholders($meta, 'sf.');
                             $modx->sendForward($page);
                         } else {

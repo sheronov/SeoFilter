@@ -282,3 +282,7 @@ $_lang['seofilter_compare_notin'] = 'Does not contain';
 $_lang['seofilter_compare_larger'] = 'Larger';
 $_lang['seofilter_compare_less'] = 'Less';
 $_lang['seofilter_compare_range'] = 'In the range (by commos)';
+
+$_lang['sf_err_value_duplicate'] = 'Duplicate propert!';
+$_lang['seofilter_rule_properties'] = 'Properties';
+$_lang['seofilter_rule_properties_intro'] = 'Properties that you can use at your discretion. All properties in JSON format in placeholder [[!+sf.properties]]';

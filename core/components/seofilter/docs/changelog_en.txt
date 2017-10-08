@@ -1,5 +1,11 @@
 Changelog for SeoFilter.
 
+1.3.2-beta
+==============
+- Fixed the formation of links and pages for sites with a modified container suffix
+- Added an experimental property tab in the rule edit window
+- A new placeholder is placed in the JSON format [[!+sf.properties]]
+
 1.3.1-beta
 ==============
 - Minor corrections on TV-fields

@@ -23,6 +23,7 @@ $xpdo_meta_map['sfRule']= array (
     'description' => '',
     'text' => '',
     'content' => '',
+    'properties' => NULL,
     'editedon' => '0000-00-00 00:00:00',
   ),
   'fieldMeta' => 
@@ -160,6 +161,12 @@ $xpdo_meta_map['sfRule']= array (
       'phptype' => 'string',
       'null' => true,
       'default' => '',
+    ),
+    'properties' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'json',
+      'null' => true,
     ),
     'editedon' => 
     array (

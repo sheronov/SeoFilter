@@ -64,7 +64,7 @@
         <field key="text" dbtype="text" phptype="string" null="true" default=""/>
         <field key="content" dbtype="text" phptype="string" null="true" default=""/>
 
-        <field key="json" dbtype="text" phptype="json" null="true" default=""/>
+        <field key="properties" dbtype="text" phptype="json" null="true"/>
 
 
         <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />

@@ -282,3 +282,7 @@ $_lang['seofilter_compare_notin'] = 'Не содержится';
 $_lang['seofilter_compare_larger'] = 'Больше';
 $_lang['seofilter_compare_less'] = 'Меньше';
 $_lang['seofilter_compare_range'] = 'В диапазоне (через запятую)';
+
+$_lang['sf_err_value_duplicate'] = 'Дублрирование свойств!';
+$_lang['seofilter_rule_properties'] = 'Свойства';
+$_lang['seofilter_rule_properties_intro'] = 'Свойства, которые можете использовать по своему усмотрению. Все свойства в JSON формате в плейсхолдере [[!+sf.properties]]';

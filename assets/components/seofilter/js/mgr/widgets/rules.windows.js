@@ -33,7 +33,6 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 title: _('seofilter_rule')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
-                ,bodyStyle: 'padding-bottom:5px;'
                 ,border:false
                 ,items: [{
                     xtype: 'textfield',
@@ -119,7 +118,6 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                 ,hideMode: 'offsets'
                 ,layout: 'form'
                 ,border:false
-                ,style: 'padding-bottom:5px;'
                 ,items: [{
                     html: _('seofilter_multiseo_intro'),
                     cls: 'panel-desc',
@@ -224,104 +222,102 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                 title: _('seofilter_rule')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
-                ,bodyStyle: 'padding-bottom:5px;'
                 ,border:false
                 ,items: [{
-                        xtype: 'hidden',
-                        name: 'id',
-                        id: config.id + '-id',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_rule_name'),
-                        name: 'name',
-                        id: config.id + '-name',
-                        anchor: '99%',
-                        allowBlank: false,
-                    }, {
-                       title: _('seofilter_rule_fields')
-                        ,xtype: 'seofilter-grid-fieldids'
-                        ,id: config.id+'_gridfield'
-                        ,record: config.record.object
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_rule_url_more'),
-                        name: 'url',
-                        readOnly: true,
-                        style: 'background:#f9f9f9;color:#aaa;',
-                        id: config.id + '-url',
-                        anchor: '99%',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel: _('seofilter_rule_link_tpl'),
-                        name: 'link_tpl',
-                        id: config.id + '-link_tpl',
-                        anchor: '99%',
-                    },{
-                        xtype: 'xcheckbox',
-                        boxLabel: _('seofilter_rule_relinks'),
-                        name: 'relinks',
-                        id: config.id + '-relinks',
-
-                    },{
-                        layout: 'column',
-                        border: false,
-                        anchor: '100%',
-                        items: [{
-                            columnWidth: .7
-                            , layout: 'form'
-                            , defaults: {msgTarget: 'under'}
-                            , border: false
-                            , items: [{
-                                    xtype: xtype_count,
-                                    fieldLabel: _('seofilter_rule_count_where'),
-                                    name: 'count_where',
-                                    id: config.id + '-count_where',
-                                    anchor: '99%',
-                                },{
-                                    xtype: 'seofilter-combo-resource',
-                                    fieldLabel: _('seofilter_field_page'),
-                                    name: 'page',
-                                    allowBlank: false,
-                                    id: config.id + '-page',
-                                    anchor: '99%',
-                                }, {
-                                    xtype: 'xcheckbox',
-                                    boxLabel: _('seofilter_rule_base_more'),
-                                    name: 'base',
-                                    id: config.id + '-base',
-                                }]
-                        }, {
-                            columnWidth: .3
-                            , layout: 'form'
-                            , defaults: {msgTarget: 'under'}
-                            , border: false
-                            , items: [{
-                                    xtype: xtype_count,
-                                    fieldLabel: _('seofilter_rule_count_parents'),
-                                    name: 'count_parents',
-                                    id: config.id + '-count_parents',
-                                    anchor: '99%',
-                                }, {
-                                    xtype: 'numberfield',
-                                    fieldLabel: _('seofilter_rule_rank'),
-                                    name: 'rank',
-                                    id: config.id + '-rank',
-                                    anchor: '99%',
-                                }, {
-                                    xtype: 'xcheckbox',
-                                    boxLabel: _('seofilter_field_active'),
-                                    name: 'active',
-                                    id: config.id + '-active',
-                            }]
-                        }]
-
-                    }]
+                    xtype: 'hidden',
+                    name: 'id',
+                    id: config.id + '-id',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_rule_name'),
+                    name: 'name',
+                    id: config.id + '-name',
+                    anchor: '99%',
+                    allowBlank: false,
                 }, {
+                    title: _('seofilter_rule_fields')
+                    ,xtype: 'seofilter-grid-fieldids'
+                    ,id: config.id+'_gridfield'
+                    ,record: config.record.object
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_rule_url_more'),
+                    name: 'url',
+                    readOnly: true,
+                    style: 'background:#f9f9f9;color:#aaa;',
+                    id: config.id + '-url',
+                    anchor: '99%',
+                },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_rule_link_tpl'),
+                    name: 'link_tpl',
+                    id: config.id + '-link_tpl',
+                    anchor: '99%',
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_rule_relinks'),
+                    name: 'relinks',
+                    id: config.id + '-relinks',
+
+                },{
+                    layout: 'column',
+                    border: false,
+                    anchor: '100%',
+                    items: [{
+                        columnWidth: .7
+                        , layout: 'form'
+                        , defaults: {msgTarget: 'under'}
+                        , border: false
+                        , items: [{
+                            xtype: xtype_count,
+                            fieldLabel: _('seofilter_rule_count_where'),
+                            name: 'count_where',
+                            id: config.id + '-count_where',
+                            anchor: '99%',
+                        },{
+                            xtype: 'seofilter-combo-resource',
+                            fieldLabel: _('seofilter_field_page'),
+                            name: 'page',
+                            allowBlank: false,
+                            id: config.id + '-page',
+                            anchor: '99%',
+                        }, {
+                            xtype: 'xcheckbox',
+                            boxLabel: _('seofilter_rule_base_more'),
+                            name: 'base',
+                            id: config.id + '-base',
+                        }]
+                    }, {
+                        columnWidth: .3
+                        , layout: 'form'
+                        , defaults: {msgTarget: 'under'}
+                        , border: false
+                        , items: [{
+                            xtype: xtype_count,
+                            fieldLabel: _('seofilter_rule_count_parents'),
+                            name: 'count_parents',
+                            id: config.id + '-count_parents',
+                            anchor: '99%',
+                        }, {
+                            xtype: 'numberfield',
+                            fieldLabel: _('seofilter_rule_rank'),
+                            name: 'rank',
+                            id: config.id + '-rank',
+                            anchor: '99%',
+                        }, {
+                            xtype: 'xcheckbox',
+                            boxLabel: _('seofilter_field_active'),
+                            name: 'active',
+                            id: config.id + '-active',
+                        }]
+                    }]
+
+                }]
+            }, {
                 title: _('seofilter_seo')
                 ,hideMode: 'offsets'
                 ,layout: 'form'
                 ,border:false
-                ,style: 'padding-bottom:5px;'
                 ,items: [{
                     html: _('seofilter_multiseo_intro'),
                     cls: 'panel-desc',
@@ -377,6 +373,21 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                         }
                     },
                     anchor: '99%'
+                }]
+            }, {
+                title: _('seofilter_rule_properties')
+                ,hideMode: 'offsets'
+                ,layout: 'form'
+                ,border:false
+                ,items: [{
+                    html: _('seofilter_rule_properties_intro'),
+                    cls: 'panel-desc',
+                },{
+                    xtype: 'seofilter-grid-combobox-options',
+                    anchor: '99%',
+                    name:'properties',
+                    record: config.record.object,
+                    id: config.id + '-properties',
                 }]
             }]
         };

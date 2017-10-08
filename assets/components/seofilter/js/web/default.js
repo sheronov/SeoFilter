@@ -17,7 +17,6 @@ jQuery(document).ready(function ($) {
                 success: function(response) {
                     var url = hash;
                     var origin = seoFilter.config.url || document.location.pathname;
-
                     //для frontendmanager
                     if($(document).find('.fm-seofilter').length) {
                         var fm_link = $(document).find('.fm-seofilter');
