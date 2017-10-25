@@ -921,7 +921,15 @@ class SeoFilter
                     if($field['exact']) {
                         $fields_where['TV' . $field['key'] . '.value'] = $params[$field_alias];
                     } else {
-                        $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
+                        //TODO: придумать что-то для SuperSelect
+                        if($field['key'] == 'tvsuper') {
+                            $this->pdo->setConfig(array('loadModels' => 'tvsuperselect'));
+                            $innerJoin['tvssOption'] = array('class'=>'tvssOption','on'=>'tvssOption.resource_id = modResource.id');
+                            $fields_where['tvssOption.value:LIKE'] = '%' . $params[$field_alias] . '%';
+                        } else {
+                            $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
+                        }
+
                     }
                     break;
                 case 'msVendor':
@@ -1028,7 +1036,6 @@ class SeoFilter
 
             return $min_max_array;
         } else {
-
             $this->pdo->setConfig(array(
                 'showLog' => 0,
                 'class' => 'modResource',

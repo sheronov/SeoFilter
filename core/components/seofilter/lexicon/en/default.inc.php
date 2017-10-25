@@ -285,4 +285,4 @@ $_lang['seofilter_compare_range'] = 'In the range (by commos)';
 
 $_lang['sf_err_value_duplicate'] = 'Duplicate propert!';
 $_lang['seofilter_rule_properties'] = 'Properties';
-$_lang['seofilter_rule_properties_intro'] = 'Properties that you can use at your discretion. All properties in JSON format in placeholder [[!+sf.properties]]';
+$_lang['seofilter_rule_properties_intro'] = 'Properties whose array will be in the JSON format in the placeholder [[!+sf.properties]]. <br> Here you can use all the same parameters as in the SEO tab';

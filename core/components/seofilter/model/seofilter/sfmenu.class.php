@@ -254,9 +254,19 @@ class sfMenu
         $time = microtime(true);
         $links = array();
         $q = $this->modx->newQuery('sfUrls');
-        $where = array('active'=>1,'multi_id:IN'=>array_keys($pre_array));
+        $where = array(
+            'active'=>1,
+            'multi_id:IN'=>array_keys($pre_array)
+        );
         if(!(int)$this->config['showHidden']) {
             $where['menu_on']=1;
+        }
+        if($this->config['where']) {
+            $where_add = $this->modx->fromJSON($this->config['where']);
+            if(!is_array($where_add)) {
+                $where_add = array($where_add);
+            }
+            $where = array_merge($where,$where_add);
         }
         $q->where($where);
         $q->leftJoin('sfUrlWord','sfUrlWord','sfUrlWord.url_id = sfUrls.id');
@@ -284,8 +294,8 @@ class sfMenu
                 if (substr($page_url, -1) != '/') {
                     $page_url .= '/';
                 }
-               // $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
                 $url = $page_url.$url.$u_suffix;
+                // $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
                 $name = $row['menutitle']?:$row['link'];
                 $row['url'] = $url;
                 $row['name'] = $name;
@@ -383,7 +393,7 @@ class sfMenu
                         if ($field['slider']) {
                             $slider = explode(',', $field['word_input']);
                             $fields_where[$fw . ':>='] = $slider[0];
-                            if ($slider[1]) {
+                            if (isset($slider[1])) {
                                 $fields_where[$fw . ':<='] = $slider[1];
                             }
                         } else {
@@ -396,7 +406,14 @@ class sfMenu
                         if ($field['exact']) {
                             $fields_where['TV' . $field['key'] . '.value'] = $field['word_input'];
                         } else {
-                            $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $field['word_input'] . '%';
+                            //TODO: придумать что-то для SuperSelect
+                            if($field['key'] == 'tvsuper') {
+                                $this->pdoTools->setConfig(array('loadModels' => 'tvsuperselect'));
+                                $innerJoin['tvssOption'] = array('class'=>'tvssOption','on'=>'tvssOption.resource_id = modResource.id');
+                                $fields_where['tvssOption.value:LIKE'] = '%' . $field['word_input'] . '%';
+                            } else {
+                                $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $field['word_input'] . '%';
+                            }
                         }
                         break;
                     case 'msVendor':
@@ -414,7 +431,7 @@ class sfMenu
             if ($link_where = $this->modx->fromJSON($link['count_where'])) {
                 $fields_where = array_merge($fields_where,$link_where);
             }
-            if ($where = $this->modx->fromJSON($link['count_where'])) {
+            if ($where = $this->modx->fromJSON($this->config['count_where'])) {
                 $fields_where = array_merge($fields_where,$where);
             }
 
@@ -529,83 +546,6 @@ class sfMenu
         }
 
         $tree = $levels[1];
-
-//        $this->modx->log(1,print_r($levels[1],1));
-
-//        foreach($links as $key => $link) {
-//            $level = $link['level'];
-//            $search = array();
-//            $words = $link['words'];
-//            $link_find = 0;
-//            if($level > 1) {
-//                foreach ($links as $s_key => $link_search) {
-//                    if ($link_search['level'] != $level - 1) {
-//                        continue;
-//                    }
-//                    $find = 0;
-//                    if (isset($link_search['words'])) {
-//                        foreach ($words as $word) {
-//                            foreach ($link_search['words'] as $word_find) {
-//                                $f_arr = array_uintersect_assoc($word_find, $word, "strcasecmp");
-//                                if (in_array('field_id', array_flip($f_arr)) && in_array('word_id', array_flip($f_arr))) {
-//                                    $find++;
-//                                    break;
-//                                }
-//                            }
-//                            if ($find == $level - 1) {
-//                                break;
-//                            }
-//                        }
-//                    }
-//                    if ($find == $level - 1) {
-//                        $search[] = $link_search['id'];
-////                        $links[$s_key]['inner'][] = $link;
-//                        $link_find++;
-//                        if (!$double) {
-//                            break;
-//                        }
-//                    }
-//                }
-//            } elseif($level) {
-//                $firstlevel[] = $link['id'];
-//            }
-//            if($link_find) {
-//                $links[$key]['parents'] = $search;
-//            } else {
-//                $firstlevel[] = $link['id'];
-//            }
-//        }
-//
-//
-//
-//
-//        $firstlevel = array_unique($firstlevel);
-//        foreach($firstlevel as $lid) {
-//            $tree[$lid] = $links[$lid];
-//            unset($links[$lid]);
-//        }
-//
-//
-//
-//        foreach($links as $key=>$link) {
-//            if(isset($link['parents'])) {
-//                foreach($link['parents'] as $parent) {
-//                    if(isset($links[$parent])) {
-//                        $links[$parent]['inner'][] = $link;
-//                    }
-//                }
-//            }
-//        }
-//        foreach($links as $key=>$link) {
-//            if(isset($link['parents'])) {
-//                foreach($link['parents'] as $parent) {
-//                    if(isset($tree[$parent])) {
-//                        $tree[$parent]['inner'][] = $link;
-//                    }
-//                }
-//            }
-//        }
-
 
         return $tree;
     }

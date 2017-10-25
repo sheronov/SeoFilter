@@ -70,7 +70,18 @@ if(!empty($rules)) {
 
     if(!empty($link)) {
         $url = $link['new_url']?:$link['old_url'];
-        $link['url'] = $modx->makeUrl($link['page_id'],$scriptProperties['context'],'',$scriptProperties['scheme']).$url;
+        $page_url = $modx->makeUrl($link['page_id'],$scriptProperties['context'],'',$scriptProperties['scheme']);
+        $c_suffix = $modx->getOption('container_suffix',null,'/');
+        $u_suffix = $modx->getOption('seofilter_url_suffix',null,'',true);
+        if($c_suffix) {
+            if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix))) {
+                $page_url = substr($page_url,0,-strlen($c_suffix));
+            }
+        }
+        if (substr($page_url, -1) != '/') {
+            $page_url .= '/';
+        }
+        $link['url'] = $page_url.$url.$u_suffix;
         $link['name'] = $link['menutitle']?:$link['link'];
         $output = $pdo->getChunk($tpl,$link,$fastMode);
     }

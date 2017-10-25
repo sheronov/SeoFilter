@@ -183,7 +183,11 @@ switch ($modx->event->name) {
 
 
             if($page) {
-                $url = $modx->makeUrl($page,$modx->context->key,'',-1);
+                if($page == $site_start) {
+                    $url = '';
+                } else {
+                    $url = $modx->makeUrl($page,$modx->context->key,'',-1);
+                }
                 $c_suffix = $SeoFilter->config['container_suffix'];
                 if($c_suffix) {
                     if(strpos($url,$c_suffix,strlen($url)-strlen($c_suffix))) {
