@@ -4,6 +4,10 @@ $xpdo_meta_map['sfRule']= array (
   'version' => '1.1',
   'table' => 'seofilter_rules',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'name' => '',
@@ -20,10 +24,14 @@ $xpdo_meta_map['sfRule']= array (
     'h1' => '',
     'h2' => '',
     'introtext' => '',
+    'keywords' => '',
     'description' => '',
     'text' => '',
     'content' => '',
     'properties' => NULL,
+    'introtexts' => NULL,
+    'introlength' => NULL,
+    'tpl' => '',
     'editedon' => '0000-00-00 00:00:00',
   ),
   'fieldMeta' => 
@@ -141,6 +149,13 @@ $xpdo_meta_map['sfRule']= array (
       'null' => true,
       'default' => '',
     ),
+    'keywords' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
     'description' => 
     array (
       'dbtype' => 'text',
@@ -167,6 +182,27 @@ $xpdo_meta_map['sfRule']= array (
       'dbtype' => 'text',
       'phptype' => 'json',
       'null' => true,
+    ),
+    'introtexts' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'json',
+      'null' => true,
+    ),
+    'introlength' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'null' => true,
+    ),
+    'tpl' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
     ),
     'editedon' => 
     array (

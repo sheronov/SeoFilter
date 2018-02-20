@@ -10,11 +10,17 @@ class sfRuleDuplicateProcessor extends modObjectDuplicateProcessor
 
     public function beforeSave()
     {
-        $this->newObject->set('page',$this->getProperty('page'));
+        $this->newObject->set('page',(int)$this->getProperty('page'));
         return parent::beforeSave();
     }
 
+    public function alreadyExists($name) {
+        return $this->modx->getCount($this->classKey,array(
+                $this->nameField => $name,
+                'page'=>(int)$this->getProperty('page')
+            )) > 0;
 
+    }
     /**
      *
      */
@@ -44,7 +50,7 @@ class sfRuleDuplicateProcessor extends modObjectDuplicateProcessor
 
     public function generateUrls()
     {
-        if($this->getProperty('active',false)) {
+        if((int)$this->getProperty('active')) {
             $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
             $multi_id = $this->newObject->get('id');
             $page_id = $this->newObject->get('page');

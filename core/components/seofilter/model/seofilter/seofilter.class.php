@@ -8,7 +8,7 @@ class SeoFilter
     public $config = array();
     /** @var array $initialized */
     public $initialized = array();
-
+    /** @var pdoFetch $pdo */
     public $pdo;
 
 
@@ -32,15 +32,19 @@ class SeoFilter
         $replace = $this->modx->getOption('seofilter_replace', null, 1, true);
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
         $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
+        $values_delimeter = $this->modx->getOption('seofilter_values_delimeter', null, ',', true);
         $site_start = $this->modx->context->getOption('site_start', 1);
         $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
+
         $container_suffix = $this->modx->getOption('container_suffix',null,'/');
+        $seo_container_suffix = $this->modx->getOption('seofilter_container_suffix',null,$container_suffix,true);
         $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);
         $redirect  = $this->modx->getOption('seofilter_url_redirect', null, 0, true);
 
         $title = $this->modx->getOption('seofilter_title', null, '', true);
         $description = $this->modx->getOption('seofilter_description', null, '', true);
         $introtext = $this->modx->getOption('seofilter_introtext', null, '', true);
+        $keywords = $this->modx->getOption('seofilter_keywords', null, '', true);
         $link = $this->modx->getOption('seofilter_link', null, '', true);
         $h1 = $this->modx->getOption('seofilter_h1', null, '', true);
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
@@ -53,17 +57,24 @@ class SeoFilter
         $count_choose = $this->modx->getOption('seofilter_choose',null,'',true);
         $count_select = $this->modx->getOption('seofilter_select',null,'',true);
         $prepareSnippet = $this->modx->getOption('seofilter_snippet',null,'',true);
+        $hideEmpty = $this->modx->getOption('seofilter_hide_empty',null,0,true);
 
-        $replacebefore = $this->modx->getOption('seofilter_replacebefore', null, 1, true);
+        $replacebefore = $this->modx->getOption('seofilter_replacebefore', null, 0, true);
         $replaceseparator = $this->modx->getOption('seofilter_replaceseparator', null, ' / ', true);
         $jtitle = $this->modx->getOption('seofilter_jtitle', null, '', true);
         $jlink = $this->modx->getOption('seofilter_jlink', null, '', true);
         $jdescription = $this->modx->getOption('seofilter_jdescription', null, '', true);
         $jintrotext = $this->modx->getOption('seofilter_jintrotext', null, '', true);
+        $jkeywords = $this->modx->getOption('seofilter_jkeywords', null, '', true);
         $jh1 = $this->modx->getOption('seofilter_jh1', null, '', true);
         $jh2 = $this->modx->getOption('seofilter_jh2', null, '', true);
         $jtext = $this->modx->getOption('seofilter_jtext', null, '', true);
         $jcontent = $this->modx->getOption('seofilter_jcontent', null, '', true);
+
+        $tplsPath = $this->modx->getOption('seofilter_tpls_path',null,'',true);
+        $urlHelp = $this->modx->getOption('seofilter_url_help',null,'',true);
+
+        $possibleSuffixes = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
 
 
         $this->pdo = $this->modx->getService('pdoFetch');
@@ -94,7 +105,8 @@ class SeoFilter
             'site_start' => $site_start,
             'charset' => $charset,
             'base_get' => $base_get,
-            'container_suffix'=>$container_suffix,
+            'values_delimeter' => $values_delimeter,
+            'container_suffix'=>$seo_container_suffix,
             'url_suffix' => $url_suffix,
 
             'count_childrens' => $count_childrens,
@@ -105,6 +117,7 @@ class SeoFilter
             'title' => $title,
             'description' => $description,
             'introtext' => $introtext,
+            'keywords' => $keywords,
             'link' => $link,
             'h1' => $h1,
             'h2' => $h2,
@@ -119,11 +132,16 @@ class SeoFilter
             'jtitle' => $jtitle,
             'jdescription' => $jdescription,
             'jintrotext' => $jintrotext,
+            'jkeywords' => $jkeywords,
             'jlink' => $jlink,
             'jh1' => $jh1,
             'jh2' => $jh2,
             'jtext' => $jtext,
             'jcontent' => $jcontent,
+            'tpls_path' =>$tplsPath,
+            'url_help' => $urlHelp,
+            'hideEmpty' => $hideEmpty,
+            'possibleSuffixes' => $possibleSuffixes
 
         ), $config);
 
@@ -161,9 +179,13 @@ class SeoFilter
                             $page_url = substr($page_url,0,-strlen($c_suffix));
                         }
                     }
-                    if (substr($page_url, -1) == '/') {
-                        $page_url = substr($page_url, 0, -1);
+
+                    foreach($this->config['possibleSuffixes'] as $possibleSuffix) {
+                        if (substr($page_url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                            $page_url = substr($page_url, 0, -strlen($possibleSuffix));
+                        }
                     }
+
                     $this->config['url'] = $page_url;
 
                     $q = $this->modx->newQuery('sfFieldIds');
@@ -192,6 +214,7 @@ class SeoFilter
                     'jlink' => $this->config['jlink'],
                     'jdescription' => $this->config['jdescription'],
                     'jintrotext' => $this->config['jintrotext'],
+                    'jkeywords' => $this->config['jkeywords'],
                     'jh1' => $this->config['jh1'],
                     'jh2' => $this->config['jh2'],
                     'jtext' => $this->config['jtext'],
@@ -268,7 +291,9 @@ class SeoFilter
         $q->limit(0);
         //$q->where(array('1 = 1 AND FIND_IN_SET('.$this->config['page'].',pages)'));
         if($page) {
-            $q->where(array('active'=>1, 'page' => $page));
+            $q->where(array(
+                //'active'=>1,
+                'page' => $page));
         }
         $q->select('id,base');
         if($q->prepare() && $q->stmt->execute()) {
@@ -400,7 +425,7 @@ class SeoFilter
 
 
                     foreach($base_params as $param => $value) {
-                        if(count(array_map('trim', explode(',',$value))) > 1) {
+                        if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
                             $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
@@ -410,12 +435,12 @@ class SeoFilter
                                 $c = $this->modx->newQuery('sfField');
                                 $c->where(array('sfField.alias'=>$param,'sfField.slider'=>1));
                                 if($this->modx->getCount('sfField',$c)) {
-                                    $values = array_map('trim', explode(',',$value));
+                                    $values = array_map('trim', explode($this->config['values_delimeter'],$value));
                                     $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id');
                                     $c->select('sfField.id,sfDictionary.input');
                                     if($c->prepare() && $c->stmt->execute()) {
                                         foreach($c->stmt->fetchAll(PDO::FETCH_ASSOC) as $inp) {
-                                            $i_values = array_map('trim',explode(',',$inp['input']));
+                                            $i_values = array_map('trim',explode($this->config['values_delimeter'],$inp['input']));
                                             if($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
                                                 $find_range = 1;
 //                                                unset($base_params[$param]);
@@ -435,7 +460,7 @@ class SeoFilter
                         }
                     }
                     foreach($diff_params as $param => $value) {
-                        if(count(array_map('trim', explode(',',$value))) > 1) {
+                        if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
                             $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
@@ -444,12 +469,12 @@ class SeoFilter
                                 $c = $this->modx->newQuery('sfField');
                                 $c->where(array('sfField.alias'=>$param,'sfField.slider'=>1));
                                 if($this->modx->getCount('sfField',$c)) {
-                                    $values = array_map('trim', explode(',',$value));
+                                    $values = array_map('trim', explode($this->config['values_delimeter'],$value));
                                     $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id');
                                     $c->select('sfField.id,sfDictionary.input');
                                     if($c->prepare() && $c->stmt->execute()) {
                                         foreach($c->stmt->fetchAll(PDO::FETCH_ASSOC) as $inp) {
-                                            $i_values = array_map('trim',explode(',',$inp['input']));
+                                            $i_values = array_map('trim',explode($this->config['values_delimeter'],$inp['input']));
                                             if($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
                                                 $find_range = 1;
                                                 break;
@@ -473,7 +498,7 @@ class SeoFilter
                         $rule_base = $rule_array['base'];
                         if((count($diff_fields) && $rule_base) || !count($diff_fields)) {
                             $meta = $this->getRuleMeta(array_intersect_key(array_merge($base_params,$diff_params),array_flip($rule_fields)),$rule_id,$pageId,1,0,$original_params);
-                            if(count($meta['diff'])) {
+                            if(!empty($meta['diff'])) {
                                 $diff = array_merge($diff,$meta['diff']);
                             }
                             $meta['find'] = $find = 1;
@@ -505,7 +530,6 @@ class SeoFilter
                         $meta['url'] = $meta['url'] . $this->getHashUrl($diff);
                     }
                 }
-
 
                 $response = array(
                     'success' => true,
@@ -608,7 +632,7 @@ class SeoFilter
                     }
                     if($row['where'] && $row['compare']) {
                         $value = $row['value'];
-                        $values = explode(',', $value);
+                        $values = explode($this->config['values_delimeter'], $value);
                         $get_param = $params[$alias];
                         switch ($row['compare']) { //Обратный механизм поиска
                             case 1:
@@ -653,6 +677,9 @@ class SeoFilter
 
     /**
      * DEPRECATED METHOD
+     * @param array $params_keys
+     * @param int $page_id
+     * @return int
      */
     public function findRule($params_keys = array(), $page_id = 0) {
         //$this->modx->log(modx::LOG_LEVEL_ERROR, 'SEOFILTER: '.print_r($params_keys,1));
@@ -696,7 +723,7 @@ class SeoFilter
 
     public function getRuleMeta($params = array(), $rule_id = 0,$page_id = 0 ,$ajax = 0,$new = 0,$original_params = array()) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class','editedon','key');
-        $seo_array = array('title','h1','h2','description','introtext','text','content','link');
+        $seo_array = array('title','h1','h2','description','introtext','keywords','text','content','link','tpl','introlength');
         $meta = $fields = $word_array = $aliases = $fields_key = $field_word = array();
         $countFields = $this->countRuleFields($rule_id);
         $diff_params = array();
@@ -740,7 +767,7 @@ class SeoFilter
                             $c->select(array('sfDictionary.*'));
                             $c->where(array('field_id' => $row['field_id'], 'input' => $input));
                             $value = $row['value'];
-                            $values = explode(',', $value);
+                            $values = explode($this->config['values_delimeter'], $value);
                             switch ($row['compare']) { //Обратный механизм поиска
                                 case 1:
                                     $c->where(array('input:NOT IN' => $values));
@@ -804,6 +831,8 @@ class SeoFilter
                 $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
             }
 
+            $meta['total'] = (int)$word_array['count'];
+
             if($this->config['page_key']) {
                 $word_array['page_number'] = $word_array[$this->config['page_key']] = $this->config['page_number'];
             }
@@ -813,7 +842,7 @@ class SeoFilter
                     $word_array[$pkey] = $page_id;
                 }
             }
-            $word_array = $this->prepareRow($word_array,$parents,$rule_id);
+            $word_array = $this->prepareRow($word_array,$parents,$rule_id,$seo);
 
             if($url_array['nourl']) {
                // $seo_array = $this->getPageMeta($page_id);
@@ -825,34 +854,76 @@ class SeoFilter
                 }
             }
 
+            $meta['rule_id'] = $word_array['rule_id'] = $rule_id;
+            $meta['url'] = $word_array['url'] = $url_array['url'];
+            $meta['seo_id'] = $word_array['seo_id'] = $url_array['id'];
+            $meta['link'] = $word_array['link'] =  $url_array['link'];
+
+            if(isset($url_array['createdon'])) {
+                $meta['createdon'] = $url_array['createdon'];
+                if($meta['editedon'] == '0000-00-00 00:00:00') {
+                    $meta['editedon'] = $url_array['createdon'];
+                } else {
+                    $meta['editedon'] = $url_array['editedon'];
+                }
+            }
+
+
+
+
             foreach ($seo_array as $tag => $text) {
                 if ($text) {
-                    $tpl = '@INLINE ' . $text;
+                    if (strpos( $text,'@INLINE')  !== false) {
+                        $tpl = $text;
+                    } else {
+                        $tpl = '@INLINE ' . $text;
+                    }
                     $meta[$tag] = $this->pdo->getChunk($tpl, $word_array);
                 }
             }
-            $meta['rule_id'] = $rule_id;
-            if($seo['properties'] && isset($seo['properties']['values'])) {
-                $properties = array();
-                $array_word = array();
-                foreach($word_array as $key => $val) {
-                    $array_word['$'.$key] = "'".$val."'";
-                }
-                uksort($array_word, function($a,$b) {
-                    if(strlen($a) == strlen($b)) {
-                        return 0;
-                    } else {
-                        return strlen($a) < strlen($b);
-                    }
-                });
-                foreach($seo['properties']['values'] as $value) {
-                    $properties[] = str_replace(array_keys($array_word),array_values($array_word),$value);
-                }
-                $meta['properties'] = $properties;
+
+            if(!empty($url_array['tpl'])) {
+                $meta['tpl'] = $url_array['tpl'];
+            } elseif(!empty($seo['tpl'])) {
+                $meta['tpl'] = $seo['tpl'];
             }
+
+            if(!empty($url_array['introlength'])) {
+                $meta['introlength'] = $url_array['introlength'];
+            } elseif(!empty($seo['introlength'])) {
+                $meta['introlength'] = $seo['introlength'];
+            }
+
+            foreach(array('properties','introtexts') as $prop) {
+                $seo_values = array();
+                if(!empty($url_array[$prop]) && !empty($url_array[$prop]['values'])) {
+                    $seo_values = $url_array[$prop]['values'];
+                } elseif(!empty($seo[$prop]) && !empty($seo[$prop]['values'])) {
+                    $seo_values = $seo[$prop]['values'];
+                }
+                if (!empty($seo_values)) {
+                    $properties = array();
+                    $array_word = array();
+                    foreach ($word_array as $key => $val) {
+                        $array_word['$' . $key] = "'" . $val . "'";
+                    }
+                    uksort($array_word, function ($a, $b) {
+                        if (strlen($a) == strlen($b)) {
+                            return 0;
+                        } else {
+                            return strlen($a) < strlen($b);
+                        }
+                    });
+                    foreach ($seo_values as $value) {
+                        $properties[] = str_replace(array_keys($array_word), array_values($array_word), $value);
+                    }
+                    $meta[$prop] = $properties;
+                }
+            }
+
         }
         $diff = array();
-        if(count($url_array['diff'])) {
+        if(!empty($url_array['diff'])) {
             foreach($url_array['diff'] as $param => $alias) {
                 if ($diff_arr = $this->pdo->getArray('sfDictionary', array('alias' => $alias))) {
                     $diff[$param] = $diff_arr['input'];
@@ -860,9 +931,6 @@ class SeoFilter
             }
             $meta['diff'] = $diff;
         }
-        $meta['url'] = $url_array['url'];
-        $meta['seo_id'] = $url_array['id'];
-        $meta['link'] = $url_array['link'];
 
         return $meta;
     }
@@ -885,7 +953,7 @@ class SeoFilter
         }
 
         if(count(array_diff(array_keys($params), array_keys($fields_key)))) {
-            $this->modx->log(modx::LOG_LEVEL_ERROR,"[SeoFilter] don't known this fields. Please add this fields to the first tab in component (Fields)".print_r(array_diff(array_keys($params), array_keys($fields_key)),1));
+//            $this->modx->log(modx::LOG_LEVEL_ERROR,"[SeoFilter] don't known this fields. Please add this fields to the first tab in component (Fields)".print_r(array_diff(array_keys($params), array_keys($fields_key)),1));
         }
 
 
@@ -904,13 +972,13 @@ class SeoFilter
                         $fw = $field['class'] . '.value';
                     }
                     if($field['slider']) {
-                        $slider = explode(',',$params[$field_alias]);
+                        $slider = explode($this->config['values_delimeter'],$params[$field_alias]);
                         $fields_where[$fw.':>='] = $slider[0];
                         if($slider[1]) {
                             $fields_where[$fw.':<='] = $slider[1];
                         }
                     } else {
-                        $values = explode(',',$params[$field_alias]);
+                        $values = explode($this->config['values_delimeter'],$params[$field_alias]);
                         if(!isset($count_where[$fw])) {
                             $fields_where[$fw.':IN'] = $values;
                         }
@@ -948,6 +1016,31 @@ class SeoFilter
             $where = array_merge($count_where,$fields_where);
         } else {
             $where = $fields_where;
+        }
+        foreach($where as $key=>$wheres) {
+            if(strpos($key,'.') !== false) {
+                $key = explode('.',$key);
+                if(!isset($innerJoin[$key[0]])) {
+                    switch($key[0]) {
+                        case 'msProductData':
+                        case 'Data':
+                            $innerJoin['msProductData'] = array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
+                            break;
+                        case 'msProductOption':
+                            $innerJoin['msProductOption'] = array('class' => 'msProductOption', 'on' => 'msProductOption.product_id = modResource.id');
+                            break;
+                        case 'msVendor':
+                            $innerJoin['msProductData'] = array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
+                            $innerJoin['msVendor'] = array('class' => 'msVendor', 'on' => 'msVendor.id = msProductData.vendor');
+                            break;
+                        case 'modResource':
+                            break;
+                        default:
+//                            $this->modx->log(MODX::LOG_LEVEL_ERROR,'[SeoFilter] The key = '.$key[0].' is wrong for where condition '.print_r($where,1));
+                            break;
+                    }
+                }
+            }
         }
 
         //$this->modx->log(modx::LOG_LEVEL_ERROR,print_r($where,1));
@@ -1051,7 +1144,9 @@ class SeoFilter
 
             $run = $this->pdo->run();
             if (count($run)) {
-                $count = $run[0]['count'];
+                if(isset($run[0]['count'])) {
+                    $count = $run[0]['count'];
+                }
             }
             return $count;
         }
@@ -1061,14 +1156,14 @@ class SeoFilter
         $word = array();
         $q = $this->modx->newQuery('sfDictionary');
         if($slider) {
-            $values = array_map('trim',explode(',',$input));
+            $values = array_map('trim',explode($this->config['values_delimeter'],$input));
             $q->where(array('field_id'=>$field_id));
             $q->limit(0);
             if($this->modx->getCount('sfDictionary',$q)) {
                 $q->select(array('sfDictionary.*'));
                 if ($q->prepare() && $q->stmt->execute()) {
                     while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $i_values = array_map('trim',explode(',',$row['input']));
+                        $i_values = array_map('trim',explode($this->config['values_delimeter'],$row['input']));
                         if($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
                             $word = $row;
                             break;
@@ -1086,7 +1181,13 @@ class SeoFilter
                 }
             } else {
                 if($field = $this->modx->getObject('sfField',$field_id)) {
+                    /*** @var sfField $field */
                     if($input && $value = $field->getValueByInput($input)) {
+                        $relation_id = $relation_value = '';
+                        if(is_array($value)) {
+                            $relation_value = $value['relation'];
+                            $value = $value['value'];
+                        }
                         $processorProps = array(
                             'class' => $field->get('class'),
                             'key' => $field->get('key'),
@@ -1094,6 +1195,20 @@ class SeoFilter
                             'value' => $value,
                             'input' => $input,
                         );
+
+                        if($relation_value) {
+                            $relation_field = $field->get('relation_field');
+                            $s = $this->modx->newQuery('sfDictionary');
+                            $s->where(array('input'=>$relation_value,'field_id'=>$relation_field));
+                            $s->select('id');
+                            $relation_id = $this->modx->getValue($s->prepare());
+                        }
+
+                        if($relation_id) {
+                            $processorProps['relation_word'] = $relation_id;
+                        }
+
+
                         $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                         if ($response->isError()) {
@@ -1115,6 +1230,7 @@ class SeoFilter
             'title'=>$this->config['title'],
             'description'=>$this->config['description'],
             'introtext'=>$this->config['introtext'],
+            'keywords'=>$this->config['keywords'],
             'h1'=>$this->config['h1'],
             'h2'=>$this->config['h2'],
             'text'=>$this->config['text'],
@@ -1137,19 +1253,23 @@ class SeoFilter
                 }
             }
             foreach ($system as $tag => $tagname) {
-                if(strpos($tagname, '[') || strpos($tagname, '{')) {
-                    $tpl = '@INLINE '. $tagname;
-                } else {
-                    $tpl = '@INLINE ' . $page->get($tagname);
+                if($tagname) {
+                    if (strpos($tagname,'@INLINE') !== false) {
+                        $tpl = $tagname;
+                    } elseif (strpos($tagname, '[') !== false || strpos($tagname, '{') !== false) {
+                        $tpl = '@INLINE ' . $tagname;
+                    } else {
+                        $tpl = '@INLINE ' . $page->get($tagname);
+                    }
+                    $meta[$tag] = $this->pdo->getChunk($tpl, $variables);
                 }
-                $meta[$tag] = $this->pdo->getChunk($tpl,$variables);
             }
         }
 
         return $meta;
     }
 
-    public function prepareRow($row = array(),$page_id = 0,$rule_id = 0) {
+    public function prepareRow($row = array(),$page_id = 0,$rule_id = 0,$rule = array()) {
         if (!empty($this->config['prepareSnippet'])) {
             $name = trim($this->config['prepareSnippet']);
             array_walk_recursive($row, function (&$value) {
@@ -1167,6 +1287,7 @@ class SeoFilter
                 'pdoFetch' => $this->pdo,
                 'rule_id' => $rule_id,
                 'page_id' => $page_id,
+                'rule' => serialize($rule)
             )));
             $tmp = ($tmp[0] == '[' || $tmp[0] == '{')
                 ? json_decode($tmp, true)
@@ -1243,6 +1364,9 @@ class SeoFilter
 
     /**
      * DEPRECATED METHOD
+     * @param string $value
+     * @param array $field
+     * @return string
      */
     public function fieldUrl($value = '', $field = array()) {
         if(!$alias = $field['alias']) {
@@ -1311,6 +1435,8 @@ class SeoFilter
         }
         return $url;
     }
+
+
 
 
 

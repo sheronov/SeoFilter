@@ -4,6 +4,10 @@ $xpdo_meta_map['sfField']= array (
   'version' => '1.1',
   'table' => 'seofilter_fields',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'name' => '',
@@ -21,6 +25,9 @@ $xpdo_meta_map['sfField']= array (
     'xpdo_id' => '',
     'xpdo_name' => '',
     'xpdo_where' => '',
+    'relation' => 0,
+    'relation_field' => 0,
+    'relation_column' => '',
     'rank' => 0,
     'active' => 1,
   ),
@@ -144,6 +151,31 @@ $xpdo_meta_map['sfField']= array (
       'precision' => '255',
       'phptype' => 'string',
       'null' => true,
+      'default' => '',
+    ),
+    'relation' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => false,
+      'default' => 0,
+    ),
+    'relation_field' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'attributes' => 'unsigned',
+      'null' => false,
+      'default' => 0,
+    ),
+    'relation_column' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => false,
       'default' => '',
     ),
     'rank' => 

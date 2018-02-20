@@ -26,10 +26,9 @@ SeoFilter.grid.ComboboxOptions = function (config) {
         cls: 'seofilter-grid',
     });
     SeoFilter.grid.ComboboxOptions.superclass.constructor.call(this, config);
-
-    this.prepareValues();
-
-
+    // setTimeout(function () {
+        this.prepareValues();
+    // },100);
 };
 
 Ext.extend(SeoFilter.grid.ComboboxOptions, MODx.grid.LocalGrid, {
@@ -131,7 +130,7 @@ Ext.extend(SeoFilter.grid.ComboboxOptions, MODx.grid.LocalGrid, {
             this.store.add(new Ext.data.Record({
                 value: ''
             }));
-            //this.focusValueCell(0);
+            this.focusValueCell(0);
         }
         this.prepareProperties();
     },
@@ -315,8 +314,8 @@ SeoFilter.window.Option = function (config) {
                 listeners: {
                     click: { fn: this.helpWindow, scope:this}
                 },
-                // handler: this.helpWindow,
-                //  scope:this,
+               // handler: this.helpWindow,
+               //  scope:this,
             }]
         }],
         keys: [{

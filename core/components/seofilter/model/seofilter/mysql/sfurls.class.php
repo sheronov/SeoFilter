@@ -1,3 +1,3 @@
 <?php
-require_once (dirname(dirname(__FILE__)) . '/sfurls.class.php');
+require_once (dirname(__DIR__) . '/sfurls.class.php');
 class sfUrls_mysql extends sfUrls {}

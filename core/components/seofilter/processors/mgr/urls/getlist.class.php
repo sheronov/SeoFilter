@@ -118,7 +118,9 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                     $url = substr($url, 0, -strlen($container_suffix));
                 }
             }
-
+            if (substr($url,-1) == '/') {
+                $url = substr($url,0,-1);
+            }
             $array['url_preview'] = $url.'/'.$addurl.$url_suffix;
 
             if(!$array['active']) {

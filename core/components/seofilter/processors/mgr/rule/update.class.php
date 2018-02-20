@@ -59,11 +59,13 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
 
     public function afterSave()
     {
-        if($this->object->get('active')) {
+        $object = $this->object;
+        /*** @var sfRule $object */
+        if($object->get('active')) {
             $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
-            $multi_id = $this->object->get('id');
-            $page_id = $this->object->get('page');
-            $urls_array = $this->object->generateUrl(1);
+            $multi_id = $object->get('id');
+            $page_id = $object->get('page');
+            $urls_array = $object->generateUrl(1);
             $reurls = $urls = array();
             foreach($urls_array as $ukey => $uarr) {
                 $urls[$ukey] = $uarr['url'];
@@ -106,7 +108,8 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
                         'old_url' => $url['url'],
                         'page_id' => $page_id,
                         'link' => $url['link'],
-                        'field_word' => $url['field_word']
+                        'field_word' => $url['field_word'],
+                        'from_rule' => 1,
                     );
                     $otherProps = array('processors_path' => $path . 'processors/');
                     $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);

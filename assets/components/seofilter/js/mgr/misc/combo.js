@@ -108,6 +108,7 @@ SeoFilter.combo.Class = function (config) {
 Ext.extend(SeoFilter.combo.Class, MODx.combo.ComboBox);
 Ext.reg('seofilter-combo-class', SeoFilter.combo.Class);
 
+
 var compares = [
     [1, _('seofilter_compare_in')],
     [2, _('seofilter_compare_notin')],
@@ -176,6 +177,37 @@ SeoFilter.combo.Field = function (config) {
 Ext.extend(SeoFilter.combo.Field, MODx.combo.ComboBox);
 Ext.reg('seofilter-combo-field', SeoFilter.combo.Field);
 
+SeoFilter.combo.Tpls = function (config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'tpl',
+        hiddenName: 'tpl',
+        displayField: 'name',
+        valueField: 'id',
+        editable: true,
+        fields: ['id','idx','name'],
+        pageSize: 20,
+        emptyText: _('seofilter_combo_select'),
+        url: SeoFilter.config.connector_url,
+        baseParams: {
+            action: 'mgr/misc/getlist',
+            combo: true,
+            id:config.value,
+            dir: SeoFilter.config.tpls_path
+        },
+        tpl: new Ext.XTemplate(''
+            +'<tpl for="."><div class="x-combo-list-item seofilter-tpls-list-item">'
+            +'<span><small>({idx})</small> <b>{name}</b></span>'
+            +'</div></tpl>',{
+            compiled: true
+        }),
+        itemSelector: 'div.seofilter-tpls-list-item'
+    });
+    SeoFilter.combo.Tpls.superclass.constructor.call(this, config);
+};
+Ext.extend(SeoFilter.combo.Tpls, MODx.combo.ComboBox);
+Ext.reg('seofilter-combo-tpls', SeoFilter.combo.Tpls);
+
 SeoFilter.combo.Rule = function (config) {
     config = config || {};
     Ext.applyIf(config, {
@@ -219,7 +251,7 @@ SeoFilter.combo.Word = function (config) {
         fields: ['id', 'value'],
         pageSize: 20,
         emptyText: _('seofilter_combo_select'),
-        allowBlank: false,
+        allowBlank: true,
         url: SeoFilter.config.connector_url,
         baseParams: {
             action: 'mgr/dictionary/getlist',

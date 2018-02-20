@@ -27,6 +27,7 @@ class sfUrlsGetProcessor extends modObjectGetProcessor
                 $this->object->set('h2',$rule->get('h2'));
                 $this->object->set('description',$rule->get('description'));
                 $this->object->set('introtext',$rule->get('introtext'));
+                $this->object->set('keywords',$rule->get('keywords'));
                 $this->object->set('text',$rule->get('text'));
                 $this->object->set('content',$rule->get('content'));
             }

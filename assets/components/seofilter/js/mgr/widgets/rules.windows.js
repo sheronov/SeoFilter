@@ -22,7 +22,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
 
     getFields: function (config) {
         var xtype_count = 'hidden';
-        if(SeoFilter.config.count_childrens!=0) {
+        if(parseInt(SeoFilter.config.count_childrens)!==0) {
             xtype_count = 'textfield';
         }
         return {
@@ -151,6 +151,12 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     name: 'introtext',
                     id: config.id + '-introtext',
                     anchor: '99%',
+                }, {
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_keywords'),
+                    name: 'keywords',
+                    id: config.id + '-keywords',
+                    anchor: '99%',
                 },{
                     xtype: 'textarea',
                     fieldLabel: _('seofilter_seometa_text'),
@@ -210,7 +216,7 @@ SeoFilter.window.UpdateRule = function (config) {
 Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
     getFields: function (config) {
         var xtype_count = 'hidden';
-        if(SeoFilter.config.count_childrens!=0) {
+        if(parseInt(SeoFilter.config.count_childrens) !== 0) {
             xtype_count = 'textfield';
         }
 
@@ -353,6 +359,12 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     anchor: '99%',
                 },{
                     xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_keywords'),
+                    name: 'keywords',
+                    id: config.id + '-keywords',
+                    anchor: '99%',
+                },{
+                    xtype: 'textarea',
                     fieldLabel: _('seofilter_seometa_text'),
                     name: 'text',
                     id: config.id + '-text',
@@ -374,21 +386,50 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     },
                     anchor: '99%'
                 }]
-            }, {
-                title: _('seofilter_rule_properties')
-                ,hideMode: 'offsets'
-                ,layout: 'form'
-                ,border:false
-                ,items: [{
-                    html: _('seofilter_rule_properties_intro'),
-                    cls: 'panel-desc',
-                },{
-                    xtype: 'seofilter-grid-combobox-options',
-                    anchor: '99%',
-                    name:'properties',
-                    record: config.record.object,
-                    id: config.id + '-properties',
-                }]
+            // }, {
+            //     //TODO: сделать скрытую возможность
+            //     title: _('seofilter_rule_properties')
+            //     ,hideMode: 'offsets'
+            //     ,layout: 'form'
+            //     ,border:false
+            //     ,items: [{
+            //         //TODO: а это вообще супер high level function!
+            //         xtype: 'seofilter-combo-tpls',
+            //         fieldLabel: _('seofilter_rule_tpl'),
+            //         name: 'tpl',
+            //         id: config.id + '-tpl',
+            //         anchor: '99%',
+            //     }, {
+            //         html: '',
+            //         style:'margin-bottom:10px'
+            //     }, {
+            //         html: _('seofilter_rule_properties_intro'),
+            //         cls: 'panel-desc',
+            //     },{
+            //         xtype: 'seofilter-grid-combobox-options',
+            //         anchor: '99%',
+            //         name:'properties',
+            //         record: config.record.object,
+            //         id: config.id + '-properties',
+            //     }, {
+            //         html: '',
+            //         style:'margin-bottom:10px'
+            //     }, {
+            //         html: _('seofilter_rule_properties_introtexts'),
+            //         cls: 'panel-desc',
+            //     },{
+            //         xtype: 'seofilter-grid-combobox-options',
+            //         anchor: '99%',
+            //         name:'introtexts',
+            //         record: config.record.object,
+            //         id: config.id + '-introtexts',
+            //     }, {
+            //         xtype: 'numberfield',
+            //         fieldLabel: _('seofilter_rule_introlength'),
+            //         name: 'introlength',
+            //         id: config.id + '-introlength',
+            //         anchor: '99%',
+            //     }]
             }]
         };
     },

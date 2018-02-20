@@ -10,10 +10,18 @@ switch ($modx->event->name) {
             $q = $modx->newQuery('sfRule');
             $q->where(array('page' => $page)); // Одно правило для одной страницы!
             if($modx->getCount('sfRule',$q)) {
-                if(!$SeoFilter->initialized[$modx->context->key]) {
-                    $SeoFilter->initialize($modx->context->key, array('page' => (int)$page));
+                if(!$SeoFilter->initialized[$modx->resource->context_key]) {
+                    $SeoFilter->initialize($modx->resource->context_keyy, array('page' => (int)$page));
                 }
             }
+
+            //TODO: сделать правильное подключение класса, чтобы без ошибок там где его нет
+//            if($msVC = $modx->getService('msvendorcollections', 'msVendorCollections', $modx->getOption('msvendorcollections_core_path', null,
+//                    $modx->getOption('core_path') . 'components/msvendorcollections/') . 'model/msvendorcollections/', $scriptProperties)) {
+//                if (!$msVC->initialized[$modx->resource->context_key]) {
+//                    $msVC->initialize($modx->resource->context_key);
+//                }
+//            }
         }
         break;
     case 'OnDocFormSave':
@@ -67,9 +75,11 @@ switch ($modx->event->name) {
                         break;
                 }
 
-                $result = json_decode($input) ;
-                if(json_last_error() === JSON_ERROR_NONE) {
-                    $input = $result;
+                if(!is_array($input) && !is_numeric($input)) {
+                    $result = json_decode($input);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $input = $result;
+                    }
                 }
 
                 if (is_array($input)) {
@@ -154,22 +164,37 @@ switch ($modx->event->name) {
                 $q = $modx->newQuery('modResource');
                 $q->where(array('id:IN' => array_unique($page_ids)));
                 $q->limit(0);
-                $q->select('id,alias');
+                $q->select('id,alias,uri_override,uri');
                 if ($q->prepare() && $q->stmt->execute()) {
                     while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $page_aliases[$row['id']] = $row['alias'];
+                        $uri = $row['alias'];
+                        if($row['uri_override']) {
+                            $uri = $row['uri'];
+                        }
+
+                        foreach($SeoFilter->config['possibleSuffixes'] as $possibleSuffix) {
+                            if (substr($uri, -strlen($possibleSuffix)) == $possibleSuffix) {
+                                $uri = substr($uri, 0, -strlen($possibleSuffix));
+                            }
+                        }
+
+                        $page_aliases[$row['id']] = $uri;
                     }
                 }
+
+
 
                 $r_tmp = array_reverse($tmp, 1);
                 $tmp_id = 0;
 
                 foreach ($r_tmp as $t_key => $t_alias) {
+                    $t_alias = trim($t_alias,'/');
                     if ($page = array_search($t_alias, $page_aliases)) {
                         $tmp_id = $t_key;
                         break;
                     }
                 }
+
                 if ($page) {
                     for ($i = 0; $i <= $tmp_id; $i++) {
                         array_shift($tmp);
@@ -183,10 +208,16 @@ switch ($modx->event->name) {
 
 
             if($page) {
+                $p = $modx->newQuery('modResource',array('id'=>$page));
+                $p->select('context_key');
+                $ctx = $modx->getValue($p->prepare());
                 if($page == $site_start) {
                     $url = '';
                 } else {
-                    $url = $modx->makeUrl($page,$modx->context->key,'',-1);
+                    $url = $modx->makeUrl($page,$ctx,'',-1);
+                }
+                if(strpos($url,$modx->getOption('site_url')) !== false) {
+                    $url = str_replace($modx->getOption('site_url'),'',$url);
                 }
                 $c_suffix = $SeoFilter->config['container_suffix'];
                 if($c_suffix) {
@@ -194,10 +225,15 @@ switch ($modx->event->name) {
                         $url = substr($url,0,-strlen($c_suffix));
                     }
                 }
+                foreach($SeoFilter->config['possibleSuffixes'] as $possibleSuffix) {
+                    if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                        $url = substr($url, 0, -strlen($possibleSuffix));
+                    }
+                }
                 if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
                     break;
                 }
-                if($url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
+                if($tmp && $url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
                     if($url_array['active']) {
                         $old_url = $url_array['old_url'];
                         $new_url = $url_array['new_url'];
@@ -209,14 +245,14 @@ switch ($modx->event->name) {
                                     $url = substr($url, 0, -strlen($container_suffix));
                                 }
                             }
-                            $modx->sendRedirect($url .'/'. $new_url . $url_suffix);
+                            $modx->sendRedirect($url .'/'. $new_url . $url_suffix,false,'REDIRECT_HEADER','HTTP/1.1 301 Moved Permanently');
                         } elseif($url_redirect && ($url_suffix != $last_char)) {
                             if ($container_suffix) {
                                 if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
                                     $url = substr($url, 0, -strlen($container_suffix));
                                 }
                             }
-                            $modx->sendRedirect($url .'/'. implode('/', $tmp) . $url_suffix);
+                            $modx->sendRedirect($url .'/'. implode('/', $tmp) . $url_suffix,false,'REDIRECT_HEADER','HTTP/1.1 301 Moved Permanently');
                         }
 
                         $tmp = explode('/', $old_url);
@@ -285,11 +321,21 @@ switch ($modx->event->name) {
 
                             $original_params = array_diff_key(array_merge($params,$_GET),array_flip(array_merge(array($del_get),$base_get)));
                             $fast_search = true;
-                            $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
                             $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);
+                            if($SeoFilter->config['hideEmpty'] && $SeoFilter->config['count_childrens'] && !$meta['total']) {
+                                $modx->setPlaceholder('sf.seo_id',$url_array['id']);
+                                break;
+                            }
+                            $SeoFilter->initialize($ctx, array('page' => $page, 'params' => $params));
                             $meta['menutitle'] = $menutitle;
                             if(isset($meta['properties'])) {
                                 $meta['properties'] = $modx->toJSON($meta['properties']);
+                            }
+                            if(isset($meta['introtexts'])) {
+                                $meta['introtexts'] = $modx->toJSON($meta['introtexts']);
+                            }
+                            if($ctx != 'web') {
+                                $modx->switchContext($ctx);
                             }
                             $modx->setPlaceholders($meta, 'sf.');
                             $modx->sendForward($page);

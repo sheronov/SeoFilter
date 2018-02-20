@@ -44,25 +44,45 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     'class' => $class,
                     'key' => $key,
                     'field_id' => $field->get('id'),
+                    'from_field' => 1,
                 );
                 $otherProps = array('processors_path' => $path . 'processors/');
 
+                if ($package = $field->get('xpdo_package')) {
+                    $this->modx->addPackage(strtolower($package), $this->modx->getOption('core_path') . 'components/' . strtolower($package) . '/model/');
+                }
                 if ($field->get('xpdo')) {
                     $xpdo_id = $field->get('xpdo_id');
                     $xpdo_name = $field->get('xpdo_name');
                     if ($xpdo_class = $field->get('xpdo_class')) {
-                        if ($package = $field->get('xpdo_package')) {
-                            $this->modx->addPackage($package, $this->modx->getOption('core_path') . 'components/' . $package . '/model/');
-                        }
                         $q = $this->modx->newQuery($xpdo_class);
-                        $q->select($xpdo_id . ',' . $xpdo_name);
-                        if ($q->prepare() && $q->stmt->execute()) {
-                            while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                                //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($row,1));
-                                $values[$row[$xpdo_id]] = $row[$xpdo_name];
+                        if($field->get('relation')) {
+                            $relation_column = $field->get('relation_column');
+                            if($relation_column) {
+                                $q->select($xpdo_id . ','.$xpdo_name.','.$relation_column);
+                                if($q->prepare() && $q->stmt->execute()) {
+                                    while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        $values[$row[$xpdo_id]] = array('value'=>$row[$xpdo_name],'relation'=>$row[$relation_column]);
+                                    }
+                                }
+                            } else {
+                                $q->select($xpdo_id . ',' . $xpdo_name);
+                                if ($q->prepare() && $q->stmt->execute()) {
+                                    while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($row,1));
+                                        $values[$row[$xpdo_id]] = $row[$xpdo_name];
+                                    }
+                                }
+                            }
+                        } else {
+                            $q->select($xpdo_id . ',' . $xpdo_name);
+                            if ($q->prepare() && $q->stmt->execute()) {
+                                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($row,1));
+                                    $values[$row[$xpdo_id]] = $row[$xpdo_name];
+                                }
                             }
                         }
-
                     }
                 }
 
@@ -111,11 +131,31 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     }
                     $words = array_unique(array_merge($tvvalues, $pre));
                     foreach ($words as $word) {
+                        $relation_id = $relation_value = '';
                         if ($field->get('xpdo')) {
-                            $value = $values[$word];
+                            if(is_array($values[$word])) {
+                                $relation_value = $values[$word]['relation'];
+                                $value = $values[$word]['value'];
+                            } else {
+                                $value = $values[$word];
+                            }
+                        } elseif(strpos($word,'==') !== false) {
+                            $word_exp = array_map('trim',explode('==',$word));
+                            $value = $word_exp[0];
+                            $word = $word_exp[1];
                         } else {
                             $value = $word;
                         }
+
+                        if($relation_value) {
+                            $relation_field = $field->get('relation_field');
+                            $s = $this->modx->newQuery('sfDictionary');
+                            $s->where(array('input'=>$relation_value,'field_id'=>$relation_field));
+                            $s->select('id');
+                            $relation_id = $this->modx->getValue($s->prepare());
+                        }
+
+                        $processorProps['relation_word'] = $relation_id;
                         $processorProps['input'] = $word;
                         $processorProps['value'] = $value;
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
@@ -137,20 +177,42 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     }
                     if ($q->prepare() && $q->stmt->execute()) {
                         while ($input = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                            $relation_id = $relation_value = '';
+
                             if ($field->get('xpdo')) {
-                                $value = $values[$input[$key]];
+                                if(is_array($values[$input[$key]])) {
+                                    $relation_value = $values[$input[$key]]['relation'];
+                                    $value = $values[$input[$key]]['value'];
+                                } else {
+                                    $value = $values[$input[$key]];
+                                }
                             } else {
                                 $value = $input[$key];
                             }
+
+                            if($relation_value) {
+                                $relation_field = $field->get('relation_field');
+                                $s = $this->modx->newQuery('sfDictionary');
+                                $s->where(array('input'=>$relation_value,'field_id'=>$relation_field));
+                                $s->select('id');
+                                $relation_id = $this->modx->getValue($s->prepare());
+                            }
+
+                            $processorProps['relation_word'] = $relation_id;
+
                             if ($class == 'msVendor') {
                                 $value = $input['name'];
                             }
-                            if (strpos($value, '||')) {
-                                $value_arr = array_map('trim', explode('||', $value));
-                            } elseif (strpos($value, ',')) {
-                                $value_arr = array_map('trim', explode(',', $value));
-                            } else {
+                            if($field->get('exact')) {
                                 $value_arr = array($value);
+                            } else {
+                                if (strpos($value, '||')) {
+                                    $value_arr = array_map('trim', explode('||', $value));
+                                } elseif (strpos($value, ',')) {
+                                    $value_arr = array_map('trim', explode(',', $value));
+                                } else {
+                                    $value_arr = array($value);
+                                }
                             }
                             foreach ($value_arr as $value) {
                                 //$this->modx->log(modX::LOG_LEVEL_ERROR, print_r($input, 1));

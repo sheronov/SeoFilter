@@ -50,6 +50,20 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             $c->andCondition(array('class' => $class), '', 1);
         }
 
+        if($relation = $this->getProperty('relation')) {
+            $field_relation = (int)$this->getProperty('field_relation');
+            $q = $this->modx->newQuery('sfField');
+            $q->where(array('id'=>$field_relation,'relation'=>1));
+            $q->select('relation_field');
+            if($this->modx->getCount('sfField',$q)) {
+                $field_id = $this->modx->getValue($q->prepare());
+                $c->andCondition(array('field_id'=>$field_id),'',1);
+            } else {
+                $c->andCondition(array('field_id'=>0),'',1);
+            }
+        }
+
+
         $c->leftJoin('sfField', 'sfField', $this->classKey.'.field_id = sfField.id');
         $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
         $c->select('sfField.name as fieldtitle');
@@ -69,6 +83,17 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
         $array = $object->toArray();
 
         $array['actions'] = array();
+
+        // Edit
+        $array['actions'][] = array(
+            'cls' => '',
+            'icon' => 'icon icon-refresh',
+            'title' => $this->modx->lexicon('seofilter_dictionary_decl'),
+            //'multiple' => $this->modx->lexicon('seofilter_dictionary_update'),
+            'action' => 'declineWord',
+            'button' => true,
+            'menu' => true,
+        );
 
         // Edit
         $array['actions'][] = array(

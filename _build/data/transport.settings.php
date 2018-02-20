@@ -32,13 +32,18 @@ $tmp = array(
         'value' => false,
         'area' => 'seofilter_main',
     ),
-    'morpher_username' => array(
+//    'morpher_username' => array(
+//        'xtype' => 'textfield',
+//        'value' => '',
+//        'area' => 'seofilter_main',
+//    ),
+//    'morpher_password' => array(
+//        'xtype' => 'text-password',
+//        'value' => '',
+//        'area' => 'seofilter_main',
+//    ),
+    'morpher_token' => array(
         'xtype' => 'textfield',
-        'value' => '',
-        'area' => 'seofilter_main',
-    ),
-    'morpher_password' => array(
-        'xtype' => 'text-password',
         'value' => '',
         'area' => 'seofilter_main',
     ),
@@ -66,6 +71,11 @@ $tmp = array(
         'xtype' => 'combo-boolean',
         'value' => false,
         'area' => 'seofilter_main',
+    ),
+    'hide_empty' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_count',
     ),
     'count' => array(
         'xtype' => 'combo-boolean',
@@ -100,6 +110,11 @@ $tmp = array(
     'introtext' => array(
         'xtype' => 'textfield',
         'value' => 'introtext',
+        'area' => 'seofilter_seo',
+    ),
+    'keywords' => array(
+        'xtype' => 'textfield',
+        'value' => '',
         'area' => 'seofilter_seo',
     ),
     'link' => array(
@@ -155,6 +170,11 @@ $tmp = array(
     'jintrotext' => array(
         'xtype' => 'textfield',
         'value' => '.sf_introtext',
+        'area' => 'seofilter_jquery',
+    ),
+    'jkeywords' => array(
+        'xtype' => 'textfield',
+        'value' => '.sf_keywords',
         'area' => 'seofilter_jquery',
     ),
     'jlink' => array(

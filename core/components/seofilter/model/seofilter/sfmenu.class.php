@@ -21,7 +21,6 @@ class sfMenu
     {
         $this->modx = &$modx;
 
-
         $config = array_merge(
             array(
                 'firstClass' => 'first',
@@ -50,10 +49,10 @@ class sfMenu
         }
 
         if(empty($config['context'])){
-            $config['context'] = $modx->context->key;
+            $config['context'] = $modx->context->get('key');
         }
-
-        if (empty($config['hereId']) && !empty($modx->getPlaceholder('sf.seo_id'))) {
+        $sf_seo_id = $modx->getPlaceholder('sf.seo_id');
+        if (empty($config['hereId']) && !empty($sf_seo_id)) {
             $config['hereId'] = (int)$modx->getPlaceholder('sf.seo_id');
         }
 
@@ -81,7 +80,10 @@ class sfMenu
 
     /**
      * DEPRECATED METHOD
-     * The new findParents */
+     * The new findParents
+     * @param int $id
+     * @return array
+     */
     public function urlParents($id = 0) {
         $parents = array();
         $words = array();
@@ -268,7 +270,6 @@ class sfMenu
             }
             $where = array_merge($where,$where_add);
         }
-        $q->where($where);
         $q->leftJoin('sfUrlWord','sfUrlWord','sfUrlWord.url_id = sfUrls.id');
         $q->innerJoin('sfDictionary','sfDictionary','sfDictionary.id = sfUrlWord.word_id');
         $q->select(array(
@@ -276,6 +277,7 @@ class sfMenu
             'sfUrlWord.word_id,sfUrlWord.field_id',
             'sfDictionary.alias,sfDictionary.input,sfDictionary.value'
         ));
+        $q->where($where);
         if($this->config['sortby'] && $this->config['sortdir']) {
             $q->sortby($this->config['sortby'], $this->config['sortdir']);
         }
@@ -340,6 +342,12 @@ class sfMenu
         $tree = array();
         $time = microtime(true);
 
+
+        $wordWhere = array();
+        if(isset($this->config['wordWhere'])) {
+            $wordWhere = $this->modx->fromJSON($this->config['wordWhere']);
+        }
+
         foreach($links as $key => $link) {
             if(isset($link['words'])) {
                 $words = $link['words'];
@@ -352,19 +360,62 @@ class sfMenu
                     }
                 });
                 $link['words'] = $words;
+
+                if($wordWhere) {
+                    $found = false;
+                    if ((count($wordWhere, COUNT_RECURSIVE) - count($wordWhere)) > 0) {
+                        //многомерный массив - несколько условий передано
+                        $wheres = count($wordWhere);
+                        $find = 0;
+                        foreach($wordWhere as $ww) {
+                            foreach($words as $wf) {
+                                if(!array_diff_assoc($ww,$wf)) {
+                                    $find++;
+                                    break;
+                                }
+                            }
+                            if($find == $wheres) {
+                                $found = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        foreach($words as $wf) {
+                            if(!array_diff_assoc($wordWhere,$wf)) {
+                                $found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(!$found) {
+                        continue;
+                    }
+                }
+
             } else {
                 $link['level'] = 0;
             }
 
             if($maxlevel = (int)$this->config['level']) {
-                if($link['level'] <= $maxlevel) {
+                if(!empty($this->config['minlevel'])) {
+                    $minlevel = (int)$this->config['minlevel'];
+                    if ($link['level'] <= $maxlevel && $link['level'] >= $minlevel) {
+                        $tree[$key] = $link;
+                    }
+                } else {
+                    if ($link['level'] <= $maxlevel) {
+                        $tree[$key] = $link;
+                    }
+                }
+            } elseif(!empty($this->config['minlevel'])) {
+                $minlevel = (int)$this->config['minlevel'];
+                if ($link['level'] >= $minlevel) {
                     $tree[$key] = $link;
                 }
             } else {
                 $tree[$key] = $link;
             }
         }
-
 
         $this->pdoTools->addTime('Sort links complete ', microtime(true) - $time);
         return $tree;
@@ -374,6 +425,7 @@ class sfMenu
         $tree = array();
         $time = microtime(true);
         foreach ($links as $link) {
+            $groupby = array();
             $total = 0;
             $addTVs = $fields_where = $innerJoin = array();
             foreach ($link['words'] as $field) {
@@ -387,17 +439,22 @@ class sfMenu
                         }
                         if ($field['class'] == 'msProductOption') {
                             $innerJoin['msProductOption'] = array('class' => 'msProductOption', 'on' => 'msProductOption.product_id = modResource.id');
+//                            $fields_where[$field['class'] . '.key:IN'][] = $field['key'];
                             $fields_where[$field['class'] . '.key'] = $field['key'];
                             $fw = $field['class'] . '.value';
                         }
+                        $values = explode(',', $field['word_input']);
                         if ($field['slider']) {
-                            $slider = explode(',', $field['word_input']);
-                            $fields_where[$fw . ':>='] = $slider[0];
-                            if (isset($slider[1])) {
-                                $fields_where[$fw . ':<='] = $slider[1];
+                            $fields_where[$fw . ':>='] = $values[0];
+                            if (isset($values[1])) {
+                                $fields_where[$fw . ':<='] = $values[1];
                             }
+                        } elseif($field['class'] == 'msProductOption') {
+//                             $tmp = count($fields_where[$fw . ':IN']) ? $fields_where[$fw . ':IN'] : array();
+//                             $fields_where[$fw . ':IN'] = array_merge($tmp, $values);
+                            $fields_where[$fw . ':IN'] = $values;
+//                            $groupby = 'msProductOption.product_id HAVING COUNT(DISTINCT msProductOption.value) = ' . count($fields_where[$fw . ':IN']);
                         } else {
-                            $values = explode(',', $field['word_input']);
                             $fields_where[$fw . ':IN'] = $values;
                         }
                         break;
@@ -434,6 +491,31 @@ class sfMenu
             if ($where = $this->modx->fromJSON($this->config['count_where'])) {
                 $fields_where = array_merge($fields_where,$where);
             }
+            foreach($fields_where as $key=>$wheres) {
+                if(strpos($key,'.') !== false) {
+                    $key = explode('.',$key);
+                    if(!isset($innerJoin[$key[0]])) {
+                        switch($key[0]) {
+                            case 'msProductData':
+                            case 'Data':
+                                $innerJoin['msProductData'] = array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
+                                break;
+                            case 'msProductOption':
+                                $innerJoin['msProductOption'] = array('class' => 'msProductOption', 'on' => 'msProductOption.product_id = modResource.id');
+                                break;
+                            case 'msVendor':
+                                $innerJoin['msProductData'] = array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
+                                $innerJoin['msVendor'] = array('class' => 'msVendor', 'on' => 'msVendor.id = msProductData.vendor');
+                                break;
+                            case 'modResource':
+                                break;
+                            default:
+//                                $this->modx->log(MODX::LOG_LEVEL_ERROR,'[SeoFilter] The key = '.$key[0].' is wrong for where condition');
+                                break;
+                        }
+                    }
+                }
+            }
 
             if($link['count_parents']) {
                 $parents = $link['count_parents'];
@@ -443,7 +525,7 @@ class sfMenu
                 $parents = $this->config['parents'];
             }
 
-            $this->pdoTools->setConfig(array(
+            $config = array(
                 'showLog' => 0,
                 'class' => 'modResource',
                 'parents' => $parents,
@@ -453,12 +535,16 @@ class sfMenu
                 'return' => 'data',
                 'select' => array(
                     'modResource' => 'COUNT(modResource.id) as count'
-                )
-            ));
+                ),
+            );
+            // if ($groupby) $config['groupby'] = $groupby;
+            $this->pdoTools->setConfig($config);
 
             $run = $this->pdoTools->run();
             if (count($run)) {
-                $total = $run[0]['count'];
+                if(isset($run[0]['count'])) {
+                    $total = $run[0]['count'];
+                }
             }
             $link['total'] = $total;
 
@@ -493,59 +579,60 @@ class sfMenu
         $roots = array();
         $firstlevel = array();
 
-        $levels = $this->recursiveLevels($links);
-
-        foreach($levels as $level => &$linkss) {
-            if($level > 1 ) {
-                foreach($linkss as $key=> &$link) {
-                    if(isset($link['words'])) {
-                        $words = $link['words'];
-                        $parents = array();
-                        $parent_find = 0;
-                        foreach ($levels[$level-1] as $pid => &$parent_link) {
-                            $find = 0;
-                            $childs = array();
-                            if(isset($parent_link['words'])) {
-                                foreach ($words as $word) {
-                                    foreach ($parent_link['words'] as $word_find) {
-                                        $f_arr = array_uintersect_assoc($word_find, $word, "strcasecmp");
-                                        if (in_array('field_id', array_flip($f_arr)) && in_array('word_id', array_flip($f_arr))) {
-                                            $find++;
-                                            break;
+        if($links && $levels = $this->recursiveLevels($links)) {
+            foreach ($levels as $level => &$linkss) {
+                if ($level > 1) {
+                    foreach ($linkss as $key => &$link) {
+                        if (isset($link['words'])) {
+                            $words = $link['words'];
+                            $parents = array();
+                            $parent_find = 0;
+                            if(isset($levels[$level-1])) {
+                                foreach ($levels[$level - 1] as $pid => &$parent_link) {
+                                    $find = 0;
+                                    $childs = array();
+                                    if (isset($parent_link['words'])) {
+                                        foreach ($words as $word) {
+                                            foreach ($parent_link['words'] as $word_find) {
+                                                $f_arr = array_uintersect_assoc($word_find, $word, "strcasecmp");
+                                                if (in_array('field_id', array_flip($f_arr)) && in_array('word_id', array_flip($f_arr))) {
+                                                    $find++;
+                                                    break;
+                                                }
+                                            }
+                                            if ($find == $level - 1) {
+                                                break;
+                                            }
                                         }
                                     }
                                     if ($find == $level - 1) {
-                                        break;
+                                        $parents[] = $parent_link['id'];
+                                        $parent_find++;
+
+                                        if (isset($parent_link['childrens'])) {
+                                            $parent_link['childrens'][] = $link['id'];
+                                        } else {
+                                            $parent_link['childrens'] = array($link['id']);
+                                        }
+                                        if (isset($parent_link['inner'])) {
+                                            $parent_link['inner'][] = $link;
+                                        } else {
+                                            $parent_link['inner'] = array($link);
+                                        }
+
+                                        if (!$double) {
+                                            break;
+                                        }
                                     }
                                 }
                             }
-                            if($find == $level - 1) {
-                                $parents[] = $parent_link['id'];
-                                $parent_find++;
-
-                                if(isset($parent_link['childrens'])) {
-                                    $parent_link['childrens'][] = $link['id'];
-                                } else {
-                                    $parent_link['childrens'] = array($link['id']);
-                                }
-                                if(isset($parent_link['inner'])) {
-                                    $parent_link['inner'][] = $link;
-                                } else {
-                                    $parent_link['inner'] = array($link);
-                                }
-
-                                if(!$double) {
-                                    break;
-                                }
-                            }
-                        }
 //                        $link['parents'] = $parents;
+                        }
                     }
                 }
             }
+            $tree = $levels[1];
         }
-
-        $tree = $levels[1];
 
         return $tree;
     }
@@ -573,13 +660,13 @@ class sfMenu
 //            return ($a['level'] < $b['level']) ? -1 : 1;
 //        });
 
-        $tree = $this->multiSort($tree);
-
-        foreach ($tree as $key=>$link) {
-            if (isset($link['inner'])) {
-                $tree[$key]['childs'] = count($link['inner']);
-            } else {
-                $tree[$key]['childs'] = 0;
+        if($tree = $this->multiSort($tree)) {
+            foreach ($tree as $key=>$link) {
+                if (isset($link['inner'])) {
+                    $tree[$key]['childs'] = count($link['inner']);
+                } else {
+                    $tree[$key]['childs'] = 0;
+                }
             }
         }
 
@@ -614,11 +701,13 @@ class sfMenu
 
 
     public function multiSort($links = array()) {
-        uasort($links,array($this,'sortingLinks'));
-        foreach($links as $key=>$link) {
-            if(isset($link['inner'])) {
-                $inner = $this->multiSort($link['inner']);
-                $links[$key]['inner'] = $inner;
+        if($links) {
+            uasort($links, array($this, 'sortingLinks'));
+            foreach ($links as $key => $link) {
+                if (isset($link['inner'])) {
+                    $inner = $this->multiSort($link['inner']);
+                    $links[$key]['inner'] = $inner;
+                }
             }
         }
         return $links;
@@ -706,8 +795,6 @@ class sfMenu
             $row['children'] = $count;
         } else {
             $row['children'] = isset($row['inner']) ? count($row['inner']) : 0;
-
-
         }
 
 
@@ -735,7 +822,44 @@ class sfMenu
 
         $tpl = $this->getTpl($row);
 
+        $row = $this->prepareRow($row,$tpl);
+
         return $this->pdoTools->getChunk($tpl,$row,(int)$this->config['fastMode']);
+    }
+
+    public function prepareRow($row = array(),$tpl='') {
+        if (!empty($this->config['prepareSnippet'])) {
+            $name = trim($this->config['prepareSnippet']);
+            array_walk_recursive($row, function (&$value) {
+                $value = str_replace(
+                    array('[', ']', '{', '}'),
+                    array('*(*(*(*(*(*', '*)*)*)*)*)*', '~(~(~(~(~(~', '~)~)~)~)~)~'),
+                    $value
+                );
+            });
+            $tmp = $this->modx->runSnippet($name, array_merge($this->config, array(
+                'row' => serialize($row),
+                'tpl' => $tpl,
+                'sfMenu' => $this,
+                'pdoTools' => $this->pdoTools,
+            )));
+            $tmp = ($tmp[0] == '[' || $tmp[0] == '{')
+                ? json_decode($tmp, true)
+                : unserialize($tmp);
+            if (!is_array($tmp)) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter]: Preparation snippet must return an array, instead of "' . gettype($tmp) . '"');
+            } else {
+                $row = array_merge($row, $tmp);
+            }
+            array_walk_recursive($row, function (&$value) {
+                $value = str_replace(
+                    array('*(*(*(*(*(*', '*)*)*)*)*)*', '~(~(~(~(~(~', '~)~)~)~)~)~'),
+                    array('[', ']', '{', '}'),
+                    $value
+                );
+            });
+        }
+        return $row;
     }
 
     public function getClasses($row = array())
@@ -886,7 +1010,6 @@ class sfMenu
                 }
             }
         } else {
-
             if((int)$this->config['relative'] && $this->config['hereId']) {
                 $find = 0;
                 foreach($tree as $row) {

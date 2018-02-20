@@ -74,6 +74,31 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         w.show(e.target);
     },
 
+    declineWord: function (btn, e, row) {
+        if (typeof(row) != 'undefined') {
+            this.menu.record = row.data;
+        }
+        else if (!this.menu.record) {
+            return false;
+        }
+        var record = this.menu.record;
+        record.action = 'mgr/dictionary/update';
+        record.update = 1;
+        record.active = 1;
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: record,
+            listeners: {
+                success: {
+                    fn: function () {
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        })
+
+    },
+
     updateField: function (btn, e, row) {
         if (typeof(row) != 'undefined') {
             this.menu.record = row.data;
@@ -185,7 +210,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'field_id', 'field', 'input', 'value', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle','editedon'];
+        return ['id', 'field_id', 'field', 'input', 'value','value_r', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle','editedon'];
     },
 
     getColumns: function () {
@@ -215,6 +240,11 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             sortable: true,
             width: 150,
         }, {
+            header: _('seofilter_dictionary_value_r'),
+            dataIndex: 'value_r',
+            sortable: true,
+            width: 150,
+        }, {
             header: _('seofilter_url_editedon'),
             dataIndex: 'editedon',
             sortable: true,
@@ -231,7 +261,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
             sortable: false,
-            width: 75,
+            width: 100,
             id: 'actions'
         }];
     },

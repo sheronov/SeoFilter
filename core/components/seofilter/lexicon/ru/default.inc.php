@@ -132,6 +132,7 @@ $_lang['seofilter_seometa_h2'] = 'Заголовок H2';
 $_lang['seofilter_seometa_active'] = 'Активно';
 $_lang['seofilter_seometa_description'] = 'Описание';
 $_lang['seofilter_seometa_introtext'] = 'Вводный текст';
+$_lang['seofilter_seometa_keywords'] = 'Ключевые слова';
 $_lang['seofilter_seometa_text'] = 'Текстовое поле';
 $_lang['seofilter_seometa_content'] = 'Контент';
 $_lang['seofilter_seometa_create'] = 'Добавить значения';
@@ -286,3 +287,17 @@ $_lang['seofilter_compare_range'] = 'В диапазоне (через запя�
 $_lang['sf_err_value_duplicate'] = 'Дублрирование свойств!';
 $_lang['seofilter_rule_properties'] = 'Свойства';
 $_lang['seofilter_rule_properties_intro'] = 'Свойства, массив которых будет в JSON формате в плейсхолдере [[!+sf.properties]].<br> Здесь можете использовать все теже параметры, что и во вкладке SEO';
+$_lang['seofilter_rule_properties_introtexts'] = 'Аналогичный массив, но тег [[!+sf.introtexts]].';
+$_lang['seofilter_rule_tpl'] = 'Шаблон чанка для результатов на странице';
+$_lang['seofilter_add_value'] = 'Добавить значение';
+$_lang['seofilter_help_window'] = 'Помощь';
+$_lang['seofilter_help_window_open'] = 'Открыть помощь';
+$_lang['seofilter_dictionary_decl'] = 'Принудительно просклонять значение';
+
+$_lang['seofilter_field_relation'] = 'Зависимое поле';
+$_lang['seofilter_field_relation_field'] = 'Зависит от';
+$_lang['seofilter_field_relation_column'] = 'По столбцу';
+$_lang['seofilter_word_relation'] = 'Зависит от';
+$_lang['seofilter_word_image'] = 'Изображение для меню';
+$_lang['seofilter_rule_introlength'] = 'Ограничение длины аноса. 0 - без ограничений. "-1" - не показывать';
+

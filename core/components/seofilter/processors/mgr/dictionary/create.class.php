@@ -15,11 +15,21 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
     {
 
         $input = trim($this->getProperty('input'));
-        $field_id = $this->getProperty('field_id');
-        if (empty($input)) {
-            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_dictionary_err_input'));
+        $field_id = (int)$this->getProperty('field_id');
+        $from_field = (int)$this->getProperty('from_field');
+        $alias = $this->getProperty('alias');
+        if (!isset($input)) {
+            if($from_field) {
+                $this->modx->error->failure($this->modx->lexicon('seofilter_dictionary_err_input'));
+            } else {
+                $this->modx->error->addField('input', $this->modx->lexicon('seofilter_dictionary_err_input'));
+            }
         } elseif ($this->modx->getCount($this->classKey, array('input' => $input,'field_id'=>$field_id))) {
-            $this->modx->error->addField('input', $this->modx->lexicon('seofilter_dictionary_err_ae'));
+            if($from_field) {
+                $this->modx->error->failure($this->modx->lexicon('seofilter_dictionary_err_ae'). ' Field_id = '.$field_id.' Input = '.$input);
+            } else {
+                $this->modx->error->addField('input', $this->modx->lexicon('seofilter_dictionary_err_ae'));
+            }
         }
 
 
@@ -28,7 +38,8 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
 
     public function beforeSave()
     {
-        if($this->object->get('value') && !$this->object->get('alias')) {
+        $alias = $this->object->get('alias');
+        if($this->object->get('value') && empty($alias)) {
             $this->object->set('alias', modResource::filterPathSegment($this->modx, $this->object->get('value')));
         }
         return parent::beforeSave();
@@ -36,13 +47,17 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
 
     public function afterSave()
     {
+        $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
+        $otherProps = array('processors_path' => $path . 'processors/');
+
         if($field = $this->object->getOne('Field')) {
             if($links = $field->getMany('Links')) {
-                $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
                 foreach ($links as $link) {
+                    /* @var sfFieldIds $link */
                     if ($rule = $link->getOne('Rule')) {
-                        $urls_array = $rule->generateUrl(1);
-
+                        /* @var sfRule $rule */
+                        $urls_array = $rule->generateUrl(1,$this->object->toArray());
+                        /* @var array $urls_array */
                         $reurls = $urls = array();
                         foreach($urls_array as $ukey => $uarr) {
                             $urls[$ukey] = $uarr['url'];
@@ -78,16 +93,16 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
                             //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($urls,1));
                         }
                         foreach($urls_array as $url) {
-                            if(in_array($url['url'],$urls)) {
+                            if(!empty($url['url']) && in_array($url['url'],$urls)) {
                                 //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($url,1));
                                 $processorProps = array(
                                     'multi_id' => $rule->get('id'),
                                     'old_url' => $url['url'],
                                     'page_id' => $rule->get('page'),
                                     'link' => $url['link'],
-                                    'field_word' => $url['field_word']
+                                    'field_word' => $url['field_word'],
+                                    'from_rule' => 1,
                                 );
-                                $otherProps = array('processors_path' => $path . 'processors/');
                                 $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
                                 if ($response->isError()) {
                                     $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());

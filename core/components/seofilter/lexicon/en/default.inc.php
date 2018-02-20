@@ -132,6 +132,7 @@ $_lang['seofilter_seometa_h2'] = 'Title H2';
 $_lang['seofilter_seometa_active'] = 'Activated';
 $_lang['seofilter_seometa_description'] = 'Description';
 $_lang['seofilter_seometa_introtext'] = 'Introtext';
+$_lang['seofilter_seometa_keywords'] = 'Лeywords';
 $_lang['seofilter_seometa_text'] = 'Text field';
 $_lang['seofilter_seometa_content'] = 'Content';
 $_lang['seofilter_seometa_create'] = 'Add values';

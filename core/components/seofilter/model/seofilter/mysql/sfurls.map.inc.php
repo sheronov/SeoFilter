@@ -4,6 +4,10 @@ $xpdo_meta_map['sfUrls']= array (
   'version' => '1.1',
   'table' => 'seofilter_urls',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'multi_id' => 0,
@@ -29,9 +33,14 @@ $xpdo_meta_map['sfUrls']= array (
     'h1' => '',
     'h2' => '',
     'introtext' => '',
+    'keywords' => '',
     'description' => '',
     'text' => '',
     'content' => '',
+    'properties' => NULL,
+    'introtexts' => NULL,
+    'introlength' => NULL,
+    'tpl' => '',
   ),
   'fieldMeta' => 
   array (
@@ -222,6 +231,13 @@ $xpdo_meta_map['sfUrls']= array (
       'null' => true,
       'default' => '',
     ),
+    'keywords' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
     'description' => 
     array (
       'dbtype' => 'text',
@@ -239,6 +255,33 @@ $xpdo_meta_map['sfUrls']= array (
     'content' => 
     array (
       'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'properties' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'json',
+      'null' => true,
+    ),
+    'introtexts' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'json',
+      'null' => true,
+    ),
+    'introlength' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'null' => true,
+    ),
+    'tpl' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
       'phptype' => 'string',
       'null' => true,
       'default' => '',

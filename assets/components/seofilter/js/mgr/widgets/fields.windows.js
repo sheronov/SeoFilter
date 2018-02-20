@@ -144,19 +144,59 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     id: config.id + '-xpdo_name',
                     anchor: '99%',
                 }]
-            // },{
-            //     columnWidth: 1
-            //     ,layout:'form'
-            //     ,defaults: { msgTarget: 'under' }
-            //     ,border:false
-            //     ,items: [{
-            //         xtype: 'textfield',
-            //         fieldLabel: _('seofilter_field_xpdo_where'),
-            //         name: 'xpdo_where',
-            //         id: config.id + '-xpdo_where',
-            //         anchor: '99%',
-            //         style:'margin-bottom:15px;'
-            //     }]
+            }]
+        },{
+            columnWidth: .99
+            ,layout:'form'
+            ,defaults: { msgTarget: 'under' }
+            ,border:false
+            ,items: [{
+                // xtype: 'textfield',
+                // fieldLabel: _('seofilter_field_xpdo_where'),
+                // name: 'xpdo_where',
+                // id: config.id + '-xpdo_where',
+                // anchor: '99%',
+                // style:'margin-bottom:15px;'
+                // },{
+                xtype: 'xcheckbox',
+                boxLabel: _('seofilter_field_relation'),
+                name: 'relation',
+                id: config.id + '-relation',
+                listeners: {
+                    check: SeoFilter.utils.handleChecked,
+                    afterrender: SeoFilter.utils.handleChecked
+                }
+            },{
+                layout:'column',
+                border: false,
+                anchor: '99%',
+                items: [{
+                    columnWidth: .5
+                    ,layout: 'form'
+                    ,defaults: { msgTarget: 'under' }
+                    ,border:false
+                    ,items: [{
+                        xtype: 'seofilter-combo-field',
+                        fieldLabel: _('seofilter_field_relation_field'),
+                        name: 'relation_field',
+                        hiddenName: 'relation_field',
+                        id: config.id + '-relation_field',
+                        allowBlank:true,
+                        anchor: '99%',
+                    }]
+                },{
+                    columnWidth: .5
+                    ,layout: 'form'
+                    ,defaults: { msgTarget: 'under' }
+                    ,border:false
+                    ,items: [{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_field_relation_column'),
+                        name: 'relation_column',
+                        id: config.id + '-relation_column',
+                        anchor: '99%',
+                    }]
+                }]
             }]
         }]
     },
@@ -333,19 +373,59 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     id: config.id + '-xpdo_name',
                     anchor: '99%',
                 }]
-            // },{
-            //     columnWidth: 1
-            //     ,layout:'form'
-            //     ,defaults: { msgTarget: 'under' }
-            //     ,border:false
-            //     ,items: [{
-            //         xtype: 'textfield',
-            //         fieldLabel: _('seofilter_field_xpdo_where'),
-            //         name: 'xpdo_where',
-            //         id: config.id + '-xpdo_where',
-            //         anchor: '99%',
-            //         style:'margin-bottom:15px;'
-            //     }]
+            }]
+        },{
+            columnWidth: .99
+            ,layout:'form'
+            ,defaults: { msgTarget: 'under' }
+            ,border:false
+            ,items: [{
+                // xtype: 'textfield',
+                // fieldLabel: _('seofilter_field_xpdo_where'),
+                // name: 'xpdo_where',
+                // id: config.id + '-xpdo_where',
+                // anchor: '99%',
+                // style:'margin-bottom:15px;'
+                // },{
+                xtype: 'xcheckbox',
+                boxLabel: _('seofilter_field_relation'),
+                name: 'relation',
+                id: config.id + '-relation',
+                listeners: {
+                    check: SeoFilter.utils.handleChecked,
+                    afterrender: SeoFilter.utils.handleChecked
+                }
+            },{
+                layout:'column',
+                border: false,
+                anchor: '99%',
+                items: [{
+                    columnWidth: .5
+                    ,layout: 'form'
+                    ,defaults: { msgTarget: 'under' }
+                    ,border:false
+                    ,items: [{
+                        xtype: 'seofilter-combo-field',
+                        fieldLabel: _('seofilter_field_relation_field'),
+                        name: 'relation_field',
+                        hiddenName: 'relation_field',
+                        id: config.id + '-relation_field',
+                        allowBlank:true,
+                        anchor: '99%',
+                    }]
+                },{
+                    columnWidth: .5
+                    ,layout: 'form'
+                    ,defaults: { msgTarget: 'under' }
+                    ,border:false
+                    ,items: [{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_field_relation_column'),
+                        name: 'relation_column',
+                        id: config.id + '-relation_column',
+                        anchor: '99%',
+                    }]
+                }]
             }]
         }]
     },

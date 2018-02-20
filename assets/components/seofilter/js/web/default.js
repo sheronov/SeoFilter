@@ -66,6 +66,7 @@ jQuery(document).ready(function ($) {
                     if(response.data.h1) {$(seoFilter.config.jh1).html(response.data.h1);}
                     if(response.data.h2) {$(seoFilter.config.jh2).html(response.data.h2);}
                     if(response.data.introtext) {$(seoFilter.config.jintrotext).html(response.data.introtext);}
+                    if(response.data.keywords) {$(seoFilter.config.jkeywords).html(response.data.keywords);}
                     if(response.data.text) {$(seoFilter.config.jtext).html(response.data.text);}
                     if(response.data.content) {$(seoFilter.config.jcontent).html(response.data.content);}
                     if(response.data.url) {url = response.data.url;}

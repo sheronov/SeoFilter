@@ -1,6 +1,8 @@
 SeoFilter.panel.Seoedit = function (config) {
     config = config || {};
     config.record = config.record || {};
+
+
     Ext.apply(config, {
         baseCls: 'modx-formpanel',
         baseParams: {},
@@ -47,6 +49,68 @@ SeoFilter.panel.Seoedit = function (config) {
                     }
                     ,cls: 'main-wrapper'
                 }]
+
+            // }, {
+            //
+            //     //TODO: сделать скрытую возможность
+            //     title: _('seofilter_rule_properties')
+            //     ,hideMode: 'offsets'
+            //     ,layout: 'form'
+            //     ,border:false
+            //     ,items: [{
+            //         layout: 'form',
+            //         items: [
+            //             {   //TODO: а это вообще супер high level function!
+            //                 xtype: 'seofilter-combo-tpls',
+            //                 fieldLabel: _('seofilter_rule_tpl'),
+            //                 name: 'tpl',
+            //                 id: config.id + '-tpl',
+            //                 value: config.record.tpl,
+            //                 anchor: '99%',
+            //             }, {
+            //                 html: '',
+            //                 style: 'margin-bottom:10px'
+            //             }, {
+            //                 html: _('seofilter_rule_properties_intro'),
+            //                 cls: 'panel-desc',
+            //                 anchor: '99%',
+            //             }, {
+            //                 xtype: 'seofilter-grid-combobox-options',
+            //                 anchor: '99%',
+            //                 name: 'properties',
+            //                 record: config.record,
+            //                 id:'properties',
+            //             }, {
+            //                 html: '',
+            //                 style: 'margin-bottom:10px'
+            //             }, {
+            //                 html: _('seofilter_rule_properties_introtexts'),
+            //                 cls: 'panel-desc',
+            //                 anchor: '99%',
+            //             }, {
+            //                 xtype: 'seofilter-grid-combobox-options',
+            //                 anchor: '99%',
+            //                 name: 'introtexts',
+            //                 record: config.record,
+            //                 id: config.id + '-introtexts',
+            //             }, {
+            //                 xtype: 'numberfield',
+            //                 fieldLabel: _('seofilter_rule_introlength'),
+            //                 name: 'introlength',
+            //                 id: config.id + '-introlength',
+            //                 anchor: '99%',
+            //             }
+            //         ]
+            //         , labelAlign: 'top'
+            //         , labelSeparator: ''
+            //         , autoHeight: true
+            //         , defaults: {
+            //             border: false
+            //             , msgTarget: 'under'
+            //             , width: 400
+            //         }
+            //         , cls: 'main-wrapper'
+            //     }]
             }]
         }]
     });
@@ -201,6 +265,16 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     fieldLabel: _('seofilter_seometa_introtext'),
                     name: 'introtext',
                     id: 'seoedit-introtext',
+                    anchor: '99%',
+                    listeners: {
+                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
+                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
+                    }
+                },{
+                    xtype: 'textarea',
+                    fieldLabel: _('seofilter_seometa_keywords'),
+                    name: 'keywords',
+                    id: 'seoedit-keywords',
                     anchor: '99%',
                     listeners: {
                         'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},

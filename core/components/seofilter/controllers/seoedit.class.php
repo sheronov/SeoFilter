@@ -26,20 +26,49 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
         if($scriptProperties['id']) {
             if($url = $this->modx->getObject('sfUrls',$scriptProperties['id'])) {
                 $this->urlArray = $url->toArray();
-                if (!$url->get('custom')) {
-                    if($rule = $this->modx->getObject('sfRule',$url->get('multi_id'))) {
+
+                if($rule = $this->modx->getObject('sfRule',$url->get('multi_id'))) {
+//                        $this->modx->log(1,'Rule'.print_r($rule->toArray(),1));
+                    if (!$url->get('custom')) {
                         $this->urlArray['title'] = $rule->get('title');
                         $this->urlArray['h1'] = $rule->get('h1');
                         $this->urlArray['h2'] = $rule->get('h2');
                         $this->urlArray['description'] = $rule->get('description');
                         $this->urlArray['introtext'] = $rule->get('introtext');
+                        $this->urlArray['keywords'] = $rule->get('keywords');
                         $this->urlArray['text'] = $rule->get('text');
                         $this->urlArray['content'] = $rule->get('content');
+                        $this->urlArray['properties'] = $rule->get('properties');
+                        $this->urlArray['introtexts'] = $rule->get('introtexts');
+                        $this->urlArray['tpl'] = $rule->get('tpl');
+                        $this->urlArray['introlength'] = $rule->get('introlength');
+                    } else {
+                        $rule_prop = $rule->get('properties');
+                        if(empty($this->urlArray['properties']) && !empty($rule_prop)) {
+                            $this->urlArray['properties'] = $rule_prop;
+                        }
+                        $rule_intros = $rule->get('introtexts');
+                        if(empty($this->urlArray['introtexts']) && !empty($rule_intros)) {
+                            $this->urlArray['introtexts'] = $rule_intros;
+                        }
+                        $rule_tpl = $rule->get('tpl');
+                        if(empty($this->urlArray['tpl']) && !empty($rule_tpl)) {
+                            $this->urlArray['tpl'] = $rule_tpl;
+                        }
+                        $rule_length = $rule->get('introlength');
+                        if(empty($this->urlArray['introlength']) && !empty($rule_length)) {
+                            $this->urlArray['introlength'] = $rule_length;
+                        }
                     }
                 }
+//                $this->modx->log(1,print_r($url->toArray(),1));
+
+
+//                $this->urlArray['properties'] = $this->modx->toJSON($this->urlArray['properties']);
+//                $this->urlArray['introtexts'] = $this->modx->toJSON($this->urlArray['properties']);
             }
         }
-       // $this->modx->log(modX::LOG_LEVEL_ERROR,print_r($this->urlArray,1));
+//        $this->modx->log(modX::LOG_LEVEL_ERROR,print_r($this->urlArray,1));
         parent::process($scriptProperties);
     }
 
@@ -81,6 +110,7 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/seofilter.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/utils.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/combo.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/combobox.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/urlwords.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/urlwords.windows.js');

@@ -31,6 +31,7 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
      */
     public function beforeSet()
     {
+
         $id = (int)$this->getProperty('id');
        // $name = trim($this->getProperty('name'));
         if (empty($id)) {

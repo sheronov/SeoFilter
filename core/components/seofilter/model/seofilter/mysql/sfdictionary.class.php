@@ -1,3 +1,3 @@
 <?php
-require_once (dirname(dirname(__FILE__)) . '/sfdictionary.class.php');
+require_once (dirname(__DIR__) . '/sfdictionary.class.php');
 class sfDictionary_mysql extends sfDictionary {}

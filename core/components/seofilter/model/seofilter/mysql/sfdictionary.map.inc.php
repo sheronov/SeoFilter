@@ -4,6 +4,10 @@ $xpdo_meta_map['sfDictionary']= array (
   'version' => '1.1',
   'table' => 'seofilter_dictionary',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'field_id' => 0,
@@ -12,6 +16,8 @@ $xpdo_meta_map['sfDictionary']= array (
     'alias' => '',
     'class' => '',
     'key' => '',
+    'relation_word' => 0,
+    'image' => '',
     'value_i' => '',
     'value_r' => '',
     'value_d' => '',
@@ -76,6 +82,23 @@ $xpdo_meta_map['sfDictionary']= array (
       'default' => '',
     ),
     'key' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
+    ),
+    'relation_word' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'attributes' => 'unsigned',
+      'null' => true,
+      'default' => 0,
+    ),
+    'image' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',

@@ -80,6 +80,49 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
             , style: 'border-top:1px solid #ccc;padding-top:5px;'
             , xtype: 'displayfield'
             , html: _('seofilter_dictionary_decline_desc_save')
+        }, {
+            layout: 'column',
+            border: false,
+            anchor: '100%',
+            items: [{
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'seofilter-combo-word',
+                        fieldLabel: _('seofilter_word_relation'),
+                        name: 'relation_word',
+                        hiddenName: 'relation_word',
+                        id: config.id + '-relation_word',
+                        anchor: '99%',
+                        baseParams: {
+                            action: 'mgr/dictionary/getlist',
+                            combo: true,
+                            id: config.value,
+                            relation: 1,
+                            //TODO: field_relation - выбранное поле
+                            field_relation: 0,
+                        }
+                    }
+                ]
+            }, {
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        //TODO: раскрыть когда нибудь
+                        // xtype: 'textfield',
+                        // fieldLabel: _('seofilter_word_image'),
+                        // name: 'image',
+                        // id: config.id + '-image',
+                        // anchor: '99%',
+                    }
+                ]
+            }]
         }];
     },
 
@@ -169,16 +212,53 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                 ]
             }]
         },{
-            //     xtype: 'xcheckbox',
-            //     boxLabel: _('seofilter_dictionary_active'),
-            //     name: 'active',
-            //     id: config.id + '-active',
-            // }, {
             title: _('seofilter_dictionary_decline')
             , xtype: 'displayfield'
             , style: 'border-top:1px solid #ccc;padding-top:5px;'
             , html: _('seofilter_dictionary_decline_desc')
-        },{
+        }, {
+            layout: 'column',
+            border: false,
+            anchor: '100%',
+            items: [{
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        xtype: 'seofilter-combo-word',
+                        fieldLabel: _('seofilter_word_relation'),
+                        name: 'relation_word',
+                        hiddenName: 'relation_word',
+                        id: config.id + '-relation_word',
+                        anchor: '99%',
+                        baseParams: {
+                            action: 'mgr/dictionary/getlist',
+                            combo: true,
+                            id: config.value,
+                            relation: 1,
+                            field_relation: config.record.object.field_id,
+                        }
+                    }
+                ]
+            }, {
+                columnWidth: .5
+                , layout: 'form'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , items: [
+                    {
+                        //TODO: раскрыть когда нибудь
+                        // xtype: 'textfield',
+                        // fieldLabel: _('seofilter_word_image'),
+                        // name: 'image',
+                        // id: config.id + '-image',
+                        // anchor: '99%',
+                    }
+                ]
+            }]
+        } ,{
             layout: 'column',
             border: false,
             anchor: '100%',
@@ -315,6 +395,11 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                     }
                 ]
             }]
+        }, {
+            xtype: 'xcheckbox',
+            boxLabel: _('seofilter_dictionary_decl'),
+            name: 'update',
+            id: config.id + '-update'
         }];
     },
 

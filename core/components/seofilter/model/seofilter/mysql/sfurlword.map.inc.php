@@ -4,6 +4,10 @@ $xpdo_meta_map['sfUrlWord']= array (
   'version' => '1.1',
   'table' => 'seofilter_urlwords',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'url_id' => 0,

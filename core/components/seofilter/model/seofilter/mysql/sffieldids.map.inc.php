@@ -4,6 +4,10 @@ $xpdo_meta_map['sfFieldIds']= array (
   'version' => '1.1',
   'table' => 'seofilter_fieldids',
   'extends' => 'xPDOSimpleObject',
+  'tableMeta' => 
+  array (
+    'engine' => 'MyISAM',
+  ),
   'fields' => 
   array (
     'multi_id' => 0,

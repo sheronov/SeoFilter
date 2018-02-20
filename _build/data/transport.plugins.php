@@ -9,7 +9,7 @@ $tmp = array(
         'file' => 'seofilter',
         'description' => '',
         'events' => array(
-            'OnPageNotFound' => array(),
+            'OnPageNotFound' => array('priority'=>-50),
             'OnLoadWebDocument' => array(),
             'OnDocFormSave' => array('priority'=>100)
         )

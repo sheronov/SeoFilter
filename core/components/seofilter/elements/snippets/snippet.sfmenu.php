@@ -40,6 +40,7 @@ if ($cache) {
 }
 if(empty($links)) {
     $links = $sfMenu->getTree($scriptProperties['rules'],$scriptProperties['parents']);
+//    $output.= '<pre>'.print_r($links,1).'</pre>';
     if ($cache) {
         $sfMenu->pdoTools->setCache($links, $scriptProperties);
     }
@@ -47,7 +48,8 @@ if(empty($links)) {
 
 if (!empty($links)) {
     if(((!empty($scriptProperties['onlyrelative'])) && (int)$modx->getPlaceholder('sf.seo_id')) || empty($scriptProperties['onlyrelative'])) {
-        $output = $sfMenu->makeMenu($links);
+        $output .= $sfMenu->makeMenu($links);
+
     }
 }
 

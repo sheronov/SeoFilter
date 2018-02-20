@@ -225,6 +225,12 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 anchor: '99%',
             },{
                 xtype: 'textarea',
+                fieldLabel: _('seofilter_seometa_keywords'),
+                name: 'keywords',
+                id: config.id + '-keywords',
+                anchor: '99%',
+            },{
+                xtype: 'textarea',
                 fieldLabel: _('seofilter_seometa_text'),
                 name: 'text',
                 id: config.id + '-text',

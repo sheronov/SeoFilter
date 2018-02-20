@@ -86,7 +86,7 @@ if(!empty($rules)) {
         $output = $pdo->getChunk($tpl,$link,$fastMode);
     }
 }
-if($toPlaceholder) {
+if(!empty($toPlaceholder)) {
     $modx->setPlaceholder($toPlaceholder,$output);
 } else {
     return $output;

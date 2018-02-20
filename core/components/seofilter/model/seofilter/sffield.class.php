@@ -43,10 +43,29 @@ class sfField extends xPDOSimpleObject {
                     $q = $this->xpdo->newQuery($xpdo_class);
                     $q->where(array($xpdo_id=>$input));
                     $q->limit(1);
-                    $q->select($xpdo_name);
-                    if ($q->prepare() && $q->stmt->execute()) {
-                        $value = $q->stmt->fetch(PDO::FETCH_COLUMN);
+                    if($this->get('relation')) {
+                        $relation_field = $this->get('relation_field');
+                        $relation_column = $this->get('relation_column');
+                        if($relation_column) {
+                            $q->select($xpdo_name.','.$relation_column);
+                            if($q->prepare() && $q->stmt->execute()) {
+                                if($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    $value = array('value'=>$row[$xpdo_name],'relation'=>$row[$relation_column]);
+                                }
+                            }
+                        } else {
+                            $q->select($xpdo_name);
+                            if ($q->prepare() && $q->stmt->execute()) {
+                                $value = $q->stmt->fetch(PDO::FETCH_COLUMN);
+                            }
+                        }
+                    } else {
+                        $q->select($xpdo_name);
+                        if ($q->prepare() && $q->stmt->execute()) {
+                            $value = $q->stmt->fetch(PDO::FETCH_COLUMN);
+                        }
                     }
+
                 }
             } else {
                 $value = $input;
