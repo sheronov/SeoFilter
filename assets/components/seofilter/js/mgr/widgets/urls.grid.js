@@ -320,13 +320,38 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     },
 
     getTopBar: function () {
-        return [
-        //     {
-        //     text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_url_create'),
-        //     handler: this.createField,
-        //     scope: this
-        // },
-            {
+        return [{
+                xtype: 'seofilter-combo-resource'
+                ,id: 'tbar-seofilter-combo-page_id'
+                ,width: 200
+                ,addall: true
+                ,emptyText: _('seofilter_filter_resource')
+                ,listeners: {
+                    select: {
+                        fn: function(ele,rec,idx) {
+                            var s = this.getStore();
+                            s.baseParams['rule'] = '';
+                            Ext.getCmp('tbar-seofilter-combo-rule').setValue('');
+                            this.filterByResource(ele);
+                            // Ext.state.Manager.set('tbar-seofilter-combo-page_id', ele.value);
+                            // setTimeout(
+                            //     function () {
+                                    var rules = Ext.getCmp('tbar-seofilter-combo-rule');
+                                    rules.baseParams.page = ele.getValue();
+                                    rules.reload();
+                                    // rules.reset();
+                                    // rules.getStore().reload({params:this.baseParams});
+                                // },10
+                            // );
+
+                        }, scope :this}
+                }
+                ,baseParams: {
+                    action: 'mgr/system/getlist',
+                    combo: true,
+                    rules: true
+                }
+            },{
                 xtype: 'seofilter-combo-rule'
                 ,id: 'tbar-seofilter-combo-rule'
                 ,width: 200
@@ -334,25 +359,31 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                 ,emptyText: _('seofilter_filter_rule')
                 ,listeners: {
                     select: {fn: this.filterByRule, scope:this}
-                }
-            },{
-                xtype: 'seofilter-combo-field'
-                ,id: 'tbar-seofilter-combo-field'
-                ,width: 150
-                ,addall: true
-                ,emptyText: _('seofilter_filter_field')
-                ,listeners: {
-                    select: {
-                        fn: function (ele, rec, idx) {
-                            this.filterByField(ele);
-                            //var words = Ext.getCmp('tbar-seofilter-combo-word');
-                            //Ext.state.Manager.set('tbar-seofilter-combo-field', ele.value);
-                           // words.baseParams.field = ele.getValue();
-                            //words.reload();
-                        }, scope: this
-                    }
+                },
+                baseParams: {
+                    action: 'mgr/rule/getlist',
+                    combo: true,
+                    page: 0
                 }
             // },{
+            //     xtype: 'seofilter-combo-field'
+            //     ,id: 'tbar-seofilter-combo-field'
+            //     ,width: 150
+            //     ,addall: true
+            //     ,emptyText: _('seofilter_filter_field')
+            //     ,listeners: {
+            //         select: {
+            //             fn: function (ele, rec, idx) {
+            //                 this.filterByField(ele);
+            //                 //var words = Ext.getCmp('tbar-seofilter-combo-word');
+            //                 //Ext.state.Manager.set('tbar-seofilter-combo-field', ele.value);
+            //                // words.baseParams.field = ele.getValue();
+            //                 //words.reload();
+            //             }, scope: this
+            //         }
+            //     }
+
+                // },{
             //     xtype: 'seofilter-combo-word'
             //     ,id: 'tbar-seofilter-combo-word'
             //     ,width: 150
@@ -437,15 +468,18 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     clearFilter: function(btn,e) {
         var s = this.getStore();
         s.baseParams['rule'] = '';
-       // s.baseParams['page'] = '';
-        s.baseParams['field'] = '';
+        s.baseParams['page'] = '';
+        // s.baseParams['field'] = '';
         //s.baseParams['word'] = '';
-       // Ext.getCmp('tbar-seofilter-combo-word').setValue('');
         Ext.getCmp('tbar-seofilter-combo-rule').setValue('');
-       // Ext.getCmp('tbar-seofilter-combo-resource').setValue('');
-        Ext.getCmp('tbar-seofilter-combo-field').setValue('');
+        var rules = Ext.getCmp('tbar-seofilter-combo-rule');
+        rules.baseParams.page = 0;
+        rules.reload();
+        Ext.getCmp('tbar-seofilter-combo-page_id').setValue('');
+       //  Ext.getCmp('tbar-seofilter-combo-field').setValue('');
         this.getBottomToolbar().changePage(1);
         this.refresh();
+
     },
 
     onClick: function (e) {

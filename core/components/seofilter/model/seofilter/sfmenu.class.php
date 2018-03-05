@@ -178,7 +178,7 @@ class sfMenu
         $pre_array = array();
         $rules_in = $rules_out = array();
         $parents_in = $parents_out = array();
-        $system = array('field_id','multi_id','priority','class','key','alias','slider','exact');
+        $system = array('field_id','multi_id','priority','class','key','alias','slider','exact','xpdo_package');
 
         if($parents) {
             $parents = array_map('trim', explode(',', $parents));
@@ -232,7 +232,7 @@ class sfMenu
         $q->select(array(
             'sfRule.*',
             'sfFieldIds.field_id,sfFieldIds.multi_id,sfFieldIds.priority',
-            'sfField.class,sfField.key,sfField.alias,sfField.slider,sfField.exact',
+            'sfField.class,sfField.key,sfField.alias,sfField.slider,sfField.exact,sfField.xpdo_package',
         ));
         $q->sortby('sfFieldIds.priority','ASC');
         if($q->prepare() && $q->stmt->execute()) {
@@ -315,6 +315,7 @@ class sfMenu
                     'field_alias'=>$pre_array[$row['multi_id']]['fields'][$row['field_id']]['alias'],
                     'priority'=>$pre_array[$row['multi_id']]['fields'][$row['field_id']]['priority'],
                     'slider'=>$pre_array[$row['multi_id']]['fields'][$row['field_id']]['slider'],
+                    'xpdo_package'=>$pre_array[$row['multi_id']]['fields'][$row['field_id']]['xpdo_package'],
                     'exact'=>$pre_array[$row['multi_id']]['fields'][$row['field_id']]['exact'],
                     'word_id'=>$word_id,
                     'word_input'=>$row['input'],
@@ -460,18 +461,16 @@ class sfMenu
                         break;
                     case 'modTemplateVar':
                         $addTVs[] = $field['key'];
-                        if ($field['exact']) {
+                        if(strtolower($field['xpdo_package']) == 'tvsuperselect') {
+                            $this->pdoTools->setConfig(array('loadModels' => 'tvsuperselect'));
+                            $innerJoin['tvssOption'.$field['key']] = array('class'=>'tvssOption','on'=>'tvssOption'. $field['key'] .'.resource_id = modResource.id');
+                            $fields_where['tvssOption'. $field['key'] .'.value:LIKE'] = '%' . $field['word_input'] . '%';
+                        } elseif($field['exact']) {
                             $fields_where['TV' . $field['key'] . '.value'] = $field['word_input'];
                         } else {
-                            //TODO: придумать что-то для SuperSelect
-                            if($field['key'] == 'tvsuper') {
-                                $this->pdoTools->setConfig(array('loadModels' => 'tvsuperselect'));
-                                $innerJoin['tvssOption'] = array('class'=>'tvssOption','on'=>'tvssOption.resource_id = modResource.id');
-                                $fields_where['tvssOption.value:LIKE'] = '%' . $field['word_input'] . '%';
-                            } else {
-                                $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $field['word_input'] . '%';
-                            }
+                            $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $field['word_input'] . '%';
                         }
+
                         break;
                     case 'msVendor':
                         $innerJoin['msProductData'] = array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');

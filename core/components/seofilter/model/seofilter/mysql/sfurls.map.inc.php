@@ -39,7 +39,7 @@ $xpdo_meta_map['sfUrls']= array (
     'content' => '',
     'properties' => NULL,
     'introtexts' => NULL,
-    'introlength' => NULL,
+    'introlength' => 0,
     'tpl' => '',
   ),
   'fieldMeta' => 
@@ -277,6 +277,7 @@ $xpdo_meta_map['sfUrls']= array (
       'precision' => '10',
       'phptype' => 'integer',
       'null' => true,
+      'default' => 0,
     ),
     'tpl' => 
     array (

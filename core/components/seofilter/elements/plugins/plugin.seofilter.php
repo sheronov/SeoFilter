@@ -37,7 +37,8 @@ switch ($modx->event->name) {
         $pdo = $SeoFilter->pdo;
         if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
 
-        $r_array = $resource->toArray();
+        $r_array = array_merge($resource->toArray(),$resource->Data->toArray());
+
 //        $modx->log(modx::LOG_LEVEL_ERROR,'SeoFilter  = ' . print_r($r_array,1));
 //        $modx->log(modx::LOG_LEVEL_ERROR,'SeoFilter DATA = ' . print_r($resource->Data->toArray(),1));
         $tv_names = array();
@@ -55,7 +56,7 @@ switch ($modx->event->name) {
                 switch ($field['class']) {
                     case 'msProductOption':
                         $input = $r_array['options'][$key];
-                        if (!$input)
+                        if (!isset($input))
                             $input = $r_array[$key];
                         break;
                     case 'msProductData':

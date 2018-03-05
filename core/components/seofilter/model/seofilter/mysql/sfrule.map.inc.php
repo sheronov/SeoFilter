@@ -30,7 +30,7 @@ $xpdo_meta_map['sfRule']= array (
     'content' => '',
     'properties' => NULL,
     'introtexts' => NULL,
-    'introlength' => NULL,
+    'introlength' => 0,
     'tpl' => '',
     'editedon' => '0000-00-00 00:00:00',
   ),
@@ -195,6 +195,7 @@ $xpdo_meta_map['sfRule']= array (
       'precision' => '10',
       'phptype' => 'integer',
       'null' => true,
+      'default' => 0,
     ),
     'tpl' => 
     array (

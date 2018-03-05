@@ -236,7 +236,13 @@ SeoFilter.combo.Rule = function (config) {
     });
     SeoFilter.combo.Rule.superclass.constructor.call(this, config);
 };
-Ext.extend(SeoFilter.combo.Rule, MODx.combo.ComboBox);
+Ext.extend(SeoFilter.combo.Rule, MODx.combo.ComboBox, {
+    val: null
+    , reload: function (value) {
+        this.val = value;
+        this.getStore().reload({params: this.baseParams});
+    }
+});
 Ext.reg('seofilter-combo-rule', SeoFilter.combo.Rule);
 
 

@@ -752,6 +752,7 @@ class SeoFilter
                     $fields_key[$alias]['key'] = $field->get('key');
                     $fields_key[$alias]['exact'] = $field->get('exact');
                     $fields_key[$alias]['slider'] = $field->get('slider');
+                    $fields_key[$alias]['xpdo_package'] = $field->get('xpdo_package');
 
                     $field_word[$field_id] = $word['id'];
                 }
@@ -942,6 +943,7 @@ class SeoFilter
         $fields_where = array();
         $params_keys = array_diff(array_keys($params), array_keys($fields_key));
 
+
         foreach($params_keys as $param) {
             if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
                 $alias = $field['alias'];
@@ -949,6 +951,7 @@ class SeoFilter
                 $fields_key[$alias]['key'] = $field['key'];
                 $fields_key[$alias]['exact'] = $field['exact'];
                 $fields_key[$alias]['slider'] = $field['slider'];
+                $fields_key[$alias]['xpdo_package'] = $field['xpdo_package'];
             }
         }
 
@@ -967,9 +970,9 @@ class SeoFilter
                         $innerJoin['msProductData'] =  array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id');
                     }
                     if ($field['class'] == 'msProductOption') {
-                        $innerJoin['msProductOption'] =  array('class' => 'msProductOption', 'on' => 'msProductOption.product_id = modResource.id');
-                        $fields_where[$field['class'].'.key'] = $field['key'];
-                        $fw = $field['class'] . '.value';
+                        $innerJoin['msOption'.$field['key']] =  array('class' => 'msProductOption', 'on' => 'msOption'.$field['key'].'.product_id = modResource.id');
+                        $fields_where['msOption'.$field['key'].'.key'] = $field['key'];
+                        $fw = 'msOption'.$field['key'].'.value';
                     }
                     if($field['slider']) {
                         $slider = explode($this->config['values_delimeter'],$params[$field_alias]);
@@ -986,18 +989,14 @@ class SeoFilter
                     break;
                 case 'modTemplateVar':
                     $addTVs[] = $field['key'];
-                    if($field['exact']) {
+                    if(strtolower($field['xpdo_package']) == 'tvsuperselect') {
+                        $this->pdo->setConfig(array('loadModels' => 'tvsuperselect'));
+                        $innerJoin['tvssOption'.$field['key']] = array('class'=>'tvssOption','on'=>'tvssOption'. $field['key'] .'.resource_id = modResource.id');
+                        $fields_where['tvssOption'. $field['key'] .'.value:LIKE'] = '%' . $params[$field_alias] . '%';
+                    } elseif($field['exact']) {
                         $fields_where['TV' . $field['key'] . '.value'] = $params[$field_alias];
                     } else {
-                        //TODO: придумать что-то для SuperSelect
-                        if($field['key'] == 'tvsuper') {
-                            $this->pdo->setConfig(array('loadModels' => 'tvsuperselect'));
-                            $innerJoin['tvssOption'] = array('class'=>'tvssOption','on'=>'tvssOption.resource_id = modResource.id');
-                            $fields_where['tvssOption.value:LIKE'] = '%' . $params[$field_alias] . '%';
-                        } else {
-                            $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
-                        }
-
+                        $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
                     }
                     break;
                 case 'msVendor':
@@ -1043,7 +1042,8 @@ class SeoFilter
             }
         }
 
-        //$this->modx->log(modx::LOG_LEVEL_ERROR,print_r($where,1));
+//        $this->modx->log(modx::LOG_LEVEL_ERROR,print_r($where,1));
+//        $this->modx->log(modx::LOG_LEVEL_ERROR,print_r($innerJoin,1));
 
         if($min_max) {
             $select = $min_max_array = $count_choose = $count_select = array();

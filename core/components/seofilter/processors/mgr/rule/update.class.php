@@ -7,6 +7,9 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
     public $languageTopics = array('seofilter');
     //public $permission = 'save';
 
+    /*** @var pdoFetch $xpdo */
+    public $xpdo;
+
 
     /**
      * We doing special check of permission
@@ -70,8 +73,10 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
             foreach($urls_array as $ukey => $uarr) {
                 $urls[$ukey] = $uarr['url'];
             }
-            $url_objs = $this->modx->getCollection('sfUrls',array('multi_id'=>$multi_id));
-            if(count($url_objs)) {
+            $q = $this->modx->newQuery('sfUrls');
+            $q->where(array('multi_id'=>$multi_id));
+            if($this->modx->getCount('sfUrls',$q)) {
+                $url_objs = $this->modx->getIterator('sfUrls',$q);
                 $old_urls = array();
                 foreach($url_objs as $url_obj) {
                     $old_url = $url_obj->get('old_url');
@@ -93,8 +98,8 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
                 $del_urls = array_diff($old_urls,$urls);
                 //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К удалению: '. print_r($del_urls,1));
                 if($del_urls) {
-                    $removed = $this->modx->removeCollection('sfUrls',array('old_url:IN'=>$del_urls));
-                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '.$removed.' urls deleted: '. print_r($del_urls,1));
+                    $removed = $this->modx->removeCollection('sfUrls',array('multi_id'=>$multi_id,'old_url:IN'=>$del_urls));
+                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '.$removed.' urls deleted from Rule ID = '.$multi_id.': '. print_r($del_urls,1));
                 }
 
                 $urls = array_diff($urls,$old_urls);

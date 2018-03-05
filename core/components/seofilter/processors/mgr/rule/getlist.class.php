@@ -38,7 +38,7 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
                 'name:LIKE' => "%{$query}%",
             ));
         }
-
+        
         if ($page = $this->getProperty('page',null)) {
             $c->andCondition(array('page' => $page), '', 1);
         }

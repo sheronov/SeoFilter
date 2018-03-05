@@ -42,6 +42,12 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     anchor: '99%',
                     allowBlank: false,
                 },{
+                    xtype: 'textfield',
+                    fieldLabel: _('seofilter_rule_link_tpl'),
+                    name: 'link_tpl',
+                    id: config.id + '-link_tpl',
+                    anchor: '99%',
+                },{
                     title: _('seofilter_fieldids')
                     , xtype: 'displayfield'
                     , html: _('seofilter_fieldids_after_save')
