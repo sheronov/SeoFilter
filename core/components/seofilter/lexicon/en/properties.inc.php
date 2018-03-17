@@ -59,7 +59,8 @@ $_lang['seofilter_prop_tplParentRowHere'] = 'The design chunk of the current lin
 $_lang['seofilter_prop_toPlaceholder'] = 'If not empty, the snippet will store all the data in the locationholder with that name, instead of displaying no screen.';
 $_lang['seofilter_prop_tplWrapper'] = 'Name of a chunk serving as a wrapper template for the output. This does not work with toSeparatePlaceholders.';
 
-$_lang['pdotools_prop_forceXML'] = 'Force the output page as xml.';
-$_lang['pdotools_prop_sitemapSchema'] = 'Schema of sitemap.';
-$_lang['pdotools_prop_cacheTime'] = 'Time until the cache expires, in seconds.';
-$_lang['pdotools_prop_cacheKey'] = 'Cache key. Stored in "core/cache/default/yourkey"';
+$_lang['seofilter_prop_forceXML'] = 'Force the output page as xml.';
+$_lang['seofilter_prop_sitemapSchema'] = 'Schema of sitemap.';
+$_lang['seofilter_prop_cacheTime'] = 'Time until the cache expires, in seconds.';
+$_lang['seofilter_prop_cacheKey'] = 'Cache key. Stored in "core/cache/default/yourkey"';
+$_lang['seofilter_prop_fast'] = 'Fast snippet mode. Uses values from the database instead of counting on the fly.';

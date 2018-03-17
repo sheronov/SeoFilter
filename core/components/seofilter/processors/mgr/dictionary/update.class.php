@@ -60,7 +60,7 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
 
         }
 
-        $change_title = $change_alias = 0;
+        $change_title = $change_alias = $change_relation = 0;
         if(($this->getProperty('value') != $this->object->get('value')) || $this->getProperty('update')) {
             $this->setProperty('update',1); //чтоб просклонять изменения
             $change_title = 1; //чтобы перегенерировать названия ссылок
@@ -70,8 +70,13 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
             $change_alias = 1;
         }
 
+        if($this->getProperty('relation_word') != $this->object->get('relation_word')) {
+            $change_relation = 1;
+        }
+
         $this->setProperty('change_alias',$change_alias);
         $this->setProperty('change_title',$change_title);
+        $this->setProperty('change_relation',$change_relation);
 
 
         return parent::beforeSet();
@@ -80,10 +85,77 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
     public function afterSave()
     {
         $id = (int)$this->object->get('id');
+        $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
+        $otherProps = array('processors_path' => $path . 'processors/');
 
-        if($this->getProperty('change_alias') || $this->getProperty('change_title')) {
-            $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
-            $otherProps = array('processors_path' => $path . 'processors/');
+        if($this->getProperty('change_relation')) {
+            if($field = $this->object->getOne('Field')) {
+                if($links = $field->getMany('Links')) {
+                    foreach ($links as $link) {
+                        /* @var sfFieldIds $link */
+                        if ($rule = $link->getOne('Rule')) {
+                            /* @var sfRule $rule */
+                            $urls_array = $rule->generateUrl(1,$this->object->toArray());
+                            /* @var array $urls_array */
+                            $reurls = $urls = array();
+                            foreach($urls_array as $ukey => $uarr) {
+                                $urls[$ukey] = $uarr['url'];
+                            }
+                            $url_objs = $this->modx->getCollection('sfUrls',array('multi_id'=>$rule->get('id')));
+                            if(count($url_objs)) {
+                                $old_urls = array();
+                                foreach($url_objs as $url_obj) {
+                                    $old_url = $url_obj->get('old_url');
+                                    $old_urls[] = $old_url;
+                                    if($this->getProperty('relinks') && $this->getProperty('link_tpl')) {
+                                        $link = '';
+                                        foreach ($urls_array as $key => $val) {
+                                            if ($val['url'] == $old_url) {
+                                                $link = $val['link'];
+                                                break;
+                                            }
+                                        }
+                                        if($link) {
+                                            $url_obj->set('link',$link);
+                                            $url_obj->save();
+                                        }
+                                    }
+                                }
+                                $del_urls = array_diff($old_urls,$urls);
+                                //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К удалению: '. print_r($del_urls,1));
+                                if($del_urls) {
+                                    $removed = $this->modx->removeCollection('sfUrls',array('old_url:IN'=>$del_urls));
+                                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '.$removed.' urls deleted: '. print_r($del_urls,1));
+                                }
+
+                                $urls = array_diff($urls,$old_urls);
+                                //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($urls,1));
+                            }
+                            foreach($urls_array as $url) {
+                                if(!empty($url['url']) && in_array($url['url'],$urls)) {
+                                    //$this->modx->log(modX::LOG_LEVEL_ERROR, 'К добавлению: '. print_r($url,1));
+                                    $processorProps = array(
+                                        'multi_id' => $rule->get('id'),
+                                        'old_url' => $url['url'],
+                                        'page_id' => $rule->get('page'),
+                                        'link' => $url['link'],
+                                        'field_word' => $url['field_word'],
+                                        'from_rule' => 1,
+                                    );
+                                    $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
+                                    if ($response->isError()) {
+                                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                                        $this->modx->error->reset();
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        } elseif($this->getProperty('change_alias') || $this->getProperty('change_title')) {
             $pdoTools = $this->modx->getService('pdoTools');
 //            if(!($pdoTools instanceof pdoTools)) {
 //                return '';

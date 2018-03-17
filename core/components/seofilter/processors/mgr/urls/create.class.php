@@ -52,6 +52,7 @@ class sfUrlsCreateProcessor extends modObjectCreateProcessor
             $response = $this->modx->runProcessor('mgr/urls/urlword/create', $processorProps, $otherProps);
             if ($response->isError()) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] ' . $response->getMessage());
+                $this->modx->error->reset();
             }
         }
 

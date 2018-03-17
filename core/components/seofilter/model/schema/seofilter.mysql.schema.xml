@@ -161,6 +161,7 @@
         <field key="value_in" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_to" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_from" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP" />
         <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
 
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
@@ -208,6 +209,7 @@
         <field key="link_attributes" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
         <field key="image" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
 
+        <field key="total" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="count" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="ajax" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
         <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>

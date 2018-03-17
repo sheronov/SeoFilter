@@ -101,7 +101,11 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
                             record: r,
                             listeners: {
                                 success: {
-                                    fn: function () {
+                                    fn: function (res) {
+                                        if(res.a.result.object.total) {
+                                            var total_message = res.a.result.object.total_message;
+                                            MODx.msg.alert(_('seofilter_rule_recount_title'), total_message);
+                                        }
                                         this.refresh();
                                         Ext.getCmp('seofilter-grid-urls').refresh();
                                     }, scope: this

@@ -16,6 +16,8 @@ class sfMenu
     protected $level = 1;
     /** @var int $idx */
     protected $idx = 1;
+    /** @var sfCountHandler $countHandler */
+    public $countHandler = null;
 
     public function __construct(modX & $modx, $config = array())
     {
@@ -43,13 +45,15 @@ class sfMenu
 
         $config['container_suffix'] = $this->modx->getOption('container_suffix',null,'/');
         $config['url_suffix'] = $this->modx->getOption('seofilter_url_suffix',null,'',true);
+        $config['possibleSuffixes'] = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
+        $config['possibleSuffixes'] = array_unique(array_merge($config['possibleSuffixes'],array($config['container_suffix'])));
 
         if (empty($config['tplInner']) && !empty($config['tplOuter'])) {
             $config['tplInner'] = $config['tplOuter'];
         }
 
         if(empty($config['context'])){
-            $config['context'] = $modx->context->get('key');
+            $config['context'] = $modx->context->key;
         }
         $sf_seo_id = $modx->getPlaceholder('sf.seo_id');
         if (empty($config['hereId']) && !empty($sf_seo_id)) {
@@ -76,6 +80,15 @@ class sfMenu
 
         $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
         $modx->lexicon->load('seofilter:default');
+    }
+
+    public function clearSuffixes($url = '') {
+        foreach($this->config['possibleSuffixes'] as $possibleSuffix) {
+            if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                $url = substr($url, 0, -strlen($possibleSuffix));
+            }
+        }
+        return $url;
     }
 
     /**
@@ -152,15 +165,23 @@ class sfMenu
         if(!$parents) {
             $parents = $this->config['parents'];
         }
-        if ($pre_array = $this->rulesArray($rules,$parents)) {
-            $tree = $this->getLinks($pre_array);
 
+        if($this->config['fast']) {
+            $tree = $this->fastGetLinks($rules,$parents);
             $tree = $this->prepareLinks($tree);
+        } else {
+            if ($pre_array = $this->rulesArray($rules,$parents)) {
+                $tree = $this->getLinks($pre_array);
 
-            if((int)$this->config['countChildren']) {
-                $tree = $this->countChildren($tree);
+                $tree = $this->prepareLinks($tree);
+
+                if((int)$this->config['countChildren']) {
+                    $tree = $this->countChildren($tree);
+                }
             }
+        }
 
+        if (!empty($tree)) {
             if((int)$this->config['nesting'] && !(int)$this->config['groupbyrule']) {
                 $tree = $this->linksNesting($tree);
             }
@@ -173,13 +194,10 @@ class sfMenu
         return $tree;
     }
 
-    public function rulesArray($rules = '',$parents = '') {
-        $time = microtime(true);
-        $pre_array = array();
+    public function prepareParents($rules = '',$parents = '',$rule_alias = 'id',$page_alias = 'page') {
+        $where = array();
         $rules_in = $rules_out = array();
         $parents_in = $parents_out = array();
-        $system = array('field_id','multi_id','priority','class','key','alias','slider','exact','xpdo_package');
-
         if($parents) {
             $parents = array_map('trim', explode(',', $parents));
             foreach ($parents as $v) {
@@ -206,26 +224,33 @@ class sfMenu
                 }
             }
         }
-
-        $q = $this->modx->newQuery('sfRule');
-        $qwhere = array();
         if(count($rules_in)) {
-            $qwhere['id:IN'] = $rules_in;
+            $where[$rule_alias.':IN'] = $rules_in;
         }
         if(count($rules_out)) {
-            $qwhere['id:NOT IN'] = $rules_out;
+            $where[$rule_alias.':NOT IN'] = $rules_out;
         }
         if(count($parents_in)){
             if(count($rules_out) || count($parents_out)) {
-                $qwhere['page:IN'] = $parents_in;
+                $where[$page_alias.':IN'] = $parents_in;
             } else {
-                $qwhere['OR:page:IN'] = $parents_in;
+                $where['OR:'.$page_alias.':IN'] = $parents_in;
             }
         }
         if(count($parents_out)) {
-            $qwhere['page:NOT IN'] = $parents_out;
+            $where[$page_alias.':NOT IN'] = $parents_out;
         }
-        $qwhere['active'] = 1;
+
+        return $where;
+    }
+
+    public function rulesArray($rules = '',$parents = '') {
+        $time = microtime(true);
+        $pre_array = array();
+        $system = array('field_id','multi_id','priority','class','key','alias','slider','exact','xpdo_package');
+
+        $q = $this->modx->newQuery('sfRule');
+        $qwhere = array_merge($this->prepareParents($rules,$parents),array('active'=>1));
         $q->where($qwhere);
         $q->leftJoin('sfFieldIds','sfFieldIds','sfFieldIds.multi_id = sfRule.id');
         $q->innerJoin('sfField','sfField','sfField.id = sfFieldIds.field_id');
@@ -250,6 +275,128 @@ class sfMenu
         }
         $this->pdoTools->addTime('Rules array complete ', microtime(true) - $time);
         return $pre_array;
+    }
+
+    public function prepareHaving($level = 'level') {
+        $having = '';
+        $maxlevel = (int)$this->config['level'];
+        $minlevel = (int)$this->config['minlevel'];
+        if($maxlevel) {
+            if($minlevel) {
+                $having = $level.' >= '.$minlevel.' AND '.$level.' <= '.$maxlevel;
+            } else {
+                $having = $level.' <= '.$maxlevel;
+            }
+        } elseif($minlevel) {
+            $having = $level.' >= '.$minlevel;
+        }
+
+        return $having;
+    }
+
+    public function fastGetLinks($rules = '',$parents = '') {
+        $links = array();
+        $where = $this->prepareParents($rules,$parents,'multi_id','page_id');
+        $select = array(
+            'sfUrls.*',
+            'sfUrlWord.id,sfUrlWord.url_id,sfUrlWord.word_id,sfUrlWord.field_id,sfUrlWord.priority',
+            'sfDictionary.alias,sfDictionary.input,sfDictionary.value'
+        );
+
+        $q = $this->modx->newQuery('sfUrls');
+        $where = array_merge(array(
+            'active'=>1,
+        ),$where);
+        $q->leftJoin('sfUrlWord','sfUrlWord','sfUrlWord.url_id = sfUrls.id');
+        $q->innerJoin('sfDictionary','sfDictionary','sfDictionary.id = sfUrlWord.word_id');
+        if((int)$this->config['level'] || (int)$this->config['minlevel']) {
+            $q->leftJoin('sfUrlWord','sfUrlWordX','sfUrlWordX.url_id = sfUrls.id');
+            $select[] = 'COUNT(sfUrlWordX.id) as level';
+            $q->having($this->prepareHaving());
+        }
+        if($mincount = (int)$this->config['mincount']) {
+            $where['total:>='] = $mincount;
+        }
+        if(!(int)$this->config['showHidden']) {
+            $where['menu_on'] = 1;
+        }
+        if(!empty($this->config['wordWhere'])) {
+            $where = array_merge($this->prepareWordWhere($this->config['wordWhere']),$where);
+        }
+        $q->select($select);
+        $q->where($where);
+
+        if((int)$this->config['sortcount']) {
+            $q->sortby($this->config['total'], 'DESC');
+        }
+        if($this->config['sortby'] && $this->config['sortdir']) {
+            $q->sortby($this->config['sortby'], $this->config['sortdir']);
+        }
+        $q->limit((int)$this->config['limit'],(int)$this->config['offset']);
+        $q->groupby('sfUrlWord.id');
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $url = $row['new_url']?:$row['old_url'];
+                $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
+                $u_suffix = $this->config['url_suffix'];
+                $page_url = $this->clearSuffixes($page_url);
+                if (substr($page_url, -1) != '/') {
+                    $page_url .= '/';
+                }
+                $url = $page_url.$url.$u_suffix;
+                $name = $row['menutitle']?:$row['link'];
+                $row['url'] = $url;
+                $row['name'] = $name;
+                $row['rule_id'] = $row['multi_id'];
+
+                $word_array = array(
+                    'multi_id'=>$row['multi_id'],
+                    'rule_id'=>$row['multi_id'],
+                    'url_id'=>$row['url_id'],
+                    'field_id'=>$row['field_id'],
+                    'word_id'=>$row['word_id'],
+                    'word_input'=>$row['input'],
+                    'word_alias'=>$row['alias'],
+                    'word_value'=>$row['value'],
+                    'priority'=>$row['priority']
+                );
+
+                if(isset($links[$row['url_id']])) {
+                    $links[$row['url_id']] = array_merge($links[$row['url_id']],$row);
+                } else {
+                    $links[$row['url_id']] = $row;
+                }
+                $links[$row['url_id']]['words'][] = $word_array;
+            }
+        }
+
+        return $links;
+    }
+
+    public function prepareWordWhere($wordWhere = '') {
+        $where = array();
+        $wordWhere = $this->modx->fromJSON($wordWhere);
+
+        if ((count($wordWhere, COUNT_RECURSIVE) - count($wordWhere)) > 0) {
+            //многомерный
+            foreach($wordWhere as $wwhere) {
+                foreach($wwhere as $param=>$val) {
+                    $param = 'sfDictionary.'.str_replace('word_','',$param);
+                    if(isset($where[$param.':IN'])) {
+                        $where[$param . ':IN'][] = $val;
+                    } else {
+                        $where[$param . ':IN'] = array($val);
+                    }
+                }
+            }
+        } else {
+            foreach($wordWhere as $param=>$val) {
+                $param = 'sfDictionary.'.str_replace('word_','',$param);
+                $where[$param] = $val;
+            }
+        }
+
+        return $where;
     }
 
     public function getLinks($pre_array) {
@@ -283,16 +430,12 @@ class sfMenu
         }
         $q->limit((int)$this->config['limit'],(int)$this->config['offset']);
         if($q->prepare() && $q->stmt->execute()) {
+
             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $url = $row['new_url']?:$row['old_url'];
                 $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
-                $c_suffix = $this->config['container_suffix'];
                 $u_suffix = $this->config['url_suffix'];
-                if($c_suffix) {
-                    if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix))) {
-                        $page_url = substr($page_url,0,-strlen($c_suffix));
-                    }
-                }
+                $page_url = $this->clearSuffixes($page_url);
                 if (substr($page_url, -1) != '/') {
                     $page_url .= '/';
                 }
@@ -339,7 +482,7 @@ class sfMenu
         return $links;
     }
 
-    public function prepareLinks($links = array()) {
+    public function prepareLinks($links = array(),$onlyWW = 0) {
         $tree = array();
         $time = microtime(true);
 
@@ -352,7 +495,9 @@ class sfMenu
         foreach($links as $key => $link) {
             if(isset($link['words'])) {
                 $words = $link['words'];
-                $link['level'] = count($words);
+                if(!$onlyWW) {
+                    $link['level'] = count($words);
+                }
                 usort($words, function ($a, $b) {
                     if ($a['priority'] == $b['priority']) {
                         return 0;
@@ -393,28 +538,30 @@ class sfMenu
                     }
                 }
 
-            } else {
+            } elseif(!$onlyWW) {
                 $link['level'] = 0;
             }
 
-            if($maxlevel = (int)$this->config['level']) {
-                if(!empty($this->config['minlevel'])) {
+            if(!$onlyWW) {
+                if ($maxlevel = (int)$this->config['level']) {
+                    if (!empty($this->config['minlevel'])) {
+                        $minlevel = (int)$this->config['minlevel'];
+                        if ($link['level'] <= $maxlevel && $link['level'] >= $minlevel) {
+                            $tree[$key] = $link;
+                        }
+                    } else {
+                        if ($link['level'] <= $maxlevel) {
+                            $tree[$key] = $link;
+                        }
+                    }
+                } elseif (!empty($this->config['minlevel'])) {
                     $minlevel = (int)$this->config['minlevel'];
-                    if ($link['level'] <= $maxlevel && $link['level'] >= $minlevel) {
+                    if ($link['level'] >= $minlevel) {
                         $tree[$key] = $link;
                     }
                 } else {
-                    if ($link['level'] <= $maxlevel) {
-                        $tree[$key] = $link;
-                    }
-                }
-            } elseif(!empty($this->config['minlevel'])) {
-                $minlevel = (int)$this->config['minlevel'];
-                if ($link['level'] >= $minlevel) {
                     $tree[$key] = $link;
                 }
-            } else {
-                $tree[$key] = $link;
             }
         }
 
@@ -422,7 +569,68 @@ class sfMenu
         return $tree;
     }
 
+    public function loadHandler() {
+        if (!is_object($this->countHandler)) {
+            require_once 'sfcount.class.php';
+            $count_class = $this->modx->getOption('seofilter_count_handler_class', null, 'sfCountHandler', true);
+            if ($count_class != 'sfCountHandler') {
+                $this->loadCustomClasses('count');
+            }
+            if (!class_exists($count_class)) {
+                $count_class = 'sfCountHandler';
+            }
+            $this->countHandler = new $count_class($this->modx, $this->config);
+            if (!($this->countHandler instanceof sfCountHandler)) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] Could not initialize count handler class: "' . $count_class . '"');
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function countChildren($links = array()) {
+        $tree = $add_where = array();
+        $time = microtime(true);
+
+
+        $this->loadHandler();
+        if (!empty($this->config['count_where'])) {
+            $add_where = $this->modx->fromJSON($this->config['count_where']);
+        }
+        foreach ($links as $link) {
+            $link['total'] = $this->countHandler->countByLink($link['id'],$add_where,0);
+            if ($mincount = (int)$this->config['mincount']) {
+                if ($link['total'] >= $mincount) {
+                    $tree[$link['id']] = $link;
+                }
+            } else {
+                $tree[$link['id']] = $link;
+            }
+
+        }
+
+        if((int)$this->config['sortcount']) {
+            uasort($tree, array($this, 'sortTotal'));
+        }
+
+        $this->pdoTools->addTime('Count Children complete', microtime(true) - $time);
+
+        return $tree;
+    }
+
+    public function sortTotal($a = array(), $b = array()) {
+        if ($a['total'] == $b['total']) {return 0;}
+        if($this->config['sortdir'] == 'DESC') {
+            return ($a['total'] > $b['total']) ? -1 : 1;
+        } else {
+            return ($a['total'] < $b['total']) ? -1 : 1;
+        }
+    }
+
+    /***
+     * DEPRECATED METHOD
+     */
+    public function _countChildren($links = array()) {
         $tree = array();
         $time = microtime(true);
         foreach ($links as $link) {
@@ -516,7 +724,7 @@ class sfMenu
                 }
             }
 
-            if($link['count_parents']) {
+            if(!empty($link['count_parents'])) {
                 $parents = $link['count_parents'];
             } elseif($link['page_id']) {
                 $parents = $link['page_id'];
@@ -557,19 +765,48 @@ class sfMenu
         }
 
         if((int)$this->config['sortcount']) {
-            uasort($tree,  function ($a, $b) {
-                if ($a['total'] == $b['total']) {return 0;}
-                if($this->config['sortdir'] == 'DESC') {
-                    return ($a['total'] > $b['total']) ? -1 : 1;
-                } else {
-                    return ($a['total'] < $b['total']) ? -1 : 1;
-                }
-            });
+            uasort($tree, array($this, 'sortTotal'));
         }
 
         $this->pdoTools->addTime('Count Children complete', microtime(true) - $time);
 
         return $tree;
+    }
+
+    /**
+     * Method loads custom classes from specified directory
+     *
+     * @var string $dir Directory for load classes
+     * @return void
+     */
+    public function loadCustomClasses($dir)
+    {
+        $customPath = $this->config['customPath'];
+        $placeholders = array(
+            'base_path' => MODX_BASE_PATH,
+            'core_path' => MODX_CORE_PATH,
+            'assets_path' => MODX_ASSETS_PATH,
+        );
+        $pl1 = $this->pdoTools->makePlaceholders($placeholders, '', '[[+', ']]', false);
+        $pl2 = $this->pdoTools->makePlaceholders($placeholders, '', '[[++', ']]', false);
+        $pl3 = $this->pdoTools->makePlaceholders($placeholders, '', '{', '}', false);
+        $customPath = str_replace($pl1['pl'], $pl1['vl'], $customPath);
+        $customPath = str_replace($pl2['pl'], $pl2['vl'], $customPath);
+        $customPath = str_replace($pl3['pl'], $pl3['vl'], $customPath);
+        if (strpos($customPath, MODX_BASE_PATH) === false && strpos($customPath, MODX_CORE_PATH) === false) {
+            $customPath = MODX_BASE_PATH . ltrim($customPath, '/');
+        }
+        $customPath = rtrim($customPath, '/') . '/' . ltrim($dir, '/');
+        if (file_exists($customPath) && $files = scandir($customPath)) {
+            foreach ($files as $file) {
+                if (preg_match('#\.class\.php$#i', $file)) {
+                    /** @noinspection PhpIncludeInspection */
+                    include $customPath . '/' . $file;
+                }
+            }
+        } else {
+            $this->modx->log(modX::LOG_LEVEL_ERROR, "[SeoFilter] Custom path is not exists: \"{$customPath}\"");
+        }
     }
 
     public function recursiveNesting($links = array(),$level = 1) {

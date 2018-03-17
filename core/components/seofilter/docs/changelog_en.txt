@@ -1,5 +1,33 @@
 Changelog for SeoFilter.
 
+1.4.4-beta
+==============
+- Improved stability
+- More "related" functions
+- Many bugs fixed
+- Field dependence is added
+- Fixed counting
+- For counting, a new class has been added, which can be expanded
+- Integration of tvSuperSelect - specify a component in the Field
+- Frozen page addresses are processed
+- Fixed link formation
+- Different suffixes are taken into account by the container
+- Re-generation of reference names when changing a word
+- Interim calculations to speed up the menu
+- Recalculation of results for changes or for a button
+- Improved rule copying
+- Adding a rule in one approach
+- Ajax bread crumbs
+- Added keywords field to rules and links
+- Passing the LastModified parameter
+- Support for browser history on the buttons back, forward
+- Versioning of js, css files
+- Updates in declensions. Now only a token is needed.
+- Integration with msVendorCollections
+- Added hidden features
+- Minor improvements in performance
+
+
 1.3.2-beta
 ==============
 - Fixed the formation of links and pages for sites with a modified container suffix

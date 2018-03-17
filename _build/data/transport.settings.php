@@ -32,16 +32,6 @@ $tmp = array(
         'value' => false,
         'area' => 'seofilter_main',
     ),
-//    'morpher_username' => array(
-//        'xtype' => 'textfield',
-//        'value' => '',
-//        'area' => 'seofilter_main',
-//    ),
-//    'morpher_password' => array(
-//        'xtype' => 'text-password',
-//        'value' => '',
-//        'area' => 'seofilter_main',
-//    ),
     'morpher_token' => array(
         'xtype' => 'textfield',
         'value' => '',
@@ -62,6 +52,11 @@ $tmp = array(
         'value' => '',
         'area' => 'seofilter_main',
     ),
+    'page_tpl' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main',
+    ),
     'url_suffix' => array(
         'xtype' => 'textfield',
         'value' => '',
@@ -70,6 +65,31 @@ $tmp = array(
     'url_redirect' => array(
         'xtype' => 'combo-boolean',
         'value' => false,
+        'area' => 'seofilter_main',
+    ),
+    'last_modified' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_main',
+    ),
+    'mfilter_words' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_main',
+    ),
+    'values_separator' => array(
+        'xtype' => 'textfield',
+        'value' => ', || и ',
+        'area' => 'seofilter_main',
+    ),
+    'values_delimeter' => array(
+        'xtype' => 'textfield',
+        'value' => ',',
+        'area' => 'seofilter_main',
+    ),
+    'snippet' => array(
+        'xtype' => 'textfield',
+        'value' => '',
         'area' => 'seofilter_main',
     ),
     'hide_empty' => array(
@@ -87,10 +107,10 @@ $tmp = array(
         'value' => '',
         'area' => 'seofilter_count',
     ),
-    'snippet' => array(
+    'count_handler_class' => array(
         'xtype' => 'textfield',
-        'value' => '',
-        'area' => 'seofilter_main',
+        'value' => 'sfCountHandler',
+        'area' => 'seofilter_count'
     ),
     'select' => array(
         'xtype' => 'textfield',
@@ -142,11 +162,11 @@ $tmp = array(
         'value' => 'content',
         'area' => 'seofilter_seo',
     ),
-//    'pagetpl' => array(
-//        'xtype' => 'textfield',
-//        'value' => '@INLINE / [[%seofilter_page]] [[+page]]',
-//        'area' => 'seofilter_seo',
-//    ),
+    'crumbs_tpl_current' => array(
+        'xtype' => 'textfield',
+        'value' => 'tpl.SeoFilter.crumbs.current',
+        'area' => 'seofitler_seo'
+    ),
     'replacebefore' => array(
         'xtype' => 'combo-boolean',
         'value' => false,
@@ -202,6 +222,11 @@ $tmp = array(
         'value' => '.sf_content',
         'area' => 'seofilter_jquery',
     ),
+    'crumbs_replace' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofitler_jquery'
+    )
 
 );
 

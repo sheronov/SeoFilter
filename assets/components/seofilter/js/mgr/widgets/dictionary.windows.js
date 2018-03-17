@@ -37,6 +37,7 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
                         fieldLabel: _('seofilter_dictionary_input'),
                         name: 'input',
                         id: config.id + '-input',
+                        description: '{$input}',
                         anchor: '99%',
                         allowBlank: false,
                     },{
@@ -44,6 +45,7 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
                         fieldLabel: _('seofilter_dictionary_value'),
                         name: 'value',
                         id: config.id + '-value',
+                        description: '{$value}',
                         anchor: '99%',
                         allowBlank: false,
                     }
@@ -61,11 +63,19 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
                         id: config.id + '-field_id',
                         anchor: '99%',
                         allowBlank: false,
+                        listeners: {
+                            beforeselect : function (combo,record,index) {
+                                var relationWord = Ext.getCmp(config.id + '-relation_word');
+                                relationWord.baseParams.field_relation = record.id;
+                                relationWord.reload();
+                            }
+                        }
                     }, {
                         xtype: 'textfield',
                         fieldLabel: _('seofilter_dictionary_alias'),
                         name: 'alias',
                         id: config.id + '-alias',
+                        description: '{$alias}',
                         anchor: '99%',
                     }
                 ]
@@ -76,11 +86,7 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
         //     name: 'active',
         //     id: config.id + '-active',
         // }, {
-            title: _('seofilter_dictionary_decline')
-            , style: 'border-top:1px solid #ccc;padding-top:5px;'
-            , xtype: 'displayfield'
-            , html: _('seofilter_dictionary_decline_desc_save')
-        }, {
+
             layout: 'column',
             border: false,
             anchor: '100%',
@@ -102,7 +108,6 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
                             combo: true,
                             id: config.value,
                             relation: 1,
-                            //TODO: field_relation - выбранное поле
                             field_relation: 0,
                         }
                     }
@@ -114,10 +119,15 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
                 , border: false
                 , items: [
                     {
-                        //TODO: раскрыть когда нибудь
+                        title: _('seofilter_dictionary_decline')
+                        , style: 'border-top:1px solid #ccc;padding-top:5px;'
+                        , xtype: 'displayfield'
+                        , html: _('seofilter_dictionary_decline_desc_save')
+                    // }, {
                         // xtype: 'textfield',
                         // fieldLabel: _('seofilter_word_image'),
                         // name: 'image',
+                        // description: '{$image}',
                         // id: config.id + '-image',
                         // anchor: '99%',
                     }
@@ -226,21 +236,21 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                 , defaults: {msgTarget: 'under'}
                 , border: false
                 , items: [
-                    {
-                        xtype: 'seofilter-combo-word',
-                        fieldLabel: _('seofilter_word_relation'),
-                        name: 'relation_word',
-                        hiddenName: 'relation_word',
-                        id: config.id + '-relation_word',
-                        anchor: '99%',
-                        baseParams: {
-                            action: 'mgr/dictionary/getlist',
-                            combo: true,
-                            id: config.value,
-                            relation: 1,
-                            field_relation: config.record.object.field_id,
-                        }
-                    }
+                    // {
+                    //     xtype: 'seofilter-combo-word',
+                    //     fieldLabel: _('seofilter_word_relation'),
+                    //     name: 'relation_word',
+                    //     hiddenName: 'relation_word',
+                    //     id: config.id + '-relation_word',
+                    //     anchor: '99%',
+                    //     baseParams: {
+                    //         action: 'mgr/dictionary/getlist',
+                    //         combo: true,
+                    //         id: config.value,
+                    //         relation: 1,
+                    //         field_relation: config.record.object.field_id,
+                    //     }
+                    // }
                 ]
             }, {
                 columnWidth: .5
@@ -248,14 +258,14 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                 , defaults: {msgTarget: 'under'}
                 , border: false
                 , items: [
-                    {
-                        //TODO: раскрыть когда нибудь
-                        // xtype: 'textfield',
-                        // fieldLabel: _('seofilter_word_image'),
-                        // name: 'image',
-                        // id: config.id + '-image',
-                        // anchor: '99%',
-                    }
+                    // {
+                    //     xtype: 'textfield',
+                    //     fieldLabel: _('seofilter_word_image'),
+                    //     name: 'image',
+                    //     description: '{$image}',
+                    //     id: config.id + '-image',
+                    //     anchor: '99%',
+                    // }
                 ]
             }]
         } ,{
@@ -268,6 +278,23 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                 , defaults: {msgTarget: 'under'}
                 , border: false
                 , items: [{
+                    xtype: config.record.object.field_relation === 0?'hidden':'seofilter-combo-word',
+                    fieldLabel: _('seofilter_word_relation'),
+                    name: 'relation_word',
+                    hiddenName: 'relation_word',
+                    emptyText: _('seofilter_combo_select'),
+                    valueNotFoundText: '',
+                    id: config.id + '-relation_word',
+                    anchor: '99%',
+                    baseParams: {
+                        action: 'mgr/dictionary/getlist',
+                        combo: true,
+                        // id: config.value,
+                        relation: 1,
+                        field_relation: config.record.object.field_id,
+                    }
+                }, {
+
                     //     xtype: 'textfield',
                     //     fieldLabel: _('seofilter_dictionary_value_i'),
                     //     name: 'value_i',
@@ -392,14 +419,14 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                         description: '{$value_from}',
                         id: config.id + '-value_from',
                         anchor: '99%',
+                    }, {
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_dictionary_decl'),
+                        name: 'update',
+                        id: config.id + '-update'
                     }
                 ]
             }]
-        }, {
-            xtype: 'xcheckbox',
-            boxLabel: _('seofilter_dictionary_decl'),
-            name: 'update',
-            id: config.id + '-update'
         }];
     },
 

@@ -154,7 +154,7 @@ SeoFilter.combo.Field = function (config) {
         displayField: 'name',
         valueField: 'id',
         editable: true,
-        fields: ['id', 'name'],
+        fields: ['id', 'name', 'relation', 'relation_field'],
         pageSize: 20,
         emptyText: _('seofilter_combo_select'),
         allowBlank: false,
@@ -256,13 +256,13 @@ SeoFilter.combo.Word = function (config) {
         editable: true,
         fields: ['id', 'value'],
         pageSize: 20,
-        emptyText: _('seofilter_combo_select'),
+        emptyText: _('seofilter_combo_relation_select'),
         allowBlank: true,
         url: SeoFilter.config.connector_url,
         baseParams: {
             action: 'mgr/dictionary/getlist',
             combo: true,
-            id: config.value
+            // id: config.value
         },
         tpl: new Ext.XTemplate(''
             +'<tpl for="."><div class="x-combo-list-item seofilter-word-list-item">'

@@ -23,6 +23,7 @@ $xpdo_meta_map['sfUrls']= array (
     'menuindex' => 0,
     'link_attributes' => '',
     'image' => '',
+    'total' => 0,
     'count' => 0,
     'ajax' => 0,
     'rank' => 0,
@@ -148,6 +149,15 @@ $xpdo_meta_map['sfUrls']= array (
       'phptype' => 'string',
       'null' => true,
       'default' => '',
+    ),
+    'total' => 
+    array (
+      'dbtype' => 'integer',
+      'precision' => '10',
+      'phptype' => 'integer',
+      'attributes' => 'unsigned',
+      'null' => true,
+      'default' => 0,
     ),
     'count' => 
     array (

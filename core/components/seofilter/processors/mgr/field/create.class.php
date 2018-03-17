@@ -161,6 +161,7 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                         if ($response->isError()) {
                             $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                            $this->modx->error->reset();
                         }
                     }
                 } else {
@@ -222,6 +223,7 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                                     $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                                     if ($response->isError()) {
                                         $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                                        $this->modx->error->reset();
                                     }
                                 }
                             }

@@ -9,12 +9,15 @@ SeoFilter.grid.FieldIds = function (config) {
         sm: new Ext.grid.CheckboxSelectionModel(),
         baseParams: {
             action: 'mgr/rule/fieldids/getlist'
-            ,multi_id: config.record.id
+            ,multi_id: config.record.id || 0
         },
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
                 this.updateFieldIds(grid, e, row);
+            },
+            sortchange: function (e,te) {
+                console.log('test',e,te);
             }
         },
         viewConfig: {
@@ -71,7 +74,11 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             targetCfg: {},
             listeners: {
                 afterrowmove: {
-                    fn: this.onAfterRowMove,
+                    fn: function (con,i1,i2,rec) {
+                        // console.log(con,i1,i2,rec);
+                        this.onAfterRowMove();
+                        // this.refresh();
+                    },
                     scope: this
                 }
             }
@@ -84,7 +91,10 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             id: Ext.id(),
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.a.result.success) {
+                            this.updateUrlMask(res.a.result.message);
+                        }
                         this.refresh();
 
                     }, scope: this,
@@ -120,7 +130,10 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
                             record: r,
                             listeners: {
                                 success: {
-                                    fn: function () {
+                                    fn: function (res) {
+                                        if(res.a.result.success) {
+                                            this.updateUrlMask(res.a.result.message);
+                                        }
                                         this.refresh();
                                     }, scope: this
                                 }
@@ -154,13 +167,22 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             },
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.success) {
+                            this.updateUrlMask(res.message);
+                        }
                         this.refresh();
                     }, scope: this
                 }
             }
         });
         return true;
+    },
+
+    updateUrlMask: function (url) {
+        var id_number = this.config.idNumber;
+        var url_mask = Ext.getCmp(id_number + '-url');
+        url_mask.setValue(url);
     },
 
     disableFieldIds: function () {
@@ -280,7 +302,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
         return this.processEvent('click', e);
     },
 
-    onAfterRowMove: function () {
+    onAfterRowMove: function (e) {
         var s = this.getStore();
         var start = 0;
         var size = s.getTotalCount();
@@ -290,6 +312,8 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             brec.commit();
             this.saveRecord({record: brec});
         }
+        // console.log(this.getStore());
+        // this.getStore().reload();
         return true;
     },
 

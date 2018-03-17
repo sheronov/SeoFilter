@@ -45,6 +45,7 @@ SeoFilter.grid.Urls = function (config) {
 };
 Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     windows: {},
+    progress: null,
 
     getMenu: function (grid, rowIndex) {
         var ids = this._getSelectedIds();
@@ -225,10 +226,68 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         })
     },
 
+    reCounting: function () {
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: {
+                action: 'mgr/urls/recount',
+                all: 1
+            },
+            listeners: {
+                success: {
+                    fn: function () {
+                        Ext.MessageBox.hide();
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        })
+    },
+
+    allReCount: function () {
+        Ext.Msg.confirm(
+            _('seofilter_url_recount_all') || _('warning'),
+            _('seofilter_url_recount_all_confirm'),
+            function (e) {
+                if (e == 'yes') {
+                    Ext.MessageBox.show({
+                        title: _('seofilter_url_recount_wait'),
+                        msg: _('seofilter_url_recount_process'),
+                        progressText: ' ... ',
+                        progress:true,
+                        closable:false,
+                    });
+                    this.reCounting();
+                } else {
+                    this.fireEvent('cancel');
+                }
+            }, this);
+    },
+
+    reCount: function () {
+        var ids = this._getSelectedIds();
+        if (!ids.length) {
+            return false;
+        }
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: {
+                action: 'mgr/urls/recount',
+                ids: Ext.util.JSON.encode(ids),
+            },
+            listeners: {
+                success: {
+                    fn: function () {
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        })
+    },
 
 
     getFields: function () {
-        return ['id', 'multi_id', 'page_id', 'name', 'link', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','menuon','multi_name','url_preview','page','pagetitle','menu_on','menutitle','menuindex','image','link_attributes'];
+        return ['id', 'multi_id', 'page_id', 'name', 'link', 'total', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','menuon','multi_name','url_preview','page','pagetitle','menu_on','menutitle','menuindex','image','link_attributes'];
     },
 
     getColumns: function () {
@@ -278,6 +337,11 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         }, {
             header: _('seofilter_url_count'),
             dataIndex: 'count',
+            sortable: true,
+            width: 70,
+        }, {
+            header: _('seofilter_url_total'),
+            dataIndex: 'total',
             sortable: true,
             width: 70,
         }, {
@@ -402,11 +466,25 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                     click: {fn: this.clearFilter, scope: this}
                 }
             }, {
-                xtype:'button'
-                ,id: 'sofilter-clear-counters'
-                ,text:  _('seofilter_clear_counters')
-                ,handler: this.clearCounters
-                ,scope: this
+                id: 'seofilter-menu-more',
+                text: '<i class="icon icon-cogs"></i> ' + _('seofilter_menu_more'),
+                menu: [{
+                    text: '<i class="icon icon-refresh green"></i> ' + _('seofilter_url_recount_all'),
+                    cls: 'seofilter-cogs',
+                    handler: this.allReCount,
+                    scope: this
+                }, {
+                    text: '<i class="icon icon-history red"></i> ' + _('seofilter_clear_counters'),
+                    cls: 'seofilter-cogs',
+                    handler: this.clearCounters,
+                    scope: this
+                }]
+            // }, {
+            //     xtype:'button'
+            //     ,id: 'sofilter-clear-counters'
+            //     ,text:  _('seofilter_clear_counters')
+            //     ,handler: this.clearCounters
+            //     ,scope: this
             }, '->', {
             xtype: 'seofilter-field-search',
             width: 200,

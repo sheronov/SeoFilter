@@ -6,6 +6,20 @@ if ($sfClass = $modx->loadClass('seofilter.sfmenu',$path, false, true)) {
     $scriptProperties['nesting'] = 0;
     $scriptProperties['groupbyrule'] = 0;
     $scriptProperties['scheme'] = 'full';
+
+    if (!empty($sortBy)) {
+        $scriptProperties['sortby'] = $sortBy;
+    }
+    if (!empty($sortDir)) {
+        $scriptProperties['sortdir'] = $sortDir;
+    }
+
+    if((int)$scriptProperties['countChildren']) {
+        $scriptProperties['fast'] = 0;
+    } elseif(!isset($scriptProperties['fast'])) {
+        $scriptProperties['fast'] = 1;
+    }
+
     $sfMenu = new sfMenu($modx, $scriptProperties);
 } else {
     return false;
@@ -29,12 +43,6 @@ if (empty($cacheKey)) {
     $scriptProperties['cacheKey'] = 'sfsitemap/' . substr(md5(json_encode($scriptProperties)), 0, 6);
 }
 
-if (!empty($sortBy)) {
-    $scriptProperties['sortby'] = $sortBy;
-}
-if (!empty($sortDir)) {
-    $scriptProperties['sortdir'] = $sortDir;
-}
 
 if (!empty($cache)) {
     $data = $sfMenu->pdoTools->getCache($scriptProperties);

@@ -8,3 +8,4 @@ Ext.extend(SeoFilter, Ext.Component, {
 Ext.reg('seofilter', SeoFilter);
 
 SeoFilter = new SeoFilter();
+

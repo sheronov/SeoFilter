@@ -151,13 +151,6 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
             ,defaults: { msgTarget: 'under' }
             ,border:false
             ,items: [{
-                // xtype: 'textfield',
-                // fieldLabel: _('seofilter_field_xpdo_where'),
-                // name: 'xpdo_where',
-                // id: config.id + '-xpdo_where',
-                // anchor: '99%',
-                // style:'margin-bottom:15px;'
-                // },{
                 xtype: 'xcheckbox',
                 boxLabel: _('seofilter_field_relation'),
                 name: 'relation',
@@ -198,6 +191,12 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     }]
                 }]
             }]
+        },{
+            xtype: 'textfield',
+            fieldLabel: _('seofilter_field_xpdo_where'),
+            name: 'xpdo_where',
+            id: config.id + '-xpdo_where',
+            anchor: '99%',
         }]
     },
 
@@ -380,13 +379,6 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
             ,defaults: { msgTarget: 'under' }
             ,border:false
             ,items: [{
-                // xtype: 'textfield',
-                // fieldLabel: _('seofilter_field_xpdo_where'),
-                // name: 'xpdo_where',
-                // id: config.id + '-xpdo_where',
-                // anchor: '99%',
-                // style:'margin-bottom:15px;'
-                // },{
                 xtype: 'xcheckbox',
                 boxLabel: _('seofilter_field_relation'),
                 name: 'relation',
@@ -427,6 +419,12 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     }]
                 }]
             }]
+        },{
+            xtype: 'textfield',
+            fieldLabel: _('seofilter_field_xpdo_where'),
+            name: 'xpdo_where',
+            id: config.id + '-xpdo_where',
+            anchor: '99%',
         }]
     },
 

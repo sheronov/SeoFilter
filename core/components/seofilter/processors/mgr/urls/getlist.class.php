@@ -39,6 +39,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
         if ($query) {
             $c->where(array(
                 'link:LIKE' => "%{$query}%",
+                'OR:id:LIKE' => "%{$query}%",
                 'OR:old_url:LIKE' => "%{$query}%",
                 'OR:new_url:LIKE' => "%{$query}%",
             ));
@@ -152,6 +153,18 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                 'title' => $this->modx->lexicon('seofilter_url_view'),
                 'action' => 'viewPage',
                 'button' => true,
+                'menu' => true,
+            );
+        }
+
+        if (!empty($array['url_preview'])) {
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-refresh',
+                'title' => $this->modx->lexicon('seofilter_url_recount'),
+                'multiple' => $this->modx->lexicon('seofilter_url_recount'),
+                'action' => 'reCount',
+                'button' => false,
                 'menu' => true,
             );
         }

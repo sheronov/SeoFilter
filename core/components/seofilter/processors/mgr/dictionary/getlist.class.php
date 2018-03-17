@@ -89,7 +89,7 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             'cls' => '',
             'icon' => 'icon icon-refresh',
             'title' => $this->modx->lexicon('seofilter_dictionary_decl'),
-            //'multiple' => $this->modx->lexicon('seofilter_dictionary_update'),
+            'multiple' => $this->modx->lexicon('seofilter_dictionary_decls'),
             'action' => 'declineWord',
             'button' => true,
             'menu' => true,

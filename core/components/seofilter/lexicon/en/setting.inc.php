@@ -90,3 +90,34 @@ $_lang['setting_seofilter_url_redirect'] = 'Redirect to a page with the correct 
 $_lang['setting_seofilter_url_redirect_desc'] = 'The default is "No". If so, it will redirect to the page with the correct url suffix.';
 $_lang['setting_seofilter_page_key'] = 'The name of the pagination variable, usually "page", for the page number in SEO-texts';
 $_lang['setting_seofilter_page_key_desc'] = 'If you specify, then in the SEO-templates will be available placeholder {$ page_number}, as well as a placeholder by name - if the name is pagе, it will be {$ page}.';
+
+$_lang['setting_seofilter_url_help'] = 'URL address for opening help in iframe';
+$_lang['setting_seofilter_tpls_path'] = 'Path for file elements';
+$_lang['setting_seofilter_hide_empty'] = 'Redirect to page 404 on blank pages';
+$_lang['setting_seofilter_hide_empty_desc'] = 'Blank pages are those with no results. The counting function must be enabled.';
+
+$_lang['setting_seofilter_morpher_token'] = 'Token to the service moprher.ru';
+$_lang['setting_seofilter_morpher_token_desc'] = 'If you specify, then do not rush into the guest limit of requests';
+$_lang['setting_seofilter_container_suffix'] = 'Suffix on resetting to original pages';
+$_lang['setting_seofilter_container_suffix_desc'] = 'By default, as from the system configuration of container_suffix. Use if you use the url freeze for parent directories';
+$_lang['setting_seofilter_last_modified'] = 'Send the Last-Modified header for "virtual" pages';
+$_lang['setting_seofilter_last_modified_desc'] = 'There is no default. When enabled, the date of the link change will be sent if available, otherwise the creation date';
+$_lang['setting_seofilter_mfilter_words'] = 'Allow new words to be added via Ajax mFilter2';
+$_lang['setting_seofilter_mfilter_words_desc'] = 'There is no default. Enable only if new values are not written through processors or are dynamically generated in mFilter2';
+$_lang['setting_seofilter_crumbs_tpl_current'] = 'Chunk for the replacement of bread crumbs through Ajax';
+$_lang['setting_seofilter_crumbs_tpl_current_desc'] = 'The default is "tpl.SeoFilter.crumbs.current". It is not recommended to change if you do not know why.';
+$_lang['setting_seofilter_crumbs_replace'] = 'Allow replacing bread crumbs through Ajax';
+$_lang['setting_seofilter_crumbs_replace_desc'] = 'By default, yes. You can turn it off if you do not use bread crumbs';
+$_lang['setting_seofilter_count_handler_class'] = 'Handler class for counting';
+$_lang['setting_seofilter_count_handler_class_desc'] = 'The default is "sfCountHandler". Name of the class that implements the logic of counting';
+$_lang['setting_seofilter_values_separator'] = 'Separate multiple values in texts';
+$_lang['setting_seofilter_values_separator_desc'] = 'The default is ", || и ". Recorded and commas. Through || write values for the connection of the last element, you can leave only a comma.';
+$_lang['setting_seofilter_values_delimeter'] = 'Value delimiter in the address bar';
+$_lang['setting_seofilter_values_delimeter_desc'] = 'Default ",". Override if in mFilter2 you use another delimiter';
+$_lang['setting_seofilter_page_tpl'] = 'The template for generating friendly URLs to pages of pagination';
+$_lang['setting_seofilter_page_tpl_desc'] = 'For sharing with pdoPage pageLinkScheme setting. You can specify this  "/page-[[+page]]"';
+
+$_lang['setting_seofilter_hidden_tab'] = 'Show hidden property tab';
+$_lang['setting_seofilter_hidden_tab_desc'] = 'There is no default. Contains two property arrays and a numeric field';
+$_lang['setting_seofilter_super_hidden_props'] = 'Show files from a folder';
+$_lang['setting_seofilter_super_hidden_props_desc'] = 'There is no default. Displays a list of files from the folder from the seofilter_tpls_path';

@@ -53,6 +53,8 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
 
             if($urlwords = $this->modx->getCollection('sfUrlWord',array('field_id'=>$id))) {
                 foreach ($urlwords as $urlword) {
+                    /* @var sfUrlWord $urlword */
+                    /* @var sfUrls $url */
                     if ($url = $urlword->getOne('Url')) {
                         $priorities = array();
                         if ($rule = $url->getOne('Rule')) {
@@ -75,6 +77,8 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
 
             if($fieldids = $this->object->getMany('Links')) {
                 foreach ($fieldids as $fieldid) {
+                    /* @var sfRule $rule */
+                    /* @var sfFieldIds $fieldid */
                     if ($rule = $fieldid->getOne('Rule')) {
                         $rule_array = $rule->toArray();
                         foreach ($rule_array as $key => $value) {
@@ -126,7 +130,7 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                 );
                 $otherProps = array('processors_path' => $path . 'processors/');
                 if ($package = $field->get('xpdo_package')) {
-                    $this->modx->addPackage($package, $this->modx->getOption('core_path') . 'components/' . strtolower($package) . '/model/');
+                    $this->modx->addPackage(strtolower($package), $this->modx->getOption('core_path') . 'components/' . strtolower($package) . '/model/');
                 }
 
                 if ($field->get('xpdo')) {
@@ -210,8 +214,10 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                     }
                     $words = array_unique(array_merge($tvvalues, $pre));
                     if($base_words) {
+                        // простая проверка
                         $words = array_diff($words,$base_words);
                     }
+                    $dictionary = array(); // промежуточный массив для проверки дубликатов
                     foreach ($words as $word) {
                         $relation_id = $relation_value = '';
                         if ($field->get('xpdo')) {
@@ -229,9 +235,11 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                             $value = $word;
                         }
 
-                        if(in_array($word,$base_words)) {
+
+                        if(in_array($word,$base_words) || empty($word)) {
                             continue;
                         }
+
 
                         if($relation_value) {
                             $relation_field = $field->get('relation_field');
@@ -241,6 +249,11 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                             $relation_id = $this->modx->getValue($s->prepare());
                         }
 
+                        if(isset($dictionary[$word]) && $dictionary[$word] == $value) {
+                            continue;
+                        }
+                        $dictionary[$word] = $value;
+
                         $processorProps['relation_word'] = $relation_id;
                         $processorProps['input'] = $word;
                         $processorProps['value'] = $value;
@@ -249,12 +262,17 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                         if ($response->isError()) {
                             $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                            $this->modx->error->reset();
                         }
                     }
                 } else {
                     $q = $this->modx->newQuery($class);
                     $q->limit(0);
-                    if ($class == 'msProductOption') {
+                    if($class == 'msProductData') {
+                        $q->select(array(
+                            'DISTINCT ' . $class . '.' . $key
+                        ));
+                    } elseif ($class == 'msProductOption') {
                         $q->where(array('key' => $key, 'value:!=' => ''));
                         $q->select(array('DISTINCT ' . $class . '.value'));
                         $key = 'value';
@@ -263,11 +281,16 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                     } else {
                         $q->select(array('DISTINCT ' . $class . '.' . $key));
                     }
+                    if($field->get('xpdo_where')) {
+                        $this->modx->log(1,print_r($this->modx->fromJSON($field->get('xpdo_where')),1));
+//                        $q->select($this->modx->getSelectColumns($class,$class));
+                        $q->where($this->modx->fromJSON($field->get('xpdo_where')));
+                    }
                     if ($q->prepare() && $q->stmt->execute()) {
                         while ($input = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $relation_id = $relation_value = '';
+                            $this->modx->log(1,print_r($input,1));
 
-                            $this->modx->log(1,print_r($values,1));
+                            $relation_id = $relation_value = '';
 
                             if ($field->get('xpdo')) {
                                 if(is_array($values[$input[$key]])) {
@@ -315,6 +338,7 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                                     $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                                     if ($response->isError()) {
                                         $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                                        $this->modx->error->reset();
                                     }
                                 }
                             }

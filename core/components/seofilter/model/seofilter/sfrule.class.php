@@ -19,6 +19,29 @@ class sfRule extends xPDOSimpleObject {
         }
     }
 
+    public function makeUrl() {
+        $url = array();
+        $rule_id = (int)$this->get('id');
+        $q = $this->xpdo->newQuery('sfFieldIds');
+        $q->where(array('multi_id'=>$rule_id));
+        $q->sortby('priority','ASC');
+        $q->innerJoin('sfField','Field','Field.id = sfFieldIds.field_id');
+        $q->select(array(
+            'Field.*',
+            'sfFieldIds.id as fid,sfFieldIds.priority'
+        ));
+        $fields = $this->xpdo->getIterator('sfField',$q);
+        foreach($fields as $field) {
+            /*** @var sfField $field */
+            $url[] = $field->makeUrl();
+        }
+
+        $this->set('url',implode('/',$url));
+
+        $this->save();
+        return implode('/',$url);
+    }
+
     /**
      * Returns true url for filter params
      *

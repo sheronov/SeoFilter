@@ -1,2 +1,5 @@
 <?php
-class sfFieldIds extends xPDOSimpleObject {}
+class sfFieldIds extends xPDOSimpleObject {
+
+
+}

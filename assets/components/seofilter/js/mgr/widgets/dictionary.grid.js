@@ -46,6 +46,8 @@ SeoFilter.grid.Dictionary = function (config) {
 Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     windows: {},
 
+    deleteLinks: false,
+
     getMenu: function (grid, rowIndex) {
         var ids = this._getSelectedIds();
 
@@ -72,31 +74,6 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         w.reset();
         w.setValues({active: true});
         w.show(e.target);
-    },
-
-    declineWord: function (btn, e, row) {
-        if (typeof(row) != 'undefined') {
-            this.menu.record = row.data;
-        }
-        else if (!this.menu.record) {
-            return false;
-        }
-        var record = this.menu.record;
-        record.action = 'mgr/dictionary/update';
-        record.update = 1;
-        record.active = 1;
-        MODx.Ajax.request({
-            url: this.config.url,
-            params: record,
-            listeners: {
-                success: {
-                    fn: function () {
-                        this.refresh();
-                    }, scope: this
-                }
-            }
-        })
-
     },
 
     updateField: function (btn, e, row) {
@@ -139,21 +116,17 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         });
     },
 
-    removeField: function () {
+
+    declineWord: function (btn, e, row) {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
         }
-        MODx.msg.confirm({
-            title: ids.length > 1
-                ? _('seofilter_dictionaries_remove')
-                : _('seofilter_dictionary_remove'),
-            text: ids.length > 1
-                ? _('seofilter_dictionaries_remove_confirm')
-                : _('seofilter_dictionary_remove_confirm'),
+
+        MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/dictionary/remove',
+                action: 'mgr/dictionary/decline',
                 ids: Ext.util.JSON.encode(ids),
             },
             listeners: {
@@ -164,6 +137,64 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                 }
             }
         });
+        // console.log(ids);
+        //
+        // if (typeof(row) != 'undefined') {
+        //     this.menu.record = row.data;
+        // }
+        // else if (!this.menu.record) {
+        //     return false;
+        // }
+        // var record = this.menu.record;
+        // record.action = 'mgr/dictionary/update';
+        // record.update = 1;
+        // record.active = 1;
+        // MODx.Ajax.request({
+        //     url: this.config.url,
+        //     params: record,
+        //     listeners: {
+        //         success: {
+        //             fn: function () {
+        //                 this.refresh();
+        //             }, scope: this
+        //         }
+        //     }
+        // })
+
+    },
+
+
+    removeField: function () {
+        var ids = this._getSelectedIds();
+        if (!ids.length) {
+            return false;
+        }
+
+
+        MODx.msg.confirm({
+            title: ids.length > 1
+                ? _('seofilter_dictionaries_remove')
+                : _('seofilter_dictionary_remove'),
+            // text: ids.length > 1
+            //     ? _('seofilter_dictionaries_remove_confirm')
+            //     : _('seofilter_dictionary_remove_confirm'),
+            text: _('seofilter_dictionary_remove_confirmation'),
+            url: this.config.url,
+            params: {
+                action: 'mgr/dictionary/remove',
+                ids: Ext.util.JSON.encode(ids),
+                deleteLinks: 1
+            },
+            listeners: {
+                success: {
+                    fn: function () {
+                        this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
+                    }, scope: this
+                }
+            }
+        });
+
         return true;
     },
 
@@ -210,7 +241,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'field_id', 'field', 'input', 'value','value_r', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle','editedon'];
+        return ['id', 'field_id', 'field', 'input', 'value','value_r', 'alias', 'active', 'class', 'rank', 'key', 'actions','menu_on','menutitle','menuindex','link_attributes','fieldtitle','createdon','editedon'];
     },
 
     getColumns: function () {
@@ -244,18 +275,24 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             dataIndex: 'value_r',
             sortable: true,
             width: 150,
+        // }, {
+        //     header: _('seofilter_dictionary_createdon'),
+        //     dataIndex: 'createdon',
+        //     sortable: true,
+        //     renderer: SeoFilter.utils.formatDate,
+        //     width: 100,
         }, {
             header: _('seofilter_url_editedon'),
             dataIndex: 'editedon',
             sortable: true,
             renderer: SeoFilter.utils.formatDate,
             width: 100,
-        }, {
-            header: _('seofilter_dictionary_active'),
-            dataIndex: 'active',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: true,
-            width: 50,
+        // }, {
+        //     header: _('seofilter_dictionary_active'),
+        //     dataIndex: 'active',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: true,
+        //     width: 50,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',

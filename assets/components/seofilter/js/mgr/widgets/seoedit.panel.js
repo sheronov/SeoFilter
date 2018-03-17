@@ -21,98 +21,7 @@ SeoFilter.panel.Seoedit = function (config) {
             'beforeSubmit': {fn:this.beforeSubmit,scope:this},
         }
         ,hideMode: 'offsets',
-        items: [{
-        //     html: '<h2>' + _('seofilter') + '</h2>',
-        //     cls: '',
-        //     style: {margin: '15px 0'}
-        // }, {
-            xtype: 'modx-tabs',
-            defaults: {border: false, autoHeight: true},
-            border: true,
-            hideMode: 'offsets',
-            items: [{
-                title: _('seofilter_url_seoedit'),
-                layout: 'anchor',
-                items: [{
-                    html: _('seofilter_url_seoedit_intro'),
-                    cls: 'panel-desc',
-                }, {
-                    layout: 'form',
-                    items: this.getFields(config)
-                    ,labelAlign: 'top'
-                    ,labelSeparator: ''
-                    ,autoHeight: true
-                    ,defaults: {
-                        border: false
-                        ,msgTarget: 'under'
-                        ,width: 400
-                    }
-                    ,cls: 'main-wrapper'
-                }]
-
-            // }, {
-            //
-            //     //TODO: сделать скрытую возможность
-            //     title: _('seofilter_rule_properties')
-            //     ,hideMode: 'offsets'
-            //     ,layout: 'form'
-            //     ,border:false
-            //     ,items: [{
-            //         layout: 'form',
-            //         items: [
-            //             {   //TODO: а это вообще супер high level function!
-            //                 xtype: 'seofilter-combo-tpls',
-            //                 fieldLabel: _('seofilter_rule_tpl'),
-            //                 name: 'tpl',
-            //                 id: config.id + '-tpl',
-            //                 value: config.record.tpl,
-            //                 anchor: '99%',
-            //             }, {
-            //                 html: '',
-            //                 style: 'margin-bottom:10px'
-            //             }, {
-            //                 html: _('seofilter_rule_properties_intro'),
-            //                 cls: 'panel-desc',
-            //                 anchor: '99%',
-            //             }, {
-            //                 xtype: 'seofilter-grid-combobox-options',
-            //                 anchor: '99%',
-            //                 name: 'properties',
-            //                 record: config.record,
-            //                 id:'properties',
-            //             }, {
-            //                 html: '',
-            //                 style: 'margin-bottom:10px'
-            //             }, {
-            //                 html: _('seofilter_rule_properties_introtexts'),
-            //                 cls: 'panel-desc',
-            //                 anchor: '99%',
-            //             }, {
-            //                 xtype: 'seofilter-grid-combobox-options',
-            //                 anchor: '99%',
-            //                 name: 'introtexts',
-            //                 record: config.record,
-            //                 id: config.id + '-introtexts',
-            //             }, {
-            //                 xtype: 'numberfield',
-            //                 fieldLabel: _('seofilter_rule_introlength'),
-            //                 name: 'introlength',
-            //                 id: config.id + '-introlength',
-            //                 anchor: '99%',
-            //             }
-            //         ]
-            //         , labelAlign: 'top'
-            //         , labelSeparator: ''
-            //         , autoHeight: true
-            //         , defaults: {
-            //             border: false
-            //             , msgTarget: 'under'
-            //             , width: 400
-            //         }
-            //         , cls: 'main-wrapper'
-            //     }]
-            }]
-        }]
+        items: this.getTabs(config)
     });
     SeoFilter.panel.Seoedit.superclass.constructor.call(this, config);
     this.getForm().setValues(this.config.record);
@@ -140,6 +49,104 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
         if(o.result.message) {
             location.href = o.result.message;
         }
+    }
+
+    ,getTabs: function (config) {
+        var tabs = {
+            //     html: '<h2>' + _('seofilter') + '</h2>',
+            //     cls: '',
+            //     style: {margin: '15px 0'}
+            // }, {
+            xtype: 'modx-tabs',
+            defaults: {border: false, autoHeight: true},
+            border: true,
+            hideMode: 'offsets',
+            items: [{
+                title: _('seofilter_url_seoedit'),
+                layout: 'anchor',
+                items: [{
+                    html: _('seofilter_url_seoedit_intro'),
+                    cls: 'panel-desc',
+                }, {
+                    layout: 'form',
+                    items: this.getFields(config)
+                    ,labelAlign: 'top'
+                    ,labelSeparator: ''
+                    ,autoHeight: true
+                    ,defaults: {
+                        border: false
+                        ,msgTarget: 'under'
+                        ,width: 400
+                    }
+                    ,cls: 'main-wrapper'
+                }]
+
+            }]
+        };
+
+        if(parseInt(SeoFilter.config.hiddenTab)) {
+            tabs.items.push({
+                title: _('seofilter_rule_properties')
+                ,hideMode: 'offsets'
+                ,layout: 'form'
+                ,border:false
+                ,items: [{
+                    layout: 'form',
+                    items: [{
+                        xtype: parseInt(SeoFilter.config.superHiddenProps) === 1 ? 'seofilter-combo-tpls' : 'hidden',
+                        fieldLabel: _('seofilter_rule_tpl'),
+                        name: 'tpl',
+                        id: config.id + '-tpl',
+                        // value: config.record.tpl,
+                        anchor: '99%',
+                    }, {
+                        html: '',
+                        style: 'margin-bottom:10px'
+                    }, {
+                        html: _('seofilter_rule_properties_intro'),
+                        cls: 'panel-desc',
+                        anchor: '99%',
+                    }, {
+                        xtype: 'seofilter-grid-combobox-options',
+                        anchor: '99%',
+                        name: 'properties',
+                        record: config.record,
+                        id:'properties',
+                    }, {
+                        html: '',
+                        style: 'margin-bottom:10px'
+                    }, {
+                        html: _('seofilter_rule_properties_introtexts'),
+                        cls: 'panel-desc',
+                        anchor: '99%',
+                    }, {
+                        xtype: 'seofilter-grid-combobox-options',
+                        anchor: '99%',
+                        name: 'introtexts',
+                        record: config.record,
+                        id: config.id + '-introtexts',
+                    }, {
+                        xtype: 'numberfield',
+                        fieldLabel: _('seofilter_rule_introlength'),
+                        name: 'introlength',
+                        id: config.id + '-introlength',
+                        anchor: '99%',
+                    }]
+                    , labelAlign: 'top'
+                    , labelSeparator: ''
+                    , autoHeight: true
+                    , defaults: {
+                        border: false
+                        , msgTarget: 'under'
+                        , width: 400
+                    }
+                    , cls: 'main-wrapper'
+                }]
+            });
+        }
+
+        return tabs;
+
     }
 
 
@@ -344,7 +351,13 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     anchor: '99%',
                     readOnly: true,
                     style: 'background:#f9f9f9;color:#999;',
-
+                },{
+                    xtype: 'numberfield',
+                    fieldLabel: _('seofilter_url_total_more'),
+                    name: 'total',
+                    //readOnly: true,
+                    id: config.id + '-total',
+                    anchor: '99%',
                 }]
             }, {
                 columnWidth: .5
@@ -376,6 +389,11 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     anchor: '99%',
                     readOnly: true,
                     style: 'background:#f9f9f9;color:#999;',
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_url_recount'),
+                    name: 'recount',
+                    id: config.id + '-recount',
                 }]
             }]
         }, {
@@ -424,7 +442,6 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     name: 'menuindex',
                     id: 'seoedit-menuindex',
                     anchor: '99%',
-
                 }]
             }]
         }];

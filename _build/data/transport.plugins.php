@@ -11,7 +11,8 @@ $tmp = array(
         'events' => array(
             'OnPageNotFound' => array('priority'=>-50),
             'OnLoadWebDocument' => array(),
-            'OnDocFormSave' => array('priority'=>100)
+            'OnDocFormSave' => array('priority'=>100),
+            'OnBeforeDocFormSave' => array()
         )
     )
 );

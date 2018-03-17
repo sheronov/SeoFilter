@@ -2,6 +2,7 @@
 
 class SeoFilter
 {
+    public $version = '1.4.4';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -10,6 +11,8 @@ class SeoFilter
     public $initialized = array();
     /** @var pdoFetch $pdo */
     public $pdo;
+    /** @var sfCountHandler $countHandler */
+    public $countHandler = null;
 
 
     /**
@@ -29,7 +32,6 @@ class SeoFilter
         $actionUrl = $assetsUrl . 'action.php';
         $connectorUrl = $assetsUrl . 'connector.php';
         $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
-        $replace = $this->modx->getOption('seofilter_replace', null, 1, true);
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
         $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
         $values_delimeter = $this->modx->getOption('seofilter_values_delimeter', null, ',', true);
@@ -50,8 +52,10 @@ class SeoFilter
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
         $text = $this->modx->getOption('seofilter_text', null, '', true);
         $content= $this->modx->getOption('seofilter_content', null, '', true);
-        $pagetpl = $this->modx->getOption('seofilter_pagetpl',null,'',true);
         $page_key = $this->modx->getOption('seofilter_page_key',null,'',true);
+        $page_tpl = $this->modx->getOption('seofilter_page_tpl',null,'',true);
+        $lastModified = $this->modx->getOption('seofilter_last_modified',null,0,true);
+        $mfilterWords = $this->modx->getOption('seofilter_mfilter_words',null,0,true);
 
         $count_childrens = $this->modx->getOption('seofilter_count',null,0,true);
         $count_choose = $this->modx->getOption('seofilter_choose',null,'',true);
@@ -71,8 +75,12 @@ class SeoFilter
         $jtext = $this->modx->getOption('seofilter_jtext', null, '', true);
         $jcontent = $this->modx->getOption('seofilter_jcontent', null, '', true);
 
+        $hiddenTab = $this->modx->getOption('seofilter_hidden_tab',null,0,true);
+        $superHiddenProps = $this->modx->getOption('seofilter_super_hidden_props',null,0,true);
         $tplsPath = $this->modx->getOption('seofilter_tpls_path',null,'',true);
         $urlHelp = $this->modx->getOption('seofilter_url_help',null,'',true);
+        $crumbsReplace = $this->modx->getOption('seofilter_crumbs_replace',null,1,true);
+        $crumbsCurrent = $this->modx->getOption('seofilter_crumbs_tpl_current',null,'tpl.SeoFilter.crumbs.current',true);
 
         $possibleSuffixes = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
 
@@ -90,6 +98,7 @@ class SeoFilter
             'json_response' => true,
 
             'corePath' => $corePath,
+            'customPath' => $corePath . 'custom/',
             'modelPath' => $corePath . 'model/',
             'chunksPath' => $corePath . 'elements/chunks/',
             'templatesPath' => $corePath . 'elements/templates/',
@@ -99,7 +108,6 @@ class SeoFilter
 
             'params' => array(),
             'ajax' => $ajax,
-            'replace' => $replace,
             'separator' => $separator,
             'redirect' => $redirect,
             'site_start' => $site_start,
@@ -123,8 +131,8 @@ class SeoFilter
             'h2' => $h2,
             'text' => $text,
             'content' => $content,
-            'pagetpl' => $pagetpl,
             'page_key' => $page_key,
+            'page_tpl' => $page_tpl,
             'page_number' => 1,
 
             'replacebefore' => $replacebefore,
@@ -141,7 +149,13 @@ class SeoFilter
             'tpls_path' =>$tplsPath,
             'url_help' => $urlHelp,
             'hideEmpty' => $hideEmpty,
-            'possibleSuffixes' => $possibleSuffixes
+            'possibleSuffixes' => $possibleSuffixes,
+            'lastModified' => $lastModified,
+            'crumbsReplace' => $crumbsReplace,
+            'crumbsCurrent' => $crumbsCurrent,
+            'mfilterWords' => $mfilterWords,
+            'superHiddenProps' => $superHiddenProps,
+            'hiddenTab'=> $hiddenTab
 
         ), $config);
 
@@ -158,15 +172,21 @@ class SeoFilter
      * @return bool
      */
     public function initialize($ctx = 'web', $scriptProperties = array()) {
-        if (isset($this->initialized[$ctx])) {
+
+        if (isset($this->initialized[$ctx]) && $this->initialized[$ctx]) {
             return $this->initialized[$ctx];
         }
         $this->config = array_merge($this->config, $scriptProperties);
-        $this->config['ctx'] = $ctx;
+//        $this->config['ctx'] = $ctx;
+
 
         if($this->config['ajax']) {
             $config = $this->makePlaceholders($this->config);
-            if ($js = trim($this->modx->getOption('seofilter_frontend_js', null, $this->config['jsUrl'] . 'web/default.js', true))) {
+            $js = trim($this->modx->getOption('seofilter_frontend_js', null, $this->config['jsUrl'] . 'web/default.js', true));
+            if (!empty($js) && preg_match('/\.js/i', $js)) {
+                if (preg_match('/\.js$/i', $js)) {
+                    $js .= '?v=' . substr(md5($this->version), 0, 10);
+                }
                 $this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
 
                 if ($this->config['page']) {
@@ -180,11 +200,8 @@ class SeoFilter
                         }
                     }
 
-                    foreach($this->config['possibleSuffixes'] as $possibleSuffix) {
-                        if (substr($page_url, -strlen($possibleSuffix)) == $possibleSuffix) {
-                            $page_url = substr($page_url, 0, -strlen($possibleSuffix));
-                        }
-                    }
+                    $page_url = $this->clearSuffixes($page_url);
+
 
                     $this->config['url'] = $page_url;
 
@@ -192,9 +209,8 @@ class SeoFilter
                     $q->rightJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id');
                     $q->rightJoin('sfField','sfField','sfField.id = sfFieldIds.field_id');
                     $q->where(array('sfField.slider'=>1,'sfRule.page'=>$this->config['page']));
-                    $this->config['slider'] = $this->modx->getCount('sfField',$q);
+                    $this->config['slider'] = $this->modx->getCount('sfFieldIds',$q);
                 }
-
 
                 $data = json_encode(array(
                     'jsUrl' => $this->config['jsUrl'] . 'web/',
@@ -204,10 +220,10 @@ class SeoFilter
                     'params' => $this->config['params'],
                     'aliases' => $this->config['aliases'],
                     'slider' => $this->config['slider'],
+                    'crumbs' => $this->config['crumbsReplace'],
                     'separator' => $this->config['separator'],
                     'redirect' => $this->config['redirect'],
                     'url' => $this->config['url'],
-                    //'pagetpl' => str_replace(array('[[+', ']]', '{$'), array('{', '}', '{'), $this->pdo->getChunk($this->config['pagetpl'])),
                     'replacebefore' => $this->config['replacebefore'],
                     'replaceseparator' => $this->config['replaceseparator'],
                     'jtitle' => $this->config['jtitle'],
@@ -229,6 +245,215 @@ class SeoFilter
         $this->initialized[$ctx] = true;
         return true;
     }
+
+    public function getFieldsKey($key = 'key') {
+        $fields = array();
+        $q = $this->modx->newQuery('sfField');
+        $q->where(array('active'=>1));
+        $q->select(array('sfField.*'));
+        if($q->prepare() && $q->stmt->execute()) {
+            while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                if($row['class'] == 'modTemplateVar') {
+                    if(strtolower($row['xpdo_package']) == 'tvsuperselect') {
+                        $fields['tvss'][$row[$key]] = $row;
+                    } else {
+                        $fields['tvs'][$row[$key]] = $row;
+                    }
+                } elseif($row['class'] == 'msVendor') {
+                    $fields['data']['vendor'] = $row;
+                } else {
+                    $fields['data'][$row[$key]] = $row;
+                }
+            }
+        }
+        return $fields;
+    }
+
+    public function explodeValue($input = '') {
+        $values = array();
+        if (strpos($input, '||') !== false) {
+            $values = array_map('trim', explode('||', $input));
+        } elseif (strpos($input, ',') !== false) {
+            $values = array_map('trim', explode(',', $input));
+        } else {
+            $values = array($input);
+        }
+
+        return $values;
+    }
+
+    public function returnChanges($after = array(), $before = array(), $type = '', $double = 1) {
+        $changes = array();
+        if(is_array($after)) {
+            foreach ($after as $param => $val) {
+                if (is_array($val)) {
+                    if (isset($before[$param])) {
+                        if ($type = 'tvs') {
+                            $tv_changes = array('after' => array(), 'before' => array());
+                            foreach ($val as $vals) {
+                                if ($tv_change = $this->explodeValue($vals)) {
+                                    foreach ($tv_change as $tvc) {
+                                        $tv_changes['after'][] = $tvc;
+                                    }
+                                }
+                            }
+                            foreach ($before[$param] as $vals) {
+                                if ($tv_change = $this->explodeValue($vals)) {
+                                    foreach ($tv_change as $tvc) {
+                                        $tv_changes['before'][] = $tvc;
+                                    }
+                                }
+                            }
+                            if ($am = array_unique(array_merge(array_diff($tv_changes['after'], $tv_changes['before']), array_diff($tv_changes['before'], $tv_changes['after'])))) {
+                                $changes[$param] = $am;
+                            }
+                        } else {
+                            if ($am = array_unique(array_merge(array_diff($val, $before[$param]), array_diff($before[$param], $val)))) {
+                                $changes[$param] = $am;
+                            }
+                        }
+                    } else {
+                        if ($type = 'tvs') {
+                            foreach ($val as $vals) {
+                                if ($tv_change = $this->explodeValue($vals)) {
+                                    foreach ($tv_change as $tvc) {
+                                        $changes[$param][] = $tvc;
+                                    }
+                                }
+                            }
+                        } else {
+                            $changes[$param] = $val;
+                        }
+                    }
+                } else {
+                    if (isset($before[$param])) {
+                        if ($val != $before[$param]) {
+                            if ($val) {
+                                $changes[$param][] = $val;
+                            }
+                            if ($before[$param]) {
+                                $changes[$param][] = $before[$param];
+                            }
+                        }
+                    } elseif ($val) {
+                        $changes[$param][] = $val;
+                    }
+                }
+                if (!empty($changes[$param])) {
+                    $changes[$param] = array_unique($changes[$param]);
+                }
+            }
+        }
+
+//        метод дополнительный
+//        if(!empty($before) && $double) {
+//            $changes = array_merge_recursive($changes,$this->returnChanges($before,$after,$type, 0));
+//        }
+
+        return $changes;
+    }
+
+    public function getResourceData($resource_id = 0,$fields = array()) {
+        $data = array();
+        foreach(array('tvs'=>'modTemplateVarResource','tvss'=>'tvssOption') as $var => $class) {
+            if(!empty($fields[$var])) {
+                if($var == 'tvss') {
+                    $this->modx->addPackage('tvsuperselect', $this->modx->getOption('core_path') . 'components/tvsuperselect/model/');
+                }
+                $q = $this->modx->newQuery($class);
+                if($var == 'tvss') {
+                    $q->innerJoin('modTemplateVar','TV','TV.id = tvssOption.tv_id');
+                    $q->where(array(
+                        'resource_id'=>$resource_id,
+                        'TV.name:IN' => array_keys($fields[$var])
+                    ));
+                } else {
+                    $q->innerJoin('modTemplateVar','TV','TV.id = modTemplateVarResource.tmplvarid');
+                    $q->where(array(
+                        'contentid'=>$resource_id,
+                        'TV.name:IN' => array_keys($fields[$var])
+                    ));
+                }
+                $q->select(array(
+                    'DISTINCT '.$class.'.value',
+                    'TV.id,TV.name'
+                ));
+                if($q->prepare() && $q->stmt->execute()) {
+                    while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)){
+                        $data[$var][$row['name']][] = $row['value'];
+                    }
+                }
+            }
+        }
+
+        if($resource = $this->modx->getObject('modResource',$resource_id)){
+            $resource = $resource->toArray();
+            foreach($resource as $param => $val) {
+                if(!empty($fields['data']) && in_array($param,array_keys($fields['data']))) {
+                    $data['data'][$param] = $val;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+
+    public function loadHandler() {
+        if (!is_object($this->countHandler)) {
+            require_once 'sfcount.class.php';
+            $count_class = $this->modx->getOption('seofilter_count_handler_class', null, 'sfCountHandler', true);
+            if ($count_class != 'sfCountHandler') {
+                $this->loadCustomClasses('count');
+            }
+            if (!class_exists($count_class)) {
+                $count_class = 'sfCountHandler';
+            }
+            $this->countHandler = new $count_class($this->modx, $this->config);
+            if (!($this->countHandler instanceof sfCountHandler)) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] Could not initialize count handler class: "' . $count_class . '"');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Method loads custom classes from specified directory
+     *
+     * @var string $dir Directory for load classes
+     * @return void
+     */
+    public function loadCustomClasses($dir)
+    {
+        $customPath = $this->config['customPath'];
+        $placeholders = array(
+            'base_path' => MODX_BASE_PATH,
+            'core_path' => MODX_CORE_PATH,
+            'assets_path' => MODX_ASSETS_PATH,
+        );
+        $pl1 = $this->pdo->makePlaceholders($placeholders, '', '[[+', ']]', false);
+        $pl2 = $this->pdo->makePlaceholders($placeholders, '', '[[++', ']]', false);
+        $pl3 = $this->pdo->makePlaceholders($placeholders, '', '{', '}', false);
+        $customPath = str_replace($pl1['pl'], $pl1['vl'], $customPath);
+        $customPath = str_replace($pl2['pl'], $pl2['vl'], $customPath);
+        $customPath = str_replace($pl3['pl'], $pl3['vl'], $customPath);
+        if (strpos($customPath, MODX_BASE_PATH) === false && strpos($customPath, MODX_CORE_PATH) === false) {
+            $customPath = MODX_BASE_PATH . ltrim($customPath, '/');
+        }
+        $customPath = rtrim($customPath, '/') . '/' . ltrim($dir, '/');
+        if (file_exists($customPath) && $files = scandir($customPath)) {
+            foreach ($files as $file) {
+                if (preg_match('#\.class\.php$#i', $file)) {
+                    /** @noinspection PhpIncludeInspection */
+                    include $customPath . '/' . $file;
+                }
+            }
+        } else {
+            $this->modx->log(modX::LOG_LEVEL_ERROR, "[SeoFilter] Custom path is not exists: \"{$customPath}\"");
+        }
+    }
+
 
     public function pageAliases($page_id = 0, $first_params = array()) {
         $field_id = $rule_id = 0;
@@ -383,37 +608,103 @@ class SeoFilter
         return '?'.implode('&',$urls);
     }
 
+    public function clearSuffixes($url = '') {
+        foreach($this->config['possibleSuffixes'] as $possibleSuffix) {
+            if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                $url = substr($url, 0, -strlen($possibleSuffix));
+            }
+        }
+        return $url;
+    }
+
+
+
     public function process($action, $data = array()) {
-        $diff = $original_params = array();
-        $params = $copyparams = $data['data'];
-        $pageId = $data['pageId'];
-        $aliases = $data['aliases'];
-        $base_get = array_map('trim', explode(',',$this->config['base_get']));
-        $page_key = 1;
-
-        if($this->config['page_key'] && isset($params[$this->config['page_key']])) {
-            $page_key = $params[$this->config['page_key']];
-            $this->config['page_number'] = $page_key;
-        }
-
-        if($params) {
-            $original_params = array_diff_key($params,array_flip($base_get));
-        }
-
-
-
-        if(count($params))
-            $diff = array_flip(array_diff(array_keys($params),$aliases));
-        if(count($diff)) {
-            foreach($diff as $dif => $dff)
-                unset($copyparams[$dif]);
-            $diff = array_diff_key($params,$copyparams);
-            $params = array_intersect_key($params,$copyparams);
-        }
-        //нахождение первичного параметра
-
         switch ($action) {
+            case 'metabyurl':
+                $meta = array();
+                $delArray = array('http://www.','https://www.','http://','https://');
+                $pageId = $data['pageId'];
+                $findUrl = '';
+                if(!empty($data['data'])) {
+                    $fullUrl = explode('?',str_replace($delArray,'',$data['data']['full_url']));
+                    $fullUrl = $this->clearSuffixes(array_shift($fullUrl));
+                    $pageUrl = $this->clearSuffixes(str_replace($delArray,'',$data['data']['page_url']));
+
+                    $findUrl = $this->clearSuffixes(trim(str_replace($pageUrl,'',$fullUrl),'/'));
+
+                }
+                if($findUrl) {
+                    if($url_words = $this->getParamsByUrl($findUrl)) {
+                        $rule_id = 0;
+                        $params = array();
+                        foreach($url_words as $row) {
+                            $params[$row['field_alias']] = $row['word_input'];
+                            $rule_id = $row['rule_id'];
+                        }
+
+                        $q = $this->modx->newQuery('sfFieldIds');
+                        $q->where(array('multi_id'=>$rule_id));
+                        $url_fields = $this->modx->getCount('sfFieldIds',$q);
+
+                        if((count($params) == $url_fields)) { //Доп проверка на изменения в базе
+                            $meta = $this->getRuleMeta($params,$rule_id,$pageId,1,0,$params);
+                            $meta['find'] = 1;
+                            $meta['params'] = $params;
+                        }
+                    }
+                } else {
+                    $meta = $this->getPageMeta($pageId);
+                    $meta['find'] = 0;
+                }
+
+
+                if($this->config['crumbsReplace']) {
+                    $crumb_array = $this->getCrumbs($pageId);
+                    if ($findUrl) {
+                        $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
+                        $crumb_array['sflink'] = $meta['link'];
+                        $crumb_array['sfurl'] = $meta['link_url'];
+                    }
+                    $meta['crumbs'] = $this->pdo->getChunk($this->config['crumbsCurrent'], $crumb_array);
+                }
+
+                $response = array(
+                    'success' => true,
+                    'data' => $meta,
+                );
+                return $this->config['json_response']
+                    ? $this->modx->toJSON($response)
+                    : $response;
+                break;
             case 'getmeta':
+
+                $diff = $original_params = array();
+                $params = $copyparams = $data['data'];
+                $pageId = $data['pageId'];
+                $aliases = $data['aliases'];
+                $base_get = array_map('trim', explode(',',$this->config['base_get']));
+                $page_key = 1;
+
+                if($this->config['page_key'] && isset($params[$this->config['page_key']])) {
+                    $page_key = $params[$this->config['page_key']];
+                    $this->config['page_number'] = $page_key;
+                }
+
+                if($params) {
+                    $original_params = array_diff_key($params,array_flip($base_get));
+                }
+
+                if(count($params))
+                    $diff = array_flip(array_diff(array_keys($params),$aliases));
+                if(count($diff)) {
+                    foreach($diff as $dif => $dff)
+                        unset($copyparams[$dif]);
+                    $diff = array_diff_key($params,$copyparams);
+                    $params = array_intersect_key($params,$copyparams);
+                }
+                //нахождение первичного параметра
+
                 $find = 0;
 
                 $rule_count = 0;
@@ -501,7 +792,11 @@ class SeoFilter
                             if(!empty($meta['diff'])) {
                                 $diff = array_merge($diff,$meta['diff']);
                             }
-                            $meta['find'] = $find = 1;
+                            if($meta['success']) {
+                                $meta['find'] = $find = 1;
+                            } else {
+                                $find = 0;
+                            }
                         } else {
                             $meta['find'] = $find = 0;
                             $diff = $data['data'];
@@ -515,6 +810,17 @@ class SeoFilter
                 if(!$find) {
                     $meta = $this->getPageMeta($pageId);
                     $meta['find'] = 0;
+                }
+
+
+                if($this->config['crumbsReplace']) {
+                    $crumb_array = $this->getCrumbs($pageId);
+                    if ($find) {
+                        $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
+                        $crumb_array['sflink'] = $meta['link'];
+                        $crumb_array['sfurl'] = $meta['link_url'];
+                    }
+                    $meta['crumbs'] = $this->pdo->getChunk($this->config['crumbsCurrent'], $crumb_array);
                 }
 
                 if($meta['url']) {
@@ -542,6 +848,25 @@ class SeoFilter
             default:
                 return $this->error('sf_err_ajax_nf', array(), array('action' => $action));
         }
+    }
+
+    public function getCrumbs($pageId = 0) {
+        $page_array = array();
+        if($pageId) {
+            if($page_array = $this->pdo->getArray('modResource', $pageId)) {
+                if (empty($page_array['menutitle'])) {
+                    $page_array['menutitle'] = $page_array['pagetitle'];
+                }
+                if ($page_array['class_key'] == 'modWebLink') {
+                    $page_array['link'] = is_numeric(trim($page_array['content'], '[]~ '))
+                        ? $this->pdo->makeUrl(intval(trim($page_array['content'], '[]~ ')), $page_array)
+                        : $page_array['content'];
+                } else {
+                    $page_array['link'] = $this->pdo->makeUrl($page_array['id'], $page_array);
+                }
+            }
+        }
+        return $page_array;
     }
 
     public function error($message = '', $data = array(), $placeholders = array())
@@ -724,11 +1049,19 @@ class SeoFilter
     public function getRuleMeta($params = array(), $rule_id = 0,$page_id = 0 ,$ajax = 0,$new = 0,$original_params = array()) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class','editedon','key');
         $seo_array = array('title','h1','h2','description','introtext','keywords','text','content','link','tpl','introlength');
-        $meta = $fields = $word_array = $aliases = $fields_key = $field_word = array();
+        $fields = $word_array = $aliases = $fields_key = $field_word = array();
+        $meta = array('success'=>true,'diff'=>array());
         $countFields = $this->countRuleFields($rule_id);
         $diff_params = array();
         $check = 0;
+        $link_id = 0;
 
+
+        // если не нужно пересчитывать на странице с учётом гет параметра - то это закоментить, а ниже раскоментить
+        $fields_keys = $this->getFieldsKey('alias');
+        foreach ($fields_keys as $fk=>$fks) {
+            $fields_key = array_merge($fields_key,$fks);
+        }
 
         foreach ($params as $param => $input) {
             if ($field = $this->modx->getObject('sfField', array('alias' => $param))) {
@@ -736,7 +1069,7 @@ class SeoFilter
                 $alias = $field->get('alias');
                 $fields[] = $field_id;
 
-                if($word = $this->getWordArray($input,$field_id,$field->get('slider'))) {
+                if($word = $this->getWordArray($input,$field_id,$field->get('slider'),$this->config['mfilterWords'])) {
                     foreach (array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
                         if ($countFields == 1) {
                             $word_array[$tmp_key] = $tmp_array;
@@ -748,13 +1081,19 @@ class SeoFilter
                     }
 
                     $aliases[$param] = $word['alias'];
-                    $fields_key[$alias]['class'] = $field->get('class');
-                    $fields_key[$alias]['key'] = $field->get('key');
-                    $fields_key[$alias]['exact'] = $field->get('exact');
-                    $fields_key[$alias]['slider'] = $field->get('slider');
-                    $fields_key[$alias]['xpdo_package'] = $field->get('xpdo_package');
+
+//                    $fields_key[$alias]['class'] = $field->get('class');
+//                    $fields_key[$alias]['key'] = $field->get('key');
+//                    $fields_key[$alias]['exact'] = $field->get('exact');
+//                    $fields_key[$alias]['slider'] = $field->get('slider');
+//                    $fields_key[$alias]['xpdo_package'] = $field->get('xpdo_package');
 
                     $field_word[$field_id] = $word['id'];
+                } else {
+                    //здесь когда переданы левые значения через ajax
+                    $meta['success'] = false;
+                    $meta['diff'] = array_merge($original_params,$params);
+                    return $meta;
                 }
 
                 $q = $this->modx->newQuery('sfFieldIds');
@@ -796,8 +1135,13 @@ class SeoFilter
                     }
                 }
             }
-
         }
+
+        if(!$meta['success']) {
+            return $meta;
+        }
+
+
 
         if($check) {
             //когда найдено слово в параметрах, которое подлежит к исключению
@@ -807,18 +1151,16 @@ class SeoFilter
            // if($rule_id = $this->findRule($params_keys,$page_id))
             if($rule_id = $this->findRuleId($page_id,$params_keys))
             {
-                $meta = $this->getRuleMeta($params,$rule_id,$page_id,1,$new,$original_params);
-                $meta['diff'] = $diff_params;
+                $meta = $this->getRuleMeta($params,$rule_id,$page_id,$ajax,$new,$original_params);
+                $meta['diff'] = array_merge($meta['diff'],$diff_params);
                 return $meta;
             }
-
         }
 
         $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new,$field_word);
 
         if ($seo = $this->pdo->getArray('sfRule', array('id'=>$rule_id,'active'=>1))) {
-
-            if($seo['count_parents']) {
+            if(!empty($seo['count_parents'])) {
                 $parents = $seo['count_parents'];
             } else {
                 $parents = $page_id;
@@ -827,12 +1169,12 @@ class SeoFilter
             if($this->config['count_choose'] && $this->config['count_select']) {
                 $min_max_array = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where'],1);
                 $word_array = array_merge($min_max_array,$word_array);
-                $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
+//                $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
             } elseif($this->config['count_childrens']) {
-                $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
+                $word_array['total'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
             }
 
-            $meta['total'] = (int)$word_array['count'];
+            $meta['total'] = $word_array['count'] = (int)$word_array['total'];
 
             if($this->config['page_key']) {
                 $word_array['page_number'] = $word_array[$this->config['page_key']] = $this->config['page_number'];
@@ -857,7 +1199,7 @@ class SeoFilter
 
             $meta['rule_id'] = $word_array['rule_id'] = $rule_id;
             $meta['url'] = $word_array['url'] = $url_array['url'];
-            $meta['seo_id'] = $word_array['seo_id'] = $url_array['id'];
+            $meta['url_id'] = $meta['seo_id'] = $word_array['seo_id'] = $url_array['id'];
             $meta['link'] = $word_array['link'] =  $url_array['link'];
 
             if(isset($url_array['createdon'])) {
@@ -930,13 +1272,26 @@ class SeoFilter
                     $diff[$param] = $diff_arr['input'];
                 }
             }
-            $meta['diff'] = $diff;
+            $meta['diff'] = array_merge($meta['diff'],$diff);
+        }
+
+        if(isset($meta['title'])) {
+            $meta['pagetitle'] = $meta['title'];
         }
 
         return $meta;
     }
 
+
     public function getRuleCount($params = array(), $fields_key = array(), $parents, $count_where = array(), $min_max = 0) {
+        $this->loadHandler();
+        return $this->countHandler->countByParams($params,$fields_key,$parents,$count_where,'',$min_max);
+    }
+
+    /***
+        Deprecated method
+    ***/
+    public function _getRuleCount($params = array(), $fields_key = array(), $parents, $count_where = array(), $min_max = 0) {
         $count = 0;
         $innerJoin = array();
         $addTVs = array();
@@ -955,9 +1310,9 @@ class SeoFilter
             }
         }
 
-        if(count(array_diff(array_keys($params), array_keys($fields_key)))) {
+//        if(count(array_diff(array_keys($params), array_keys($fields_key)))) {
 //            $this->modx->log(modx::LOG_LEVEL_ERROR,"[SeoFilter] don't known this fields. Please add this fields to the first tab in component (Fields)".print_r(array_diff(array_keys($params), array_keys($fields_key)),1));
-        }
+//        }
 
 
         foreach($fields_key as $field_alias => $field) {
@@ -1078,8 +1433,9 @@ class SeoFilter
                     $class = $choose[0];
                     $choose = $choose[1];
                     if(strpos($choose,'=')) {
-                        $choose_alias = explode('=',$choose)[1];
-                        $choose = explode('=',$choose)[0];
+                        $chooses = explode('=',$choose);
+                        $choose = array_shift($chooses);
+                        $choose_alias = implode('=',$chooses);
                     } else {
                         $choose_alias = $choose;
                     }
@@ -1092,8 +1448,9 @@ class SeoFilter
                     $sortby = $class.'.'.$choose_alias;
                 } else {
                     if(strpos($choose,'=')) {
-                        $choose_alias = explode('=',$choose)[1];
-                        $choose = explode('=',$choose)[0];
+                        $chooses = explode('=', $choose);
+                        $choose = array_shift($chooses);
+                        $choose_alias = implode('=',$chooses);
                     } else {
                         $choose_alias = $choose;
                     }
@@ -1142,6 +1499,7 @@ class SeoFilter
                 )
             ));
 
+
             $run = $this->pdo->run();
             if (count($run)) {
                 if(isset($run[0]['count'])) {
@@ -1152,7 +1510,7 @@ class SeoFilter
         }
     }
 
-    public function getWordArray($input = '', $field_id = 0,$slider = 0) {
+    public function getWordArray($input = '', $field_id = 0,$slider = 0,$allow_new = 0) {
         $word = array();
         $q = $this->modx->newQuery('sfDictionary');
         if($slider) {
@@ -1180,7 +1538,7 @@ class SeoFilter
                     $word = $q->stmt->fetch(PDO::FETCH_ASSOC);
                 }
             } else {
-                if($field = $this->modx->getObject('sfField',$field_id)) {
+                if($allow_new && $field = $this->modx->getObject('sfField',$field_id)) {
                     /*** @var sfField $field */
                     if($input && $value = $field->getValueByInput($input)) {
                         $relation_id = $relation_value = '';
@@ -1213,11 +1571,14 @@ class SeoFilter
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                         if ($response->isError()) {
                             $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '. print_r($response->response, 1));
+                            $this->modx->error->reset();
                         } else {
                             $word = $response->response['object'];
 
                         }
                     }
+                } else {
+                    return false;
                 }
             }
         }
@@ -1266,6 +1627,10 @@ class SeoFilter
             }
         }
 
+        if(isset($meta['title'])) {
+            $meta['pagetitle'] = $meta['title'];
+        }
+
         return $meta;
     }
 
@@ -1308,13 +1673,41 @@ class SeoFilter
         return $row;
     }
 
+    public function getParamsByUrl($url = '') {
+        $params = array();
 
-    public function findMultiId($url = '') {
-        if($url_array = $this->pdo->getArray('sfUrls',array('old_url'=>$url,'OR:new_url:='=>$url))) {
-            return $url_array['multi_id'];
-        } else {
-            return 0;
+        $q = $this->modx->newQuery('sfUrls');
+        $q->where(array('old_url'=>$url,'OR:new_url:='=>$url));
+        $q->leftJoin('sfUrlWord','sfUrlWord','sfUrlWord.url_id = sfUrls.id');
+        $q->innerJoin('sfField','Field','Field.id = sfUrlWord.field_id');
+        $q->innerJoin('sfDictionary','Word','Word.id = sfUrlWord.word_id');
+        $q->sortby('sfUrlWord.priority','ASC');
+        $q->groupby('sfUrlWord.id');
+        $q->select(array(
+            'sfUrlWord.*',
+            'sfUrls.multi_id as rule_id,sfUrls.page_id as page_id',
+            'Field.class as field_class,Field.key as field_key,Field.alias as field_alias',
+            'Word.input as word_input,Word.value as word_value,Word.alias as word_alias'
+
+        ));
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $params[] = $row;
+            }
         }
+
+        return $params;
+    }
+
+    public function findUrlId($url = '') {
+        $url_id = 0;
+        if($url) {
+            $q = $this->modx->newQuery('sfUrls');
+            $q->where(array('old_url'=>$url,'OR:new_url:='=>$url));
+            $q->select('id');
+            $url_id = $this->modx->getValue($q->prepare());
+        }
+        return $url_id;
     }
 
     public function findUrlArray($url = '',$page = 0) {
@@ -1342,6 +1735,7 @@ class SeoFilter
         $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
         if ($response->isError()) {
             $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]: '.print_r($response->getMessage(),1));
+            $this->modx->error->reset();
         } else {
             $url = $response->response['object'];
         }
@@ -1436,9 +1830,47 @@ class SeoFilter
         return $url;
     }
 
+    public function checkStat() {
+        $key = strtolower(__CLASS__);
+        /** @var modDbRegister $registry */
+        $registry = $this->modx->getService('registry', 'registry.modRegistry')
+            ->getRegister('user', 'registry.modDbRegister');
+        $registry->connect();
+        $registry->subscribe('/modstore/' . md5($key));
+        if ($res = $registry->read(array('poll_limit' => 1, 'remove_read' => false))) {
+            return;
+        }
+        $c = $this->modx->newQuery('transport.modTransportProvider', array('service_url:LIKE' => '%modstore%'));
+        $c->select('username,api_key');
+        /** @var modRest $rest */
+        $rest = $this->modx->getService('modRest', 'rest.modRest', '', array(
+            'baseUrl' => 'https://modstore.pro/extras',
+            'suppressSuffix' => true,
+            'timeout' => 1,
+            'connectTimeout' => 1,
+        ));
 
-
-
-
+        if ($rest) {
+            $level = $this->modx->getLogLevel();
+            $this->modx->setLogLevel(modX::LOG_LEVEL_FATAL);
+            $response = $rest->post('stat', array(
+                'package' => $key,
+                'version' => $this->version,
+                'keys' => $c->prepare() && $c->stmt->execute()
+                    ? $c->stmt->fetchAll(PDO::FETCH_ASSOC)
+                    : array(),
+                'uuid' => $this->modx->uuid,
+                'database' => $this->modx->config['dbtype'],
+                'revolution_version' => $this->modx->version['code_name'].'-'.$this->modx->version['full_version'],
+                'supports' => $this->modx->version['code_name'].'-'.$this->modx->version['full_version'],
+                'http_host' => $this->modx->getOption('http_host'),
+                'php_version' => XPDO_PHP_VERSION,
+                'language' => $this->modx->getOption('manager_language'),
+            ));
+            $this->modx->setLogLevel($level);
+        }
+        $registry->subscribe('/modstore/');
+        $registry->send('/modstore/', array(md5($key) => true), array('ttl' => 3600 * 24));
+    }
 
 }

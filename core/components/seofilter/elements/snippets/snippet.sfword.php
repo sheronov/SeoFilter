@@ -29,6 +29,7 @@ if(isset($input) && isset($field_id)) {
                 $response = $modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                 if ($response->isError()) {
                     $modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                    $modx->error->reset();
                 } else {
                     $output = array('value'=>$value,'alias'=>$response->response['object']['alias']);
                 }

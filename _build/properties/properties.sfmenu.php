@@ -39,6 +39,10 @@ $tmp = array(
         'type' => 'combo-boolean',
         'value' => false,
     ),
+    'fast'=> array(
+        'type' => 'combo-boolean',
+        'value' => true,
+    ),
     'mincount' => array(
         'type'=> 'numberfield',
         'value' => 0,
@@ -191,15 +195,15 @@ $tmp = array(
     ),
     'tpl' => array(
         'type'=> 'textfield',
-        'value' => '@INLINE <li[[+classes]]><a href="[[+url]]">[[+name]]</a>[[+wrapper]]</li>',
+        'value' => '@INLINE <li{$classes}><a href="{$url}">{$name}{if $total?} ({$total}){/if}</a>{$wrapper}</li>',
     ),
     'tplOuter' => array(
         'type'=> 'textfield',
-        'value' => '@INLINE <ul[[+classes]]>[[+wrapper]]</ul>',
+        'value' => '@INLINE <ul{$classes}>{$wrapper}</ul>',
     ),
     'tplGroup' => array(
         'type'=> 'textfield',
-        'value' => '@INLINE <div><h4>[[+name]]</h4>[[+wrapper]]</div>',
+        'value' => '@INLINE <div><h4>{$name}</h4>{$wrapper}</div>',
     ),
     'tplHere'=> array(
         'type'=> 'textfield',

@@ -84,7 +84,7 @@ $_lang['seofilter_rule_active'] = 'Активно';
 $_lang['seofilter_rule_page'] = 'Страница';
 $_lang['seofilter_rule_name'] = 'Название';
 $_lang['seofilter_rule_url'] = 'URL маска';
-$_lang['seofilter_rule_url_more'] = 'Маска URL адреса (можно изменять во вкладке Таблица URL)';
+$_lang['seofilter_rule_url_more'] = 'Маска URL адреса (генерируется автоматически при добавлении полей)';
 $_lang['seofilter_rule_count'] = 'Кол-во';
 $_lang['seofilter_rule_fields'] = 'Поля';
 $_lang['seofilter_rule_tablefields'] = 'Выберите поля';
@@ -257,7 +257,7 @@ $_lang['seofilter_field_xpdo_package'] = 'Компонент, например c
 $_lang['seofilter_field_xpdo_class'] = 'Класс, например customExtraItem';
 $_lang['seofilter_field_xpdo_id'] = 'Поле для сопоставления (id)';
 $_lang['seofilter_field_xpdo_name'] = 'Поле, где хранится значение (name)';
-$_lang['seofilter_field_xpdo_where'] = 'Дополнительное условие (where)';
+$_lang['seofilter_field_xpdo_where'] = 'Дополнительное условие/ограничение для сбора значений в JSON формате';
 
 $_lang['sf_err_ajax_nf'] = 'Ошибка. Не найден action.';
 
@@ -293,11 +293,27 @@ $_lang['seofilter_add_value'] = 'Добавить значение';
 $_lang['seofilter_help_window'] = 'Помощь';
 $_lang['seofilter_help_window_open'] = 'Открыть помощь';
 $_lang['seofilter_dictionary_decl'] = 'Принудительно просклонять значение';
+$_lang['seofilter_dictionary_decls'] = 'Принудительно просклонять значения';
+$_lang['seofilter_dictionary_createdon'] = 'Добавлено';
 
 $_lang['seofilter_field_relation'] = 'Зависимое поле';
 $_lang['seofilter_field_relation_field'] = 'Зависит от';
 $_lang['seofilter_field_relation_column'] = 'По столбцу';
 $_lang['seofilter_word_relation'] = 'Зависит от';
 $_lang['seofilter_word_image'] = 'Изображение для меню';
-$_lang['seofilter_rule_introlength'] = 'Ограничение длины аноса. 0 - без ограничений. "-1" - не показывать';
-
+$_lang['seofilter_rule_introlength'] = 'Ограничение длины анонса. 0 - без ограничений. "-1" - не показывать';
+$_lang['seofilter_rule_recount'] = 'Пересчитать результаты по каждой ссылке';
+$_lang['seofilter_url_recount'] = 'Пересчитать результаты';
+$_lang['seofilter_url_recount_all'] = 'Пересчитать все результаты';
+$_lang['seofilter_url_recount_all_confirm'] = 'Вы уверены, что хотите пересчитать результаты?<br> Операция может занять какое-то время';
+$_lang['seofilter_menu_more'] = 'Ещё';
+$_lang['seofilter_rule_recount_new'] = 'Подсчитать результаты по каждой ссылке';
+$_lang['seofilter_rule_recount_title'] = 'Количество успешно пересчитано';
+$_lang['seofilter_url_recount_wait'] = 'Пожалуйста подождите';
+$_lang['seofilter_url_recount_process'] = 'Идёт пересчёт...';
+$_lang['seofilter_rule_recount_message'] = 'Всего ссылок связанных с правилом: {$all_links}. <br> Cсылок, имеющих результаты: <b>{$links}</b>. <br> Количество результатов (не уникальных): {$total}. ';
+$_lang['seofilter_dictionary_remove_confirmation'] = '<b class="red">Внимание!</b> Удаление слова приводит к удалению ссылок, связанных с ним! <b>Вы уверены?</b> Сейчас ещё можно отредактировать, а вернуть нет.';
+$_lang['seofilter_url_total'] = 'Результатов';
+$_lang['seofilter_url_total_more'] = 'Количество результатов';
+$_lang['seofilter_url_total_desc'] = 'Промежуточные результаты подсчёта для ускорения меню';
+$_lang['seofilter_combo_relation_select'] = 'Будет доступно при зависимом поле';

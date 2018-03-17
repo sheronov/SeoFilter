@@ -18,6 +18,7 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
         $path = $this->modx->getOption('seofilter_core_path', null,
                 $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/';
         $this->SeoFilter = $this->modx->getService('seofilter', 'SeoFilter', $path);
+        $this->SeoFilter->checkStat();
         parent::initialize();
     }
 
@@ -132,6 +133,24 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
         </script>
         ');
 
+    }
+
+    public function addCss($script)
+    {
+        $script = $script . '?v=' . $this->SeoFilter->version;
+        parent::addCss($script);
+    }
+
+    public function addJavascript($script)
+    {
+        $script = $script . '?v=' . $this->SeoFilter->version;
+        parent::addJavascript($script);
+    }
+
+    public function addLastJavascript($script)
+    {
+        $script = $script . '?v=' . $this->SeoFilter->version;
+        parent::addLastJavascript($script);
     }
 
 

@@ -47,6 +47,25 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
         return parent::beforeSet();
     }
 
+
+    public function afterSave()
+    {
+        if((int)$this->getProperty('recount')) {
+            $SeoFilter = $this->modx->getService('seofilter', 'SeoFilter', $this->modx->getOption('seofilter_core_path', null,
+                    $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', array());
+            $SeoFilter->loadHandler();
+
+            $old_total = $this->object->get('total');
+            $total = $SeoFilter->countHandler->countByLink($this->object->get('id'));
+            $this->object->set('total',$total);
+            if($old_total != $total) {
+                $this->object->set('editedon',strtotime(date('Y-m-d H:i:s')));
+            }
+            $this->object->save();
+        }
+        return parent::afterSave();
+    }
+
     public function cleanup()
     {
         $url = '';

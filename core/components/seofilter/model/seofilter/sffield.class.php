@@ -7,6 +7,9 @@ class sfField extends xPDOSimpleObject {
         if(!$alias = $this->get('alias')) {
             $alias = $this->get('key');
         }
+        if(!$value) {
+            $value = '{$'.$alias.'}';
+        }
         if($this->get('hideparam')) {
             $url = $value;
         } elseif ($this->get('valuefirst')) {
@@ -38,7 +41,7 @@ class sfField extends xPDOSimpleObject {
                 $xpdo_name = $this->get('xpdo_name');
                 if($xpdo_class = $this->get('xpdo_class')) {
                     if($package = $this->get('xpdo_package')) {
-                        $this->xpdo->addPackage($package, $this->xpdo->getOption('core_path').'components/'.$package.'/model/');
+                        $this->xpdo->addPackage(strtolower($package), $this->xpdo->getOption('core_path').'components/'.strtolower($package).'/model/');
                     }
                     $q = $this->xpdo->newQuery($xpdo_class);
                     $q->where(array($xpdo_id=>$input));

@@ -64,6 +64,20 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
     {
         $object = $this->object;
         /*** @var sfRule $object */
+
+        if((int)$this->getProperty('recount')) {
+            $SeoFilter = $this->modx->getService('seofilter', 'SeoFilter', $this->modx->getOption('seofilter_core_path', null,
+                    $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', array());
+            $SeoFilter->loadHandler();
+            if($counts = $SeoFilter->countHandler->countByRule($object->id)) {
+                $object->set('total',1);
+                $total_message = $SeoFilter->pdo->parseChunk('@INLINE '.$this->modx->lexicon('seofilter_rule_recount_message'),$counts);
+                $object->set('total_message',$total_message);
+            }
+
+//            $this->modx->log(1,print_r($counts,1));
+        }
+
         if($object->get('active')) {
             $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
             $multi_id = $object->get('id');
@@ -120,6 +134,7 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
                     $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
                     if ($response->isError()) {
                         $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                        $this->modx->error->reset();
                     }
                 }
             }

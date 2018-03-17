@@ -106,6 +106,7 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
                                 $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
                                 if ($response->isError()) {
                                     $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                                    $this->modx->error->reset();
                                 }
                             }
                         }

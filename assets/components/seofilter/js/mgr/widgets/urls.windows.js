@@ -139,6 +139,7 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
             name: 'link',
             id: config.id + '-link',
             anchor: '99%',
+            description: "[[!+sf.link]] / {$_modx->getPlaceholder('sf.link')}",
         },{
             layout: 'column',
             border: false,
@@ -156,6 +157,7 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     readOnly: true,
                     style: 'background:#f9f9f9;color:#aaa;',
                     anchor: '99%',
+                    description: "[[!+sf.url]] / {$_modx->getPlaceholder('sf.url')}",
                 }]
             }, {
                 columnWidth: .5
@@ -168,6 +170,7 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     name: 'new_url',
                     id: config.id + '-new_url',
                     anchor: '99%',
+                    description: "[[!+sf.url]] / {$_modx->getPlaceholder('sf.url')}",
                 }]
             }]
         }, {
@@ -199,42 +202,49 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 name: 'title',
                 id: config.id + '-title',
                 anchor: '99%',
+                description: "[[!+sf.title]] / {$_modx->getPlaceholder('sf.title')}",
             }, {
                 xtype: 'textfield',
                 fieldLabel: _('seofilter_seometa_h1'),
                 name: 'h1',
                 id: config.id + '-h1',
                 anchor: '99%',
+                description: "[[!+sf.h1]] / {$_modx->getPlaceholder('sf.h1')}",
             },{
                 xtype: 'textfield',
                 fieldLabel: _('seofilter_seometa_h2'),
                 name: 'h2',
                 id: config.id + '-h2',
                 anchor: '99%',
+                description: "[[!+sf.h2]] / {$_modx->getPlaceholder('sf.h2')}",
             }, {
                 xtype: 'textarea',
                 fieldLabel: _('seofilter_seometa_description'),
                 name: 'description',
                 id: config.id + '-description',
                 anchor: '99%',
+                description: "[[!+sf.description]] / {$_modx->getPlaceholder('sf.description')}",
             }, {
                 xtype: 'textarea',
                 fieldLabel: _('seofilter_seometa_introtext'),
                 name: 'introtext',
                 id: config.id + '-introtext',
                 anchor: '99%',
+                description: "[[!+sf.introtext]] / {$_modx->getPlaceholder('sf.introtext')}",
             },{
                 xtype: 'textarea',
                 fieldLabel: _('seofilter_seometa_keywords'),
                 name: 'keywords',
                 id: config.id + '-keywords',
                 anchor: '99%',
+                description: "[[!+sf.keywords]] / {$_modx->getPlaceholder('sf.keywords')}",
             },{
                 xtype: 'textarea',
                 fieldLabel: _('seofilter_seometa_text'),
                 name: 'text',
                 id: config.id + '-text',
                 anchor: '99%',
+                description: "[[!+sf.text]] / {$_modx->getPlaceholder('sf.text')}",
             }, {
                 xtype: 'textarea',
                 heght:300,
@@ -250,7 +260,8 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                         }, 100);
                     }
                 },
-                anchor: '99%'
+                anchor: '99%',
+                description: "[[!+sf.content]] / {$_modx->getPlaceholder('sf.content')}",
             }]
         }, {
             layout: 'column',
@@ -285,6 +296,14 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     anchor: '99%',
                     readOnly: true,
                     style: 'background:#f9f9f9;color:#aaa;',
+                    description: "[[!+sf.createdon]] / {$_modx->getPlaceholder('sf.createdon')}",
+                },{
+                    xtype: 'numberfield',
+                    fieldLabel: _('seofilter_url_total_more'),
+                    name: 'total',
+                    //readOnly: true,
+                    id: config.id + '-total',
+                    anchor: '99%',
                 }]
             }, {
                 columnWidth: .5
@@ -316,13 +335,19 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     anchor: '99%',
                     readOnly: true,
                     style: 'background:#f9f9f9;color:#aaa;',
+                    description: "[[!+sf.editedon]] / {$_modx->getPlaceholder('sf.editedon')}",
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_url_recount'),
+                    name: 'recount',
+                    id: config.id + '-recount',
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_url_active_more'),
+                    name: 'active',
+                    id: config.id + '-active',
                 }]
             }]
-        },{
-            xtype: 'xcheckbox',
-            boxLabel: _('seofilter_url_active_more'),
-            name: 'active',
-            id: config.id + '-active',
         }, {
             xtype: 'xcheckbox',
             boxLabel: _('seofilter_url_menu_on'),
@@ -348,12 +373,14 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     name: 'menutitle',
                     id: config.id + '-menutitle',
                     anchor: '99%',
+                    description: "{$menutitle}",
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_url_image'),
                     name: 'image',
                     id: config.id + '-image',
                     anchor: '99%',
+                    description: "{$image}",
                 }]
             },{
                 columnWidth: .35
@@ -366,12 +393,14 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     name: 'link_attributes',
                     id: config.id + '-link_attributes',
                     anchor: '99%',
+                    description: "{$link_attributes}",
                 },{
                     xtype: 'numberfield',
                     fieldLabel: _('seofilter_url_menuindex'),
                     name: 'menuindex',
                     id: config.id + '-menuindex',
                     anchor: '99%',
+                    description: "{$menuindex}",
 
                 }]
             }]

@@ -5,10 +5,10 @@
 $chunks = array();
 
 $tmp = array(
-//    'tpl.SeoFilter.item' => array(
-//        'file' => 'item',
-//        'description' => '',
-//    )
+    'tpl.SeoFilter.crumbs.current' => array(
+        'file' => 'current',
+        'description' => '',
+    )
 );
 
 // Save chunks for setup options

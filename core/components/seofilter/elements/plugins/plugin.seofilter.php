@@ -11,18 +11,35 @@ switch ($modx->event->name) {
             $q->where(array('page' => $page)); // Одно правило для одной страницы!
             if($modx->getCount('sfRule',$q)) {
                 if(!$SeoFilter->initialized[$modx->resource->context_key]) {
-                    $SeoFilter->initialize($modx->resource->context_keyy, array('page' => (int)$page));
+                    $SeoFilter->initialize($modx->resource->context_key, array('page' => (int)$page));
                 }
             }
-
-            //TODO: сделать правильное подключение класса, чтобы без ошибок там где его нет
-//            if($msVC = $modx->getService('msvendorcollections', 'msVendorCollections', $modx->getOption('msvendorcollections_core_path', null,
-//                    $modx->getOption('core_path') . 'components/msvendorcollections/') . 'model/msvendorcollections/', $scriptProperties)) {
-//                if (!$msVC->initialized[$modx->resource->context_key]) {
-//                    $msVC->initialize($modx->resource->context_key);
-//                }
-//            }
         }
+        break;
+    case 'OnBeforeDocFormSave':
+        $sf_count = $modx->getOption('seofilter_count', null, 0, true);
+        if(!$sf_count)
+            break;
+        $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
+        if($sf_classes &&!in_array($resource->get('class_key'),array_map('trim', explode(',',$sf_classes))))
+            break;
+        $sf_templates = $modx->getOption('seofilter_templates', null, '', true);
+        if($sf_templates && !in_array($resource->get('template'),array_map('trim', explode(',',$sf_templates))))
+            break;
+
+        $before = array();
+        if ($mode == 'upd') {
+            $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
+                    $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+            if (!($SeoFilter instanceof SeoFilter)) break;
+
+            $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
+
+            $fields = $SeoFilter->getFieldsKey();
+            $before = $SeoFilter->getResourceData($resource->id,$fields);
+        }
+        $_SESSION['SeoFilter']['before'] = $before;
+        @session_write_close();
         break;
     case 'OnDocFormSave':
         $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
@@ -32,77 +49,92 @@ switch ($modx->event->name) {
         if($sf_templates && !in_array($resource->get('template'),array_map('trim', explode(',',$sf_templates))))
             break;
 
+        $sf_count = $modx->getOption('seofilter_count', null, 0, true);
         $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
                 $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
         $pdo = $SeoFilter->pdo;
         if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) break;
 
-        $r_array = array_merge($resource->toArray(),$resource->Data->toArray());
-
-//        $modx->log(modx::LOG_LEVEL_ERROR,'SeoFilter  = ' . print_r($r_array,1));
-//        $modx->log(modx::LOG_LEVEL_ERROR,'SeoFilter DATA = ' . print_r($resource->Data->toArray(),1));
-        $tv_names = array();
-        if($tvs = $resource->getMany('TemplateVars')) {
-            foreach($tvs as $tv) {
-                $tv_names[$tv->get('name')] = $tv->get('id');
-            }
+        $dictionary = $changes = $before = array();
+        $fields = $SeoFilter->getFieldsKey();
+        $after = $SeoFilter->getResourceData($resource->id, $fields);
+        if($sf_count) {
+            $SeoFilter->loadHandler();
+            $before = $_SESSION['SeoFilter']['before'];
+            unset($_SESSION['SeoFilter']);
         }
 
-        $fields = $pdo->getCollection('sfField');
-        foreach($fields as $field) {
-            if($field['active'] && !$field['slider']) {
-                $key = $field['key'];
-                $input = '';
-                switch ($field['class']) {
-                    case 'msProductOption':
-                        $input = $r_array['options'][$key];
-                        if (!isset($input))
-                            $input = $r_array[$key];
-                        break;
-                    case 'msProductData':
-                    case 'modResource':
-                        $input = $r_array[$key];
-                        break;
-                    case 'modTemplateVar':
-                        if(in_array($key,array_keys($tv_names))) {
-                            $input = $resource->getTVValue($key);
-                            //$modx->log(modx::LOG_LEVEL_ERROR,$field['name'] .' = ' . print_r($input,1));
-                        }
-                        break;
-                    case 'msVendor':
-                        $input = $r_array['vendor.id'];
-                        break;
-                    default:
-                        break;
-                }
+        foreach(array('tvs','tvss','data') as $var) {
+            $dictionary = $SeoFilter->returnChanges($after[$var],array(),$var);
 
-                if(!is_array($input) && !is_numeric($input)) {
-                    $result = json_decode($input);
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        $input = $result;
-                    }
+            if(!empty($after[$var])) {
+                if(!empty($before[$var])) {
+                    if($change = $SeoFilter->returnChanges($before[$var],$after[$var],$var))
+                        $changes[$var] = $change;
+                    // сравнить значения
+                } else {
+                    if($change = $SeoFilter->returnChanges($after[$var],array(),$var))
+                        $changes[$var] = $change;
+                    // появились значения
                 }
+            } elseif(!empty($before[$var])) {
+                if($change = $SeoFilter->returnChanges($before[$var],array(),$var))
+                    $changes[$var] = $change;
+                // удалилась значения
+            }
 
-                if (is_array($input)) {
-                    foreach ($input as $inp) {
-                        $word_array = $SeoFilter->getWordArray($inp, $field['id']);
-                    }
-                } elseif ($input) {
-                    if (strpos($input, '||')) {
-                        foreach (array_map('trim', explode('||', $input)) as $inp) {
-                            $word_array = $SeoFilter->getWordArray($inp, $field['id']);
+//            $modx->log(1,'Changes '.print_r($changes[$var],1));
+
+            if(!empty($dictionary)) {
+                foreach ($dictionary as $field_key => $words) {
+                    foreach($words as $word) {
+                        if(empty($word)) {
+                            continue;
                         }
-                    } elseif (strpos($input, ',')) {
-                        foreach (array_map('trim', explode(',', $input)) as $inp) {
-                            $word_array = $SeoFilter->getWordArray($inp, $field['id']);
+                        $slider = (int)$fields[$var][$field_key]['slider'];
+                        if($word_array = $SeoFilter->getWordArray($word, $fields[$var][$field_key]['id'], 0, !$slider)) {
+                            if(is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
+                                $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
+//                                $modx->log(1,print_r($recount,1));
+                            }
+                        } elseif($slider && is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
+                            $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'],$fields[$var][$field_key]);
+                            $modx->log(1,print_r($recount,1));
                         }
-                    } else {
-                        $word_array = $SeoFilter->getWordArray($input, $field['id']);
+                        if(is_array($changes[$var][$field_key])) {
+                            foreach ($changes[$var][$field_key] as $key => $value) {
+                                if ($word == $value) {
+                                    unset($changes[$var][$field_key][$key]);
+                                }
+                                //здесь пересчитали только новые значения
+                            }
+                        }
+
                     }
                 }
             }
 
+            if(!empty($changes[$var])) {
+                // действия на пересчёт слов, которые удалены
+                foreach($changes[$var] as $field_key => $words) {
+                    foreach($words as $word) {
+                        if(empty($word)) {
+                            continue;
+                        }
+                        $slider = (int)$fields[$var][$field_key]['slider'];
+                        if ($word_array = $SeoFilter->getWordArray($word, $fields[$var][$field_key]['id'], 0, !$slider)) {
+                            $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
+//                            $modx->log(1, print_r($recount, 1));
+                        } elseif ($slider) {
+                            $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'], $fields[$var][$field_key]);
+                            $modx->log(1, print_r($recount, 1));
+                        }
+                    }
+                }
+
+            }
         }
+
 
         break;
     case 'OnPageNotFound':
@@ -163,7 +195,7 @@ switch ($modx->event->name) {
 
             if(count($page_ids)) {
                 $q = $modx->newQuery('modResource');
-                $q->where(array('id:IN' => array_unique($page_ids)));
+                $q->where(array('context_key'=>$modx->context->key,'id:IN' => array_unique($page_ids)));
                 $q->limit(0);
                 $q->select('id,alias,uri_override,uri');
                 if ($q->prepare() && $q->stmt->execute()) {
@@ -182,8 +214,6 @@ switch ($modx->event->name) {
                         $page_aliases[$row['id']] = $uri;
                     }
                 }
-
-
 
                 $r_tmp = array_reverse($tmp, 1);
                 $tmp_id = 0;
@@ -208,10 +238,12 @@ switch ($modx->event->name) {
             }
 
 
+
             if($page) {
-                $p = $modx->newQuery('modResource',array('id'=>$page));
-                $p->select('context_key');
-                $ctx = $modx->getValue($p->prepare());
+//                $p = $modx->newQuery('modResource',array('id'=>$page));
+//                $p->select('context_key');
+//                $ctx = $modx->getValue($p->prepare());
+                $ctx = $modx->context->key;
                 if($page == $site_start) {
                     $url = '';
                 } else {
@@ -220,9 +252,8 @@ switch ($modx->event->name) {
                 if(strpos($url,$modx->getOption('site_url')) !== false) {
                     $url = str_replace($modx->getOption('site_url'),'',$url);
                 }
-                $c_suffix = $SeoFilter->config['container_suffix'];
-                if($c_suffix) {
-                    if(strpos($url,$c_suffix,strlen($url)-strlen($c_suffix))) {
+                if($c_suffix = $SeoFilter->config['container_suffix']) {
+                    if(strpos($url,$c_suffix,strlen($url)-strlen($c_suffix)) !== false) {
                         $url = substr($url,0,-strlen($c_suffix));
                     }
                 }
@@ -317,7 +348,6 @@ switch ($modx->event->name) {
                             }
                         }
 
-
                         if (count($params)) {
 
                             $original_params = array_diff_key(array_merge($params,$_GET),array_flip(array_merge(array($del_get),$base_get)));
@@ -327,7 +357,34 @@ switch ($modx->event->name) {
                                 $modx->setPlaceholder('sf.seo_id',$url_array['id']);
                                 break;
                             }
+
+                            if($SeoFilter->config['lastModified']) {
+                                if(empty($meta['editedon']) && $meta['editedon'] != '0000-00-00 00:00:00') {
+                                    $modified = $meta['editedon'];
+                                } else {
+                                    $modified = $meta['createdon'];
+                                }
+                                $modified = date('r',strtotime($modified));
+                                $qtime = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? $_SERVER['HTTP_IF_MODIFIED_SINCE'] : '';
+                                if (strtotime($qtime) >= strtotime($modified)) {
+                                    header ("HTTP/1.1 304 Not Modified ");
+                                    exit();
+                                }
+                                header ("Last-Modified: $modified");
+                            }
+
                             $SeoFilter->initialize($ctx, array('page' => $page, 'params' => $params));
+
+                            if(is_dir($modx->getOption('core_path').'components/msvendorcollections/model/')) {
+                                if ($msVC = $modx->getService('msvendorcollections', 'msVendorCollections', $modx->getOption('msvendorcollections_core_path', null,
+                                        $modx->getOption('core_path') . 'components/msvendorcollections/') . 'model/msvendorcollections/', $scriptProperties)) {
+                                    if (!$msVC->initialized[$modx->resource->context_key]) {
+                                        $msVC->initialize($modx->resource->context_key);
+                                    }
+                                }
+                            }
+
+
                             $meta['menutitle'] = $menutitle;
                             if(isset($meta['properties'])) {
                                 $meta['properties'] = $modx->toJSON($meta['properties']);
@@ -335,6 +392,10 @@ switch ($modx->event->name) {
                             if(isset($meta['introtexts'])) {
                                 $meta['introtexts'] = $modx->toJSON($meta['introtexts']);
                             }
+                            if(isset($meta['url'])) {
+                                $meta['url'] .= $SeoFilter->config['url_suffix'];
+                            }
+
                             if($ctx != 'web') {
                                 $modx->switchContext($ctx);
                             }

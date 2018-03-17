@@ -4,9 +4,11 @@
 define('PKG_NAME', 'SeoFilter');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
 
-define('PKG_VERSION', '1.3.12');
+
+define('PKG_VERSION', '1.4.4');
 define('PKG_RELEASE', 'beta');
 define('PKG_AUTO_INSTALL', true);
+define('PKG_PROVIDER_ID', 2);
 define('PKG_NAMESPACE_PATH', '{core_path}components/' . PKG_NAME_LOWER . '/');
 //define('PKG_NAMESPACE_PATH', '{base_path}'.PKG_NAME.'/core/components/'.PKG_NAME_LOWER.'/');
 
@@ -50,5 +52,6 @@ define('BUILD_PLUGIN_STATIC', false);
 $BUILD_RESOLVERS = array(
     'tables',
     'chunks',
-    //'setup',
+//    'encryption',
+//    'setup',
 );
