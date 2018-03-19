@@ -23,6 +23,10 @@ $tmp = array(
         'type' => 'combo-boolean',
         'value' => true,
     ),
+    'fast'=> array(
+        'type' => 'combo-boolean',
+        'value' => true,
+    ),
     'sitemapSchema' => array(
         'type' => 'textfield',
         'value' => 'http://www.sitemaps.org/schemas/sitemap/0.9',

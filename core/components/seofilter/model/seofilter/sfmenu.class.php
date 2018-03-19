@@ -320,6 +320,9 @@ class sfMenu
         if(!(int)$this->config['showHidden']) {
             $where['menu_on'] = 1;
         }
+        if(!empty($this->config['where'])) {
+            $where = array_merge($where, $this->modx->fromJSON($this->config['where']));
+        }
         if(!empty($this->config['wordWhere'])) {
             $where = array_merge($this->prepareWordWhere($this->config['wordWhere']),$where);
         }

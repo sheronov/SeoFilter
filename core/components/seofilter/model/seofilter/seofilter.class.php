@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.4.4';
+    public $version = '1.4.5';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -1212,8 +1212,6 @@ class SeoFilter
             }
 
 
-
-
             foreach ($seo_array as $tag => $text) {
                 if ($text) {
                     if (strpos( $text,'@INLINE')  !== false) {
@@ -1648,6 +1646,7 @@ class SeoFilter
                 'row' => serialize($row),
                 'input' => $row['input'] ? $row['input'] : 0,
                 'seoFilter' => $this,
+                'SeoFilter' => $this,
                 'pdoTools' => $this->pdo,
                 'pdoFetch' => $this->pdo,
                 'rule_id' => $rule_id,
