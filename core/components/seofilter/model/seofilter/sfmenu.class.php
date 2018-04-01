@@ -231,11 +231,12 @@ class sfMenu
             $where[$rule_alias.':NOT IN'] = $rules_out;
         }
         if(count($parents_in)){
-            if(count($rules_out) || count($parents_out)) {
-                $where[$page_alias.':IN'] = $parents_in;
-            } else {
-                $where['OR:'.$page_alias.':IN'] = $parents_in;
-            }
+//            if(count($rules_out) || count($parents_out)) {
+//                $where['OR:'.$page_alias.':IN'] = $parents_in;
+//            } else {
+//                $where[$page_alias.':IN'] = $parents_in;
+//            }
+            $where[$page_alias.':IN'] = $parents_in;
         }
         if(count($parents_out)) {
             $where[$page_alias.':NOT IN'] = $parents_out;

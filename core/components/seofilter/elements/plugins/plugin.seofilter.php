@@ -93,13 +93,13 @@ switch ($modx->event->name) {
                         }
                         $slider = (int)$fields[$var][$field_key]['slider'];
                         if($word_array = $SeoFilter->getWordArray($word, $fields[$var][$field_key]['id'], 0, !$slider)) {
-                            if(is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
+                            if($sf_count && is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
                                 $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
 //                                $modx->log(1,print_r($recount,1));
                             }
-                        } elseif($slider && is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
+                        } elseif($sf_count && $slider && is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
                             $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'],$fields[$var][$field_key]);
-                            $modx->log(1,print_r($recount,1));
+//                            $modx->log(1,print_r($recount,1));
                         }
                         if(is_array($changes[$var][$field_key])) {
                             foreach ($changes[$var][$field_key] as $key => $value) {
@@ -114,7 +114,7 @@ switch ($modx->event->name) {
                 }
             }
 
-            if(!empty($changes[$var])) {
+            if(!empty($changes[$var]) && $sf_count) {
                 // действия на пересчёт слов, которые удалены
                 foreach($changes[$var] as $field_key => $words) {
                     foreach($words as $word) {
@@ -124,10 +124,9 @@ switch ($modx->event->name) {
                         $slider = (int)$fields[$var][$field_key]['slider'];
                         if ($word_array = $SeoFilter->getWordArray($word, $fields[$var][$field_key]['id'], 0, !$slider)) {
                             $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
-//                            $modx->log(1, print_r($recount, 1));
                         } elseif ($slider) {
                             $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'], $fields[$var][$field_key]);
-                            $modx->log(1, print_r($recount, 1));
+//                            $modx->log(1, print_r($recount, 1));
                         }
                     }
                 }
@@ -159,6 +158,8 @@ switch ($modx->event->name) {
             $check = $novalue = $page = $fast_search = 0; //переменные для проверки
             $params = array(); //итоговый массив с параметром и значением
             $last_char = ''; //был ли в конце url-а слэш
+            $ctx = $modx->context->key; //если используете контексты, то переключить должны до события onPageNotFound
+
 //            if (substr($_REQUEST[$alias], -1) == '/') {
 //                $last_char = '/';
 //            }
@@ -177,50 +178,93 @@ switch ($modx->event->name) {
                 }
             }
 
-            $request = trim($request, "/");
 
-            $tmp = explode('/', $request);
-            $r_tmp = array();
+
+//            print_r($request);
+
+            $request = trim($request, "/"); //основной запрос
+            $tmp = explode('/', $request); //массив запроса
+
+            $check_doubles = false;
+            $uris = $aliases = array();
 
             $q = $modx->newQuery('sfRule');
-            $q->limit(0);
-            $q->select(array('sfRule.*'));
-            $page_ids = $page_aliases = array();
-            if ($q->prepare() && $q->stmt->execute()) {
-                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $page_ids[$row['id']] = $row['page'];
+            $q->innerJoin('modResource','modResource','modResource.id = sfRule.page');
+            $q->where(array(
+                'sfRule.active'=>1,  //только активные правила ищутся, также правильнее ? :)
+                'modResource.published' => 1,
+                'modResource.context_key' => $ctx
+            ));
+            $q->select(array(
+                'sfRule.id as rule_id',
+                'modResource.id,modResource.alias,modResource.uri,modResource.uri_override'
+            ));
+            if($q->prepare() && $q->stmt->execute()) {
+                while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $uri = $SeoFilter->clearSuffixes($row['uri']);
+                    if($row['id'] == $site_start) {
+                        $uri = '';
+                    }
+                    $uris[$row['id']] = array_reverse(explode('/',$uri),1);
+                    //переворот для удобства поиска
+
+                    if(in_array($row['alias'],$aliases)) {
+                        $check_doubles = true;
+                    }
+                    $aliases[$row['id']] = $row['alias'];
                 }
             }
 
+            $r_tmp = array_reverse($tmp, 1); //перевёрнутый запрос
 
-            if(count($page_ids)) {
-                $q = $modx->newQuery('modResource');
-                $q->where(array('context_key'=>$modx->context->key,'id:IN' => array_unique($page_ids)));
-                $q->limit(0);
-                $q->select('id,alias,uri_override,uri');
-                if ($q->prepare() && $q->stmt->execute()) {
-                    while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $uri = $row['alias'];
-                        if($row['uri_override']) {
-                            $uri = $row['uri'];
-                        }
+            if($check_doubles) {
+                //если есть дубли синонимов
 
-                        foreach($SeoFilter->config['possibleSuffixes'] as $possibleSuffix) {
-                            if (substr($uri, -strlen($possibleSuffix)) == $possibleSuffix) {
-                                $uri = substr($uri, 0, -strlen($possibleSuffix));
+                //обязательная сортировка массива по количеству внутренних алиасов
+                uasort($uris, function($a, $b) {
+                    if (count($a) == count($b)) {
+                        return 0;
+                    }
+                    return (count($a) > count($b)) ? -1 : 1;
+                });
+
+                foreach ($uris as $page_id => $uri_arr) {
+                    $need_count = count($uri_arr); //сколько совпадений подряд нужно
+                    $uri_count = 0; //количество совпадений
+                    $pos_count = false; //позиция, на которой произошло сопадение
+                    $check_break = false; //проверка, чтобы в разнобой не пошло
+                    foreach($r_tmp as $t_key => $t_alias) {
+                        foreach($uri_arr as $u_key => $uri) {
+                            if($uri == $t_alias) {
+                                if($pos_count !== false) {
+                                    if($pos_count-$uri_count != $t_key) {
+                                        $check_break = true;
+                                        break;
+                                    }
+                                } else {
+                                    $pos_count = $t_key;
+                                }
+                                $uri_count++;
+                                break; //выходим из перебора uri для текущего alias-а в адресе
                             }
                         }
-
-                        $page_aliases[$row['id']] = $uri;
+                        if($check_break) {
+                            break;
+                        }
+                    }
+                    if($need_count == $uri_count) {
+                        //ссылка найдена
+                        $page = $page_id;
+                        $tmp = array_slice($tmp,++$pos_count);
+                        break;
                     }
                 }
-
-                $r_tmp = array_reverse($tmp, 1);
+            } else {
+                //простой механизм поиска
                 $tmp_id = 0;
 
                 foreach ($r_tmp as $t_key => $t_alias) {
-                    $t_alias = trim($t_alias,'/');
-                    if ($page = array_search($t_alias, $page_aliases)) {
+                    if ($page = array_search($t_alias, $aliases)) {
                         $tmp_id = $t_key;
                         break;
                     }
@@ -230,20 +274,22 @@ switch ($modx->event->name) {
                     for ($i = 0; $i <= $tmp_id; $i++) {
                         array_shift($tmp);
                     }
-                } else {
-                    if (in_array($site_start, $page_ids)) {
-                        $page = $site_start;  //для тех у кого главная страница сайта - фильтр
-                    }
                 }
+
             }
 
-
+            if(!$page) {
+                //если не будет найдено, то проверим, вдруг это главная страница
+                if(in_array($site_start,array_keys($aliases))) {
+                    $page = $site_start;
+                }
+            }
 
             if($page) {
 //                $p = $modx->newQuery('modResource',array('id'=>$page));
 //                $p->select('context_key');
 //                $ctx = $modx->getValue($p->prepare());
-                $ctx = $modx->context->key;
+
                 if($page == $site_start) {
                     $url = '';
                 } else {
@@ -347,6 +393,7 @@ switch ($modx->event->name) {
                                 }
                             }
                         }
+
 
                         if (count($params)) {
 

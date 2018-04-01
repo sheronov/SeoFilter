@@ -1,5 +1,14 @@
 Changelog for SeoFilter.
 
+1.4.7-beta
+==============
+- Fixed the mechanism for finding pages in the plugin for sites with duplicates of aliases
+- Fixed work with parents in sfMenu, now strictly the "page:IN" (without OR)
+
+1.4.6-beta
+==============
+- Fixed a bug in the plugin with counting turned off
+
 1.4.5-beta
 ==============
 - Added forgotten where for sfMenu
