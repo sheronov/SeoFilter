@@ -695,8 +695,10 @@ class SeoFilter
                     $original_params = array_diff_key($params,array_flip($base_get));
                 }
 
-                if(count($params))
+
+                if(is_array($params) && count($params))
                     $diff = array_flip(array_diff(array_keys($params),$aliases));
+
                 if(count($diff)) {
                     foreach($diff as $dif => $dff)
                         unset($copyparams[$dif]);
@@ -709,7 +711,7 @@ class SeoFilter
 
                 $rule_count = 0;
                 $meta = array();
-                if(count($params)) { //тут проверяет, были ли переданы первичные алиасы в правилах. если их нет, то и правил нет)
+                if(is_array($params) && count($params)) { //тут проверяет, были ли переданы первичные алиасы в правилах. если их нет, то и правил нет)
                     $base_params = $params;
                     $diff_params = array_diff_key($diff,array_flip($base_get));
                     $diff = array_diff_key($diff,$diff_params);

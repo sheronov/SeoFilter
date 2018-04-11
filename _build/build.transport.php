@@ -66,7 +66,6 @@ if ($provider = $modx->getObject('transport.modTransportProvider', PKG_PROVIDER_
         $modx->log(xPDO::LOG_LEVEL_ERROR, $msg);
     } else {
         $data = $response->toXml();
-        $modx->log(1,print_r($data,1));
         if (!empty($data->key)) {
             define('PKG_ENCODE_KEY', $data->key);
         } elseif (!empty($data->message)) {

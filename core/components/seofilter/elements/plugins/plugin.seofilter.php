@@ -83,7 +83,6 @@ switch ($modx->event->name) {
                 // удалилась значения
             }
 
-//            $modx->log(1,'Changes '.print_r($changes[$var],1));
 
             if(!empty($dictionary)) {
                 foreach ($dictionary as $field_key => $words) {
@@ -95,11 +94,9 @@ switch ($modx->event->name) {
                         if($word_array = $SeoFilter->getWordArray($word, $fields[$var][$field_key]['id'], 0, !$slider)) {
                             if($sf_count && is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
                                 $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
-//                                $modx->log(1,print_r($recount,1));
                             }
                         } elseif($sf_count && $slider && is_array($changes[$var][$field_key]) && in_array($word,$changes[$var][$field_key])) {
                             $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'],$fields[$var][$field_key]);
-//                            $modx->log(1,print_r($recount,1));
                         }
                         if(is_array($changes[$var][$field_key])) {
                             foreach ($changes[$var][$field_key] as $key => $value) {
@@ -126,7 +123,6 @@ switch ($modx->event->name) {
                             $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
                         } elseif ($slider) {
                             $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'], $fields[$var][$field_key]);
-//                            $modx->log(1, print_r($recount, 1));
                         }
                     }
                 }
@@ -208,10 +204,17 @@ switch ($modx->event->name) {
                     $uris[$row['id']] = array_reverse(explode('/',$uri),1);
                     //переворот для удобства поиска
 
-                    if(in_array($row['alias'],$aliases)) {
+                    $alias = $row['alias'];
+                    if($row['uri_override']) {
+                        //если url заморожен
+                        $uri = explode('/',$uri);
+                        $alias = array_pop($uri);
+                    }
+
+                    if(in_array($alias,$aliases)) {
                         $check_doubles = true;
                     }
-                    $aliases[$row['id']] = $row['alias'];
+                    $aliases[$row['id']] = $alias;
                 }
             }
 

@@ -254,7 +254,6 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
 //                            }
 //                        }
 //                    }
-//                    $this->modx->log(1,print_r($priorities,1));
 //                    $new_url = $url->updateUrl($priorities);
 //                    // $this->modx->log(modX::LOG_LEVEL_ERROR, 'SEOFILTER URL: '.$new_url);
 //                }

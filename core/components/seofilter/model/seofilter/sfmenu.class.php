@@ -187,7 +187,11 @@ class sfMenu
             }
 
             if((int)$this->config['groupbyrule']) {
-                $tree = $this->groupByRule($tree,$pre_array);
+                if($this->config['fast']) {
+                    $tree = $this->fastGroupByRule($tree, $rules,$parents);
+                } else {
+                    $tree = $this->groupByRule($tree,$pre_array);
+                }
             }
         }
         $this->pdoTools->addTime('Tree was built (AllTime)', microtime(true) - $time);
@@ -241,6 +245,7 @@ class sfMenu
         if(count($parents_out)) {
             $where[$page_alias.':NOT IN'] = $parents_out;
         }
+
 
         return $where;
     }
@@ -914,6 +919,37 @@ class sfMenu
         return $tree;
     }
 
+    public function fastGroupByRule($links = array(),$rules = '',$parents = '') {
+        $time = microtime(true);
+        $tree = array();
+        $groupsort = $this->config['groupsort'];
+        $groupdir = $this->config['groupdir'];
+        $rules = array();
+
+        $q = $this->modx->newQuery('sfRule');
+        $q->where = array_merge($this->prepareParents($rules,$parents),array('active'=>1));
+        $q->select(array('sfRule.*'));
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+//                $row['links'] = array();
+                $row['level'] = 0;
+                $rules[$row['id']] = $row;
+            }
+        }
+        if($groupsort) {
+            uasort($rules, array($this,'sortingGroups'));
+        }
+
+        foreach($links as $key=>$link) {
+            $rules[$link['multi_id']]['links'][] = $link;
+            $rules[$link['multi_id']]['level'] = $link['level'];
+
+        }
+
+
+        return $rules;
+    }
+
     public function groupByRule($links = array(),$pre_array = array()) {
         $time = microtime(true);
         $tree = array();
@@ -1171,6 +1207,8 @@ class sfMenu
             $row['idx'] = $idx++;
             $row['last'] = (integer)$row['idx'] == $count;
 
+            $row['children'] = $row['total'];
+
             $output .= $this->linkTemplate($row);
         }
 
@@ -1245,6 +1283,8 @@ class sfMenu
                             'idx' => $idx,
                             'last' => $last,
                             'first' => $first,
+                            'total' => count($group['links']),
+                            'children' => count($group['links']),
                             'wrapper' => $this->getTemplate($group['links'])))
                     );
                 }

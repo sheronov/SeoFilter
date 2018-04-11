@@ -282,14 +282,11 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                         $q->select(array('DISTINCT ' . $class . '.' . $key));
                     }
                     if($field->get('xpdo_where')) {
-                        $this->modx->log(1,print_r($this->modx->fromJSON($field->get('xpdo_where')),1));
 //                        $q->select($this->modx->getSelectColumns($class,$class));
                         $q->where($this->modx->fromJSON($field->get('xpdo_where')));
                     }
                     if ($q->prepare() && $q->stmt->execute()) {
                         while ($input = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $this->modx->log(1,print_r($input,1));
-
                             $relation_id = $relation_value = '';
 
                             if ($field->get('xpdo')) {

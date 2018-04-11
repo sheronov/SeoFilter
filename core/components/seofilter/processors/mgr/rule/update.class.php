@@ -75,7 +75,6 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
                 $object->set('total_message',$total_message);
             }
 
-//            $this->modx->log(1,print_r($counts,1));
         }
 
         if($object->get('active')) {

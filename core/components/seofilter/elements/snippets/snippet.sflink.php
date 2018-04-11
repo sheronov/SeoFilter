@@ -8,14 +8,42 @@ if (!($pdo instanceof pdoTools))
 $toPlaceholder = $modx->getOption('toPlaceholder', $scriptProperties, '');
 $tpl = $modx->getOption('tpl', $scriptProperties, '@INLINE <a href="[[+url]]">[[+name]]</a>');
 $rules = $modx->getOption('rules',$scriptProperties,'');
+$pages = $modx->getOption('pages',$scriptProperties,'');
+$where = $modx->getOption('where',$scriptProperties,'');
+$as_name = $modx->getOption('as_name',$scriptProperties,'');
 $output =  '';
-if(!empty($rules)) {
+if(!empty($rules) || !empty($pages)) {
     $all = array();
     $fields = array();
     $words = array();
     $link = array();
 
-    $rules = explode(',',$rules);
+
+    if(!empty($rules)) {
+        $rules = array_map('trim',explode(',',$rules));
+    } else {
+        $rules = array();
+    }
+
+    if(!empty($pages)) {
+        if(!empty($where)) {
+            if(!is_array($where)) {
+                $where = $modx->fromJSON($where);
+            }
+        }
+        $pages = array_map('trim',explode(',',$pages));
+        foreach($pages as $page) {
+            $q = $modx->newQuery('sfRule');
+            $q_where = array('page'=>$page);
+            if(is_array($where)) {
+                $q_where = array_merge($q_where,$where);
+            }
+            $q->where($q_where);
+            $q->select('id');
+            $rules[] = $modx->getValue($q->prepare());
+        }
+    }
+
     $q = $modx->newQuery('sfFieldIds');
     $q->where(array('sfFieldIds.multi_id:IN'=>$rules));
     $q->leftJoin('sfField','sfField','sfFieldIds.field_id = sfField.id');
@@ -35,7 +63,7 @@ if(!empty($rules)) {
             if($field['exact']) {
                 $where['input'] = $scriptProperties[$field['alias']];
             } else {
-                $where['input:LIKE'] = $scriptProperties[$field['alias']];
+                $where['input:LIKE'] = '%'.$scriptProperties[$field['alias']].'%';
             }
             $q->where($where);
             $q->select(array('sfDictionary.*'));
@@ -82,7 +110,11 @@ if(!empty($rules)) {
             $page_url .= '/';
         }
         $link['url'] = $page_url.$url.$u_suffix;
-        $link['name'] = $link['menutitle']?:$link['link'];
+        if($as_name) {
+            $link['name'] = $as_name;
+        } else {
+            $link['name'] = $link['menutitle']?:$link['link'];
+        }
         $output = $pdo->getChunk($tpl,$link,$fastMode);
     }
 }

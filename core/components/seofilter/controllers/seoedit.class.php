@@ -29,7 +29,6 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
                 $this->urlArray = $url->toArray();
 
                 if($rule = $this->modx->getObject('sfRule',$url->get('multi_id'))) {
-//                        $this->modx->log(1,'Rule'.print_r($rule->toArray(),1));
                     if (!$url->get('custom')) {
                         $this->urlArray['title'] = $rule->get('title');
                         $this->urlArray['h1'] = $rule->get('h1');
@@ -62,7 +61,6 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
                         }
                     }
                 }
-//                $this->modx->log(1,print_r($url->toArray(),1));
 
 
 //                $this->urlArray['properties'] = $this->modx->toJSON($this->urlArray['properties']);

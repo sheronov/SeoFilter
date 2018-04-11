@@ -189,7 +189,7 @@ class sfCountHandler
                     if(json_last_error() === JSON_ERROR_NONE) {
                         $rule_where = $result;
                     } else {
-                        $this->modx->log(1,'[SeoFilter] Additional where error. It is not JSON "'.$row['rule.count_where'].'". Please fix it and try again');
+                        $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] Additional where error. It is not JSON "'.$row['rule.count_where'].'". Please fix it and try again');
                     }
                 }
                 if(!empty($row['rule.count_parents']) || $row['rule.count_parents'] === 0 || $row['rule.count_parents'] === '0') {
@@ -208,7 +208,7 @@ class sfCountHandler
                 if(is_array($additional_params)) {
                     $rule_where = array_merge($additional_params, $rule_where);
                 } else {
-                    $this->modx->log(1,'[SeoFilter] Additional params must be array! Please fix it "'.$additional_params.'"');
+                    $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] Additional params must be array! Please fix it "'.$additional_params.'"');
                 }
             }
             $class = $this->getClassForCount($rule_id,$fields);
@@ -366,7 +366,7 @@ class sfCountHandler
             if(method_exists($this,$method_name)) {
                 $conditions = call_user_func_array(array($this,$method_name), array($value,$field));
             } elseif($this->config['count_results']) {
-                $this->modx->log(1,'[SeoFilter] Counting error: Method "' . $method_name . '" not exists in class "' . get_class($this). ' ".');
+                $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] Counting error: Method "' . $method_name . '" not exists in class "' . get_class($this). ' ".');
             }
         }
 
@@ -506,7 +506,7 @@ class sfCountHandler
                 }
             } else {
 //                TODO: здесь настройку добавить, считать с учётом GET или нет
-//                $this->modx->log(1,'[SeoFilter] ERROR: The field by alias = '.$alias.' is not set to fields array. Param = '.$param);
+//                $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] ERROR: The field by alias = '.$alias.' is not set to fields array. Param = '.$param);
             }
         }
 
@@ -701,8 +701,6 @@ class sfCountHandler
                 $conditions['where'][$key] = $cond;
             }
         }
-
-//        $this->modx->log(1,'Where = '.print_r($conditions,1));
 
         return $conditions;
     }

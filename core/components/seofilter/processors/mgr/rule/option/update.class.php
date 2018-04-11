@@ -10,8 +10,6 @@ class sfRuleOptionUpdateProcessor extends modProcessor
 
     public function process()
     {
-//        $this->modx->log(1,print_r($this->getProperties(),1));
-
         return $this->success('',$this->getProperties());
     }
 

@@ -1,21 +1,25 @@
 <?php
 /** @var array $scriptProperties */
 $output = '';
-if(isset($options)) {
+if(isset($options) && !isset($field_id)) {
     $field_id = (int)$options;
 }
-if(isset($input) && isset($field_id)) {
+if(isset($input)) {
     $tpl = $modx->getOption('tpl', $scriptProperties, '');
-    $class_key = 'sfDictionary';
     $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
-    $q = $modx->newQuery('sfDictionary',array('field_id' => $field_id,'input'=>$input));
+    $q = $modx->newQuery('sfDictionary');
+    $where = array('input'=>$input);
+    if(isset($field_id)) {
+        $where['field_id'] = (int)$field_id;
+    }
+    $q->where($where);
     $q->limit(1);
-    $q->select('value,alias');
+    $q->select(array('sfDictionary.*'));
     if ($q->prepare() && $q->stmt->execute()) {
         $output = $q->stmt->fetch(PDO::FETCH_ASSOC);
     }
-    if(!$output) {
-        if($field = $modx->getObject('sfField',$field_id)) {
+    if(empty($output) && !empty($field_id)) {
+        if($field = $modx->getObject('sfField',(int)$field_id)) {
             if($value = $field->getValueByInput($input,$field->get('class'),$field->get('key'))) {
                 $path = $modx->getOption('seofilter_core_path', null, $modx->getOption('core_path') . 'components/seofilter/');
                 $processorProps = array(
@@ -31,17 +35,17 @@ if(isset($input) && isset($field_id)) {
                     $modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
                     $modx->error->reset();
                 } else {
-                    $output = array('value'=>$value,'alias'=>$response->response['object']['alias']);
+                    $output = $response->response['object'];
                 }
             }
         }
     }
-    if($tpl) {
-        $pdo = $modx->getService('pdoTools');
-        if (!($pdo instanceof pdoTools))
+    if(!empty($tpl)) {
+        $pdoTools = $modx->getService('pdoTools');
+        if (!($pdoTools instanceof pdoTools))
             return '';
-        if(isset($output['value']) && isset($output['alias'])) {
-            $output = $pdo->getChunk($tpl,array('value'=>$output['value'],'alias'=>$output['alias']));
+        if(!empty($output)) {
+            $output = $pdoTools->getChunk($tpl,$output);
         } else {
             $output = '';
         }
