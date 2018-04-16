@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.4.7';
+    public $version = '1.4.8';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -36,12 +36,14 @@ class SeoFilter
         $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
         $values_delimeter = $this->modx->getOption('seofilter_values_delimeter', null, ',', true);
         $site_start = $this->modx->context->getOption('site_start', 1);
+        $site_url = $this->modx->context->getOption('site_url', '');
         $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
 
         $container_suffix = $this->modx->getOption('container_suffix',null,'/');
         $seo_container_suffix = $this->modx->getOption('seofilter_container_suffix',null,$container_suffix,true);
         $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);
         $redirect  = $this->modx->getOption('seofilter_url_redirect', null, 0, true);
+        $replace_host  = $this->modx->getOption('seofilter_replace_host', null, 0, true);
 
         $title = $this->modx->getOption('seofilter_title', null, '', true);
         $description = $this->modx->getOption('seofilter_description', null, '', true);
@@ -111,6 +113,7 @@ class SeoFilter
             'separator' => $separator,
             'redirect' => $redirect,
             'site_start' => $site_start,
+            'site_url' => $site_url,
             'charset' => $charset,
             'base_get' => $base_get,
             'values_delimeter' => $values_delimeter,
@@ -135,6 +138,7 @@ class SeoFilter
             'page_tpl' => $page_tpl,
             'page_number' => 1,
 
+            'replace_host' => $replace_host,
             'replacebefore' => $replacebefore,
             'replaceseparator' => $replaceseparator,
             'jtitle' => $jtitle,
@@ -193,13 +197,18 @@ class SeoFilter
                     $aliases = $this->fieldsAliases($this->config['page'], 1);
                     $this->config['aliases'] = $aliases;
                     $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', 'full');
+                    if($this->config['replace_host']) {
+                        $site_url = explode('://',$this->config['site_url']);
+                        $site_url = array_pop($site_url);
+                        $site_url = trim($site_url,'/');
+                        $page_url = str_replace($site_url,$_SERVER['HTTP_HOST'],$page_url);
+                    }
                     $c_suffix = $this->config['container_suffix'];
-                    if($c_suffix) {
-                        if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix))) {
+                    if($c_suffix && $page_url) {
+                        if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix)) !== false) {
                             $page_url = substr($page_url,0,-strlen($c_suffix));
                         }
                     }
-
                     $page_url = $this->clearSuffixes($page_url);
 
 
@@ -1565,7 +1574,6 @@ class SeoFilter
                         if($relation_id) {
                             $processorProps['relation_word'] = $relation_id;
                         }
-
 
                         $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);

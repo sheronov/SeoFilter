@@ -121,3 +121,6 @@ $_lang['setting_seofilter_hidden_tab'] = 'Show hidden property tab';
 $_lang['setting_seofilter_hidden_tab_desc'] = 'There is no default. Contains two property arrays and a numeric field';
 $_lang['setting_seofilter_super_hidden_props'] = 'Show files from a folder';
 $_lang['setting_seofilter_super_hidden_props_desc'] = 'There is no default. Displays a list of files from the folder from the seofilter_tpls_path';
+
+$_lang['setting_seofilter_replace_host'] = 'Replace domain from site_url to $ _SERVER ["http_host"]';
+$_lang['setting_seofilter_replace_host_desc'] = 'There is no default. Use if the site is available across multiple domains or contexts with different addresses are used, but without switching them';

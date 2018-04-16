@@ -187,11 +187,7 @@ class sfMenu
             }
 
             if((int)$this->config['groupbyrule']) {
-                if($this->config['fast']) {
-                    $tree = $this->fastGroupByRule($tree, $rules,$parents);
-                } else {
-                    $tree = $this->groupByRule($tree,$pre_array);
-                }
+                $tree = $this->fastGroupByRule($tree,$rules,$parents);
             }
         }
         $this->pdoTools->addTime('Tree was built (AllTime)', microtime(true) - $time);
@@ -839,11 +835,17 @@ class sfMenu
                                     if (isset($parent_link['words'])) {
                                         foreach ($words as $word) {
                                             foreach ($parent_link['words'] as $word_find) {
-                                                $f_arr = array_uintersect_assoc($word_find, $word, "strcasecmp");
-                                                if (in_array('field_id', array_flip($f_arr)) && in_array('word_id', array_flip($f_arr))) {
+                                                if(($word_find['field_id'] == $word['field_id'])
+                                                    && ($word_find['word_id'] == $word['word_id'])) {
                                                     $find++;
                                                     break;
                                                 }
+//                                             странный старый метод
+//                                                $f_arr = array_flip(array_uintersect_assoc($word_find, $word, "strcasecmp"));
+//                                                if (in_array('field_id', $f_arr) && in_array('word_id', $f_arr)) {
+//                                                    $find++;
+//                                                    break;
+//                                                }
                                             }
                                             if ($find == $level - 1) {
                                                 break;
@@ -924,11 +926,32 @@ class sfMenu
         $tree = array();
         $groupsort = $this->config['groupsort'];
         $groupdir = $this->config['groupdir'];
-        $rules = array();
+        $where = $this->prepareParents($rules,$parents);
 
         $q = $this->modx->newQuery('sfRule');
-        $q->where = array_merge($this->prepareParents($rules,$parents),array('active'=>1));
-        $q->select(array('sfRule.*'));
+        $select = array('sfRule.*');
+        if($groupsort == 'level') {
+            $q->leftJoin('sfFieldIds','sfFieldIds','sfFieldIds.multi_id = sfRule.id');
+            $select[] = 'COUNT(sfFieldIds.id) as level';
+            $q->groupby('sfRule.id');
+        }
+        if($groupsort == 'total' || $groupsort == 'children' || $groupsort == 'count') {
+            $q->leftJoin('sfUrls','sfUrls','sfUrls.multi_id = sfRule.id');
+            $select[] = 'COUNT(sfUrls.id) as '.$groupsort;
+            $q->groupby('sfRule.id');
+            $where['sfUrls.id:IN'] = array_keys($links);
+        }
+
+        $q->where(array_merge($where,array('active'=>1)));
+        if($groupsort && $groupdir) {
+            $q->sortby($groupsort,$groupdir);
+        } elseif($groupsort) {
+            $q->sortby($groupsort);
+        } elseif($rules) {
+            $q->sortby("FIELD(sfRule.id,".$rules.")");
+        }
+        $q->select($select);
+        $rules = array();
         if($q->prepare() && $q->stmt->execute()) {
             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 //                $row['links'] = array();
@@ -936,15 +959,13 @@ class sfMenu
                 $rules[$row['id']] = $row;
             }
         }
-        if($groupsort) {
-            uasort($rules, array($this,'sortingGroups'));
-        }
 
         foreach($links as $key=>$link) {
             $rules[$link['multi_id']]['links'][] = $link;
             $rules[$link['multi_id']]['level'] = $link['level'];
-
         }
+
+
 
 
         return $rules;

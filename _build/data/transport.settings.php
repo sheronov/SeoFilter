@@ -92,6 +92,11 @@ $tmp = array(
         'value' => '',
         'area' => 'seofilter_main',
     ),
+    'replace_host' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_main'
+    ),
     'hide_empty' => array(
         'xtype' => 'combo-boolean',
         'value' => false,

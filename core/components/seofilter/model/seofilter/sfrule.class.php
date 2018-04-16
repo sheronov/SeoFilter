@@ -58,6 +58,7 @@ class sfRule extends xPDOSimpleObject {
         $urls = array();
         $count = 1;
         $rule_id = $this->get('id');
+        $page_id = $this->get('page');
         $q = $this->xpdo->newQuery('sfFieldIds');
         $q->sortby('priority', 'ASC');
         if($links = $this->getMany('Links',$q)){
@@ -189,13 +190,23 @@ class sfRule extends xPDOSimpleObject {
                     $urls_array = $this->matrixmult($urls_array,$url_arr);
                 }
             }
+
+
 //            $this->xpdo->log(1,'Urls '.print_r($urls_array,1));
             foreach($urls_array as $key=> $url_array) {
                 if($url_array['delete']) {
                     unset($urls_array[$key]);
                     continue;
                 }
-                $urls_array[$key]['link'] = $this->SeoFilter->pdo->getChunk('@INLINE '.$url_array['link'], $url_array['word_array']);
+
+                $word_array = $url_array['word_array'];
+                $word_array['rule_id'] = $rule_id;
+                foreach(array('id','page','page_id') as $pkey) {
+                    if (!isset($word_array[$pkey])) {
+                        $word_array[$pkey] = $page_id;
+                    }
+                }
+                $urls_array[$key]['link'] = $this->SeoFilter->pdo->getChunk('@INLINE '.$url_array['link'], $word_array);
                 unset($urls_array[$key]['word_array']);
             }
             return $urls_array;

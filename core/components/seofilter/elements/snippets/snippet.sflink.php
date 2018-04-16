@@ -81,10 +81,12 @@ if(!empty($rules) || !empty($pages)) {
         $q->select(array('sfUrls.*'));
         $q->limit(1);
         $i = 0;
-        foreach($all[$rule_id] as $field_id => $field) {
-            $word_id = $words[$field_id];
-            $q->innerJoin('sfUrlWord','sfUrlWord'.$i,'sfUrlWord'.$i.'.url_id = sfUrls.id AND sfUrlWord'.$i.'.word_id = '.$word_id.' AND sfUrlWord'.$i.'.field_id = '.$field_id);
-            $i++;
+        if(isset($all[$rule_id]) && is_array($all[$rule_id])) {
+            foreach ($all[$rule_id] as $field_id => $field) {
+                $word_id = $words[$field_id];
+                $q->innerJoin('sfUrlWord', 'sfUrlWord' . $i, 'sfUrlWord' . $i . '.url_id = sfUrls.id AND sfUrlWord' . $i . '.word_id = ' . $word_id . ' AND sfUrlWord' . $i . '.field_id = ' . $field_id);
+                $i++;
+            }
         }
         if($modx->getCount('sfUrls',$q)) {
             if($q->prepare() && $q->stmt->execute()) {
@@ -97,12 +99,13 @@ if(!empty($rules) || !empty($pages)) {
     }
 
     if(!empty($link)) {
+
         $url = $link['new_url']?:$link['old_url'];
         $page_url = $modx->makeUrl($link['page_id'],$scriptProperties['context'],'',$scriptProperties['scheme']);
         $c_suffix = $modx->getOption('container_suffix',null,'/');
         $u_suffix = $modx->getOption('seofilter_url_suffix',null,'',true);
-        if($c_suffix) {
-            if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix))) {
+        if($c_suffix && $page_url) {
+            if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix)) !== false) {
                 $page_url = substr($page_url,0,-strlen($c_suffix));
             }
         }

@@ -121,3 +121,6 @@ $_lang['setting_seofilter_hidden_tab'] = 'Показывать скрытую в
 $_lang['setting_seofilter_hidden_tab_desc'] = 'По умолчанию нет. Содержит в себе два массива свойств и числовое поле';
 $_lang['setting_seofilter_super_hidden_props'] = 'Показывать файлы из папки';
 $_lang['setting_seofilter_super_hidden_props_desc'] = 'По умолчанию нет. Покажет список файлов из папки из настройки seofilter_tpls_path';
+
+$_lang['setting_seofilter_replace_host'] = 'Заменять домен из site_url в на $_SERVER["http_host"]';
+$_lang['setting_seofilter_replace_host_desc'] = 'По умолчанию нет. Используйте, если сайт доступен по нескольким доменам или используются контексты с разными адресами, но без их переключения';

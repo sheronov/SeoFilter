@@ -1,5 +1,14 @@
 Changelog for SeoFilter.
 
+1.4.8-beta
+==============
+- Snippet sfLink now accepts the parameters "pages", "where", "as_name" for easy reference search
+- Corrected work with grouping in sfMenu, supports sorting of rules, with empty sortby sorting according to the passed rules
+- Snippet sfWord returns the whole array with all cases for Fenom (you can use to declare any words)
+- The resource id variable {$id} has been added to the link generation template for using fields
+- Added setting seofilter_replace_host (for those sites where one page is available on several domains)
+- Cleaned the component of unnecessary entries in the log and fixed minor errors, optimized for PHP 7.2
+
 1.4.7-beta
 ==============
 - Fixed the mechanism for finding pages in the plugin for sites with duplicates of aliases

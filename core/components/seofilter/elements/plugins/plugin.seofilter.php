@@ -114,19 +114,25 @@ switch ($modx->event->name) {
             if(!empty($changes[$var]) && $sf_count) {
                 // действия на пересчёт слов, которые удалены
                 foreach($changes[$var] as $field_key => $words) {
-                    foreach($words as $word) {
-                        if(empty($word)) {
-                            continue;
+                    foreach($words as $_word) {
+                        if(is_array($_word)) {
+                            $word_arr = $_word;
+                        }  else {
+                            $word_arr = array($_word);
                         }
-                        $slider = (int)$fields[$var][$field_key]['slider'];
-                        if ($word_array = $SeoFilter->getWordArray($word, $fields[$var][$field_key]['id'], 0, !$slider)) {
-                            $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
-                        } elseif ($slider) {
-                            $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'], $fields[$var][$field_key]);
+                        foreach($word_arr as $word) {
+                            if (empty($word)) {
+                                continue;
+                            }
+                            $slider = (int)$fields[$var][$field_key]['slider'];
+                            if ($word_array = $SeoFilter->getWordArray($word, $fields[$var][$field_key]['id'], 0, !$slider)) {
+                                $recount = $SeoFilter->countHandler->countByWord($word_array['id']);
+                            } elseif ($slider) {
+                                $recount = $SeoFilter->countHandler->countBySlider($fields[$var][$field_key]['id'], $fields[$var][$field_key]);
+                            }
                         }
                     }
                 }
-
             }
         }
 
