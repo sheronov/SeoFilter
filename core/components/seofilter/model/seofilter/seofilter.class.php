@@ -824,6 +824,10 @@ class SeoFilter
                             }
                             if($meta['success']) {
                                 $meta['find'] = $find = 1;
+                                //обновление счётчика, если отличается количество
+                                if(empty($diff) && empty($diff_fields) && ($meta['total'] != $meta['old_total']) && !$meta['has_slider']) {
+                                    $this->updateUrlTotal($meta['url_id'],$meta['total']);
+                                }
                             } else {
                                 $find = 0;
                             }
@@ -1074,6 +1078,14 @@ class SeoFilter
         return $this->modx->getCount('sfFieldIds',$q);
     }
 
+    public function updateUrlTotal($url_id = 0, $total = 0) {
+        if($url_id && $url = $this->modx->getObject('sfUrls',$url_id)) {
+            $url->set('total',$total);
+            $url->set('editedon',strtotime(date('Y-m-d H:i:s')));
+            $url->save();
+        }
+    }
+
     public function getRuleMeta($params = array(), $rule_id = 0,$page_id = 0 ,$ajax = 0,$new = 0,$original_params = array()) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class','editedon','key');
         $seo_array = array('title','h1','h2','description','introtext','keywords','text','content','link','tpl','introlength');
@@ -1083,6 +1095,7 @@ class SeoFilter
         $diff_params = array();
         $check = 0;
         $link_id = 0;
+        $has_slider = 0;
 
 
         // если не нужно пересчитывать на странице с учётом гет параметра - то это закоментить, а ниже раскоментить
@@ -1092,12 +1105,15 @@ class SeoFilter
         }
 
         foreach ($params as $param => $input) {
-            if ($field = $this->modx->getObject('sfField', array('alias' => $param))) {
-                $field_id = $field->get('id');
-                $alias = $field->get('alias');
+            if ($field = $this->pdo->getArray('sfField', array('alias' => $param))) {
+                $field_id = $field['id'];
+                $alias = $field['alias'];
                 $fields[] = $field_id;
+                if($field['slider']) {
+                    $has_slider = 1;
+                }
 
-                if($word = $this->getWordArray($input,$field_id,$field->get('slider'),$this->config['mfilterWords'])) {
+                if($word = $this->getWordArray($input,$field_id,$field['slider'],$this->config['mfilterWords'])) {
                     foreach (array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
                         if ($countFields == 1) {
                             $word_array[$tmp_key] = $tmp_array;
@@ -1110,11 +1126,11 @@ class SeoFilter
 
                     $aliases[$param] = $word['alias'];
 
-//                    $fields_key[$alias]['class'] = $field->get('class');
-//                    $fields_key[$alias]['key'] = $field->get('key');
-//                    $fields_key[$alias]['exact'] = $field->get('exact');
-//                    $fields_key[$alias]['slider'] = $field->get('slider');
-//                    $fields_key[$alias]['xpdo_package'] = $field->get('xpdo_package');
+//                    $fields_key[$alias]['class'] = $field['class'];
+//                    $fields_key[$alias]['key'] = $field['key'];
+//                    $fields_key[$alias]['exact'] = $field['exact'];
+//                    $fields_key[$alias]['slider'] = $field['slider'];
+//                    $fields_key[$alias]['xpdo_package'] = $field['xpdo_package'];
 
                     $field_word[$field_id] = $word['id'];
                 } else {
@@ -1186,6 +1202,9 @@ class SeoFilter
         }
 
         $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new,$field_word);
+        if(isset($url_array['total'])) {
+            $meta['old_total'] = $url_array['total'];
+        }
 
         if ($seo = $this->pdo->getArray('sfRule', array('id'=>$rule_id,'active'=>1))) {
             if(!empty($seo['count_parents'])) {
@@ -1306,6 +1325,7 @@ class SeoFilter
         }
 
         $meta['page_id'] = $page_id;
+        $meta['has_slider'] = $has_slider;
 
         return $meta;
     }

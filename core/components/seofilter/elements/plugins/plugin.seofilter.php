@@ -24,8 +24,7 @@ switch ($modx->event->name) {
         }
         break;
     case 'OnBeforeDocFormSave':
-        $sf_count = $modx->getOption('seofilter_count', null, 0, true);
-        if(!$sf_count)
+        if(!$sf_count = $modx->getOption('seofilter_count', null, 0, true))
             break;
         $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
         if($sf_classes &&!in_array($resource->get('class_key'),array_map('trim', explode(',',$sf_classes))))
@@ -143,7 +142,6 @@ switch ($modx->event->name) {
             }
         }
 
-
         break;
     case 'OnPageNotFound':
         $time = microtime(true);
@@ -163,15 +161,10 @@ switch ($modx->event->name) {
             $base_get = array_map('trim', explode(',',$SeoFilter->config['base_get']));
             $separator = $SeoFilter->config['separator'];
             $site_start = $SeoFilter->config['site_start'];
-            $charset = $SeoFilter->config['charset'];
             $check = $novalue = $page = $fast_search = 0; //переменные для проверки
             $params = array(); //итоговый массив с параметром и значением
             $last_char = ''; //был ли в конце url-а слэш
             $ctx = $modx->context->key; //если используете контексты, то переключить должны до события onPageNotFound
-
-//            if (substr($_REQUEST[$alias], -1) == '/') {
-//                $last_char = '/';
-//            }
 
             $request = trim($_REQUEST[$alias]);
 
@@ -186,10 +179,6 @@ switch ($modx->event->name) {
                     $last_char = '/';
                 }
             }
-
-
-
-//            print_r($request);
 
             $request = trim($request, "/"); //основной запрос
             $tmp = explode('/', $request); //массив запроса
@@ -254,12 +243,10 @@ switch ($modx->event->name) {
                     $aliases[$row['id']] = $alias;
                 }
             }
-
             $r_tmp = array_reverse($tmp, 1); //перевёрнутый запрос
 
             if($check_doubles) {
                 //если есть дубли синонимов
-
                 //обязательная сортировка массива по количеству внутренних алиасов
                 uasort($uris, function($a, $b) {
                     if (count($a) == count($b)) {
@@ -302,21 +289,18 @@ switch ($modx->event->name) {
             } else {
                 //простой механизм поиска
                 $tmp_id = 0;
-
                 foreach ($r_tmp as $t_key => $t_alias) {
                     if ($page = array_search($t_alias, $aliases)) {
                         $tmp_id = $t_key;
                         break;
                     }
                 }
-
                 if ($page) {
                     for ($i = 0; $i <= $tmp_id; $i++) {
                         array_shift($tmp);
                     }
                 }
             }
-
             if(!$page) {
                 //если не будет найдено, то проверим, вдруг это главная страница
                 if(in_array($site_start,array_keys($aliases))) {
@@ -325,10 +309,6 @@ switch ($modx->event->name) {
             }
 
             if($page) {
-//                $p = $modx->newQuery('modResource',array('id'=>$page));
-//                $p->select('context_key');
-//                $ctx = $modx->getValue($p->prepare());
-
                 if($page == $site_start) {
                     $url = '';
                 } else {
@@ -350,7 +330,6 @@ switch ($modx->event->name) {
                 if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
                     break;
                 }
-
 
                 if($tmp && $url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
                     if($url_array['active']) {
@@ -379,7 +358,6 @@ switch ($modx->event->name) {
                         if ($url_array['menu_on']) {
                             $menutitle = $url_array['menutitle'];
                         }
-
 
                         $q = $modx->newQuery('sfUrlWord');
                         $q->sortby('priority','ASC');
@@ -427,7 +405,6 @@ switch ($modx->event->name) {
                                                     $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
                                                     if (!$menutitle) $menutitle = $word['value'];
                                                 }
-
                                             }
                                         }
                                     }
@@ -435,12 +412,17 @@ switch ($modx->event->name) {
                             }
                         }
 
-
                         if (count($params)) {
                             $original_params = array_diff_key(array_merge($params,$_GET),array_flip(array_merge(array($del_get),$base_get)));
                             $fast_search = true;
                             $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);
-                            if($SeoFilter->config['hideEmpty'] && $SeoFilter->config['count_childrens'] && !$meta['total']) {
+
+                            //обновление счётчика, если отличается количество
+                            if(empty($meta['diff']) && ($meta['total'] != $meta['old_total'])) {
+                                $this->updateUrlTotal($meta['url_id'],$meta['total']);
+                            }
+
+                            if($SeoFilter->config['hideEmpty'] && $SeoFilter->config['count_childrens'] && empty($meta['total'])) {
                                 $modx->setPlaceholder('sf.seo_id',$url_array['id']);
                                 break;
                             }
