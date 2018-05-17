@@ -32,7 +32,8 @@ class sfUrlsReCountProcessor extends modObjectProcessor
             foreach($links as $object) {
                 $id = $object->get('id');
                 $old_total = $object->get('total');
-                $total = $SeoFilter->countHandler->countByLink($id);
+                $page_id = $object->get('page_id');
+                $total = $SeoFilter->countHandler->countByLink($id,$page_id);
                 $object->set('total', $total);
                 if ($old_total != $total) {
                     $object->set('editedon', strtotime(date('Y-m-d H:i:s')));
@@ -47,8 +48,8 @@ class sfUrlsReCountProcessor extends modObjectProcessor
                 }
 
                 $old_total = $object->get('total');
-
-                $total = $SeoFilter->countHandler->countByLink($id);
+                $page_id = $object->get('page_id');
+                $total = $SeoFilter->countHandler->countByLink($id,$page_id);
                 $object->set('total', $total);
 
                 if ($old_total != $total) {

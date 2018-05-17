@@ -12,6 +12,7 @@ $xpdo_meta_map['sfRule']= array (
   array (
     'name' => '',
     'page' => 0,
+    'pages' => '',
     'url' => '',
     'link_tpl' => '',
     'base' => 0,
@@ -32,7 +33,7 @@ $xpdo_meta_map['sfRule']= array (
     'introtexts' => NULL,
     'introlength' => 0,
     'tpl' => '',
-    'editedon' => '0000-00-00 00:00:00',
+    'editedon' => '0',
   ),
   'fieldMeta' => 
   array (
@@ -50,8 +51,16 @@ $xpdo_meta_map['sfRule']= array (
       'precision' => '10',
       'attributes' => 'unsigned',
       'phptype' => 'integer',
-      'null' => false,
+      'null' => true,
       'default' => 0,
+    ),
+    'pages' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '255',
+      'phptype' => 'string',
+      'null' => true,
+      'default' => '',
     ),
     'url' => 
     array (
@@ -210,7 +219,7 @@ $xpdo_meta_map['sfRule']= array (
       'dbtype' => 'timestamp',
       'phptype' => 'timestamp',
       'null' => true,
-      'default' => '0000-00-00 00:00:00',
+      'default' => '0',
     ),
   ),
   'indexes' => 
@@ -240,6 +249,22 @@ $xpdo_meta_map['sfRule']= array (
       'columns' => 
       array (
         'page' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'pages' => 
+    array (
+      'alias' => 'pages',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'pages' => 
         array (
           'length' => '',
           'collation' => 'A',

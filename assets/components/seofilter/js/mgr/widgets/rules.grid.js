@@ -61,7 +61,10 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             id: Ext.id(),
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.a.result.object.total_message) {
+                            MODx.msg.alert(_('seofilter_info'), res.a.result.object.total_message);
+                        }
                         this.refresh();
                         Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
@@ -69,7 +72,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             }
         });
         w.reset();
-        w.setValues({active: true});
+        w.setValues({active: true,count_where: SeoFilter.config.defaultWhere || ''});
         w.show(e.target);
     },
 
@@ -102,9 +105,8 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
                             listeners: {
                                 success: {
                                     fn: function (res) {
-                                        if(res.a.result.object.total) {
-                                            var total_message = res.a.result.object.total_message;
-                                            MODx.msg.alert(_('seofilter_rule_recount_title'), total_message);
+                                        if(res.a.result.object.total_message) {
+                                            MODx.msg.alert(_('seofilter_info'), res.a.result.object.total_message);
                                         }
                                         this.refresh();
                                         Ext.getCmp('seofilter-grid-urls').refresh();
@@ -143,6 +145,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
                 success: {
                     fn: function () {
                         this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
                 }
             }
@@ -201,7 +204,10 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             xtype: 'seofilter-window-copy-rule',
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.a.result.object.total_message) {
+                            MODx.msg.alert(_('seofilter_info'), res.a.result.object.total_message);
+                        }
                         this.refresh();
                         Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
@@ -215,7 +221,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'title', 'base', 'page', 'url', 'active', 'count','rank', 'fields', 'actions','link_tpl','pagetitle','editedon', 'seo_id','properties','introtexts','keywords','tpl','length'];
+        return ['id', 'name', 'title', 'base', 'page', 'pages','url', 'active', 'count','rank', 'fields', 'actions','link_tpl','pagetitle','editedon', 'seo_id','properties','introtexts','keywords','tpl','length'];
     },
 
     getColumns: function () {

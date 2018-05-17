@@ -603,7 +603,7 @@ class sfMenu
             $add_where = $this->modx->fromJSON($this->config['count_where']);
         }
         foreach ($links as $link) {
-            $link['total'] = $this->countHandler->countByLink($link['id'],$add_where,0);
+            $link['total'] = $this->countHandler->countByLink($link['id'],$link['page_id'],$add_where,0);
             if ($mincount = (int)$this->config['mincount']) {
                 if ($link['total'] >= $mincount) {
                     $tree[$link['id']] = $link;

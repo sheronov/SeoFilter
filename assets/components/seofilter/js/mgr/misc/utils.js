@@ -5,9 +5,24 @@ SeoFilter.utils.renderBoolean = function (value) {
 };
 
 SeoFilter.utils.renderResource = function (value, cell, row) {
-    return value
-        ? String.format('({0}) {1}', value, row.data['pagetitle'])
-        : value;
+    var proMode = parseInt(SeoFilter.config['proMode']);
+
+    var output = '';
+
+    var pagetitle = row.data['pagetitle'];
+    if(!pagetitle) {
+        pagetitle = '';
+    }
+    output = String.format('({0}) {1}', value, pagetitle)
+
+    if(proMode && row.data['pages']) {
+        output = row.data['pages'];
+    }
+
+    return output;
+    // return value
+    //     ? String.format('({0}) {1}', value, row.data['pagetitle'])
+    //     : value;
 };
 
 SeoFilter.utils.getMenu = function (actions, grid, selected) {

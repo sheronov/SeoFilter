@@ -78,14 +78,15 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     id: config.id + '-valuefirst',
                 },{
                     xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_field_exact'),
-                    name: 'exact',
-                    id: config.id + '-exact',
-                },{
-                    xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_slider'),
                     name: 'slider',
                     id: config.id + '-slider',
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_field_exact'),
+                    name: 'exact',
+                    id: config.id + '-exact',
+                    checked: true,
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),
@@ -307,14 +308,14 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     id: config.id + '-valuefirst',
                 },{
                     xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_field_exact'),
-                    name: 'exact',
-                    id: config.id + '-exact',
-                },{
-                    xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_slider'),
                     name: 'slider',
                     id: config.id + '-slider',
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_field_exact'),
+                    name: 'exact',
+                    id: config.id + '-exact',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),

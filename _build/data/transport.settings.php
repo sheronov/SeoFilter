@@ -97,6 +97,42 @@ $tmp = array(
         'value' => false,
         'area' => 'seofilter_main'
     ),
+    'pro_mode' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_main'
+    ),
+    'url_scheme' => array(
+        'xtype' => 'list',
+        'options' => array(
+            array(
+                'name' => 'System default',
+                'value' => '',
+            ),
+            array(
+                'name' => '-1 (relative to site_url)',
+                'value' => -1,
+            ),
+            array(
+                'name' => 'full (absolute, prepended with site_url)',
+                'value' => 'full',
+            ),
+            array(
+                'name' => 'abs (absolute, prepended with base_url)',
+                'value' => 'abs',
+            ),
+            array(
+                'name' => 'http (absolute, forced to http scheme)',
+                'value' => 'http',
+            ),
+            array(
+                'name' => 'https (absolute, forced to https scheme)',
+                'value' => 'https',
+            ),
+        ),
+        'value' => '',
+        'area' => 'seofilter_main'
+    ),
     'hide_empty' => array(
         'xtype' => 'combo-boolean',
         'value' => false,
@@ -104,7 +140,7 @@ $tmp = array(
     ),
     'count' => array(
         'xtype' => 'combo-boolean',
-        'value' => false,
+        'value' => true,
         'area' => 'seofilter_count',
     ),
     'choose' => array(
@@ -121,6 +157,11 @@ $tmp = array(
         'xtype' => 'textfield',
         'value' => '',
         'area' => 'seofilter_count',
+    ),
+    'default_where' => array(
+        'xtype' => 'textfield',
+        'value' => '{"published":1,"deleted":0}',
+        'area' => 'seofilter_count'
     ),
     'title' => array(
         'xtype' => 'textfield',
@@ -170,7 +211,7 @@ $tmp = array(
     'crumbs_tpl_current' => array(
         'xtype' => 'textfield',
         'value' => 'tpl.SeoFilter.crumbs.current',
-        'area' => 'seofitler_seo'
+        'area' => 'seofilter_seo'
     ),
     'replacebefore' => array(
         'xtype' => 'combo-boolean',
@@ -230,7 +271,7 @@ $tmp = array(
     'crumbs_replace' => array(
         'xtype' => 'combo-boolean',
         'value' => true,
-        'area' => 'seofitler_jquery'
+        'area' => 'seofilter_jquery'
     )
 
 );

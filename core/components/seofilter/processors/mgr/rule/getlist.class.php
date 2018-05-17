@@ -7,7 +7,14 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';
     //public $permission = 'list';
+    public $proMode = 0;
 
+    public function initialize()
+    {
+        $this->proMode = (int)$this->modx->getOption('seofilter_pro_mode', null, 0);
+
+        return parent::initialize();
+    }
 
     /**
      * We do a special check of permissions
@@ -48,9 +55,9 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
 
         //if($this->getProperty('page')) {
 
-            $c->leftJoin('modResource', 'modResource', $this->classKey.'.page = modResource.id');
-            $c->select($this->modx->getSelectColumns($this->classKey,$this->classKey));
-            $c->select($this->modx->getSelectColumns('modResource','modResource','',array('pagetitle')));
+            $c->leftJoin('modResource', 'modResource', $this->classKey . '.page = modResource.id');
+            $c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
+            $c->select($this->modx->getSelectColumns('modResource', 'modResource', '', array('pagetitle')));
 
         //}
 
@@ -78,6 +85,8 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
 //                $array['pagetitle'] = $q->stmt->fetch(PDO::FETCH_COLUMN);
 //            }
 //        }
+
+
 
         $array['actions'] = array();
 

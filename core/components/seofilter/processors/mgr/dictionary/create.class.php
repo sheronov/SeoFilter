@@ -8,6 +8,7 @@ class sfDictionaryCreateProcessor extends modObjectCreateProcessor
     //public $permission = 'create';
 
 
+
     /**
      * @return bool
      */

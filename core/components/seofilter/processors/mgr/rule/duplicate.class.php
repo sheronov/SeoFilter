@@ -6,38 +6,74 @@ class sfRuleDuplicateProcessor extends modObjectDuplicateProcessor
     public $classKey = 'sfRule';
     public $languageTopics = array('seofilter');
     public $nameField = 'name';
-
+    /*** @var SeoFilter $SeoFilter */
+    protected $SeoFilter;
 
     public function beforeSave()
     {
-
         $this->newObject->set('page',(int)$this->getProperty('page'));
+        $this->newObject->set('pages',$this->getProperty('pages'));
         $this->newObject->set('active',(int)$this->getProperty('active'));
         return parent::beforeSave();
     }
 
     public function alreadyExists($name) {
-        return $this->modx->getCount($this->classKey,array(
-                $this->nameField => $name,
-                'page'=>(int)$this->getProperty('page')
-            )) > 0;
+        $page = (int)$this->getProperty('page');
+        $pages = $this->getProperty('pages','');
+        $proMode = $this->SeoFilter->config['proMode'];
+
+        $exists =  ((!$proMode && $this->modx->getCount($this->classKey, array('name' => $name,'page'=>$page))) || ($proMode && $this->modx->getCount($this->classKey, array('name' => $name,'pages'=>$pages))));
+
+        return $exists > 0;
 
     }
+
+    public function initialize()
+    {
+        $this->SeoFilter = $this->modx->getService('seofilter', 'SeoFilter',
+            $this->modx->getOption('seofilter_core_path', null,
+                $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/');
+        return parent::initialize();
+    }
+
     /**
      *
      */
-    public function afterSave()
-    {
+    public function afterSave() {
+        if($this->getProperty('copy_fields',false)) {
+            $this->duplicateFields();
+
+            /*** @var sfRule $object */
+            $object = $this->newObject;
+            $url_mask = $object->updateUrlMask(); //обновление маски
+            $recount = (int)$this->getProperty('recount');
+
+            if($object->get('active')) {
+                if($this->SeoFilter->config['proMode']) {
+                    $response = $this->SeoFilter->generateUrls($object->get('id'),$object->get('pages'),$object->get('link_tpl'),$url_mask);
+                } else {
+                    $response = $this->SeoFilter->generateUrls($object->get('id'),$object->get('page'),$object->get('link_tpl'),$url_mask);
+                }
+                $total_message = $this->SeoFilter->pdo->parseChunk('@INLINE '.$this->modx->lexicon('seofilter_rule_information'),$response);
+
+                if($recount) {
+                    $this->SeoFilter->loadHandler();
+                    if($counts = $this->SeoFilter->countHandler->countByRule($object->id)) {
+                        $total_message .= $this->SeoFilter->pdo->parseChunk('@INLINE '.$this->modx->lexicon('seofilter_rule_recount_message'),$counts);
+                    }
+                }
+                $object->set('total_message',$total_message);
+            }
+        }
+
        // $this->modx->log(modx::LOG_LEVEL_ERROR,print_r($this->getProperties(),1));
-        $this->duplicateFields();
-        $this->generateUrls();
+
     }
 
 
 
     public function duplicateFields()
     {
-        if($this->getProperty('copy_fields',false)) {
             $links = $this->object->getMany('Links');
             if(is_array($links) && !empty($links)) {
                 foreach($links as $link) {
@@ -47,7 +83,6 @@ class sfRuleDuplicateProcessor extends modObjectDuplicateProcessor
                     $newLink->save();
                 }
             }
-        }
     }
 
     public function generateUrls()

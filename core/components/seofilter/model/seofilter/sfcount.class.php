@@ -56,8 +56,9 @@ class sfCountHandler
         foreach($urls as $url) {
             $url_id = $url->get('id');
             $old_total = $url->get('total');
+            $page_id = $url->get('page_id');
             $all_links++;
-            if($link_total = $this->countByLink($url_id,array(),0)) {
+            if($link_total = $this->countByLink($url_id,$page_id,array(),0)) {
                 $total += $link_total;
                 $links++;
             }
@@ -115,8 +116,9 @@ class sfCountHandler
         foreach($urls as $url) {
             $url_id = $url->get('id');
             $old_total = $url->get('total');
+            $page_id = $url->get('page_id');
             $all_links++;
-            if($link_total = $this->countByLink($url_id,array(),0)) {
+            if($link_total = $this->countByLink($url_id,$page_id,array(),0)) {
                 $total += $link_total;
                 $links++;
             }
@@ -141,7 +143,7 @@ class sfCountHandler
         return array('all_links'=>$all_links,'links'=>$links,'total'=>$total);
     }
 
-    public function countByLink($url_id = 0, $additional_params = array(), $update = 1, $min_max = 0) {
+    public function countByLink($url_id = 0,$page_id = 0, $additional_params = array(), $update = 1, $min_max = 0) {
         $total = $old_total = 0;
         $params = array(); //параметры, из которых состоит ссылка
         $fields = array(); //поля, которые задействованы
@@ -194,6 +196,8 @@ class sfCountHandler
                 }
                 if(!empty($row['rule.count_parents']) || $row['rule.count_parents'] === 0 || $row['rule.count_parents'] === '0') {
                     $parents = $row['rule.count_parents'];
+                } elseif($page_id) {
+                    $parents = $page_id;
                 } else {
                     $parents = $row['rule.page'];
                 }

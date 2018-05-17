@@ -124,3 +124,7 @@ $_lang['setting_seofilter_super_hidden_props_desc'] = 'There is no default. Disp
 
 $_lang['setting_seofilter_replace_host'] = 'Replace domain from site_url to $ _SERVER ["http_host"]';
 $_lang['setting_seofilter_replace_host_desc'] = 'There is no default. Use if the site is available across multiple domains or contexts with different addresses are used, but without switching them';
+$_lang['setting_seofilter_url_scheme'] = 'Scheme of the formation of links to pages where SEO links will be added';
+$_lang['setting_seofilter_url_scheme_desc'] = 'If empty, then the default is taken from the system settings. The available values are: "-1", "abs", "full", "http", "https"';
+$_lang['setting_seofilter_default_where'] = 'Condition for default counting for rules';
+$_lang['setting_seofilter_default_where_desc'] = 'When creating a rule, the entered condition will be written to the appropriate field. By default {"published": 1,"deleted": 0}';

@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.4.8';
+    public $version = '1.4.9';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -33,6 +33,7 @@ class SeoFilter
         $connectorUrl = $assetsUrl . 'connector.php';
         $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
+        $level_separator = $this->modx->getOption('seofilter_level_separator', null, '/', true);
         $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
         $values_delimeter = $this->modx->getOption('seofilter_values_delimeter', null, ',', true);
         $site_start = $this->modx->context->getOption('site_start', 1);
@@ -84,6 +85,10 @@ class SeoFilter
         $crumbsReplace = $this->modx->getOption('seofilter_crumbs_replace',null,1,true);
         $crumbsCurrent = $this->modx->getOption('seofilter_crumbs_tpl_current',null,'tpl.SeoFilter.crumbs.current',true);
 
+        $proMode = $this->modx->getOption('seofilter_pro_mode',null,0,true);
+        $scheme = $this->modx->getOption('seofilter_url_scheme',null,$this->modx->getOption('link_tag_scheme'),true);
+        $defaultWhere = $this->modx->getOption('seofilter_default_where',null,'{"published":1,"deleted":0}',true);
+
         $possibleSuffixes = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
 
 
@@ -111,6 +116,7 @@ class SeoFilter
             'params' => array(),
             'ajax' => $ajax,
             'separator' => $separator,
+            'level_separator' => $level_separator,
             'redirect' => $redirect,
             'site_start' => $site_start,
             'site_url' => $site_url,
@@ -159,8 +165,10 @@ class SeoFilter
             'crumbsCurrent' => $crumbsCurrent,
             'mfilterWords' => $mfilterWords,
             'superHiddenProps' => $superHiddenProps,
-            'hiddenTab'=> $hiddenTab
-
+            'hiddenTab'=> $hiddenTab,
+            'proMode' => $proMode,
+            'scheme' => $scheme,
+            'defaultWhere' => $defaultWhere,
         ), $config);
 
         $this->modx->addPackage('seofilter', $this->config['modelPath']);
@@ -194,15 +202,17 @@ class SeoFilter
                 $this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
 
                 if ($this->config['page']) {
-                    $aliases = $this->fieldsAliases($this->config['page'], 1);
-                    $this->config['aliases'] = $aliases;
-                    $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', 'full');
-                    if($this->config['replace_host']) {
+//                    $aliases = $this->fieldsAliases($this->config['page'], 1);
+//                    $this->config['aliases'] = $aliases;
+                    $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', $this->config['scheme']);
+
+                    if($this->config['replace_host'] ) {
                         $site_url = explode('://',$this->config['site_url']);
                         $site_url = array_pop($site_url);
                         $site_url = trim($site_url,'/');
                         $page_url = str_replace($site_url,$_SERVER['HTTP_HOST'],$page_url);
                     }
+
                     $c_suffix = $this->config['container_suffix'];
                     if($c_suffix && $page_url) {
                         if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix)) !== false) {
@@ -210,7 +220,6 @@ class SeoFilter
                         }
                     }
                     $page_url = $this->clearSuffixes($page_url);
-
 
                     $this->config['url'] = $page_url;
 
@@ -227,7 +236,7 @@ class SeoFilter
                     'ctx' => $ctx,
                     'page' => $this->config['page'],
                     'params' => $this->config['params'],
-                    'aliases' => $this->config['aliases'],
+//                    'aliases' => $this->config['aliases'],
                     'slider' => $this->config['slider'],
                     'crumbs' => $this->config['crumbsReplace'],
                     'separator' => $this->config['separator'],
@@ -477,8 +486,13 @@ class SeoFilter
             }
 
             $q = $this->modx->newQuery('sfFieldIds');
-            $q->innerJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id AND sfRule.active = 1 AND sfRule.page = '.$page_id);
+            $q->innerJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id AND sfRule.active = 1');
             $q->where(array('sfFieldIds.field_id'=>$field_id));
+            if($this->config['proMode']) {
+                $q->where('1=1 AND FIND_IN_SET('.$page_id.',REPLACE(IFNULL(NULLIF(sfRule.pages,""),sfRule.page)," ",""))');
+            } else {
+                $q->where(array('sfRule.page'=>$page_id));
+            }
             $q->select(array('sfFieldIds.multi_id','sfRule.rank','sfRule.base'));
             $q->sortby('sfFieldIds.priority','ASC');
             $q->limit(0);
@@ -523,11 +537,14 @@ class SeoFilter
         $aliases = $rules_id = array();
         $q = $this->modx->newQuery('sfRule');
         $q->limit(0);
-        //$q->where(array('1 = 1 AND FIND_IN_SET('.$this->config['page'].',pages)'));
         if($page) {
-            $q->where(array(
-                //'active'=>1,
-                'page' => $page));
+            $q->where(array('active'=>1));
+            if($this->config['proMode']) {
+                $q->where('1=1 AND FIND_IN_SET('.$page.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+//                $q->where(array('(page = '.$page.') OR (1 = 1 AND FIND_IN_SET('.$page.',pages))'));
+            } else {
+                $q->where(array('page' => $page));
+            }
         }
         $q->select('id,base');
         if($q->prepare() && $q->stmt->execute()) {
@@ -543,7 +560,6 @@ class SeoFilter
                     $q->sortby('priority','ASC');
                     $q->limit(1);
                 }
-
                     $q->select('field_id');
                     $fcount = $this->modx->getCount('sfFieldIds',$q);
                     if ($q->prepare() && $q->stmt->execute()) {
@@ -687,11 +703,12 @@ class SeoFilter
                     : $response;
                 break;
             case 'getmeta':
-
                 $diff = $original_params = array();
                 $params = $copyparams = $data['data'];
-                $pageId = $data['pageId'];
-                $aliases = $data['aliases'];
+                $pageId = (int)$data['pageId'];
+//                $aliases = $data['aliases'];
+                $aliases = $this->fieldsAliases($pageId,1);
+
                 $base_get = array_map('trim', explode(',',$this->config['base_get']));
                 $page_key = 1;
 
@@ -700,31 +717,33 @@ class SeoFilter
                     $this->config['page_number'] = $page_key;
                 }
 
-                if($params) {
+                if(!empty($params) && is_array($params)) {
                     $original_params = array_diff_key($params,array_flip($base_get));
                 }
 
+                if(is_array($params) && count($params) && is_array($aliases)) {
+                    $diff = array_flip(array_diff(array_keys($params), $aliases));
+                }
 
-                if(is_array($params) && count($params))
-                    $diff = array_flip(array_diff(array_keys($params),$aliases));
-
-                if(count($diff)) {
+                if(!empty($diff)) {
                     foreach($diff as $dif => $dff)
                         unset($copyparams[$dif]);
                     $diff = array_diff_key($params,$copyparams);
                     $params = array_intersect_key($params,$copyparams);
                 }
+
                 //нахождение первичного параметра
 
                 $find = 0;
 
                 $rule_count = 0;
                 $meta = array();
+
+
                 if(is_array($params) && count($params)) { //тут проверяет, были ли переданы первичные алиасы в правилах. если их нет, то и правил нет)
                     $base_params = $params;
                     $diff_params = array_diff_key($diff,array_flip($base_get));
                     $diff = array_diff_key($diff,$diff_params);
-
 
                     foreach($base_params as $param => $value) {
                         if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
@@ -907,10 +926,10 @@ class SeoFilter
     }
 
     public function findRuleId($page_id = 0, $params = array(), $first_params = array(), $other_params = array()) {
-
         if(!count($first_params)) {
             $copyparams = $params;
-            $aliases = $this->fieldsAliases($this->config['page'],1);
+//            $aliases = $this->fieldsAliases($this->config['page'],1);
+            $aliases = $this->fieldsAliases($page_id,1);
             if(count($params))
                 $other_params = array_flip(array_diff(array_keys($params),$aliases));
             if(count($other_params)) {
@@ -924,13 +943,11 @@ class SeoFilter
         }
 
 
-
         $rule_id = $rid = $rid_count = 0;
         $diff = $find = $rule_aliases = array();
         $params_keys = array_keys(array_merge($first_params,$other_params));
 
         $page_aliases = $this->pageAliases($page_id,array_keys($first_params));
-
         foreach($page_aliases as $rule => $ralias) {
             $sort = $ralias['sort'];
             $base = $ralias['base'];
@@ -1288,6 +1305,8 @@ class SeoFilter
             $meta['pagetitle'] = $meta['title'];
         }
 
+        $meta['page_id'] = $page_id;
+
         return $meta;
     }
 
@@ -1575,14 +1594,13 @@ class SeoFilter
                             $processorProps['relation_word'] = $relation_id;
                         }
 
-                        $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
+                        $otherProps = array('processors_path' => $this->config['processorsPath']);
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                         if ($response->isError()) {
                             $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '. print_r($response->response, 1));
                             $this->modx->error->reset();
                         } else {
                             $word = $response->response['object'];
-
                         }
                     }
                 } else {
@@ -1638,6 +1656,8 @@ class SeoFilter
         if(isset($meta['title'])) {
             $meta['pagetitle'] = $meta['title'];
         }
+
+        $meta['page_id'] = $page_id;
 
         return $meta;
     }
@@ -1882,4 +1902,292 @@ class SeoFilter
         $registry->send('/modstore/', array(md5($key) => true), array('ttl' => 3600 * 24));
     }
 
+    public function createLinks($rule_id = 0,$urls = array(),$recount = 0) {
+        $otherProps = array('processors_path' => $this->config['processorsPath']);
+
+        $old_links = array();
+        $del_links = array();
+        $new_links = array();
+        $doubles = 0;
+        $success_create = 0;
+        $success_delete = 0;
+
+        $old_links_ids = array();
+
+        $q = $this->modx->newQuery('sfUrls');
+        $q->where(array('multi_id'=>$rule_id));
+        $q->select('id,old_url as url,link as name,page_id as page');
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $old_links[$row['page']][$row['url']] = $row;
+                $old_links_ids[$row['id']] = $row;
+            }
+        }
+
+        $find_links_ids = array();
+        foreach ($urls as $url) {
+            if(isset($old_links[$url['page']][$url['url']])) {
+                $find_links_ids[] = $old_links[$url['page']][$url['url']]['id'];
+                continue;
+            } else {
+                $new_links[] = $url;
+            }
+        }
+
+
+        $del_links = array_diff(array_keys($old_links_ids),$find_links_ids);
+        if(!empty($del_links)) {
+            $processorProps = array(
+                'ids'=>$this->modx->toJSON($del_links),
+                'to_log'=>1
+            );
+            $response = $this->modx->runProcessor('mgr/urls/remove', $processorProps, $otherProps);
+            if ($response->isError()) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '. $response->getMessage());
+                $this->modx->error->reset();
+            } else {
+                $success_delete = count($del_links);
+            }
+        }
+
+        if(!empty($new_links)) {
+            foreach ($new_links as $url) {
+                $processorProps = array(
+                    'multi_id' => $rule_id,
+                    'old_url' => $url['url'],
+                    'page_id' => $url['page'],
+                    'link' => $url['name'],
+                    'field_word' => $url['relation'],
+                    'from_rule' => 1,
+                );
+                $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
+                if ($response->isError()) {
+                    if(in_array('double',$response->response['errors'])) {
+                        $doubles++;
+                    }
+//                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                    $this->modx->error->reset();
+                } else {
+//                    $this->modx->log(1,print_r($response['object'],1));
+//                    $find_links_ids[] = $response['object']['id'];
+                    $success_create++;
+                }
+            }
+        }
+
+        $all_links = count($find_links_ids) + $success_create;
+
+        return array(
+            'was_links'=>count($old_links_ids), //было ссылок в правиле
+            'old_links'=>count($find_links_ids), //ссылок старых осталось
+            'add_links'=>$success_create, //новых ссылок добавлено
+            'remove_links'=>$success_delete, //удалено ссылок из правило
+            'doubles_links' =>$doubles, //дубли, ссылок в других правилах
+            'all_links'=>$all_links //всего ссылок стало в правиле
+        );
+    }
+
+    public function generateUrls($rule_id = 0,$pages = '',$tpl = '',$url_mask = '') {
+        $pages = array_map('trim',explode(',',$pages));
+        $urls = array();
+
+        $links = $this->gettingUrls($rule_id);
+
+//        $this->modx->log(1,print_r($links,1));
+
+        foreach($pages as $page_id) {
+            foreach ($links as $link) {
+                if(empty($link['urls']) || empty($link['words'])) {
+                    continue;
+                }
+                //TODO в $link['aliases'] хранятся синонимы для замены через Fenom
+                $link_url = implode($this->config['level_separator'],$link['urls']);
+
+                foreach (array('id', 'page', 'page_id') as $pkey) {
+                    if (!isset($link['words'][$pkey])) {
+                        $link['words'][$pkey] = $page_id;
+                    }
+                }
+
+                $link_name = '';
+                if(!empty($tpl)) {
+                    $link_name = $this->pdo->getChunk('@INLINE ' . $tpl,$link['words']);
+                }
+
+                $urls[] = array(
+                    'url' => $link_url,
+                    'name' => $link_name,
+                    'page' => $page_id,
+                    'relation' => $link['relation']
+                );
+            }
+        }
+
+        $response = $this->createLinks($rule_id,$urls);
+
+        return $response;
+    }
+
+    public function gettingUrls($rule_id = 0) {
+        if(!$rule_id) {
+            return false;
+        }
+        $seo_system = array('field_id','multi_id','name','rank','active','class','editedon','createdon','key');
+        $fields = array();
+        $words = array();
+
+        $q = $this->modx->newQuery('sfFieldIds');
+        $q->where(array('multi_id'=>$rule_id));
+        $q->sortby('priority','ASC');
+        $q->innerJoin('sfField','Field','Field.id = sfFieldIds.field_id');
+        $q->select($this->modx->getSelectColumns('sfFieldIds','sfFieldIds',''));
+        $q->select($this->modx->getSelectColumns('sfField','Field','field_'));
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $fields[$row['field_id']] = $row;
+            }
+        }
+
+        foreach ($fields as $field_id => &$field) {
+            $alias = $field['field_alias'];
+            $q = $this->modx->newQuery('sfDictionary');
+            $q->where(array('field_id'=>$field_id));
+            if($field['where'] && $field['compare']) {
+                $q->where($this->fieldWhere($field['compare'],$field['value']));
+            }
+            $q->select($this->modx->getSelectColumns('sfDictionary','sfDictionary','',$seo_system,1));
+            if($q->prepare() && $q->stmt->execute()) {
+                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $word = array();
+                    foreach($row as $key=>$val) {
+                        if($key == 'id') {
+                            $word[$alias.'_id'] = $val;
+                            continue;
+                        }
+                        if(count($fields) == 1) {
+                            $word[$key] = $val;
+                        }
+                        $word[str_replace('value',$alias,$key)] = $val;
+                    }
+                    $word[$alias.'_input'] = $row['input'];
+                    $word[$alias.'_image'] = $row['image'];
+                    $word[$alias.'_alias'] = $row['alias'];
+                    $word['m_'.$alias] = $row['m_value_i'];
+
+                    if($field['field_hideparam']) {
+                        $word['url_part'] = $row['alias'];
+                    } elseif($field['field_valuefirst']) {
+                        $word['url_part'] = $row['alias'].$this->config['separator'].$alias;
+                    } else {
+                        $word['url_part'] = $alias.$this->config['separator'].$row['alias'];
+                    }
+
+                    $forMulti = array(
+                        'urls' => array(
+                            $word['url_part']
+                        ),
+                        'aliases' => array(
+                          $alias=>$row['alias'], //TODO: благодаря aliases можно будет разрешить ввод кастомного шаблона у ссылок
+                        ),
+                        'words' => $word,
+                        'field_relation' => $field['field_relation_field'],
+                        'word_relation' => $row['relation_word'],
+                        'relation'=>array(
+                            array(
+                                'field_id'=>$field_id,
+                                'word_id'=>$row['id'],
+                                'field_relation' => $field['field_relation_field'],
+                                'word_relation' => $row['relation_word'],
+                            )
+                        ),
+                        'delete'=>0
+                    );
+
+                    $field['words'][] = $word;
+                    $words[$field_id][] = $forMulti;
+                }
+            }
+        }
+
+        $words1 = array_shift($words);
+        foreach ($words as $words2) {
+            $words1 = $this->wordsMultiplication($words1,$words2);
+        }
+
+        foreach ($words1 as $key => $words) {
+            if($words['delete']) {
+                unset($words1[$key]);
+                continue;
+            }
+        }
+
+        return array_values($words1);
+    }
+
+    public function wordsMultiplication($a1 = array(),$a2 = array()) {
+        $a3 = array();
+        $ca1 = count($a1);
+        $ca2 = count($a2);
+
+        for($i = 0;$i < $ca1; $i++) {
+            for($j = 0;$j < $ca2; $j++) {
+                $delete = $a1[$i]['delete'] || $a2[$j]['delete'];
+
+                $arr = array(
+                    'urls' => array_merge($a1[$i]['urls'],$a2[$j]['urls']),
+                    'aliases' => array_merge($a1[$i]['aliases'],$a2[$j]['aliases']),
+                    'words'=>array_merge($a1[$i]['words'],$a2[$j]['words']),
+                    'relation'=>array_merge($a1[$i]['relation'],$a2[$j]['relation']),
+                    'delete'=>$delete
+                );
+                $find = 1;
+                if($a2[$j]['field_relation'] && $a2[$j]['word_relation']) {
+                    $find = 0;
+                    foreach ($a1[$i]['relation'] as $relation) {
+                        if($relation['field_id'] == $a2[$j]['field_relation']
+                        && $relation['word_id'] == $a2[$j]['word_relation']) {
+                            $find = 1;
+                            break;
+                        }
+                    }
+                }
+                if(!$find) {
+                    $arr['delete'] = 1;
+                }
+                $a3[] = $arr;
+            }
+        }
+
+        return $a3;
+    }
+
+    public function fieldWhere($compare = 0,$value = '',$param = 'input') {
+        $where = array();
+        $values = array_map('trim',explode(',',$value));
+        switch ($compare) {
+            case 1:
+                // в массиве
+                $where = array('input:IN'=>$values);
+                break;
+            case 2:
+                // не в массиве
+                $where = array('input:NOT IN'=>$values);
+                break;
+            case 3:
+                // больше чем
+                $where = array('input:>'=>$value);
+                break;
+            case 4:
+                // меньше чем
+                $where = array('input:<'=>$value);
+                break;
+            case 5:
+                // в диапазоне
+                if(count($values) >= 2) {
+                    $where = array('input:>' => $values[0], 'AND:input:<' => $values[1]);
+                }
+                break;
+        }
+        return $where;
+    }
 }

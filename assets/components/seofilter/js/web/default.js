@@ -12,7 +12,7 @@ jQuery(document).ready(function ($) {
                     data: array,
                     pageId: this.config.page,
                     hash: hash,
-                    aliases: this.config.aliases
+                    // aliases: this.config.aliases
                 },
                 success: function(response) {
                     var url = hash;
@@ -113,9 +113,10 @@ jQuery(document).ready(function ($) {
                         mSearch2.load(params);
                     } else {
                         if (oldbrowser) {
-                            window.location.hash = url.substr(1);
+                            window.location.hash = hash.substr(1);
+                            // window.location.search = hash;
                         } else {
-                            window.history.pushState({mSearch2: origin + url}, '    ', origin + url);
+                            window.history.pushState({mSearch2: origin + url}, '', origin + url);
                         }
                     }
                 },

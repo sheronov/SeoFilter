@@ -42,12 +42,53 @@ class sfRule extends xPDOSimpleObject {
         return implode('/',$url);
     }
 
+    public function updateUrlMask() {
+        $separator = $this->xpdo->getOption('seofilter_separator', null, '-', true);
+        $level_separator = $this->xpdo->getOption('seofilter_level_separator', null, '/', true);
+
+        $rule_id = $this->get('id');
+        $urls = array();
+        $q = $this->xpdo->newQuery('sfFieldIds');
+        $q->where(array('multi_id'=>$rule_id));
+        $q->sortby('priority','ASC');
+        $q->innerJoin('sfField','Field','Field.id = sfFieldIds.field_id');
+        $q->select(array(
+            'Field.*'
+        ));
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $var = '{$'.$row['alias'].'}';
+
+                // TODO: раскомментировать, если маску URL будет обрабатывать Fenom
+                //if(strpos($row['alias'],'-') !== false) {
+                //   $var = '{$_pls["'.$row['alias'].'"]}';
+                //}
+
+                if($row['hideparam']) {
+                    $urls[] = $var;
+                } elseif($row['valuefirst']) {
+                    $urls[] = $var.$separator.$row['alias'];
+                } else {
+                    $urls[] = $row['alias'].$separator.$var;
+                }
+            }
+        }
+
+        $url = implode($level_separator,$urls);
+        if($url != $this->get('url')) {
+            $this->set('url', $url);
+            $this->save();
+        }
+
+        return $url;
+    }
+
     /**
      * Returns true url for filter params
      *
      * @param int $returnArray = 0
      *
-     * @return string
+     * @return string|array
      */
     public function generateUrl($returnArray = 0,$word_arr = array()) {
         $link_tpl = $this->get('link_tpl');
@@ -183,6 +224,7 @@ class sfRule extends xPDOSimpleObject {
             return $url;
         } else {
             $urls = array_values($urls);
+//            $this->xpdo->log(1,print_r($urls,1));
             $urls_array = array();
             if(count($urls)) {
                 $urls_array = array_shift($urls);
@@ -209,6 +251,8 @@ class sfRule extends xPDOSimpleObject {
                 $urls_array[$key]['link'] = $this->SeoFilter->pdo->getChunk('@INLINE '.$url_array['link'], $word_array);
                 unset($urls_array[$key]['word_array']);
             }
+
+//            $this->xpdo->log(1,print_r($urls_array,1));
             return $urls_array;
         }
     }

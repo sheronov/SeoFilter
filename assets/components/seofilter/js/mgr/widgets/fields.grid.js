@@ -71,7 +71,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             }
         });
         w.reset();
-        w.setValues({active: true});
+        w.setValues({active: true,exact:true});
         w.show(e.target);
     },
 

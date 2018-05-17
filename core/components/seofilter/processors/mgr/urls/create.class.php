@@ -15,6 +15,7 @@ class sfUrlsCreateProcessor extends modObjectCreateProcessor
     {
         $name = trim($this->getProperty('old_url'));
         $multi_id = trim($this->getProperty('multi_id'));
+        $page_id = (int)$this->getProperty('page_id');
         $from_rule = (int)$this->getProperty('from_rule');
         if (empty($name)) {
             if($from_rule) {
@@ -22,12 +23,14 @@ class sfUrlsCreateProcessor extends modObjectCreateProcessor
             } else {
                 $this->modx->error->addField('old_url', $this->modx->lexicon('seofilter_url_err_url'));
             }
-        } elseif ($this->modx->getCount($this->classKey, array('old_url' => $name,'multi_id'=>$multi_id))) {
+        } elseif ($this->modx->getCount($this->classKey, array('old_url' => $name,'page_id'=>$page_id))) {
+            $this->modx->error->errors[] = 'double';
             if($from_rule) {
                 $this->modx->error->failure( $this->modx->lexicon('seofilter_url_err_ae'));
             } else {
                 $this->modx->error->addField('old_url', $this->modx->lexicon('seofilter_url_err_ae'));
             }
+
         }
 
 

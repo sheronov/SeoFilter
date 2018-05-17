@@ -4,12 +4,19 @@
 switch ($modx->event->name) {
     case 'OnLoadWebDocument':
         if($page = $modx->resource->id) {
-            $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
-                    $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
-            if (!($SeoFilter instanceof SeoFilter)) break;
+            $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
+            $proMode = $modx->getOption('seofilter_pro_mode',null,0,true);
             $q = $modx->newQuery('sfRule');
-            $q->where(array('page' => $page)); // Одно правило для одной страницы!
+            $q->where(array('active'=>1));
+            if($proMode) {
+                $q->where('1=1 AND FIND_IN_SET('.$page.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+            } else {
+                $q->where(array('page' => $page));
+            }
             if($modx->getCount('sfRule',$q)) {
+                $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
+                        $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+                if (!($SeoFilter instanceof SeoFilter)) break;
                 if(!$SeoFilter->initialized[$modx->resource->context_key]) {
                     $SeoFilter->initialize($modx->resource->context_key, array('page' => (int)$page));
                 }
@@ -191,14 +198,38 @@ switch ($modx->event->name) {
             $uris = $aliases = array();
 
             $q = $modx->newQuery('sfRule');
-            $q->innerJoin('modResource','modResource','modResource.id = sfRule.page');
+            $q->where(array('active'=>1));
+            $q->select(array('sfRule.*'));
+            $page_ids = array();
+            $all_pages = array();
+            if ($q->prepare() && $q->stmt->execute()) {
+                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    if($SeoFilter->config['proMode']) {
+                        $pages = $row['pages'];
+                        if(empty($pages)) {
+                            $pages = $row['page'];
+                        }
+                    } else {
+                        $pages = $row['page'];
+                        if(empty($pages) && !empty($row['pages'])) {
+                            $pages = $row['pages'];
+                        }
+                    }
+                    $pages = array_map('trim',explode(',',$pages));
+                    $page_ids[$row['id']] = $pages;
+                    $all_pages = array_merge($all_pages,$pages);
+                }
+            }
+            $all_pages = array_unique($all_pages);
+
+            $q = $modx->newQuery('modResource');
             $q->where(array(
-                'sfRule.active'=>1,  //только активные правила ищутся, также правильнее ? :)
-                'modResource.published' => 1,
-                'modResource.context_key' => $ctx
+                'id:IN'=>$all_pages,
+                'deleted'=>0,
+                'published'=>1,
+                'context_key' => $ctx
             ));
             $q->select(array(
-                'sfRule.id as rule_id',
                 'modResource.id,modResource.alias,modResource.uri,modResource.uri_override'
             ));
             if($q->prepare() && $q->stmt->execute()) {
@@ -284,7 +315,6 @@ switch ($modx->event->name) {
                         array_shift($tmp);
                     }
                 }
-
             }
 
             if(!$page) {
@@ -320,6 +350,8 @@ switch ($modx->event->name) {
                 if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
                     break;
                 }
+
+
                 if($tmp && $url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
                     if($url_array['active']) {
                         $old_url = $url_array['old_url'];
@@ -405,7 +437,6 @@ switch ($modx->event->name) {
 
 
                         if (count($params)) {
-
                             $original_params = array_diff_key(array_merge($params,$_GET),array_flip(array_merge(array($del_get),$base_get)));
                             $fast_search = true;
                             $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);
@@ -455,6 +486,9 @@ switch ($modx->event->name) {
                             if($ctx != 'web') {
                                 $modx->switchContext($ctx);
                             }
+
+                            $meta['params'] = $modx->toJSON($params);
+
                             $modx->setPlaceholders($meta, 'sf.');
                             $modx->sendForward($page);
                         } else {

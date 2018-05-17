@@ -311,9 +311,16 @@ $_lang['seofilter_rule_recount_new'] = 'Counting results for each link';
 $_lang['seofilter_rule_recount_title'] = 'Quantity successfully counted';
 $_lang['seofilter_url_recount_wait'] = 'Please wait';
 $_lang['seofilter_url_recount_process'] = 'Is recounting...';
-$_lang['seofilter_rule_recount_message'] = 'Total links associated with the rule: {$all_links}. <br> Links that have results: <b>{$links}</b>. <br> Number of results (not unique): {$total}.';
+$_lang['seofilter_rule_recount_message'] = '<br><b>Counting results:</b><br>Total links associated with the rule: {$all_links}. <br> Links that have results: <b>{$links}</b>. <br> Number of results (not unique): {$total}.';
 $_lang['seofilter_dictionary_remove_confirmation'] = '<b class="red">Attention!</b> Deleting a word results in the deletion of the links associated with it! <b> Are you sure? </b> You can now edit, but not return.';
 $_lang['seofilter_url_total'] = 'Results';
 $_lang['seofilter_url_total_more'] = 'Number of results';
 $_lang['seofilter_url_total_desc'] = 'Interim counted for speeding up the menu';
 $_lang['seofilter_combo_relation_select'] = 'Will be available with the dependent field';
+$_lang['seofilter_info'] = 'Information';
+$_lang['seofilter_rule_information'] = '{if $was_links?} <nobr> Related links to the rule: <b> {$was_links} </b> </nobr> <br> {/if}
+                                         {if $remove_links?} Removed <b> {$remove_links} </b> old links <br> {/if}
+                                         {if $old_links && $old_links! = $was_links?} Old links left: <b> {$old_links} </b> <br> {/if}
+                                         {if $add_links?} New links added: <b> {$add_links} </b> <br> {/if}
+                                         {if $doubles_links?} No links added: <b> {$doubles_links} </b> (doubles) <br> {/if}
+                                         {if $all_links && ($remove_links || $add_links || $doubles_links)} Total links to the rule: <b> {$all_links} </b> pcs <br> {/if}';

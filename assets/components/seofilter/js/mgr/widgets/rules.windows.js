@@ -103,12 +103,12 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 id: config.id + '-count_where',
                                 anchor: '99%',
                             }, {
-                                xtype: 'seofilter-combo-resource',
-                                fieldLabel: _('seofilter_field_page'),
-                                name: 'page',
-                                id: config.id + '-page',
-                                anchor: '99%',
+                                xtype: parseInt(SeoFilter.config.proMode)?'textfield':'seofilter-combo-resource',
+                                fieldLabel: parseInt(SeoFilter.config.proMode)? _('seofilter_field_pages') : _('seofilter_field_page'),
+                                name: parseInt(SeoFilter.config.proMode)? 'pages':'page',
                                 allowBlank: false,
+                                id: parseInt(SeoFilter.config.proMode)? config.id + '-pages':config.id + '-page',
+                                anchor: '99%',
                             }, {
                                 xtype: 'xcheckbox',
                                 boxLabel: _('seofilter_rule_base_more'),
@@ -347,11 +347,11 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             id: config.id + '-count_where',
                             anchor: '99%',
                         },{
-                            xtype: 'seofilter-combo-resource',
-                            fieldLabel: _('seofilter_field_page'),
-                            name: 'page',
+                            xtype: parseInt(SeoFilter.config.proMode)?'textfield':'seofilter-combo-resource',
+                            fieldLabel: parseInt(SeoFilter.config.proMode)? _('seofilter_field_pages') : _('seofilter_field_page'),
+                            name: parseInt(SeoFilter.config.proMode)? 'pages':'page',
                             allowBlank: false,
-                            id: config.id + '-page',
+                            id: parseInt(SeoFilter.config.proMode)? config.id + '-pages':config.id + '-page',
                             anchor: '99%',
                         }, {
                             xtype: 'xcheckbox',
@@ -549,10 +549,10 @@ Ext.extend(SeoFilter.window.duplicateRule, MODx.Window, {
             name: 'name',
             allowBlank: false,
         }, {
-            fieldLabel: _('seofilter_rule_page'),
-            xtype: 'seofilter-combo-resource',
+            xtype: parseInt(SeoFilter.config.proMode)?'textfield':'seofilter-combo-resource',
+            fieldLabel: parseInt(SeoFilter.config.proMode)? _('seofilter_field_pages') : _('seofilter_field_page'),
+            name: parseInt(SeoFilter.config.proMode)? 'pages':'page',
             anchor: '99%',
-            name: 'page',
             allowBlank: false,
         }, {
             boxLabel: _('seofilter_rule_copy_fields'),
@@ -560,6 +560,10 @@ Ext.extend(SeoFilter.window.duplicateRule, MODx.Window, {
             anchor: '99%',
             name: 'copy_fields',
         }, {
+            xtype: parseInt(SeoFilter.config.count_childrens)===0?'hidden':'xcheckbox',
+            boxLabel: _('seofilter_rule_recount'),
+            name: 'recount',
+        },{
             boxLabel: _('seofilter_rule_active'),
             xtype: 'xcheckbox',
             anchor: '99%',
