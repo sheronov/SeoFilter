@@ -33,33 +33,50 @@ class sfFieldIdsRemoveProcessor extends modObjectProcessor
             $object->remove();
         }
 
-        if($rule_id && $rule = $this->modx->getObject('sfRule',$rule_id)) {
-            $url = $rule->makeUrl();
-        } else {
-            $url = $this->makeUrl($rule_id);
-        }
 
+        if($rule_id && $rule = $this->modx->getObject('sfRule',$rule_id)) {
+            $url = $rule->updateUrlMask();
+        } else {
+            $url = $this->updateUrlMask($rule_id);
+        }
 
         return $this->success($url);
     }
 
-    public function makeUrl($rule_id = 0) {
-        $url = array();
+    public function updateUrlMask($rule_id = 0) {
+        $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
+        $level_separator = $this->modx->getOption('seofilter_level_separator', null, '/', true);
+
+        $urls = array();
         $q = $this->modx->newQuery('sfFieldIds');
         $q->where(array('multi_id'=>$rule_id));
         $q->sortby('priority','ASC');
         $q->innerJoin('sfField','Field','Field.id = sfFieldIds.field_id');
         $q->select(array(
-            'Field.*',
-            'sfFieldIds.id as fid,sfFieldIds.priority'
+            'Field.*'
         ));
-        $fields = $this->modx->getIterator('sfField',$q);
-        foreach($fields as $field) {
-            /*** @var sfField $field */
-            $url[] = $field->makeUrl();
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $var = '{$'.$row['alias'].'}';
+
+                // TODO: раскомментировать, если маску URL будет обрабатывать Fenom
+                //if(strpos($row['alias'],'-') !== false) {
+                //   $var = '{$_pls["'.$row['alias'].'"]}';
+                //}
+
+                if($row['hideparam']) {
+                    $urls[] = $var;
+                } elseif($row['valuefirst']) {
+                    $urls[] = $var.$separator.$row['alias'];
+                } else {
+                    $urls[] = $row['alias'].$separator.$var;
+                }
+            }
         }
 
-        return implode('/',$url);
+        $url = implode($level_separator,$urls);
+
+        return $url;
     }
 
 }

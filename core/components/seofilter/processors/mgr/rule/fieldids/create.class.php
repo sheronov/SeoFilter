@@ -25,38 +25,18 @@ class sfFieldIdsCreateProcessor extends modObjectCreateProcessor
 
 
 
+
     public function cleanup() {
-
-        $rule_id = (int)$this->object->get('multi_id');
+        /* @var sfFieldIds $object */
+        $object = $this->object;
+        $rule_id = (int)$object->get('multi_id');
         if($rule_id && $rule = $this->modx->getObject('sfRule',$rule_id)) {
-            $url = $rule->makeUrl();
+            $url = $rule->updateUrlMask();
         } else {
-            $url = $this->makeUrl($rule_id);
+            $url = $object->updateUrlMask($rule_id);
         }
-
-        return $this->success($url,$this->object);
+        return $this->success($url,$object);
     }
-
-    public function makeUrl($rule_id = 0) {
-        $url = array();
-        $q = $this->modx->newQuery('sfFieldIds');
-        $q->where(array('multi_id'=>$rule_id));
-        $q->sortby('priority','ASC');
-        $q->innerJoin('sfField','Field','Field.id = sfFieldIds.field_id');
-        $q->select(array(
-            'Field.*',
-            'sfFieldIds.id as fid,sfFieldIds.priority'
-        ));
-        $fields = $this->modx->getIterator('sfField',$q);
-        foreach($fields as $field) {
-            /*** @var sfField $field */
-            $url[] = $field->makeUrl();
-        }
-
-        return implode('/',$url);
-    }
-
-
 
 }
 

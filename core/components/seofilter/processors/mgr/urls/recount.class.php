@@ -27,38 +27,23 @@ class sfUrlsReCountProcessor extends modObjectProcessor
                 $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', array());
         $SeoFilter->loadHandler();
 
-        if($all) {
-            $links = $this->modx->getIterator('sfUrls');
-            foreach($links as $object) {
-                $id = $object->get('id');
-                $old_total = $object->get('total');
-                $page_id = $object->get('page_id');
-                $total = $SeoFilter->countHandler->countByLink($id,$page_id);
-                $object->set('total', $total);
-                if ($old_total != $total) {
-                    $object->set('editedon', strtotime(date('Y-m-d H:i:s')));
-                }
-                $object->save();
-            }
-        } else {
-            foreach ($ids as $id) {
-                /** @var sfUrls $object */
-                if (!$object = $this->modx->getObject($this->classKey, $id)) {
-                    return $this->failure($this->modx->lexicon('seofilter_url_err_nf'));
-                }
-
-                $old_total = $object->get('total');
-                $page_id = $object->get('page_id');
-                $total = $SeoFilter->countHandler->countByLink($id,$page_id);
-                $object->set('total', $total);
-
-                if ($old_total != $total) {
-                    $object->set('editedon', strtotime(date('Y-m-d H:i:s')));
-                }
-
-                $object->save();
-            }
+        $q = $this->modx->newQuery('sfUrls');
+        if(!$all) {
+            $q->where(array('id:IN'=>$ids));
         }
+        $links = $this->modx->getIterator('sfUrls',$q);
+        foreach($links as $object) {
+            $id = $object->get('id');
+            $old_total = $object->get('total');
+            $page_id = $object->get('page_id');
+            $total = $SeoFilter->countHandler->countByLink($id,$page_id);
+            $object->set('total', $total);
+            if ($old_total != $total) {
+                $object->set('editedon', strtotime(date('Y-m-d H:i:s')));
+            }
+            $object->save();
+        }
+
 
         return $this->success();
     }

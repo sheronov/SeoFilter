@@ -29,6 +29,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
             id: config.id + '-name',
             anchor: '99%',
             allowBlank: false,
+            maxLength: 255,
         }, {
             layout:'column',
             border: false,
@@ -239,6 +240,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
             id: config.id + '-name',
             anchor: '99%',
             allowBlank: false,
+            maxLength: 255,
         }, {
             layout:'column',
             border: false,
@@ -279,8 +281,8 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     name: 'key',
                     id: config.id + '-key',
                     anchor: '99%',
-                    readOnly: true,
-                    style: 'background:#f9f9f9;color:#aaa;',
+                    // readOnly: true,
+                    // style: 'background:#f9f9f9;color:#aaa;',
                     allowBlank:false,
                 },{
                     xtype: 'textfield',

@@ -31,6 +31,7 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
     {
         $id = (int)$this->getProperty('id');
         $name = trim($this->getProperty('name'));
+        $alias = trim($this->getProperty('alias'));
         if (empty($id)) {
             return $this->modx->lexicon('seofilter_field_err_ns');
         }
@@ -39,6 +40,8 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
             $this->modx->error->addField('name', $this->modx->lexicon('seofilter_field_err_name'));
         } elseif ($this->modx->getCount($this->classKey, array('name' => $name, 'id:!=' => $id))) {
             $this->modx->error->addField('name', $this->modx->lexicon('seofilter_field_err_ae'));
+//        } elseif ($this->modx->getCount($this->classKey, array('alias' => $alias, 'id:!=' => $id))) {
+//            $this->modx->error->addField('alias', $this->modx->lexicon('seofilter_field_err_ae'));
         }
 
         if(($this->getProperty('alias') != $this->object->get('alias'))
@@ -265,7 +268,45 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                             $this->modx->error->reset();
                         }
                     }
-                } else {
+                } elseif(strtolower($class) == 'tagger') {
+                    $taggerPath = $this->modx->getOption('tagger.core_path', null, $this->modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/tagger/');
+                    /** @var Tagger $tagger */
+                    $tagger = $this->modx->getService('tagger', 'Tagger', $taggerPath . 'model/tagger/', array('core_path' => $taggerPath));
+                    if(!($tagger instanceof Tagger)) {
+                        return parent::afterSave();
+                    }
+                    $q = $this->modx->newQuery('TaggerTag');
+                    $q->innerJoin('TaggerGroup','Group','Group.id = TaggerTag.group');
+                    $q->groupby('TaggerTag.id');
+                    $q->where(array('Group.id = "'.$key.'" OR Group.alias = "'.$key.'"'));
+                    $q->limit(0);
+                    $q->select(array(
+                        'TaggerTag.tag as input,TaggerTag.label as value,TaggerTag.alias'
+                    ));
+                    if($q->prepare() && $q->stmt->execute()) {
+                        while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                            if(in_array($row['input'],$base_words) || empty($row['input'])) {
+                                continue;
+                            }
+                            $processorProps['value'] = $row['value'];
+                            if(empty($processorProps['value'])) {
+                                $processorProps = $row['input'];
+                            }
+                            $processorProps['input'] = $row['input'];
+                            $processorProps['alias'] = '';
+                            if($row['alias'] && $row['alias'] != '-1') {
+                                $processorProps['alias'] = $row['alias'];
+                            }
+                            if ($processorProps['input'] && $processorProps['value']) {
+                                $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                                if ($response->isError()) {
+                                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                                    $this->modx->error->reset();
+                                }
+                            }
+                        }
+                    }
+                }  else {
                     $q = $this->modx->newQuery($class);
                     $q->limit(0);
                     if($class == 'msProductData') {

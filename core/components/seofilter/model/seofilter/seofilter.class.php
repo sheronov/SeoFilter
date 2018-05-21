@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.4.9';
+    public $version = '1.5.0';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -34,6 +34,7 @@ class SeoFilter
         $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
         $level_separator = $this->modx->getOption('seofilter_level_separator', null, '/', true);
+        $between_urls = $this->modx->getOption('seofilter_between_urls', null, '/', true);
         $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
         $values_delimeter = $this->modx->getOption('seofilter_values_delimeter', null, ',', true);
         $site_start = $this->modx->context->getOption('site_start', 1);
@@ -117,6 +118,7 @@ class SeoFilter
             'ajax' => $ajax,
             'separator' => $separator,
             'level_separator' => $level_separator,
+            'between_urls' => $between_urls,
             'redirect' => $redirect,
             'site_start' => $site_start,
             'site_url' => $site_url,
@@ -272,11 +274,13 @@ class SeoFilter
         if($q->prepare() && $q->stmt->execute()) {
             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 if($row['class'] == 'modTemplateVar') {
-                    if(strtolower($row['xpdo_package']) == 'tvsuperselect') {
+                    if (strtolower($row['xpdo_package']) == 'tvsuperselect') {
                         $fields['tvss'][$row[$key]] = $row;
                     } else {
                         $fields['tvs'][$row[$key]] = $row;
                     }
+                } elseif(strtolower($row['class']) == 'tagger') {
+                    $fields['tagger'][$row[$key]] = $row;
                 } elseif($row['class'] == 'msVendor') {
                     $fields['data']['vendor'] = $row;
                 } else {
@@ -399,6 +403,27 @@ class SeoFilter
                 if($q->prepare() && $q->stmt->execute()) {
                     while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)){
                         $data[$var][$row['name']][] = $row['value'];
+                    }
+                }
+            }
+        }
+
+        if(in_array('tagger',array_keys($fields))) {
+            $taggerPath = $this->modx->getOption('tagger.core_path', null, $this->modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/tagger/');
+            /** @var Tagger $tagger */
+            $tagger = $this->modx->getService('tagger', 'Tagger', $taggerPath . 'model/tagger/', array('core_path' => $taggerPath));
+            if(($tagger instanceof Tagger)) {
+                $q = $this->modx->newQuery('TaggerTagResource');
+                $q->innerJoin('TaggerTag','Tag','Tag.id = TaggerTagResource.tag');
+                $q->innerJoin('TaggerGroup','Group','Group.id = Tag.group');
+                $q->where(array('resource'=>$resource_id));
+                $q->select($this->modx->getSelectColumns('TaggerTag','Tag',''));
+                $q->select($this->modx->getSelectColumns('TaggerGroup','Group','group_'));
+                if($this->modx->getCount('TaggerTagResource')) {
+                    if ($q->prepare() && $q->stmt->execute()) {
+                        while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                            $data['tagger'][$row['group_id']][] = $row['tag'];
+                        }
                     }
                 }
             }
@@ -858,7 +883,7 @@ class SeoFilter
                 }
 
                 if($meta['url']) {
-                    $meta['url'] = '/'.$meta['url'].$this->config['url_suffix'];
+                    $meta['url'] = $this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
                 } else {
                     $meta['url'] = $this->config['container_suffix'];
                 }
@@ -1214,8 +1239,11 @@ class SeoFilter
             }
 
             if($this->config['count_choose'] && $this->config['count_select']) {
-                $min_max_array = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where'],1);
-                $word_array = array_merge($min_max_array,$word_array);
+                if($min_max_array = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where'],1)) {
+                    if(is_array($min_max_array)) {
+                        $word_array = array_merge($min_max_array, $word_array);
+                    }
+                }
 //                $word_array['count'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
             } elseif($this->config['count_childrens']) {
                 $word_array['total'] = $this->getRuleCount($original_params, $fields_key, $parents, $seo['count_where']);
@@ -1767,19 +1795,49 @@ class SeoFilter
         }
     }
 
-    public function newUrl($old_url = '',$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0,$field_word = array()) {
+    public function newUrl($old_url = '',$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0,$field_word = array(),$link_tpl='') {
+        $seo_system = array('field_id','multi_id','name','rank','active','class','editedon','createdon','key');
         $url = array();
         if($ajax) {
             $new = $ajax;
         }
+        $link = '';
+        if(!empty($link_tpl)) {
+            $all_words = array();
+            $words = array();
+            foreach($field_word as $fw) {
+                $words[] = $fw['word_id'];
+            }
+            $q = $this->modx->newQuery('sfDictionary');
+            $q->innerJoin('sfField','Field','Field.id = sfDictionary.field_id');
+            $q->where(array('id:IN'=>$words));
+            $q->select($this->modx->getSelectColumns('sfDictionary','sfDictionary','',$seo_system,1));
+            $q->select($this->modx->getSelectColumns('sfField','Field','field_',array('alias')));
+            if($q->prepare() && $q->stmt->execute()) {
+                while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $all_words = array_merge($all_words,$this->prepareWordsToLink($row, array('alias'=>$row['field_alias']), count($all_words)));
+                }
+            }
+
+            foreach (array('id', 'page', 'page_id') as $pkey) {
+                if (!isset($all_words[$pkey])) {
+                    $all_words[$pkey] = $page_id;
+                }
+            }
+
+            $link = $this->pdo->getChunk('@INLINE ' . $link_tpl,$all_words);
+        }
+
         $processorProps = array(
             'old_url' => $old_url,
             'multi_id' => $multi_id,
             'page_id' => $page_id,
             'ajax' => $ajax,
             'count' => $new,
-            'field_word' => $field_word
+            'field_word' => $field_word,
+            'link' => $link
         );
+
         $otherProps = array('processors_path' => $this->config['corePath'] . 'processors/');
         $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
         if ($response->isError()) {
@@ -1829,6 +1887,7 @@ class SeoFilter
         $url = array();
         if($multi_id) {
             if($rule = $this->pdo->getArray('sfRule', array('id'=>$multi_id,'active'=>1))) {
+                $link_tpl = $rule['link_tpl'];
  //               $tpl = '@INLINE ' . $rule['url'];
                // $url['url'] = $this->pdo->getChunk($tpl, $aliases);
  //               $url_link = $this->pdo->getChunk($tpl, $aliases);
@@ -1856,7 +1915,7 @@ class SeoFilter
                     foreach($field_word as $field_id => $word_id) {
                        $field_words[] = array('field_id'=>$field_id,'word_id'=>$word_id);
                     }
-                    $url = $this->newUrl($url_link,$multi_id,$page_id,$ajax,$new,$field_words);
+                    $url = $this->newUrl($url_link,$multi_id,$page_id,$ajax,$new,$field_words,$link_tpl);
                     $url['url'] = $url_link;
                     //$this->modx->log(modx::LOG_LEVEL_ERROR, 'SeoFilter: сработало условие и создан УРЛ '.$url_link);
                 }
@@ -1922,11 +1981,11 @@ class SeoFilter
         $registry->send('/modstore/', array(md5($key) => true), array('ttl' => 3600 * 24));
     }
 
-    public function createLinks($rule_id = 0,$urls = array(),$recount = 0) {
+    public function createLinks($rule_id = 0,$urls = array(),$where = array(),$update = 0) {
         $otherProps = array('processors_path' => $this->config['processorsPath']);
 
         $old_links = array();
-        $del_links = array();
+        $find_links = array();
         $new_links = array();
         $doubles = 0;
         $success_create = 0;
@@ -1936,7 +1995,19 @@ class SeoFilter
 
         $q = $this->modx->newQuery('sfUrls');
         $q->where(array('multi_id'=>$rule_id));
-        $q->select('id,old_url as url,link as name,page_id as page');
+        if($where) {
+            foreach($where as $field_id => $w) {
+                $q->rightJoin('sfUrlWord','sfUrlWord','sfUrls.id = sfUrlWord.url_id');
+                $q->where(array('sfUrlWord.word_id'=>$w['id']));
+                $q->groupby('sfUrls.id');
+                $q->select(array(
+                    'sfUrls.id,sfUrls.old_url as url,sfUrls.link as name,sfUrls.page_id as page'
+                ));
+            }
+        } else {
+            $q->select('id,old_url as url,link as name,page_id as page');
+        }
+
         if($q->prepare() && $q->stmt->execute()) {
             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $old_links[$row['page']][$row['url']] = $row;
@@ -1944,9 +2015,11 @@ class SeoFilter
             }
         }
 
+
         $find_links_ids = array();
         foreach ($urls as $url) {
             if(isset($old_links[$url['page']][$url['url']])) {
+                $find_links[$old_links[$url['page']][$url['url']]['id']] = $url;
                 $find_links_ids[] = $old_links[$url['page']][$url['url']]['id'];
                 continue;
             } else {
@@ -1955,7 +2028,9 @@ class SeoFilter
         }
 
 
+        $find_links_ids = array_unique($find_links_ids);
         $del_links = array_diff(array_keys($old_links_ids),$find_links_ids);
+
         if(!empty($del_links)) {
             $processorProps = array(
                 'ids'=>$this->modx->toJSON($del_links),
@@ -1984,6 +2059,7 @@ class SeoFilter
                 if ($response->isError()) {
                     if(in_array('double',$response->response['errors'])) {
                         $doubles++;
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
                     }
 //                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
                     $this->modx->error->reset();
@@ -1991,6 +2067,22 @@ class SeoFilter
 //                    $this->modx->log(1,print_r($response['object'],1));
 //                    $find_links_ids[] = $response['object']['id'];
                     $success_create++;
+                }
+            }
+        }
+
+        $update_links = 0;
+        if(!empty($find_links) && $update) {
+            $q = $this->modx->newQuery('sfUrls');
+            $q->where(array('custom:!='=>1,'id:IN'=>array_keys($find_links)));
+            $links = $this->modx->getIterator('sfUrls',$q);
+            foreach ($links as $link) {
+                $new_name = $find_links[$link->get('id')]['name'];
+                if($link->get('link') != $new_name) {
+                    $update_links++;
+                    $link->set('link', $new_name);
+                    $link->set('editedon', strtotime(date('Y-m-d H:i:s')));
+                    $link->save();
                 }
             }
         }
@@ -2003,17 +2095,44 @@ class SeoFilter
             'add_links'=>$success_create, //новых ссылок добавлено
             'remove_links'=>$success_delete, //удалено ссылок из правило
             'doubles_links' =>$doubles, //дубли, ссылок в других правилах
+            'update_links' => $update_links, //обновлено названий ссылок
             'all_links'=>$all_links //всего ссылок стало в правиле
         );
     }
 
-    public function generateUrls($rule_id = 0,$pages = '',$tpl = '',$url_mask = '') {
+    public function generateUrlsByWord($word = array(),$update = 0) {
+        $response = array();
+        if($field_id = $word['field_id']) {
+            $q = $this->modx->newQuery('sfFieldIds');
+            $q->innerJoin('sfRule', 'Rule', 'Rule.id = sfFieldIds.multi_id');
+            $q->where(array('field_id' => $field_id));
+            //$q->select($this->modx->getSelectColumns('sfFieldIds','sfFieldIds','link_'));
+            $q->select($this->modx->getSelectColumns('sfRule', 'Rule', ''));
+            $rules = array();
+            if ($q->prepare() && $q->stmt->execute()) {
+                while ($rule = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $rules[] = $rule;
+                    $where = array($field_id => array('id'=>$word['id']));
+                    if($this->config['proMode']) {
+                        $pages = $rule['pages'];
+                        if(empty($pages)) {
+                            $pages = $rule['page'];
+                        }
+                    } else {
+                        $pages = $rule['page'];
+                    }
+                    $response[$rule['id']] = $this->generateUrls($rule['id'],$pages,$rule['link_tpl'],$rule['url'],$where,$update);
+                }
+            }
+        }
+        return $response;
+    }
+
+    public function generateUrls($rule_id = 0,$pages = '',$tpl = '',$url_mask = '',$where = array(),$update = 0) {
         $pages = array_map('trim',explode(',',$pages));
         $urls = array();
 
-        $links = $this->gettingUrls($rule_id);
-
-//        $this->modx->log(1,print_r($links,1));
+        $links = $this->gettingUrls($rule_id,$where);
 
         foreach($pages as $page_id) {
             foreach ($links as $link) {
@@ -2043,12 +2162,43 @@ class SeoFilter
             }
         }
 
-        $response = $this->createLinks($rule_id,$urls);
+
+        $response = $this->createLinks($rule_id,$urls,$where,$update);
 
         return $response;
     }
 
-    public function gettingUrls($rule_id = 0) {
+    public function prepareWordsToLink($row = array(),$field = array(),$count_fields = 1) {
+        $word = array();
+        if(empty($field['alias']) && empty($row['field_alias'])) {
+            return $word;
+        }
+        if(!empty($field['alias'])) {
+            $alias = $field['alias'];
+        } else {
+            $alias = $row['field_alias'];
+        }
+
+        foreach($row as $key=>$val) {
+            if($key == 'id') {
+                $word[$alias.'_id'] = $val;
+                continue;
+            }
+            if($count_fields == 1) {
+                $word[$key] = $val;
+            }
+            $word[str_replace('value',$alias,$key)] = $val;
+        }
+        $word[$alias.'_input'] = $row['input'];
+        $word[$alias.'_image'] = $row['image'];
+        $word[$alias.'_alias'] = $row['alias'];
+        $word['m_'.$alias] = $row['m_value_i'];
+
+        return $word;
+    }
+
+
+    public function gettingUrls($rule_id = 0,$where = array()) {
         if(!$rule_id) {
             return false;
         }
@@ -2072,27 +2222,16 @@ class SeoFilter
             $alias = $field['field_alias'];
             $q = $this->modx->newQuery('sfDictionary');
             $q->where(array('field_id'=>$field_id));
+            if(isset($where[$field_id])) {
+                $q->where($where[$field_id]);
+            }
             if($field['where'] && $field['compare']) {
                 $q->where($this->fieldWhere($field['compare'],$field['value']));
             }
             $q->select($this->modx->getSelectColumns('sfDictionary','sfDictionary','',$seo_system,1));
             if($q->prepare() && $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $word = array();
-                    foreach($row as $key=>$val) {
-                        if($key == 'id') {
-                            $word[$alias.'_id'] = $val;
-                            continue;
-                        }
-                        if(count($fields) == 1) {
-                            $word[$key] = $val;
-                        }
-                        $word[str_replace('value',$alias,$key)] = $val;
-                    }
-                    $word[$alias.'_input'] = $row['input'];
-                    $word[$alias.'_image'] = $row['image'];
-                    $word[$alias.'_alias'] = $row['alias'];
-                    $word['m_'.$alias] = $row['m_value_i'];
+                    $word = $this->prepareWordsToLink($row,array('alias'=>$alias),count($fields));
 
                     if($field['field_hideparam']) {
                         $word['url_part'] = $row['alias'];

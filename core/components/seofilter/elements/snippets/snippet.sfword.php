@@ -47,7 +47,7 @@ if(isset($input)) {
         if(!empty($output)) {
             $output = $pdoTools->getChunk($tpl,$output);
         } else {
-            $output = '';
+            $output = $input;
         }
     }
 }

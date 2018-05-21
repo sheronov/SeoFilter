@@ -130,3 +130,7 @@ $_lang['setting_seofilter_url_scheme'] = 'Схема формирования с
 $_lang['setting_seofilter_url_scheme_desc'] = 'Если пусто, то по умолчанию берётся схема из системных настроек. Доступны значения: "-1","abs","full","http","https"';
 $_lang['setting_seofilter_default_where'] = 'Условие для подсчётов по умолчанию для правил';
 $_lang['setting_seofilter_default_where_desc'] = 'При создании правила введённое условие запишется в соотвествующее поле. По умолчанию {"published":1,"deleted":0}';
+$_lang['setting_seofilter_level_separator'] = 'Разделитель вложенности в SEO-ссылках';
+$_lang['setting_seofilter_level_separator_desc'] = 'По умолчанию "/". Не рекомендуется изменять, если не знаете для чего';
+$_lang['setting_seofilter_between_urls'] = 'Разделитель между адресом страницы и SEO-ссылками';
+$_lang['setting_seofilter_between_urls_desc'] = 'По умолчанию "/". Не рекомендуется изменять, если не знаете для чего';

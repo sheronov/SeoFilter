@@ -3,6 +3,14 @@
 $properties = array();
 
 $tmp = array(
+    'input' => array(
+        'type' => 'textfield',
+        'value'=>'',
+    ),
+    'field_id' => array(
+        'type' => 'textfield',
+        'value'=>'',
+    ),
     'tpl' => array(
         'type' => 'textfield',
         'value' => '',

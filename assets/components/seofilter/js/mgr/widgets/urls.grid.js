@@ -413,6 +413,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                 ,baseParams: {
                     action: 'mgr/system/getlist',
                     combo: true,
+                    fromUrls: true,
                     rules: true
                 }
             },{

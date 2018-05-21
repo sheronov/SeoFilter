@@ -1,5 +1,20 @@
 Changelog for SeoFilter.
 
+1.5.0-beta
+==============
+- Added PRO-mode, which allows you to bind to the rule several pages
+- Integration with the Tagger component, including calculations
+- Added the ability to receive SEO-links without nesting through the slash (setting seofilter_level_separator)
+- Added the ability to generate a SEO link in 1 level from the site root (setting seofilter_between_urls)
+- Added a seoPage class to override the pdoPage class to get more accurate links in the pagination
+- Small conveniences with calculations:
+- URL's results counter is updated if the value is different
+- New setting for where conditions into new rules
+- Added file for recounting links results via cron
+- New default fields in strict search, so the counts are much more accurate
+- Added item to recalculate link results by word and rule in the table using the right mouse button
+- Optimization and correction of all previous errors
+
 1.4.8-beta
 ==============
 - Snippet sfLink now accepts the parameters "pages", "where", "as_name" for easy reference search

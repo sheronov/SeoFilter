@@ -21,18 +21,33 @@ class sfDictionaryDeclineProcessor extends modObjectProcessor
         if (empty($ids)) {
             return $this->failure($this->modx->lexicon('seofilter_url_err_ns'));
         }
-
-        foreach ($ids as $id) {
-            /** @var sfUrls $object */
-            if (!$object = $this->modx->getObject($this->classKey, $id)) {
-                return $this->failure($this->modx->lexicon('seofilter_url_err_nf'));
+        $total_message = '';
+        $recount = (int)$this->getProperty('recount');
+        if($recount) {
+            /* @var SeoFilter $SeoFilter */
+            $SeoFilter = $this->modx->getService('seofilter', 'SeoFilter', $this->modx->getOption('seofilter_core_path', null,
+                    $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', array());
+            $SeoFilter->loadHandler();
+            foreach ($ids as $id) {
+                if($counts = $SeoFilter->countHandler->countByWord($id)) {
+                    $counts['word_id'] = $id;
+                    $total_message .= $SeoFilter->pdo->parseChunk('@INLINE ' . $this->modx->lexicon('seofilter_word_recount_message'), $counts);
+                }
             }
 
-            $object->set('update', true);
-            $object->save();
+        } else {
+            foreach ($ids as $id) {
+                /** @var sfUrls $object */
+                if (!$object = $this->modx->getObject($this->classKey, $id)) {
+                    return $this->failure($this->modx->lexicon('seofilter_url_err_nf'));
+                }
+
+                $object->set('update', true);
+                $object->save();
+            }
         }
 
-        return $this->success();
+        return $this->success($total_message);
     }
 
 }

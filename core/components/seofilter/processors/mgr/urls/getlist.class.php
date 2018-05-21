@@ -114,6 +114,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             $url = $this->modx->makeUrl($array['page_id'],'','','full');
             $container_suffix = $this->modx->getOption('container_suffix',null,'/');
             $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);
+            $between_urls = $this->modx->getOption('seofilter_between_urls',null,'/',true);
             if ($container_suffix) {
                 if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
                     $url = substr($url, 0, -strlen($container_suffix));
@@ -122,7 +123,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             if (substr($url,-1) == '/') {
                 $url = substr($url,0,-1);
             }
-            $array['url_preview'] = $url.'/'.$addurl.$url_suffix;
+            $array['url_preview'] = $url.$between_urls.$addurl.$url_suffix;
 
             if(!$array['active']) {
                 $addurl = array();

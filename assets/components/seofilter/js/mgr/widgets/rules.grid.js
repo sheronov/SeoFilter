@@ -195,6 +195,30 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
         })
     },
 
+    reCounting: function (btn,e) {
+        var ids = this._getSelectedIds();
+        if (!ids.length) {
+            return false;
+        }
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: {
+                action: 'mgr/rule/recount',
+                ids: Ext.util.JSON.encode(ids),
+            },
+            listeners: {
+                success: {
+                    fn: function (res) {
+                        if(res.message) {
+                            MODx.msg.alert(_('seofilter_info'), res.message);
+                        }
+                        this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
+                    }, scope: this
+                }
+            }
+        })
+    },
 
     duplicateRule: function (btn,e) {
         var r = this.menu.record;

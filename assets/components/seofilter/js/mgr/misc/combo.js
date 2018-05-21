@@ -74,9 +74,10 @@ Ext.reg('seofilter-combo-resource', SeoFilter.combo.Resource);
 var classes = [
     ['msProductData', _('seofilter_msProductData')],
     ['modResource', _('seofilter_modResource')],
-    ['msVendor', _('seofilter_msVendor')],
+    // ['msVendor', _('seofilter_msVendor')],
     ['msProductOption', _('seofilter_msProductOption')],
     ['modTemplateVar', _('seofilter_modTemplateVar')],
+    ['Tagger', _('seofilter_Tagger')],
 ];
 SeoFilter.combo.Class = function (config) {
     config = config || {};

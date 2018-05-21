@@ -64,3 +64,7 @@ $_lang['seofilter_prop_sitemapSchema'] = 'Схема карты сайта.';
 $_lang['seofilter_prop_cacheTime'] = 'Время актуальности кэша в секундах.';
 $_lang['seofilter_prop_cacheKey'] = 'Ключ кэширования. Сохраняется в "core/cache/default/вашключ"';
 $_lang['seofilter_prop_fast'] = 'Быстрый режим работы сниппета. Использует значения из базы вместо подсчёта на лету.';
+$_lang['seofilter_prop_input'] = 'Запрос, по которому нужно найти значение в словаре SeoFilter';
+$_lang['seofilter_prop_field_id'] = 'ID поля, для уточнения поиска значения';
+$_lang['seofilter_prop_pages'] = 'Список id страниц для поиска - поиск идёт в таком порядке, как переданы значения (можно не указывать список правил).';
+$_lang['seofilter_prop_as_name'] = 'Значение, которое подставитсчя вместо оригинального названия ссылки.';

@@ -335,6 +335,38 @@ class sfCountHandler
         return $conditions;
     }
 
+    public function getTaggerConditions($value = '',$field = array(),$includeWhere = 1) {
+        $group = ucfirst($field['key']);
+
+        $conditions = array(
+            'models'=>array('tagger'),
+            'join' => array(
+                'TaggerGroup'.$group => array(
+                    'class'=>'TaggerGroup',
+                    'on'=>'TaggerGroup'.$group.'.id = "'.$group.'" OR TaggerGroup'.$group.'.alias = "'.$group.'"'
+                ),
+                'TaggerTag'.$group => array(
+                    'class'=>'TaggerTag',
+                    'on'=>'TaggerTag'.$group.'.group = TaggerGroup'.$group.'.id'
+                ),
+                'TaggerTagResource'.$group => array(
+                    'class'=>'TaggerTagResource',
+                    'on'=>'TaggerTagResource'.$group.'.tag = TaggerTag'.$group.'.id AND modResource.id = TaggerTagResource'.$group.'.resource'
+                )
+            )
+        );
+
+        if($includeWhere) {
+            $class_key = 'TaggerTag'.$group.'.tag';
+            $conditions = array_merge($conditions,$this->getModResourceConditions($value,$field,$class_key));
+        }
+
+//        $this->modx->log(1,$value.print_r($field,1));
+//        $this->modx->log(1,'Conditions '.print_r($conditions,1));
+
+        return $conditions;
+    }
+
     public function getTVConditions($value = '', $field = array(),$includeWhere = 1) {
         $this->getModTemplateVarConditions($value, $field, $includeWhere);
     }
@@ -346,7 +378,8 @@ class sfCountHandler
 
         $tv = ucfirst($field['key']);
         if(isset($field['xpdo_package']) && strtolower($field['xpdo_package']) == 'tvsuperselect') {
-            $this->pdoTools->setConfig(array('loadModels' => 'tvsuperselect'));
+//            $this->pdoTools->setConfig(array('loadModels' => 'tvsuperselect'));
+            $conditions['models'][] = 'tvsuperselect';
             $conditions['join']['tvssOption'.$tv] = array('class'=>'tvssOption','on'=>'tvssOption'. $tv .'.resource_id = modResource.id');
             $class_key = 'tvssOption'.$tv.'.value';
         }  else {
@@ -497,8 +530,8 @@ class sfCountHandler
         if(!$class) {
             $class = 'modResource';
         }
-        $where = $join = $tvs = array();
-        $to_config = array('where'=>'where','join'=>'innerJoin','tvs'=>'includeTVs');
+        $where = $join = $tvs = $models = array();
+        $to_config = array('where'=>'where','join'=>'innerJoin','tvs'=>'includeTVs','models'=>'loadModels');
 
         foreach($params as $alias=>$param) {
             if(isset($fields[$alias])) {
@@ -528,16 +561,17 @@ class sfCountHandler
             'return' => 'data',
             'limit' => 1,
             'select' => array(
-                $class => 'COUNT('.$class.'.id) as count'
+                $class => 'COUNT(DISTINCT '.$class.'.id) as count'
             )
         );
 
         if(!empty($parents) || $parents === 0 || $parents === '0') {
             $config['parents'] = $parents;
         }
+
         foreach($to_config as $prop=>$propConfig) {
             if (!empty(${$prop})) {
-                if($prop == 'tvs') {
+                if($prop == 'tvs' || $prop == 'models') {
                     $config[$propConfig] = implode(',',${$prop});
                 } else {
                     $config[$propConfig] = ${$prop};
@@ -545,17 +579,36 @@ class sfCountHandler
             }
         }
 
-        if($run = $this->run($config)) {
-            if (count($run)) {
+        $check = true;
+        if(isset($config['where']['modResource.parent']) && isset($config['parents'])) {
+            if($config['parents'] != $config['where']['modResource.parent']) {
+                $this->pdoTools->setConfig($config);
+                $where = $this->pdoTools->additionalConditions();
+                $check = false;
+                foreach($where as $key=>$vals) {
+                    if(is_array($vals) && in_array($config['where']['modResource.parent'],$vals)) {
+                        $check = true;
+                    }
+                }
+                if(!$check) {
+                    $total = 0;
+                }
+            }
+        }
+
+        if($check && $run = $this->run($config)) {
+            if (is_array($run)) {
                 if (isset($run[0]['count'])) {
                     $total = $run[0]['count'];
                 }
             }
+//            $this->modx->log(1,print_r($config,1));
+//            $this->modx->log(1,print_r($run,1));
             // если проблема с подсчётами - проверить здесь в первую очередь
         }
 
         $min_max_array = array('total'=>$total);
-        if($min_max && $this->config['count_select'] && $this->config['count_choose']) {
+        if($total && $min_max && $this->config['count_select'] && $this->config['count_choose']) {
             $conditions = $this->getMinMaxConditions($class);
 
             if(!empty($conditions['choose']) && !empty($conditions['select'])) {

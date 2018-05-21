@@ -95,6 +95,21 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             'menu' => true,
         );
 
+
+        if($array['active']) {
+            //recount
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-refresh action-green',
+                'title' => $this->modx->lexicon('seofilter_word_recount'),
+                'multiple' => $this->modx->lexicon('seofilter_words_recount'),
+                'action' => 'reCounting',
+                'button' => false,
+                'menu' => true,
+            );
+        }
+
+
         // Edit
         $array['actions'][] = array(
             'cls' => '',

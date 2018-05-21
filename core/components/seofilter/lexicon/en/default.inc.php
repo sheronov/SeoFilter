@@ -2,7 +2,7 @@
 include_once 'setting.inc.php';
 
 $_lang['seofilter'] = 'SeoFilter';
-$_lang['seofilter_menu_desc'] = 'The managing of SEF URL and SEO for filters';
+$_lang['seofilter_menu_desc'] = 'The managing friendly URLs and SEO for filters';
 $_lang['seofilter_intro_msg'] = 'You can select several items at once with Shift or Ctrl';
 
 
@@ -311,7 +311,7 @@ $_lang['seofilter_rule_recount_new'] = 'Counting results for each link';
 $_lang['seofilter_rule_recount_title'] = 'Quantity successfully counted';
 $_lang['seofilter_url_recount_wait'] = 'Please wait';
 $_lang['seofilter_url_recount_process'] = 'Is recounting...';
-$_lang['seofilter_rule_recount_message'] = '<br><b>Counting results:</b><br>Total links associated with the rule: {$all_links}. <br> Links that have results: <b>{$links}</b>. <br> Number of results (not unique): {$total}.';
+$_lang['seofilter_rule_recount_message'] = '<br><b>Counting results by rule (id={$rule_id}):</b><br>Total links associated with the rule: {$all_links}. <br> Links that have results: <b>{$links}</b>. <br> Number of results (not unique): {$total}.';
 $_lang['seofilter_dictionary_remove_confirmation'] = '<b class="red">Attention!</b> Deleting a word results in the deletion of the links associated with it! <b> Are you sure? </b> You can now edit, but not return.';
 $_lang['seofilter_url_total'] = 'Results';
 $_lang['seofilter_url_total_more'] = 'Number of results';
@@ -320,7 +320,15 @@ $_lang['seofilter_combo_relation_select'] = 'Will be available with the dependen
 $_lang['seofilter_info'] = 'Information';
 $_lang['seofilter_rule_information'] = '{if $was_links?} <nobr> Related links to the rule: <b> {$was_links} </b> </nobr> <br> {/if}
                                          {if $remove_links?} Removed <b> {$remove_links} </b> old links <br> {/if}
-                                         {if $old_links && $old_links! = $was_links?} Old links left: <b> {$old_links} </b> <br> {/if}
+                                         {if $old_links && ($old_links != $was_links)} Old links left: <b> {$old_links} </b> <br> {/if}
                                          {if $add_links?} New links added: <b> {$add_links} </b> <br> {/if}
                                          {if $doubles_links?} No links added: <b> {$doubles_links} </b> (doubles) <br> {/if}
+                                         {if $update_links?}Names of links updated: <b>{$update_links}</b><br>{/if}
                                          {if $all_links && ($remove_links || $add_links || $doubles_links)} Total links to the rule: <b> {$all_links} </b> pcs <br> {/if}';
+$_lang['seofilter_word_recount'] = 'Recounting results by word';
+$_lang['seofilter_words_recount'] = 'Recounting results by words';
+$_lang['seofilter_word_recount_message'] = '<b>Counting results by word (id={$word_id}):</b><br>Total links associated with the word: {$all_links}. <br> Links that have results: <b>{$links}</b>. <br> Number of results (not unique): {$total}.<br><br>';
+$_lang['seofilter_word_add_info'] = 'For Rule (id={$rule_id}):<br><b>added {$add_links} links</b><br><br>';
+$_lang['seofilter_word_update_info'] = 'For Rule (id={$rule_id}):<br>{if $remove_links}<b>remove {$remove_links} links</b><br>{/if} <b>added {$add_links} new links</b><br><br>';
+$_lang['seofilter_dictionary_alias_double'] = 'For one Field words aliases can not coincide';
+$_lang['seofilter_Tagger'] = 'Tagger (tags from component Tagger)';

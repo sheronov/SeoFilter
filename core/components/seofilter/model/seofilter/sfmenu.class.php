@@ -43,6 +43,7 @@ class sfMenu
             )
         );
 
+        $config['between_urls'] = $this->modx->getOption('seofilter_between_urls', null, '/', true);
         $config['container_suffix'] = $this->modx->getOption('container_suffix',null,'/');
         $config['url_suffix'] = $this->modx->getOption('seofilter_url_suffix',null,'',true);
         $config['possibleSuffixes'] = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
@@ -341,14 +342,15 @@ class sfMenu
         $q->groupby('sfUrlWord.id');
         if($q->prepare() && $q->stmt->execute()) {
             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                if(!(int)$row['page_id']) {
+                    continue;
+                }
+
                 $url = $row['new_url']?:$row['old_url'];
                 $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
                 $u_suffix = $this->config['url_suffix'];
                 $page_url = $this->clearSuffixes($page_url);
-                if (substr($page_url, -1) != '/') {
-                    $page_url .= '/';
-                }
-                $url = $page_url.$url.$u_suffix;
+                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                 $name = $row['menutitle']?:$row['link'];
                 $row['url'] = $url;
                 $row['name'] = $name;
@@ -435,16 +437,15 @@ class sfMenu
         }
         $q->limit((int)$this->config['limit'],(int)$this->config['offset']);
         if($q->prepare() && $q->stmt->execute()) {
-
             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                if(!(int)$row['page_id']) {
+                    continue;
+                }
                 $url = $row['new_url']?:$row['old_url'];
                 $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
                 $u_suffix = $this->config['url_suffix'];
                 $page_url = $this->clearSuffixes($page_url);
-                if (substr($page_url, -1) != '/') {
-                    $page_url .= '/';
-                }
-                $url = $page_url.$url.$u_suffix;
+                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                 // $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
                 $name = $row['menutitle']?:$row['link'];
                 $row['url'] = $url;

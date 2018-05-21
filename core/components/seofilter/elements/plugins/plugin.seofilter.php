@@ -43,6 +43,7 @@ switch ($modx->event->name) {
 
             $fields = $SeoFilter->getFieldsKey();
             $before = $SeoFilter->getResourceData($resource->id,$fields);
+
         }
         $_SESSION['SeoFilter']['before'] = $before;
         @session_write_close();
@@ -64,13 +65,32 @@ switch ($modx->event->name) {
         $dictionary = $changes = $before = array();
         $fields = $SeoFilter->getFieldsKey();
         $after = $SeoFilter->getResourceData($resource->id, $fields);
+
+        if(in_array('tagger',array_keys($fields))) {
+            $taggerPath = $modx->getOption('tagger.core_path', null, $modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/tagger/');
+            /** @var Tagger $tagger */
+            $tagger = $modx->getService('tagger', 'Tagger', $taggerPath . 'model/tagger/', array('core_path' => $taggerPath));
+            if(($tagger instanceof Tagger)) {
+                $q = $modx->newQuery('TaggerGroup');
+                $q->where(array('id:IN'=>array_keys($fields['tagger']),'OR:alias:IN'=>array_keys($fields['tagger'])));
+                $q->select('id,alias');
+                if($q->prepare() && $q->stmt->execute()) {
+                    while($group = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                        if($resource->get('tagger-'.$group['id'])) {
+                            $after['tagger'][$group['id']] = $tagger->explodeAndClean($resource->get('tagger-'.$group['id']));
+                        }
+                    }
+                }
+            }
+        }
+
         if($sf_count) {
             $SeoFilter->loadHandler();
             $before = $_SESSION['SeoFilter']['before'];
             unset($_SESSION['SeoFilter']);
         }
 
-        foreach(array('tvs','tvss','data') as $var) {
+        foreach(array('tvs','tvss','data','tagger') as $var) {
             $dictionary = $SeoFilter->returnChanges($after[$var],array(),$var);
 
             if(!empty($after[$var])) {
@@ -89,6 +109,7 @@ switch ($modx->event->name) {
                 // удалилась значения
             }
 
+//            $modx->log(1,$var.print_r($changes[$var],1));
 
             if(!empty($dictionary)) {
                 foreach ($dictionary as $field_key => $words) {
@@ -116,6 +137,7 @@ switch ($modx->event->name) {
                     }
                 }
             }
+
 
             if(!empty($changes[$var]) && $sf_count) {
                 // действия на пересчёт слов, которые удалены
@@ -158,6 +180,7 @@ switch ($modx->event->name) {
             $url_suffix = $SeoFilter->config['url_suffix'];
             $url_redirect = $SeoFilter->config['redirect'];
 
+            $between_urls = $SeoFilter->config['between_urls'];
             $base_get = array_map('trim', explode(',',$SeoFilter->config['base_get']));
             $separator = $SeoFilter->config['separator'];
             $site_start = $SeoFilter->config['site_start'];
@@ -168,11 +191,10 @@ switch ($modx->event->name) {
 
             $request = trim($_REQUEST[$alias]);
 
-            if ($url_suffix) {
-                if (strpos($request, $url_suffix, strlen($request) - strlen($url_suffix))) {
+            if (!empty($url_suffix)) {
+                if (strpos($request, $url_suffix, strlen($request) - strlen($url_suffix)) !== false) {
                     $request = substr($request, 0, -strlen($url_suffix));
                     $last_char = $url_suffix; //был ли суффикс в конце
-
                 }
             } elseif ($url_redirect) {
                 if (substr($_REQUEST[$alias], -1) == '/') {
@@ -181,7 +203,6 @@ switch ($modx->event->name) {
             }
 
             $request = trim($request, "/"); //основной запрос
-            $tmp = explode('/', $request); //массив запроса
 
             $check_doubles = false;
             $uris = $aliases = array();
@@ -227,6 +248,7 @@ switch ($modx->event->name) {
                     if($row['id'] == $site_start) {
                         $uri = '';
                     }
+
                     $uris[$row['id']] = array_reverse(explode('/',$uri),1);
                     //переворот для удобства поиска
 
@@ -243,64 +265,87 @@ switch ($modx->event->name) {
                     $aliases[$row['id']] = $alias;
                 }
             }
+
+            //обязательная сортировка массива по количеству внутренних алиасов
+            uasort($uris, function($a, $b) {
+                if (count($a) == count($b)) {
+                    return 0;
+                }
+                return (count($a) > count($b)) ? -1 : 1;
+            });
+
+            $tmp = explode($between_urls, $request);
             $r_tmp = array_reverse($tmp, 1); //перевёрнутый запрос
 
-            if($check_doubles) {
-                //если есть дубли синонимов
-                //обязательная сортировка массива по количеству внутренних алиасов
-                uasort($uris, function($a, $b) {
-                    if (count($a) == count($b)) {
-                        return 0;
+            if($between_urls != '/') {
+                //if all links in the first level
+                $page = 0;
+                $remaining_part = '';
+                foreach($uris as $page_id => $uri_arr){
+                    $uri_part = implode('/',array_reverse($uri_arr,1));
+                    if(strpos($request,$uri_part) === 0) {
+                        $page = $page_id;
+                        $remaining_part = trim(str_replace($uri_part,'',$request),$between_urls);
+                        break;
                     }
-                    return (count($a) > count($b)) ? -1 : 1;
-                });
+                }
 
-                foreach ($uris as $page_id => $uri_arr) {
-                    $need_count = count($uri_arr); //сколько совпадений подряд нужно
-                    $uri_count = 0; //количество совпадений
-                    $pos_count = false; //позиция, на которой произошло сопадение
-                    $check_break = false; //проверка, чтобы в разнобой не пошло
-                    foreach($r_tmp as $t_key => $t_alias) {
-                        foreach($uri_arr as $u_key => $uri) {
-                            if($uri == $t_alias) {
-                                if($pos_count !== false) {
-                                    if($pos_count-$uri_count != $t_key) {
-                                        $check_break = true;
-                                        break;
+                if($page && $remaining_part) {
+                    //we found one page
+                    $tmp = explode('/',$remaining_part);
+                }
+
+            } else {
+                if($check_doubles) {
+                    //если есть дубли синонимов
+                    foreach ($uris as $page_id => $uri_arr) {
+                        $need_count = count($uri_arr); //сколько совпадений подряд нужно
+                        $uri_count = 0; //количество совпадений
+                        $pos_count = false; //позиция, на которой произошло сопадение
+                        $check_break = false; //проверка, чтобы в разнобой не пошло
+                        foreach($r_tmp as $t_key => $t_alias) {
+                            foreach($uri_arr as $u_key => $uri) {
+                                if($uri == $t_alias) {
+                                    if($pos_count !== false) {
+                                        if($pos_count-$uri_count != $t_key) {
+                                            $check_break = true;
+                                            break;
+                                        }
+                                    } else {
+                                        $pos_count = $t_key;
                                     }
-                                } else {
-                                    $pos_count = $t_key;
+                                    $uri_count++;
+                                    break; //выходим из перебора uri для текущего alias-а в адресе
                                 }
-                                $uri_count++;
-                                break; //выходим из перебора uri для текущего alias-а в адресе
+                            }
+                            if($check_break) {
+                                break;
                             }
                         }
-                        if($check_break) {
+                        if($need_count == $uri_count) {
+                            //ссылка найдена
+                            $page = $page_id;
+                            $tmp = array_slice($tmp,++$pos_count);
                             break;
                         }
                     }
-                    if($need_count == $uri_count) {
-                        //ссылка найдена
-                        $page = $page_id;
-                        $tmp = array_slice($tmp,++$pos_count);
-                        break;
+                } else {
+                    //простой механизм поиска
+                    $tmp_id = 0;
+                    foreach ($r_tmp as $t_key => $t_alias) {
+                        if ($page = array_search($t_alias, $aliases)) {
+                            $tmp_id = $t_key;
+                            break;
+                        }
                     }
-                }
-            } else {
-                //простой механизм поиска
-                $tmp_id = 0;
-                foreach ($r_tmp as $t_key => $t_alias) {
-                    if ($page = array_search($t_alias, $aliases)) {
-                        $tmp_id = $t_key;
-                        break;
-                    }
-                }
-                if ($page) {
-                    for ($i = 0; $i <= $tmp_id; $i++) {
-                        array_shift($tmp);
+                    if ($page) {
+                        for ($i = 0; $i <= $tmp_id; $i++) {
+                            array_shift($tmp);
+                        }
                     }
                 }
             }
+
             if(!$page) {
                 //если не будет найдено, то проверим, вдруг это главная страница
                 if(in_array($site_start,array_keys($aliases))) {
@@ -327,33 +372,45 @@ switch ($modx->event->name) {
                         $url = substr($url, 0, -strlen($possibleSuffix));
                     }
                 }
-                if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
-                    break;
+
+
+                if($between_urls == '/') {
+                    if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
+                        break;
+                    }
+                } else {
+                    if(trim($url,'/') != str_replace($between_urls.implode('/',$tmp),'',$request)) {
+                        break;
+                    }
                 }
+
 
                 if($tmp && $url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
                     if($url_array['active']) {
                         $old_url = $url_array['old_url'];
                         $new_url = $url_array['new_url'];
                         $rule_id = $url_array['multi_id'];
+                        $tofind = implode($SeoFilter->config['level_separator'],$tmp).$url_suffix;
 
-                        if ($new_url && ($new_url != implode('/', $tmp))) {
+                        if ($new_url && ($new_url != implode($SeoFilter->config['level_separator'], $tmp))) {
                             if ($container_suffix) {
-                                if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
+                                if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix)) !== false) {
                                     $url = substr($url, 0, -strlen($container_suffix));
                                 }
                             }
                             $modx->sendRedirect($url .'/'. $new_url . $url_suffix,false,'REDIRECT_HEADER','HTTP/1.1 301 Moved Permanently');
-                        } elseif($url_redirect && ($url_suffix != $last_char)) {
+                        } elseif($url_redirect && ($url_suffix != $last_char)
+                            && ((strpos($_SERVER['REQUEST_URI'],$tofind) === false) ||  (strpos($_SERVER['QUERY_STRING'],$tofind) === false)) //when server have bugs
+                        ) {
                             if ($container_suffix) {
-                                if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
+                                if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix)) !== false) {
                                     $url = substr($url, 0, -strlen($container_suffix));
                                 }
                             }
-                            $modx->sendRedirect($url .'/'. implode('/', $tmp) . $url_suffix,false,'REDIRECT_HEADER','HTTP/1.1 301 Moved Permanently');
+                            $modx->sendRedirect($url .'/'. implode($SeoFilter->config['level_separator'], $tmp) . $url_suffix,false,'REDIRECT_HEADER','HTTP/1.1 301 Moved Permanently');
                         }
 
-                        $tmp = explode('/', $old_url);
+                        $tmp = explode($SeoFilter->config['level_separator'], $old_url);
                         $menutitle = '';
                         if ($url_array['menu_on']) {
                             $menutitle = $url_array['menutitle'];
@@ -418,8 +475,10 @@ switch ($modx->event->name) {
                             $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);
 
                             //обновление счётчика, если отличается количество
-                            if(empty($meta['diff']) && ($meta['total'] != $meta['old_total'])) {
-                                $this->updateUrlTotal($meta['url_id'],$meta['total']);
+                            if(empty($meta['diff']) && $SeoFilter->config['count_childrens']) {
+                                if((int)$meta['url_id'] && ($meta['total'] != $meta['old_total'])) {
+                                    $SeoFilter->updateUrlTotal($meta['url_id'], $meta['total']);
+                                }
                             }
 
                             if($SeoFilter->config['hideEmpty'] && $SeoFilter->config['count_childrens'] && empty($meta['total'])) {

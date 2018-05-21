@@ -63,7 +63,10 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             id: Ext.id(),
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.a.result.object.total_message) {
+                            MODx.msg.alert(_('seofilter_info'), res.a.result.object.total_message);
+                        }
                         this.refresh();
                         Ext.getCmp('seofilter-grid-urls').refresh();
 
@@ -100,7 +103,10 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                             record: r,
                             listeners: {
                                 success: {
-                                    fn: function () {
+                                    fn: function (res) {
+                                        if(res.a.result.object.total_message) {
+                                            MODx.msg.alert(_('seofilter_info'), res.a.result.object.total_message);
+                                        }
                                         this.refresh();
                                         Ext.getCmp('seofilter-grid-urls').refresh();
                                     }, scope: this
@@ -137,31 +143,35 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
                 }
             }
         });
-        // console.log(ids);
-        //
-        // if (typeof(row) != 'undefined') {
-        //     this.menu.record = row.data;
-        // }
-        // else if (!this.menu.record) {
-        //     return false;
-        // }
-        // var record = this.menu.record;
-        // record.action = 'mgr/dictionary/update';
-        // record.update = 1;
-        // record.active = 1;
-        // MODx.Ajax.request({
-        //     url: this.config.url,
-        //     params: record,
-        //     listeners: {
-        //         success: {
-        //             fn: function () {
-        //                 this.refresh();
-        //             }, scope: this
-        //         }
-        //     }
-        // })
-
     },
+
+    reCounting: function (btn, e, row) {
+        var ids = this._getSelectedIds();
+        if (!ids.length) {
+            return false;
+        }
+
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: {
+                action: 'mgr/dictionary/decline',
+                ids: Ext.util.JSON.encode(ids),
+                recount: 1
+            },
+            listeners: {
+                success: {
+                    fn: function (res) {
+                        if(res.message) {
+                            MODx.msg.alert(_('seofilter_info'), res.message);
+                        }
+                        Ext.getCmp('seofilter-grid-urls').refresh();
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        });
+    },
+
 
 
     removeField: function () {

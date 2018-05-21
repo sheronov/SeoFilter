@@ -41,6 +41,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     id: config.id + '-name',
                     anchor: '99%',
                     allowBlank: false,
+                    maxLength: 255,
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_rule_link_tpl'),
@@ -48,6 +49,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     id: config.id + '-link_tpl',
                     anchor: '99%',
                     description: "[[!+sf.link]] / {$_modx->getPlaceholder('sf.link')}",
+                    maxLength: 255,
                 },{
                     layout: 'column',
                     border: false,
@@ -102,6 +104,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 name: 'count_where',
                                 id: config.id + '-count_where',
                                 anchor: '99%',
+                                maxLength: 255,
                             }, {
                                 xtype: parseInt(SeoFilter.config.proMode)?'textfield':'seofilter-combo-resource',
                                 fieldLabel: parseInt(SeoFilter.config.proMode)? _('seofilter_field_pages') : _('seofilter_field_page'),
@@ -109,6 +112,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 allowBlank: false,
                                 id: parseInt(SeoFilter.config.proMode)? config.id + '-pages':config.id + '-page',
                                 anchor: '99%',
+                                maxLength: 255,
                             }, {
                                 xtype: 'xcheckbox',
                                 boxLabel: _('seofilter_rule_base_more'),
@@ -127,6 +131,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 name: 'count_parents',
                                 id: config.id + '-count_parents',
                                 anchor: '99%',
+                                maxLength: 255,
                             }, {
                                 xtype: 'numberfield',
                                 fieldLabel: _('seofilter_rule_rank'),
@@ -157,6 +162,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     id: config.id + '-title',
                     anchor: '99%',
                     description: "[[!+sf.title]] / {$_modx->getPlaceholder('sf.title')}",
+                    maxLength: 255,
                 }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_h1'),
@@ -164,6 +170,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     id: config.id + '-h1',
                     anchor: '99%',
                     description: "[[!+sf.h1]] / {$_modx->getPlaceholder('sf.h1')}",
+                    maxLength: 255,
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_h2'),
@@ -171,6 +178,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     id: config.id + '-h2',
                     anchor: '99%',
                     description: "[[!+sf.h2]] / {$_modx->getPlaceholder('sf.h2')}",
+                    maxLength: 255,
                 }, {
                     xtype: 'textarea',
                     fieldLabel: _('seofilter_seometa_description'),
@@ -278,6 +286,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     id: config.id + '-name',
                     anchor: '99%',
                     allowBlank: false,
+                    maxLength: 255,
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_rule_link_tpl'),
@@ -285,6 +294,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     id: config.id + '-link_tpl',
                     description: "[[!+sf.link]] / {$_modx->getPlaceholder('sf.link')}",
                     anchor: '99%',
+                    maxLength: 255,
                 },{
                     layout: 'column',
                     border: false,
@@ -346,6 +356,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             name: 'count_where',
                             id: config.id + '-count_where',
                             anchor: '99%',
+                            maxLength: 255,
                         },{
                             xtype: parseInt(SeoFilter.config.proMode)?'textfield':'seofilter-combo-resource',
                             fieldLabel: parseInt(SeoFilter.config.proMode)? _('seofilter_field_pages') : _('seofilter_field_page'),
@@ -353,6 +364,8 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             allowBlank: false,
                             id: parseInt(SeoFilter.config.proMode)? config.id + '-pages':config.id + '-page',
                             anchor: '99%',
+                            maxLength: 255,
+
                         }, {
                             xtype: 'xcheckbox',
                             boxLabel: _('seofilter_rule_base_more'),
@@ -370,6 +383,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             name: 'count_parents',
                             id: config.id + '-count_parents',
                             anchor: '99%',
+                            maxLength: 255,
                         }, {
                             xtype: 'numberfield',
                             fieldLabel: _('seofilter_rule_rank'),
@@ -400,6 +414,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     id: config.id + '-title',
                     description: "[[!+sf.title]] / {$_modx->getPlaceholder('sf.title')}",
                     anchor: '99%',
+                    maxLength: 255,
                 }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_h1'),
@@ -407,6 +422,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     id: config.id + '-h1',
                     anchor: '99%',
                     description: "[[!+sf.h1]] / {$_modx->getPlaceholder('sf.h1')}",
+                    maxLength: 255,
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_seometa_h2'),
@@ -414,6 +430,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     id: config.id + '-h2',
                     anchor: '99%',
                     description: "[[!+sf.h2]] / {$_modx->getPlaceholder('sf.h2')}",
+                    maxLength: 255,
                 }, {
                     xtype: 'textarea',
                     fieldLabel: _('seofilter_seometa_description'),
@@ -548,12 +565,14 @@ Ext.extend(SeoFilter.window.duplicateRule, MODx.Window, {
             anchor: '99%',
             name: 'name',
             allowBlank: false,
+            maxLength: 255,
         }, {
             xtype: parseInt(SeoFilter.config.proMode)?'textfield':'seofilter-combo-resource',
             fieldLabel: parseInt(SeoFilter.config.proMode)? _('seofilter_field_pages') : _('seofilter_field_page'),
             name: parseInt(SeoFilter.config.proMode)? 'pages':'page',
             anchor: '99%',
             allowBlank: false,
+            maxLength: 255,
         }, {
             boxLabel: _('seofilter_rule_copy_fields'),
             xtype: 'xcheckbox',

@@ -13,26 +13,24 @@ class sfUrlsCreateProcessor extends modObjectCreateProcessor
      */
     public function beforeSet()
     {
-        $name = trim($this->getProperty('old_url'));
+        $url = trim($this->getProperty('old_url'));
         $multi_id = trim($this->getProperty('multi_id'));
         $page_id = (int)$this->getProperty('page_id');
         $from_rule = (int)$this->getProperty('from_rule');
-        if (empty($name)) {
+        if (empty($url)) {
             if($from_rule) {
                 $this->modx->error->failure($this->modx->lexicon('seofilter_url_err_url'));
             } else {
                 $this->modx->error->addField('old_url', $this->modx->lexicon('seofilter_url_err_url'));
             }
-        } elseif ($this->modx->getCount($this->classKey, array('old_url' => $name,'page_id'=>$page_id))) {
+        } elseif ($this->modx->getCount($this->classKey, array('old_url' => $url,'page_id'=>$page_id))) {
             $this->modx->error->errors[] = 'double';
             if($from_rule) {
-                $this->modx->error->failure( $this->modx->lexicon('seofilter_url_err_ae'));
+                $this->modx->error->failure( $this->modx->lexicon('seofilter_url_err_ae').' = '.$url);
             } else {
                 $this->modx->error->addField('old_url', $this->modx->lexicon('seofilter_url_err_ae'));
             }
-
         }
-
 
 
         return parent::beforeSet();

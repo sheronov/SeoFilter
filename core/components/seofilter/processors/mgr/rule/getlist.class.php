@@ -50,7 +50,13 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
         }
         
         if ($page = $this->getProperty('page',null)) {
-            $c->andCondition(array('page' => $page), '', 1);
+            $proMode =  $this->modx->getOption('seofilter_pro_mode',null,0,true);
+            if($proMode) {
+                $c->andCondition('1=1 AND FIND_IN_SET('.$page.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+//                $q->where(array('(page = '.$page.') OR (1 = 1 AND FIND_IN_SET('.$page.',pages))'));
+            } else {
+                $c->andCondition(array('page' => $page), '', 1);
+            }
         }
 
         //if($this->getProperty('page')) {
@@ -89,6 +95,19 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
 
 
         $array['actions'] = array();
+
+        if($array['active']) {
+            //recount
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-refresh',
+                'title' => $this->modx->lexicon('seofilter_url_recount'),
+                'multiple' => $this->modx->lexicon('seofilter_url_recount'),
+                'action' => 'reCounting',
+                'button' => false,
+                'menu' => true,
+            );
+        }
 
         // Edit
         $array['actions'][] = array(

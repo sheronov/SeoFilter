@@ -99,20 +99,21 @@ if(!empty($rules) || !empty($pages)) {
     }
 
     if(!empty($link)) {
+        $c_suffix = $modx->getOption('container_suffix',null,'/');
+        $u_suffix = $modx->getOption('seofilter_url_suffix',null,'',true);
+        $between_links = $modx->getOption('seofilter_between_links',null,'/',true);
+        $possibleSuffixes = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
+        $possibleSuffixes = array_unique(array_merge($possibleSuffixes,array($c_suffix)));
 
         $url = $link['new_url']?:$link['old_url'];
         $page_url = $modx->makeUrl($link['page_id'],$scriptProperties['context'],'',$scriptProperties['scheme']);
-        $c_suffix = $modx->getOption('container_suffix',null,'/');
-        $u_suffix = $modx->getOption('seofilter_url_suffix',null,'',true);
-        if($c_suffix && $page_url) {
-            if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix)) !== false) {
-                $page_url = substr($page_url,0,-strlen($c_suffix));
+
+        foreach($possibleSuffixes as $possibleSuffix) {
+            if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                $url = substr($url, 0, -strlen($possibleSuffix));
             }
         }
-        if (substr($page_url, -1) != '/') {
-            $page_url .= '/';
-        }
-        $link['url'] = $page_url.$url.$u_suffix;
+        $link['url'] = $page_url.$between_links.$url.$u_suffix;
         if($as_name) {
             $link['name'] = $as_name;
         } else {

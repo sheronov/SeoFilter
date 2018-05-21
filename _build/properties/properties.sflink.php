@@ -3,6 +3,22 @@
 $properties = array();
 
 $tmp = array(
+    'rules' => array(
+        'type' => 'textfield',
+        'value' => ''
+    ),
+    'pages' => array(
+        'type' => 'textfield',
+        'value' => ''
+    ),
+    'where' => array(
+        'type' => 'textfield',
+        'value' => ''
+    ),
+    'as_name' => array(
+        'type' => 'textfield',
+        'value' => ''
+    ),
     'tpl' => array(
         'type' => 'textfield',
         'value' => '@INLINE <a href="[[+url]]">[[+name]]</a>',
