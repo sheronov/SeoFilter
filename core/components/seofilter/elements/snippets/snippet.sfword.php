@@ -1,10 +1,11 @@
 <?php
 /** @var array $scriptProperties */
 $output = '';
-if(isset($options) && !isset($field_id)) {
+if(isset($options) && empty($field_id)) {
     $field_id = (int)$options;
 }
-if(isset($input)) {
+$input = $modx->getOption('input',$scriptProperties,'');
+if(!empty($input) || $input === '0' || $input === 0) {
     $tpl = $modx->getOption('tpl', $scriptProperties, '');
     $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
     $q = $modx->newQuery('sfDictionary');
@@ -47,7 +48,7 @@ if(isset($input)) {
         if(!empty($output)) {
             $output = $pdoTools->getChunk($tpl,$output);
         } else {
-            $output = $input;
+            $output = '';
         }
     }
 }
