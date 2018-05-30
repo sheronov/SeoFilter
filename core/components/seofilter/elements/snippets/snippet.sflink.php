@@ -11,6 +11,7 @@ $rules = $modx->getOption('rules',$scriptProperties,'');
 $pages = $modx->getOption('pages',$scriptProperties,'');
 $where = $modx->getOption('where',$scriptProperties,'');
 $as_name = $modx->getOption('as_name',$scriptProperties,'');
+$proMode = $modx->getOption('seofilter_pro_mode',null,0,true);
 $output =  '';
 if(!empty($rules) || !empty($pages)) {
     $all = array();
@@ -34,15 +35,19 @@ if(!empty($rules) || !empty($pages)) {
         $pages = array_map('trim',explode(',',$pages));
         foreach($pages as $page) {
             $q = $modx->newQuery('sfRule');
-            $q_where = array('page'=>$page);
-            if(is_array($where)) {
-                $q_where = array_merge($q_where,$where);
+            if($proMode) {
+                $q->where('1=1 AND FIND_IN_SET('.$page.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+            } else {
+                $q->where(array('page' => $page));
             }
-            $q->where($q_where);
+            if(is_array($where)) {
+                $q->where($where);
+            }
             $q->select('id');
             $rules[] = $modx->getValue($q->prepare());
         }
     }
+
 
     $q = $modx->newQuery('sfFieldIds');
     $q->where(array('sfFieldIds.multi_id:IN'=>$rules));
@@ -102,15 +107,15 @@ if(!empty($rules) || !empty($pages)) {
         $c_suffix = $modx->getOption('container_suffix',null,'/');
         $u_suffix = $modx->getOption('seofilter_url_suffix',null,'',true);
         $between_links = $modx->getOption('seofilter_between_links',null,'/',true);
-        $possibleSuffixes = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
+        $possibleSuffixes = array_map('trim',explode(',',$modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
         $possibleSuffixes = array_unique(array_merge($possibleSuffixes,array($c_suffix)));
 
         $url = $link['new_url']?:$link['old_url'];
         $page_url = $modx->makeUrl($link['page_id'],$scriptProperties['context'],'',$scriptProperties['scheme']);
 
         foreach($possibleSuffixes as $possibleSuffix) {
-            if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
-                $url = substr($url, 0, -strlen($possibleSuffix));
+            if (substr($page_url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                $page_url = substr($page_url, 0, -strlen($possibleSuffix));
             }
         }
         $link['url'] = $page_url.$between_links.$url.$u_suffix;

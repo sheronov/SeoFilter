@@ -75,7 +75,7 @@
         <field key="introlength" dbtype="integer" precision="10" phptype="integer" null="true" default="0" />
         <field key="tpl" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
-        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0" />
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" />
 
         <index alias="url" name="url" primary="false" unique="false" type="BTREE">
             <column key="url" length="" collation="A" null="false"/>
@@ -166,7 +166,7 @@
         <field key="value_to" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_from" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP" />
-        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0" />
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" />
 
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
@@ -204,7 +204,7 @@
         <field key="link" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="old_url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="new_url" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" default="0" />
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" />
         <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP" />
 
         <field key="menu_on" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>

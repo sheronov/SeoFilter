@@ -16,7 +16,7 @@ $xpdo_meta_map['sfUrls']= array (
     'link' => '',
     'old_url' => '',
     'new_url' => '',
-    'editedon' => '0',
+    'editedon' => NULL,
     'createdon' => 'CURRENT_TIMESTAMP',
     'menu_on' => 0,
     'menutitle' => '',
@@ -100,7 +100,6 @@ $xpdo_meta_map['sfUrls']= array (
       'dbtype' => 'timestamp',
       'phptype' => 'timestamp',
       'null' => true,
-      'default' => '0',
     ),
     'createdon' => 
     array (

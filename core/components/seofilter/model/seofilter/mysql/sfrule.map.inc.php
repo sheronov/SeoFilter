@@ -33,7 +33,7 @@ $xpdo_meta_map['sfRule']= array (
     'introtexts' => NULL,
     'introlength' => 0,
     'tpl' => '',
-    'editedon' => '0',
+    'editedon' => NULL,
   ),
   'fieldMeta' => 
   array (
@@ -219,7 +219,6 @@ $xpdo_meta_map['sfRule']= array (
       'dbtype' => 'timestamp',
       'phptype' => 'timestamp',
       'null' => true,
-      'default' => '0',
     ),
   ),
   'indexes' => 
