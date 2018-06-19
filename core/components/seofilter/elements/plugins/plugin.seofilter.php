@@ -231,7 +231,9 @@ switch ($modx->event->name) {
                 }
             }
             $all_pages = array_unique($all_pages);
-
+            if(empty($all_pages)) {
+                break;
+            }
             $q = $modx->newQuery('modResource');
             $q->where(array(
                 'id:IN'=>$all_pages,

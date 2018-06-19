@@ -117,6 +117,11 @@ $tmp = array(
         'value' => '/',
         'area' => 'seofilter_main'
     ),
+    'frontend_js' => array(
+        'xtype' => 'textfield',
+        'value' => '[[+jsUrl]]web/default.js',
+        'area' => 'seofilter_main'
+    ),
     'hide_empty' => array(
         'xtype' => 'combo-boolean',
         'value' => false,

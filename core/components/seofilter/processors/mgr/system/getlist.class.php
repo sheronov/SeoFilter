@@ -52,6 +52,7 @@ class msResourceGetListProcessor extends modObjectGetListProcessor
         } elseif ($this->getProperty('combo')) {
             $c->select('id,pagetitle');
         }
+        $c->sortby('id','ASC');
         $c->where(array('class_key:!=' => 'msProduct'));
         if ($id = (int)$this->getProperty('id')) {
             $c->where(array('id' => $id));
@@ -59,7 +60,8 @@ class msResourceGetListProcessor extends modObjectGetListProcessor
         if ($query = trim($this->getProperty('query'))) {
             $c->where(array(
                 'pagetitle:LIKE' => "%{$query}%",
-                'OR:id' => $query
+                'OR:menutitle:LIKE' => "%{$query}%",
+                'OR:id:LIKE' => "{$query}%"
             ));
         }
 

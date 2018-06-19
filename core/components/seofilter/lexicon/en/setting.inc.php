@@ -134,3 +134,5 @@ $_lang['setting_seofilter_level_separator'] = 'Separator of nesting in SEO-links
 $_lang['setting_seofilter_level_separator_desc'] = 'By default "/". It is not recommended to change if you do not know what';
 $_lang['setting_seofilter_between_urls'] = 'Delimiter between the page address and SEO links';
 $_lang['setting_seofilter_between_urls_desc'] = 'By default "/". It is not recommended to change if you do not know what';
+$_lang['setting_seofilter_frontend_js'] = 'Frontend JS-file';
+$_lang['setting_seofilter_frontend_js_desc'] = 'By default "[[+jsUrl]]web/default.js". The path to the file with SeoFilter scripts. If you want choose your scripts, you can clear this parameter.';

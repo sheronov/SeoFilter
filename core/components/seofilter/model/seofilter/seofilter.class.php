@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.5.1';
+    public $version = '1.5.2';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -193,74 +193,76 @@ class SeoFilter
         $this->config = array_merge($this->config, $scriptProperties);
 //        $this->config['ctx'] = $ctx;
 
-
         if($this->config['ajax']) {
             $config = $this->makePlaceholders($this->config);
-            $js = trim($this->modx->getOption('seofilter_frontend_js', null, $this->config['jsUrl'] . 'web/default.js', true));
+            $js = trim($this->modx->getOption('seofilter_frontend_js', null, $this->config['jsUrl'] . 'web/default.js', false));
             if (!empty($js) && preg_match('/\.js/i', $js)) {
                 if (preg_match('/\.js$/i', $js)) {
                     $js .= '?v=' . substr(md5($this->version), 0, 10);
                 }
-                $this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
+//                $this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
+                $js_file = str_replace($config['pl'], $config['vl'], $js);
+                $this->modx->regClientScript($js_file);
+            }
 
-                if ($this->config['page']) {
+            if ($this->config['page']) {
 //                    $aliases = $this->fieldsAliases($this->config['page'], 1);
 //                    $this->config['aliases'] = $aliases;
-                    $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', $this->config['scheme']);
+                $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', $this->config['scheme']);
 
-                    if($this->config['replace_host'] ) {
-                        $site_url = explode('://',$this->config['site_url']);
-                        $site_url = array_pop($site_url);
-                        $site_url = trim($site_url,'/');
-                        $page_url = str_replace($site_url,$_SERVER['HTTP_HOST'],$page_url);
-                    }
-
-                    $c_suffix = $this->config['container_suffix'];
-                    if($c_suffix && $page_url) {
-                        if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix)) !== false) {
-                            $page_url = substr($page_url,0,-strlen($c_suffix));
-                        }
-                    }
-                    $page_url = $this->clearSuffixes($page_url);
-
-                    $this->config['url'] = $page_url;
-
-                    $q = $this->modx->newQuery('sfFieldIds');
-                    $q->rightJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id');
-                    $q->rightJoin('sfField','sfField','sfField.id = sfFieldIds.field_id');
-                    $q->where(array('sfField.slider'=>1,'sfRule.page'=>$this->config['page']));
-                    $this->config['slider'] = $this->modx->getCount('sfFieldIds',$q);
+                if($this->config['replace_host'] ) {
+                    $site_url = explode('://',$this->config['site_url']);
+                    $site_url = array_pop($site_url);
+                    $site_url = trim($site_url,'/');
+                    $page_url = str_replace($site_url,$_SERVER['HTTP_HOST'],$page_url);
                 }
 
-                $data = json_encode(array(
-                    'jsUrl' => $this->config['jsUrl'] . 'web/',
-                    'actionUrl' => $this->config['actionUrl'],
-                    'ctx' => $ctx,
-                    'page' => $this->config['page'],
-                    'params' => $this->config['params'],
-//                    'aliases' => $this->config['aliases'],
-                    'slider' => $this->config['slider'],
-                    'crumbs' => $this->config['crumbsReplace'],
-                    'separator' => $this->config['separator'],
-                    'redirect' => $this->config['redirect'],
-                    'url' => $this->config['url'],
-                    'replacebefore' => $this->config['replacebefore'],
-                    'replaceseparator' => $this->config['replaceseparator'],
-                    'jtitle' => $this->config['jtitle'],
-                    'jlink' => $this->config['jlink'],
-                    'jdescription' => $this->config['jdescription'],
-                    'jintrotext' => $this->config['jintrotext'],
-                    'jkeywords' => $this->config['jkeywords'],
-                    'jh1' => $this->config['jh1'],
-                    'jh2' => $this->config['jh2'],
-                    'jtext' => $this->config['jtext'],
-                    'jcontent' => $this->config['jcontent'],
-                ), true);
+                $c_suffix = $this->config['container_suffix'];
+                if($c_suffix && $page_url) {
+                    if(strpos($page_url,$c_suffix,strlen($page_url)-strlen($c_suffix)) !== false) {
+                        $page_url = substr($page_url,0,-strlen($c_suffix));
+                    }
+                }
+                $page_url = $this->clearSuffixes($page_url);
 
-                $this->modx->regClientStartupScript(
-                    '<script type="text/javascript">seoFilterConfig = ' . $data . ';</script>', true
-                );
+                $this->config['url'] = $page_url;
+
+                $q = $this->modx->newQuery('sfFieldIds');
+                $q->rightJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id');
+                $q->rightJoin('sfField','sfField','sfField.id = sfFieldIds.field_id');
+                $q->where(array('sfField.slider'=>1,'sfRule.page'=>$this->config['page']));
+                $this->config['slider'] = $this->modx->getCount('sfFieldIds',$q);
             }
+
+            $data = json_encode(array(
+                'jsUrl' => $this->config['jsUrl'] . 'web/',
+                'actionUrl' => $this->config['actionUrl'],
+                'ctx' => $ctx,
+                'page' => $this->config['page'],
+                'params' => $this->config['params'],
+//                    'aliases' => $this->config['aliases'],
+                'slider' => $this->config['slider'],
+                'crumbs' => $this->config['crumbsReplace'],
+                'separator' => $this->config['separator'],
+                'redirect' => $this->config['redirect'],
+                'url' => $this->config['url'],
+                'replacebefore' => $this->config['replacebefore'],
+                'replaceseparator' => $this->config['replaceseparator'],
+                'jtitle' => $this->config['jtitle'],
+                'jlink' => $this->config['jlink'],
+                'jdescription' => $this->config['jdescription'],
+                'jintrotext' => $this->config['jintrotext'],
+                'jkeywords' => $this->config['jkeywords'],
+                'jh1' => $this->config['jh1'],
+                'jh2' => $this->config['jh2'],
+                'jtext' => $this->config['jtext'],
+                'jcontent' => $this->config['jcontent'],
+            ), true);
+
+            $this->modx->regClientStartupScript(
+                '<script type="text/javascript">seoFilterConfig = ' . $data . ';</script>', true
+            );
+
         }
         $this->initialized[$ctx] = true;
         return true;

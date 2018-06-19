@@ -301,11 +301,9 @@ $builder->setPackageAttributes(array(
     'setup-options' => array(
         'source' => $sources['build'] . 'setup.options.php',
     ),
-    /*
-    'requires' => array(
-        'pdotools' => '>=2.5.0-pl',
-    ),
-    */
+//    'requires' => array(
+//        'pdotools' => '>=2.5.0-pl',
+//    ),
 ));
 $modx->log(modX::LOG_LEVEL_INFO, 'Added package attributes and setup options.');
 
