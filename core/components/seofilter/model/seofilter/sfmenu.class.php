@@ -43,6 +43,11 @@ class sfMenu
             )
         );
 
+        $config['corePath'] = $this->modx->getOption('seofilter_core_path', $config,
+            $this->modx->getOption('core_path') . 'components/seofilter/'
+        );
+        $config['customPath'] = $this->modx->getOption('seofilter_custom_path',$config,$config['corePath'].'custom/');
+
         $config['between_urls'] = $this->modx->getOption('seofilter_between_urls', null, '/', true);
         $config['container_suffix'] = $this->modx->getOption('container_suffix',null,'/');
         $config['url_suffix'] = $this->modx->getOption('seofilter_url_suffix',null,'',true);
@@ -807,7 +812,7 @@ class sfMenu
             foreach ($files as $file) {
                 if (preg_match('#\.class\.php$#i', $file)) {
                     /** @noinspection PhpIncludeInspection */
-                    include $customPath . '/' . $file;
+                    include_once $customPath . '/' . $file;
                 }
             }
         } else {

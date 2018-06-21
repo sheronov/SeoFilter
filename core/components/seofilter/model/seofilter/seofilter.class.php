@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.5.2';
+    public $version = '1.5.3';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -29,6 +29,7 @@ class SeoFilter
         $assetsUrl = $this->modx->getOption('seofilter_assets_url', $config,
             $this->modx->getOption('assets_url') . 'components/seofilter/'
         );
+        $customPath = $this->modx->getOption('seofilter_custom_path',$config,$corePath.'custom/');
         $actionUrl = $assetsUrl . 'action.php';
         $connectorUrl = $assetsUrl . 'connector.php';
         $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
@@ -106,7 +107,7 @@ class SeoFilter
             'json_response' => true,
 
             'corePath' => $corePath,
-            'customPath' => $corePath . 'custom/',
+            'customPath' => $customPath,
             'modelPath' => $corePath . 'model/',
             'chunksPath' => $corePath . 'elements/chunks/',
             'templatesPath' => $corePath . 'elements/templates/',
@@ -271,7 +272,7 @@ class SeoFilter
     public function getFieldsKey($key = 'key') {
         $fields = array();
         $q = $this->modx->newQuery('sfField');
-        $q->where(array('active'=>1));
+//        $q->where(array('active'=>1));
         $q->select(array('sfField.*'));
         if($q->prepare() && $q->stmt->execute()) {
             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -487,11 +488,12 @@ class SeoFilter
             $customPath = MODX_BASE_PATH . ltrim($customPath, '/');
         }
         $customPath = rtrim($customPath, '/') . '/' . ltrim($dir, '/');
+
         if (file_exists($customPath) && $files = scandir($customPath)) {
             foreach ($files as $file) {
                 if (preg_match('#\.class\.php$#i', $file)) {
                     /** @noinspection PhpIncludeInspection */
-                    include $customPath . '/' . $file;
+                    include_once $customPath . '/' . $file;
                 }
             }
         } else {

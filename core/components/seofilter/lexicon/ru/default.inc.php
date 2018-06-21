@@ -28,7 +28,7 @@ $_lang['seofilter_urls_intro'] = 'После добавления правил �
 $_lang['seofilter_field_id'] = 'Id';
 $_lang['seofilter_field_name'] = 'Название';
 $_lang['seofilter_field_description'] = 'Описание';
-$_lang['seofilter_field_active'] = 'Активно (собираются слова)';
+$_lang['seofilter_field_active'] = 'Активно (собирать значения)';
 $_lang['seofilter_field_page'] = 'Страница';
 $_lang['seofilter_field_pages'] = 'Страницы';
 $_lang['seofilter_field_pages_more'] = 'ID страниц (несколько через запятую)';
@@ -64,7 +64,6 @@ $_lang['seofilter_field_remove'] = 'Удалить поле';
 $_lang['seofilter_fields_remove'] = 'Удалить поля';
 $_lang['seofilter_field_remove_confirm'] = 'Вы уверены, что хотите удалить это поле?';
 $_lang['seofilter_fields_remove_confirm'] = 'Вы уверены, что хотите удалить эти поля?';
-$_lang['seofilter_field_active'] = 'Включено';
 
 $_lang['seofilter_field_err_name'] = 'Вы должны указать имя поля.';
 $_lang['seofilter_field_err_ae'] = 'Поле с таким именем уже существует.';

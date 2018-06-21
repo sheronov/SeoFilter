@@ -96,7 +96,7 @@ $_lang['setting_seofilter_tpls_path'] = 'Путь для файловых эле
 $_lang['setting_seofilter_hide_empty'] = 'Отдавать 404 ошибку на пустых страницах';
 $_lang['setting_seofilter_hide_empty_desc'] = 'Пустые страницы - это те, где нет результатов. Функция подсчётов должна быть включена.';
 
-$_lang['setting_seofilter_morpher_token'] = 'Токен к сервису moprher.ru';
+$_lang['setting_seofilter_morpher_token'] = 'Токен к сервису morpher.ru';
 $_lang['setting_seofilter_morpher_token_desc'] = 'Если указать, то не упрётесь в гостевой лимит запросов';
 $_lang['setting_seofilter_container_suffix'] = 'Окончание для сброшенных страниц';
 $_lang['setting_seofilter_container_suffix_desc'] = 'По умолчанию, как из системной настройки container_suffix. Использовать если используете заморозку url для родительских каталогов';

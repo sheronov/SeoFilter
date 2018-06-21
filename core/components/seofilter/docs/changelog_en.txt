@@ -1,5 +1,10 @@
 Changelog for SeoFilter.
 
+1.5.3-beta (19.06.2018)
+=======================
+- Little fixes for counting through extend class
+- Now inactive fields just for don't collect values
+
 1.5.2-beta (01.06.2018)
 =======================
 - Fixed page list processor

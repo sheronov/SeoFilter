@@ -20,6 +20,7 @@ class sfCountHandler
         $corePath = $this->modx->getOption('seofilter_core_path', $config,
             $this->modx->getOption('core_path') . 'components/seofilter/'
         );
+        $customPath = $this->modx->getOption('seofilter_custom_path',$config,$corePath.'custom/');
 
         $count_results = $this->modx->getOption('seofilter_count',null,0,true);
         $count_choose = $this->modx->getOption('seofilter_choose',null,'',true);
@@ -28,7 +29,7 @@ class sfCountHandler
         
         $this->config = array_merge(array(
             'corePath' => $corePath,
-            'customPath' => $corePath . 'custom/',
+            'customPath' => $customPath,
             'modelPath' => $corePath . 'model/',
 
             'count_choose' => $count_choose,

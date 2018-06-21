@@ -96,7 +96,7 @@ $_lang['setting_seofilter_tpls_path'] = 'Path for file elements';
 $_lang['setting_seofilter_hide_empty'] = 'Redirect to page 404 on blank pages';
 $_lang['setting_seofilter_hide_empty_desc'] = 'Blank pages are those with no results. The counting function must be enabled.';
 
-$_lang['setting_seofilter_morpher_token'] = 'Token to the service moprher.ru';
+$_lang['setting_seofilter_morpher_token'] = 'Token to the service morpher.ru';
 $_lang['setting_seofilter_morpher_token_desc'] = 'If you specify, then do not rush into the guest limit of requests';
 $_lang['setting_seofilter_container_suffix'] = 'Suffix on resetting to original pages';
 $_lang['setting_seofilter_container_suffix_desc'] = 'By default, as from the system configuration of container_suffix. Use if you use the url freeze for parent directories';

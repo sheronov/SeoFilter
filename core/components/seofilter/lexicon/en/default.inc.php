@@ -28,7 +28,7 @@ $_lang['seofilter_urls_intro'] = 'After the rules are added, the addresses and m
 $_lang['seofilter_field_id'] = 'Id';
 $_lang['seofilter_field_name'] = 'Name';
 $_lang['seofilter_field_description'] = 'Description';
-$_lang['seofilter_field_active'] = 'Active (The words are collected)';
+$_lang['seofilter_field_active'] = 'Active (The values are collected)';
 $_lang['seofilter_field_page'] = 'Page';
 $_lang['seofilter_field_pages'] = 'Pages';
 $_lang['seofilter_field_pages_more'] = 'Pages ID (Several ID separated by commas)';
@@ -64,7 +64,6 @@ $_lang['seofilter_field_remove'] = 'Delete field';
 $_lang['seofilter_fields_remove'] = 'Delete fields';
 $_lang['seofilter_field_remove_confirm'] = 'Are you sure that you want to delete this field?';
 $_lang['seofilter_fields_remove_confirm'] = 'Are you sure that you want to delete these fields?';
-$_lang['seofilter_field_active'] = 'Activated';
 
 $_lang['seofilter_field_err_name'] = 'You need to specify a field name.';
 $_lang['seofilter_field_err_ae'] = 'The field with the same name already exists.';

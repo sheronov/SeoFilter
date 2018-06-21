@@ -271,7 +271,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     fieldLabel: _('seofilter_field_class'),
                     name: 'class',
                     id: config.id + '-class',
-                    readOnly: true,
+                    // readOnly: true,
                     style: 'background:#f9f9f9;color:#aaa;',
                     anchor: '99%',
                     allowBlank:false,
