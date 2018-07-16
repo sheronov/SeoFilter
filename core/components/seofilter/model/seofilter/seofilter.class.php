@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.5.3';
+    public $version = '1.5.4';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -26,6 +26,7 @@ class SeoFilter
         $corePath = $this->modx->getOption('seofilter_core_path', $config,
             $this->modx->getOption('core_path') . 'components/seofilter/'
         );
+
         $assetsUrl = $this->modx->getOption('seofilter_assets_url', $config,
             $this->modx->getOption('assets_url') . 'components/seofilter/'
         );
@@ -92,7 +93,8 @@ class SeoFilter
         $defaultWhere = $this->modx->getOption('seofilter_default_where',null,'{"published":1,"deleted":0}',true);
 
         $possibleSuffixes = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
-
+        $admin_version = $this->modx->getOption('seofilter_admin_version',null,1);
+        $main_alias = $this->modx->getOption('seofilter_main_alias',null,0);
 
         $this->pdo = $this->modx->getService('pdoFetch');
         $this->pdo->setConfig(array('loadModels' => 'seofilter'));
@@ -146,6 +148,8 @@ class SeoFilter
             'page_key' => $page_key,
             'page_tpl' => $page_tpl,
             'page_number' => 1,
+            'admin_version' => $admin_version,
+            'main_alias' => $main_alias,
 
             'replace_host' => $replace_host,
             'replacebefore' => $replacebefore,
@@ -247,6 +251,7 @@ class SeoFilter
                 'separator' => $this->config['separator'],
                 'redirect' => $this->config['redirect'],
                 'url' => $this->config['url'],
+                'between' => $this->config['between_urls'],
                 'replacebefore' => $this->config['replacebefore'],
                 'replaceseparator' => $this->config['replaceseparator'],
                 'jtitle' => $this->config['jtitle'],
@@ -684,9 +689,17 @@ class SeoFilter
                     $fullUrl = explode('?',str_replace($delArray,'',$data['data']['full_url']));
                     $fullUrl = $this->clearSuffixes(array_shift($fullUrl));
                     $pageUrl = $this->clearSuffixes(str_replace($delArray,'',$data['data']['page_url']));
-
+                    if($this->config['main_alias'] && $pageId == $this->config['site_start']) {
+                        $q = $this->modx->newQuery('modResource');
+                        $q->where(array('id'=>$pageId));
+                        $q->select('alias');
+                        $alias = $this->modx->getValue($q->prepare());
+                        if($pageUrl != $fullUrl) {
+                            $pageUrl .= '/' . $alias;
+                        }
+                    }
                     $findUrl = $this->clearSuffixes(trim(str_replace($pageUrl,'',$fullUrl),'/'));
-
+                    $findUrl = trim($findUrl,$this->config['between_urls']);
                 }
                 if($findUrl) {
                     if($url_words = $this->getParamsByUrl($findUrl)) {
@@ -778,7 +791,7 @@ class SeoFilter
                         if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
-                            $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
+                            $q->where(array('sfDictionary.input'=>$value,'sfDictionary.active'=>1,'sfField.alias'=>$param));
                             if(!$this->modx->getCount('sfDictionary',$q)) {
                                 $find_range = 0;
 
@@ -786,7 +799,7 @@ class SeoFilter
                                 $c->where(array('sfField.alias'=>$param,'sfField.slider'=>1));
                                 if($this->modx->getCount('sfField',$c)) {
                                     $values = array_map('trim', explode($this->config['values_delimeter'],$value));
-                                    $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id');
+                                    $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id AND sfDictionary.active = 1');
                                     $c->select('sfField.id,sfDictionary.input');
                                     if($c->prepare() && $c->stmt->execute()) {
                                         foreach($c->stmt->fetchAll(PDO::FETCH_ASSOC) as $inp) {
@@ -813,14 +826,14 @@ class SeoFilter
                         if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
-                            $q->where(array('sfDictionary.input'=>$value,'sfField.alias'=>$param));
+                            $q->where(array('sfDictionary.input'=>$value,'sfDictionary.active'=>1,'sfField.alias'=>$param));
                             if(!$this->modx->getCount('sfDictionary',$q)) {
                                 $find_range = 0;
                                 $c = $this->modx->newQuery('sfField');
                                 $c->where(array('sfField.alias'=>$param,'sfField.slider'=>1));
                                 if($this->modx->getCount('sfField',$c)) {
                                     $values = array_map('trim', explode($this->config['values_delimeter'],$value));
-                                    $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id');
+                                    $c->leftJoin('sfDictionary','sfDictionary','sfDictionary.field_id = sfField.id AND sfDictionary.active = 1');
                                     $c->select('sfField.id,sfDictionary.input');
                                     if($c->prepare() && $c->stmt->execute()) {
                                         foreach($c->stmt->fetchAll(PDO::FETCH_ASSOC) as $inp) {
@@ -887,7 +900,20 @@ class SeoFilter
                 }
 
                 if($meta['url']) {
-                    $meta['url'] = $this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
+                    if($pageId == $this->config['site_start']) {
+                        if($this->config['main_alias']) {
+                            $q = $this->modx->newQuery('modResource');
+                            $q->where(array('id'=>$pageId));
+                            $q->select('alias');
+                            $alias = $this->modx->getValue($q->prepare());
+                            $meta['url'] = '/'.$alias.$this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
+                        } else {
+                            $meta['url'] = '/' . $meta['url'] . $this->config['url_suffix'];
+                        }
+                    } else {
+                        $meta['url'] = $this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
+                    }
+
                 } else {
                     $meta['url'] = $this->config['container_suffix'];
                 }
@@ -1126,6 +1152,8 @@ class SeoFilter
         $link_id = 0;
         $has_slider = 0;
 
+        $params_to_text = array();
+
 
         // если не нужно пересчитывать на странице с учётом гет параметра - то это закоментить, а ниже раскоментить
         $fields_keys = $this->getFieldsKey('alias');
@@ -1153,6 +1181,14 @@ class SeoFilter
                         $word_array['m_' . $alias] = $word_array['m_' . $alias . '_i'];
                     }
 
+                    $params_to_text[$param] = array(
+                        'input'=>$word['input'],
+                        'value'=>$word['value'],
+                        'alias'=>$word['alias'],
+                        'field'=>$word['field_id'],
+                        'class'=>$field['class'],
+                        'key'=>$field['key']
+                    );
                     $aliases[$param] = $word['alias'];
 
 //                    $fields_key[$alias]['class'] = $field['class'];
@@ -1178,7 +1214,7 @@ class SeoFilter
                         if ($row['where'] && $row['compare'] && $row['value']) {
                             $c = $this->modx->newQuery('sfDictionary');
                             $c->select(array('sfDictionary.*'));
-                            $c->where(array('field_id' => $row['field_id'], 'input' => $input));
+                            $c->where(array('field_id' => $row['field_id'], 'input' => $input,'active'=>1));
                             $value = $row['value'];
                             $values = explode($this->config['values_delimeter'], $value);
                             switch ($row['compare']) { //Обратный механизм поиска
@@ -1264,6 +1300,12 @@ class SeoFilter
                     $word_array[$pkey] = $page_id;
                 }
             }
+
+            $word_array['original_params'] = $params_to_text;
+            if(!isset($word_array['params'])) {
+                $word_array['params'] = $params_to_text;
+            }
+
             $word_array = $this->prepareRow($word_array,$parents,$rule_id,$seo);
 
             if($url_array['nourl']) {
@@ -1345,7 +1387,7 @@ class SeoFilter
         $diff = array();
         if(!empty($url_array['diff'])) {
             foreach($url_array['diff'] as $param => $alias) {
-                if ($diff_arr = $this->pdo->getArray('sfDictionary', array('alias' => $alias))) {
+                if ($diff_arr = $this->pdo->getArray('sfDictionary', array('alias' => $alias,'active'=>1))) {
                     $diff[$param] = $diff_arr['input'];
                 }
             }
@@ -1595,23 +1637,34 @@ class SeoFilter
         $q = $this->modx->newQuery('sfDictionary');
         if($slider) {
             $values = array_map('trim',explode($this->config['values_delimeter'],$input));
-            $q->where(array('field_id'=>$field_id));
+            $q->where(array('field_id'=>$field_id,'active'=>1));
             $q->limit(0);
             if($this->modx->getCount('sfDictionary',$q)) {
                 $q->select(array('sfDictionary.*'));
                 if ($q->prepare() && $q->stmt->execute()) {
+                    $min_diff = 0;
+                    $min_diff_word = array();
                     while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                         $i_values = array_map('trim',explode($this->config['values_delimeter'],$row['input']));
                         if($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
-                            $word = $row;
-                            break;
+                            $diff = ($values[0] - $i_values[0]) + ($i_values[1] - $values[1]);
+                            if(empty($min_diff_word)) {
+                                $min_diff_word = $row;
+                                $min_diff = $diff;
+                            } elseif($diff < $min_diff) {
+                                $min_diff_word = $row;
+                                $min_diff = $diff;
+                            }
+//                            $word = $row;
+//                            break;
                         }
                     }
+                    $word = $min_diff_word;
                 }
             }
         } else {
             $q->limit(1);
-            $q->where(array('field_id'=> $field_id,'input'=>$input));
+            $q->where(array('field_id'=> $field_id,'input'=>$input,'active'=>1));
             if($this->modx->getCount('sfDictionary',$q)) {
                 $q->select(array('sfDictionary.*'));
                 if ($q->prepare() && $q->stmt->execute()) {
@@ -1637,7 +1690,7 @@ class SeoFilter
                         if($relation_value) {
                             $relation_field = $field->get('relation_field');
                             $s = $this->modx->newQuery('sfDictionary');
-                            $s->where(array('input'=>$relation_value,'field_id'=>$relation_field));
+                            $s->where(array('input'=>$relation_value,'field_id'=>$relation_field,'active'=>1));
                             $s->select('id');
                             $relation_id = $this->modx->getValue($s->prepare());
                         }
@@ -1761,7 +1814,7 @@ class SeoFilter
         $q->where(array('old_url'=>$url,'OR:new_url:='=>$url));
         $q->leftJoin('sfUrlWord','sfUrlWord','sfUrlWord.url_id = sfUrls.id');
         $q->innerJoin('sfField','Field','Field.id = sfUrlWord.field_id');
-        $q->innerJoin('sfDictionary','Word','Word.id = sfUrlWord.word_id');
+        $q->innerJoin('sfDictionary','Word','Word.id = sfUrlWord.word_id AND Word.active = 1');
         $q->sortby('sfUrlWord.priority','ASC');
         $q->groupby('sfUrlWord.id');
         $q->select(array(
@@ -1792,11 +1845,16 @@ class SeoFilter
     }
 
     public function findUrlArray($url = '',$page = 0) {
-        if($url_array = $this->pdo->getArray('sfUrls',array('page_id'=>$page,'old_url'=>$url,'OR:new_url:='=>$url))) {
-            return $url_array;
-        } else {
-            return array();
+        $url_array = array();
+        $q = $this->modx->newQuery('sfUrls');
+        $q->where(array('page_id'=>$page));
+        $q->where(array('old_url:LIKE'=>$url,'OR:new_url:LIKE'=>$url));
+        $q->select($this->modx->getSelectColumns('sfUrls','sfUrls'));
+        $q->limit(1);
+        if($q->prepare() && $q->stmt->execute()) {
+            $url_array = $q->stmt->fetch(PDO::FETCH_ASSOC);
         }
+        return $url_array;
     }
 
     public function newUrl($old_url = '',$multi_id = 0,$page_id = 0,$ajax = 0,$new = 0,$field_word = array(),$link_tpl='') {
@@ -1814,7 +1872,7 @@ class SeoFilter
             }
             $q = $this->modx->newQuery('sfDictionary');
             $q->innerJoin('sfField','Field','Field.id = sfDictionary.field_id');
-            $q->where(array('id:IN'=>$words));
+            $q->where(array('id:IN'=>$words,'active'=>1));
             $q->select($this->modx->getSelectColumns('sfDictionary','sfDictionary','',$seo_system,1));
             $q->select($this->modx->getSelectColumns('sfField','Field','field_',array('alias')));
             if($q->prepare() && $q->stmt->execute()) {
@@ -2225,7 +2283,7 @@ class SeoFilter
         foreach ($fields as $field_id => &$field) {
             $alias = $field['field_alias'];
             $q = $this->modx->newQuery('sfDictionary');
-            $q->where(array('field_id'=>$field_id));
+            $q->where(array('field_id'=>$field_id,'active'=>1));
             if(isset($where[$field_id])) {
                 $q->where($where[$field_id]);
             }

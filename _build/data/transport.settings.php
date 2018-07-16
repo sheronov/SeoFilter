@@ -104,7 +104,7 @@ $tmp = array(
     ),
     'url_scheme' => array(
         'xtype' => 'textfield',
-        'value' => '',
+        'value' => 'full',
         'area' => 'seofilter_main'
     ),
     'level_separator' => array(
@@ -115,6 +115,11 @@ $tmp = array(
     'between_urls' => array(
         'xtype' => 'textfield',
         'value' => '/',
+        'area' => 'seofilter_main'
+    ),
+    'main_alias' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
         'area' => 'seofilter_main'
     ),
     'frontend_js' => array(

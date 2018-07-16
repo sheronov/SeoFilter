@@ -54,6 +54,7 @@ class SeoFilterHomeManagerController extends modExtraManagerController
      */
     public function loadCustomCssJs()
     {
+
         $this->addCss($this->SeoFilter->config['cssUrl'] . 'mgr/main.css');
         $this->addCss($this->SeoFilter->config['cssUrl'] . 'mgr/bootstrap.buttons.css');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/seofilter.js');
@@ -88,19 +89,25 @@ class SeoFilterHomeManagerController extends modExtraManagerController
 
     public function addCss($script)
     {
-        $script = $script . '?v=' . $this->SeoFilter->version;
+        if($this->SeoFilter->config['admin_version']) {
+            $script = $script . '?v=' . $this->SeoFilter->version;
+        }
         parent::addCss($script);
     }
 
     public function addJavascript($script)
     {
-        $script = $script . '?v=' . $this->SeoFilter->version;
+        if($this->SeoFilter->config['admin_version']) {
+            $script = $script . '?v=' . $this->SeoFilter->version;
+        }
         parent::addJavascript($script);
     }
 
     public function addLastJavascript($script)
     {
-        $script = $script . '?v=' . $this->SeoFilter->version;
+        if($this->SeoFilter->config['admin_version']) {
+            $script = $script . '?v=' . $this->SeoFilter->version;
+        }
         parent::addLastJavascript($script);
     }
 

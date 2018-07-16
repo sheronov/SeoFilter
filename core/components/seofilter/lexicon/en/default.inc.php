@@ -331,3 +331,10 @@ $_lang['seofilter_word_add_info'] = 'For Rule (id={$rule_id}):<br><b>added {$add
 $_lang['seofilter_word_update_info'] = 'For Rule (id={$rule_id}):<br>{if $remove_links}<b>remove {$remove_links} links</b><br>{/if} <b>added {$add_links} new links</b><br><br>';
 $_lang['seofilter_dictionary_alias_double'] = 'For one Field words aliases can not coincide';
 $_lang['seofilter_Tagger'] = 'Tagger (tags from component Tagger)';
+$_lang['seofilter_word_enable'] = 'Activate word (links will be created)';
+$_lang['seofilter_words_enable'] = 'Activate words (links will be created)';
+$_lang['seofilter_word_disable'] = 'Disable word (links will be deleted)';
+$_lang['seofilter_words_disable'] = 'Disable words (links will be deleted)';
+$_lang['seofilter_word_disable_confirmation'] = 'Disabling the words results in the irretrievable deletion of the links. Re-enabling will create new links. Do you really want to continue?';
+$_lang['seofilter_word_enable_confirmation'] = 'Activating words leads to the creation of links for all rules associated with this word. Do you really want to continue?';
+$_lang['seofilter_word_disable_info'] = 'For Rule (id={$rule_id}):<br><b>removed {$total} links</b><br><br>';

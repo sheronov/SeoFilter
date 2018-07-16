@@ -134,5 +134,7 @@ $_lang['setting_seofilter_level_separator'] = 'Разделитель вложе
 $_lang['setting_seofilter_level_separator_desc'] = 'По умолчанию "/". Не рекомендуется изменять, если не знаете для чего';
 $_lang['setting_seofilter_between_urls'] = 'Разделитель между адресом страницы и SEO-ссылками';
 $_lang['setting_seofilter_between_urls_desc'] = 'По умолчанию "/". Не рекомендуется изменять, если не знаете для чего';
+$_lang['setting_seofilter_main_alias'] = 'Добавлять синоним главной страницы в URL';
+$_lang['setting_seofilter_main_alias_desc'] = 'По умолчанию "Нет". Используется тогда, когда к главной странице привязано правило и нужны ссылки в один уровень';
 $_lang['setting_seofilter_frontend_js'] = 'JS-файл фронтенда';
 $_lang['setting_seofilter_frontend_js_desc'] = 'По умолчанию "[[+jsUrl]]web/default.js". Путь к файлу со скриптами SeoFilter. Если хотите использовать свои скрипты - очистите здесь параметр.';

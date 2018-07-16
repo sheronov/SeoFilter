@@ -57,7 +57,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         this.addContextMenuItem(menu);
     },
 
-    createField: function (btn, e) {
+    createWord: function (btn, e) {
         var w = MODx.load({
             xtype: 'seofilter-dictionary-window-create',
             id: Ext.id(),
@@ -79,7 +79,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         w.show(e.target);
     },
 
-    updateField: function (btn, e, row) {
+    updateWord: function (btn, e, row) {
         if (typeof(row) != 'undefined') {
             this.menu.record = row.data;
         }
@@ -173,8 +173,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     },
 
 
-
-    removeField: function () {
+    removeWord: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -197,7 +196,10 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             },
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.message) {
+                            MODx.msg.alert(_('seofilter_info'), res.message);
+                        }
                         this.refresh();
                         Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
@@ -208,12 +210,17 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
         return true;
     },
 
-    disableField: function () {
+    disableWord: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
         }
-        MODx.Ajax.request({
+
+        MODx.msg.confirm({
+            title: ids.length > 1
+                ? _('seofilter_words_disable')
+                : _('seofilter_word_disable'),
+            text: _('seofilter_word_disable_confirmation'),
             url: this.config.url,
             params: {
                 action: 'mgr/dictionary/disable',
@@ -221,20 +228,30 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             },
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.message) {
+                            MODx.msg.alert(_('seofilter_info'), res.message);
+                        }
                         this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
                 }
             }
-        })
+        });
+
     },
 
-    enableField: function () {
+    enableWord: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
         }
-        MODx.Ajax.request({
+
+        MODx.msg.confirm({
+            title: ids.length > 1
+                ? _('seofilter_words_enable')
+                : _('seofilter_word_enable'),
+            text: _('seofilter_word_enable_confirmation'),
             url: this.config.url,
             params: {
                 action: 'mgr/dictionary/enable',
@@ -242,12 +259,17 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             },
             listeners: {
                 success: {
-                    fn: function () {
+                    fn: function (res) {
+                        if(res.message) {
+                            MODx.msg.alert(_('seofilter_info'), res.message);
+                        }
                         this.refresh();
+                        Ext.getCmp('seofilter-grid-urls').refresh();
                     }, scope: this
                 }
             }
-        })
+        });
+
     },
 
     getFields: function () {
@@ -297,12 +319,12 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             sortable: true,
             renderer: SeoFilter.utils.formatDate,
             width: 100,
-        // }, {
-        //     header: _('seofilter_dictionary_active'),
-        //     dataIndex: 'active',
-        //     renderer: SeoFilter.utils.renderBoolean,
-        //     sortable: true,
-        //     width: 50,
+        }, {
+            header: _('seofilter_dictionary_active'),
+            dataIndex: 'active',
+            renderer: SeoFilter.utils.renderBoolean,
+            sortable: true,
+            width: 50,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',

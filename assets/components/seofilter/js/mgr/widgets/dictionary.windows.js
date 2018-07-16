@@ -80,13 +80,7 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
                     }
                 ]
             }]
-        },{
-        //     xtype: 'xcheckbox',
-        //     boxLabel: _('seofilter_dictionary_active'),
-        //     name: 'active',
-        //     id: config.id + '-active',
-        // }, {
-
+        }, {
             layout: 'column',
             border: false,
             anchor: '100%',
@@ -117,12 +111,18 @@ Ext.extend(SeoFilter.window.CreateDictionary, MODx.Window, {
                 , layout: 'form'
                 , defaults: {msgTarget: 'under'}
                 , border: false
+                , style: 'padding-top:20px;text-align:right;'
                 , items: [
                     {
-                        title: _('seofilter_dictionary_decline')
-                        , style: 'border-top:1px solid #ccc;padding-top:5px;'
-                        , xtype: 'displayfield'
-                        , html: _('seofilter_dictionary_decline_desc_save')
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_dictionary_active'),
+                        name: 'active',
+                        id: config.id + '-active',
+                    // }, {
+                    //     title: _('seofilter_dictionary_decline')
+                    //     , style: 'border-top:1px solid #ccc;padding-top:5px;'
+                    //     , xtype: 'displayfield'
+                    //     , html: _('seofilter_dictionary_decline_desc_save')
                     // }, {
                         // xtype: 'textfield',
                         // fieldLabel: _('seofilter_word_image'),
@@ -355,6 +355,12 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                         description: '{$value_to}',
                         name: 'value_to',
                         id: config.id + '-value_to',
+                        anchor: '99%',
+                    },{
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_dictionary_active'),
+                        name: 'active',
+                        id: config.id + '-active',
                         anchor: '99%',
                     }
                 ]

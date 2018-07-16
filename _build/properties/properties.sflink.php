@@ -19,9 +19,13 @@ $tmp = array(
         'type' => 'textfield',
         'value' => ''
     ),
+    'link_classes' => array(
+        'type' => 'textfield',
+        'value' => '',
+    ),
     'tpl' => array(
         'type' => 'textfield',
-        'value' => '@INLINE <a href="[[+url]]">[[+name]]</a>',
+        'value' => '@INLINE <a href="[[+url]]"[[+classes]]>[[+name]]</a>',
     ),
     'toPlaceholder' => array(
         'type' => 'textfield',

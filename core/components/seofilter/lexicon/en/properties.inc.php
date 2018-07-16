@@ -68,3 +68,4 @@ $_lang['seofilter_prop_input'] = 'The query by which to find the value at the di
 $_lang['seofilter_prop_field_id'] = 'Field ID, to refine the search value';
 $_lang['seofilter_prop_pages'] = 'List of id pages for search - the search is in the order as the values are passed (you may do not need a list of rules).';
 $_lang['seofilter_prop_as_name'] = 'The value that will substitute for the original name of the link.';
+$_lang['seofilter_prop_link_classes'] = 'The classes that you want to add to the link.';

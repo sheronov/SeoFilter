@@ -135,19 +135,25 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
 
     public function addCss($script)
     {
-        $script = $script . '?v=' . $this->SeoFilter->version;
+        if($this->SeoFilter->config['admin_version']) {
+            $script = $script . '?v=' . $this->SeoFilter->version;
+        }
         parent::addCss($script);
     }
 
     public function addJavascript($script)
     {
-        $script = $script . '?v=' . $this->SeoFilter->version;
+        if($this->SeoFilter->config['admin_version']) {
+            $script = $script . '?v=' . $this->SeoFilter->version;
+        }
         parent::addJavascript($script);
     }
 
     public function addLastJavascript($script)
     {
-        $script = $script . '?v=' . $this->SeoFilter->version;
+        if($this->SeoFilter->config['admin_version']) {
+            $script = $script . '?v=' . $this->SeoFilter->version;
+        }
         parent::addLastJavascript($script);
     }
 

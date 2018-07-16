@@ -39,7 +39,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
         if ($query) {
             $c->where(array(
                 'link:LIKE' => "%{$query}%",
-                'OR:id:LIKE' => "%{$query}%",
+                'OR:id:LIKE' => "{$query}%",
                 'OR:old_url:LIKE' => "%{$query}%",
                 'OR:new_url:LIKE' => "%{$query}%",
             ));
@@ -115,6 +115,9 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             $container_suffix = $this->modx->getOption('container_suffix',null,'/');
             $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);
             $between_urls = $this->modx->getOption('seofilter_between_urls',null,'/',true);
+            $main_alias = $this->modx->getOption('seofilter_main_alias',null,0);
+            $site_start = $this->modx->context->getOption('site_start', 1);
+
             if ($container_suffix) {
                 if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
                     $url = substr($url, 0, -strlen($container_suffix));
@@ -123,7 +126,21 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             if (substr($url,-1) == '/') {
                 $url = substr($url,0,-1);
             }
-            $array['url_preview'] = $url.$between_urls.$addurl.$url_suffix;
+
+            if($site_start == $array['page_id']) {
+                if($main_alias) {
+                    $q = $this->modx->newQuery('modResource',array('id'=>$array['page_id']));
+                    $q->select('alias');
+                    $malias = $this->modx->getValue($q->prepare());
+                    $array['url_preview'] = $url.'/'.$malias.$between_urls.$addurl.$url_suffix;
+                } else {
+                    $array['url_preview'] = $url.'/'.$addurl.$url_suffix;
+                }
+            } else {
+                $array['url_preview'] = $url.$between_urls.$addurl.$url_suffix;
+            }
+
+
 
             if(!$array['active']) {
                 $addurl = array();

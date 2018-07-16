@@ -140,7 +140,7 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                                 anchor: '99%',
                             }, {
                                 xtype: 'xcheckbox',
-                                boxLabel: _('seofilter_field_active'),
+                                boxLabel: _('seofilter_rule_active'),
                                 name: 'active',
                                 id: config.id + '-active',
                             }
@@ -392,7 +392,7 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                             anchor: '99%',
                         }, {
                             xtype: 'xcheckbox',
-                            boxLabel: _('seofilter_field_active'),
+                            boxLabel: _('seofilter_rule_active'),
                             name: 'active',
                             id: config.id + '-active',
                         }]

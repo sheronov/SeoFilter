@@ -53,6 +53,8 @@ class sfMenu
         $config['url_suffix'] = $this->modx->getOption('seofilter_url_suffix',null,'',true);
         $config['possibleSuffixes'] = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
         $config['possibleSuffixes'] = array_unique(array_merge($config['possibleSuffixes'],array($config['container_suffix'])));
+        $config['main_alias'] = $this->modx->getOption('seofilter_main_alias',null,0);
+        $config['site_start'] = $this->modx->context->getOption('site_start', 1);
 
         if (empty($config['tplInner']) && !empty($config['tplOuter'])) {
             $config['tplInner'] = $config['tplOuter'];
@@ -355,7 +357,20 @@ class sfMenu
                 $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
                 $u_suffix = $this->config['url_suffix'];
                 $page_url = $this->clearSuffixes($page_url);
-                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
+
+                if($this->config['site_start'] == $row['page_id']) {
+                    if($this->config['main_alias']) {
+                        $qq = $this->modx->newQuery('modResource',array('id'=>$row['page_id']));
+                        $qq->select('alias');
+                        $malias = $this->modx->getValue($qq->prepare());
+                        $url = $page_url.'/'.$malias.$this->config['between_urls'].$url.$u_suffix;
+                    } else {
+                        $url = $page_url.'/'.$url.$u_suffix;
+                    }
+                } else {
+                    $url = $page_url . $this->config['between_urls'] . $url . $u_suffix;
+                }
+//                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                 $name = $row['menutitle']?:$row['link'];
                 $row['url'] = $url;
                 $row['name'] = $name;
@@ -450,7 +465,19 @@ class sfMenu
                 $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
                 $u_suffix = $this->config['url_suffix'];
                 $page_url = $this->clearSuffixes($page_url);
-                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
+//                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
+                if($this->config['site_start'] == $row['page_id']) {
+                    if($this->config['main_alias']) {
+                        $qq = $this->modx->newQuery('modResource',array('id'=>$row['page_id']));
+                        $qq->select('alias');
+                        $malias = $this->modx->getValue($qq->prepare());
+                        $url = $page_url.'/'.$malias.$this->config['between_urls'].$url.$u_suffix;
+                    } else {
+                        $url = $page_url.'/'.$url.$u_suffix;
+                    }
+                } else {
+                    $url = $page_url . $this->config['between_urls'] . $url . $u_suffix;
+                }
                 // $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
                 $name = $row['menutitle']?:$row['link'];
                 $row['url'] = $url;

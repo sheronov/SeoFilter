@@ -129,8 +129,6 @@ jQuery(document).ready(function ($) {
 
 
     if(typeof mSearch2 != 'undefined') {
-
-
         window.setTimeout(function() {
             $(window).unbind('popstate');
             $(window).on('popstate', function (e) {
@@ -244,6 +242,10 @@ jQuery(document).ready(function ($) {
                     });
 
                     var changed = mSearch2.Hash.get()[name] !== undefined;
+                    //замена #0
+                    // if(!changed) {
+                    //     changed = seoFilterConfig.params[name] !== undefined;
+                    // }
                     mSearch2.sliders[name] = {
                         changed: changed,
                         user_changed: changed

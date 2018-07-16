@@ -1,5 +1,15 @@
 Changelog for SeoFilter.
 
+1.5.4-beta (16.07.2018)
+=======================
+- Setting "seofilter_url_scheme" by default "full";
+- The new sfLink snippet parameter is "link_classes". Classes for link;
+- Words can now be disabled and they will not participate in the formation of links. Links with them are deleted. Re-enabling will create new links;
+- Added accounting of the "seofilter_admin_version" setting, which is responsible for the versioning of scripts in the admin panel. If versioning is not needed - add the setting to manual with a value of 0;
+- Fixed the formation of links, addresses when links in one level and are tied to the main page;
+- Fixed counting for the sliders fields, if they are based on TV fields;
+- Some improvements and renaming in the admin panel.
+
 1.5.3-beta (19.06.2018)
 =======================
 - Little fixes for counting through extend class

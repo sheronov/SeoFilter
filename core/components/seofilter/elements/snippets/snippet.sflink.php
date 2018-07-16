@@ -6,11 +6,12 @@ if (!($pdo instanceof pdoTools))
     return '';
 
 $toPlaceholder = $modx->getOption('toPlaceholder', $scriptProperties, '');
-$tpl = $modx->getOption('tpl', $scriptProperties, '@INLINE <a href="[[+url]]">[[+name]]</a>');
+$tpl = $modx->getOption('tpl', $scriptProperties, '@INLINE <a href="[[+url]]"[[+classes]]>[[+name]]</a>');
 $rules = $modx->getOption('rules',$scriptProperties,'');
 $pages = $modx->getOption('pages',$scriptProperties,'');
 $where = $modx->getOption('where',$scriptProperties,'');
 $as_name = $modx->getOption('as_name',$scriptProperties,'');
+$link_classes = $modx->getOption('link_classes',$scriptProperties,'');
 $proMode = $modx->getOption('seofilter_pro_mode',null,0,true);
 $output =  '';
 if(!empty($rules) || !empty($pages)) {
@@ -106,9 +107,11 @@ if(!empty($rules) || !empty($pages)) {
     if(!empty($link)) {
         $c_suffix = $modx->getOption('container_suffix',null,'/');
         $u_suffix = $modx->getOption('seofilter_url_suffix',null,'',true);
-        $between_links = $modx->getOption('seofilter_between_links',null,'/',true);
+        $between_urls = $modx->getOption('seofilter_between_urls', null, '/', true);
         $possibleSuffixes = array_map('trim',explode(',',$modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
         $possibleSuffixes = array_unique(array_merge($possibleSuffixes,array($c_suffix)));
+        $main_alias = $modx->getOption('seofilter_main_alias',null,0);
+        $site_start = $modx->context->getOption('site_start', 1);
 
         $url = $link['new_url']?:$link['old_url'];
         $page_url = $modx->makeUrl($link['page_id'],$scriptProperties['context'],'',$scriptProperties['scheme']);
@@ -118,12 +121,31 @@ if(!empty($rules) || !empty($pages)) {
                 $page_url = substr($page_url, 0, -strlen($possibleSuffix));
             }
         }
-        $link['url'] = $page_url.$between_links.$url.$u_suffix;
+
+        if($site_start == $link['page_id']) {
+            if($main_alias) {
+                $qq = $modx->newQuery('modResource',array('id'=>$link['page_id']));
+                $qq->select('alias');
+                $malias = $modx->getValue($qq->prepare());
+                $link['url'] = $page_url.'/'.$malias.$between_urls.$url.$u_suffix;
+            } else {
+                $link['url'] = $page_url.'/'.$url.$u_suffix;
+            }
+        } else {
+            $link['url'] = $page_url.$between_urls.$url.$u_suffix;
+        }
+
         if($as_name) {
             $link['name'] = $as_name;
         } else {
             $link['name'] = $link['menutitle']?:$link['link'];
         }
+        if($link_classes) {
+            $link['classes'] = ' class="'.$link_classes.'"';
+        }
+//        $output = '<pre>';
+//        $output .= print_r($link,1);
+//        $output .= '</pre>';
         $output = $pdo->getChunk($tpl,$link,$fastMode);
     }
 }

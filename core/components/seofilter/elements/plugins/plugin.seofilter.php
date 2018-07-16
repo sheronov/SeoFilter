@@ -295,8 +295,21 @@ switch ($modx->event->name) {
                 if($page && $remaining_part) {
                     //we found one page
                     $tmp = explode('/',$remaining_part);
+                } elseif(in_array($site_start,array_keys($aliases))) {
+                    $page = $site_start;
+                    if($SeoFilter->config['main_alias']) {
+                        $upart = $aliases[$page].$between_urls;
+                        if(strpos($request,$upart) === 0) {
+                            $tmp = explode('/',substr($request,strlen($upart)));
+                        } else {
+                            break;
+                        }
+                    } else {
+                        $tmp = explode('/',$request);
+                    }
+//                    print_r($tmp);
+//                    die;
                 }
-
             } else {
                 if($check_doubles) {
                     //если есть дубли синонимов
@@ -355,6 +368,7 @@ switch ($modx->event->name) {
                 }
             }
 
+
             if($page) {
                 if($page == $site_start) {
                     $url = '';
@@ -381,18 +395,21 @@ switch ($modx->event->name) {
                         break;
                     }
                 } else {
-                    if(trim($url,'/') != str_replace($between_urls.implode('/',$tmp),'',$request)) {
+
+                    if($url && (trim($url,'/') != str_replace($between_urls.implode('/',$tmp),'',$request))) {
                         break;
                     }
                 }
 
 
-                if($tmp && $url_array = $SeoFilter->findUrlArray(implode('/',$tmp),$page)) {
+
+                if($tmp && $url_array = $SeoFilter->findUrlArray(implode($SeoFilter->config['level_separator'],$tmp),$page)) {
                     if($url_array['active']) {
                         $old_url = $url_array['old_url'];
                         $new_url = $url_array['new_url'];
                         $rule_id = $url_array['multi_id'];
                         $tofind = implode($SeoFilter->config['level_separator'],$tmp).$url_suffix;
+
 
                         if ($new_url && ($new_url != implode($SeoFilter->config['level_separator'], $tmp))) {
                             if ($container_suffix) {

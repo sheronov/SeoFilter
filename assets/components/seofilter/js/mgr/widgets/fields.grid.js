@@ -225,6 +225,12 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             sortable: true,
             width: 50
         }, {
+            header: _('seofilter_field_exact'),
+            dataIndex: 'exact',
+            renderer: SeoFilter.utils.renderBoolean,
+            sortable: true,
+            width: 50
+        }, {
             header: _('seofilter_field_active'),
             dataIndex: 'active',
             renderer: SeoFilter.utils.renderBoolean,

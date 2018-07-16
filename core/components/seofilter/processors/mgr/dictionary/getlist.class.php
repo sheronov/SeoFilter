@@ -96,8 +96,17 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
         );
 
 
-        if($array['active']) {
-            //recount
+        if (!$array['active']) {
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-power-off action-green',
+                'title' => $this->modx->lexicon('seofilter_word_enable'),
+                'multiple' => $this->modx->lexicon('seofilter_words_enable'),
+                'action' => 'enableWord',
+                'button' => true,
+                'menu' => true,
+            );
+        } else {
             $array['actions'][] = array(
                 'cls' => '',
                 'icon' => 'icon icon-refresh action-green',
@@ -105,6 +114,15 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
                 'multiple' => $this->modx->lexicon('seofilter_words_recount'),
                 'action' => 'reCounting',
                 'button' => false,
+                'menu' => true,
+            );
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-power-off action-gray',
+                'title' => $this->modx->lexicon('seofilter_word_disable'),
+                'multiple' => $this->modx->lexicon('seofilter_words_disable'),
+                'action' => 'disableWord',
+                'button' => true,
                 'menu' => true,
             );
         }
@@ -116,7 +134,7 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             'icon' => 'icon icon-edit',
             'title' => $this->modx->lexicon('seofilter_dictionary_update'),
             //'multiple' => $this->modx->lexicon('seofilter_dictionary_update'),
-            'action' => 'updateField',
+            'action' => 'updateWord',
             'button' => true,
             'menu' => true,
         );
@@ -127,7 +145,7 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             'icon' => 'icon icon-trash-o action-red',
             'title' => $this->modx->lexicon('seofilter_dictionary_remove'),
             'multiple' => $this->modx->lexicon('seofilter_dictionary_remove'),
-            'action' => 'removeField',
+            'action' => 'removeWord',
             'button' => true,
             'menu' => true,
         );

@@ -275,10 +275,12 @@ $vehicle->resolve('file', array(
     'source' => $sources['source_assets'],
     'target' => "return MODX_ASSETS_PATH . 'components/';",
 ));
+/*
 $vehicle->resolve('file', array(
     'source' => $sources['source_core'],
     'target' => "return MODX_CORE_PATH . 'components/';",
 ));
+*/
 
 /** @var array $BUILD_RESOLVERS */
 foreach ($BUILD_RESOLVERS as $resolver) {

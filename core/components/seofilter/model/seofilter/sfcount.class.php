@@ -258,10 +258,14 @@ class sfCountHandler
 
         if($field['slider']) {
             $slider = explode($this->config['values_delimeter'],$value);
-            $where[$class_key.':>='] = $slider[0];
+            $slider_arr = array();
+            $slider_arr[] = "$class_key >=  ".(float)$slider[0];
+//            $where[$class_key.':>='] = (float)$slider[0];
             if(isset($slider[1])) {
-                $where[$class_key.':<='] = $slider[1];
+//                $where[$class_key.':<='] = (float)$slider[1];
+                $slider_arr[] = "$class_key <= ".(float)$slider[1];
             }
+            $where[] = implode(' AND ',$slider_arr);
         } else {
             if(strpos($value,$this->config['values_delimeter']) !== false) {
                 $values = explode($this->config['values_delimeter'],$value);
@@ -805,10 +809,18 @@ class sfCountHandler
                     }
                     if($field['slider']) {
                         $slider = explode($this->config['values_delimeter'],$params[$field_alias]);
-                        $fields_where[$fw.':>='] = $slider[0];
-                        if($slider[1]) {
-                            $fields_where[$fw.':<='] = $slider[1];
+                        $slider_arr = array();
+                        $slider_arr[] = "$fw >=  ".(float)$slider[0];
+//                      $where[$class_key.':>='] = (float)$slider[0];
+                        if(isset($slider[1])) {
+//                      $where[$class_key.':<='] = (float)$slider[1];
+                            $slider_arr[] = "$fw <= ".(float)$slider[1];
                         }
+                        $fields_where[] = implode(' AND ',$slider_arr);
+//                        $fields_where[$fw.':>='] = (float)$slider[0];
+//                        if($slider[1]) {
+//                            $fields_where[$fw.':<='] = (float)$slider[1];
+//                        }
                     } else {
                         $values = explode($this->config['values_delimeter'],$params[$field_alias]);
                         if(!isset($count_where[$fw])) {

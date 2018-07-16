@@ -23,8 +23,7 @@ if (!function_exists('installPackage')) {
                     $sig = explode('-', $foundPackage->signature);
                     $versionSignature = explode('.', $sig[1]);
                     $url = $foundPackage->location;
-                    if (!downloadPackage($url,
-                        $modx->getOption('core_path') . 'packages/' . $foundPackage->signature . '.transport.zip')
+                    if (!downloadPackage($url, $modx->getOption('core_path') . 'packages/' . $foundPackage->signature . '.transport.zip')
                     ) {
                         return array(
                             'success' => 0,
@@ -108,15 +107,15 @@ if (!function_exists('downloadPackage')) {
 $success = false;
 /** @var xPDOTransport $transport */
 /** @var array $options */
-/** @var modX $modx */
-if ($transport->xpdo) {
-    $modx =& $transport->xpdo;
-    switch ($options[xPDOTransport::PACKAGE_ACTION]) {
+
+    switch (@$options[xPDOTransport::PACKAGE_ACTION]) {
         case xPDOTransport::ACTION_INSTALL:
         case xPDOTransport::ACTION_UPGRADE:
+            /* @var modX $modx */
+            $modx = &$object->xpdo;
             // Checking and installing required packages
             $packages = array(
-                'pdoTools' => '2.5.0-pl',
+                'pdoTools' => '2.2.1-pl',
             );
             foreach ($packages as $package_name => $version) {
                 $installed = $modx->getIterator('transport.modTransportPackage',
@@ -141,4 +140,3 @@ if ($transport->xpdo) {
             break;
     }
     return $success;
-}
