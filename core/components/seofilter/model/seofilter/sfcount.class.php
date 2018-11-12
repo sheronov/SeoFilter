@@ -1,5 +1,4 @@
 <?php
-
 class sfCountHandler
 {
     /* @var modX $modx */
@@ -388,7 +387,7 @@ class sfCountHandler
             $conditions['join']['tvssOption'.$tv] = array('class'=>'tvssOption','on'=>'tvssOption'. $tv .'.resource_id = modResource.id');
             $class_key = 'tvssOption'.$tv.'.value';
         }  else {
-            $class_key = 'TV'.$field['key'].'.value';
+            $class_key = 'TV'.strtolower($field['key']).'.value';
         }
 
         if($includeWhere) {
@@ -593,6 +592,11 @@ class sfCountHandler
                 foreach($where as $key=>$vals) {
                     if(is_array($vals) && in_array($config['where']['modResource.parent'],$vals)) {
                         $check = true;
+                    }
+                    foreach($vals as $vkey=>$vvals) {
+                        if(strpos($vkey,'modResource.parent')!==false && is_array($vvals) && in_array($config['where']['modResource.parent'],$vvals)) {
+                            $check = true;
+                        }
                     }
                 }
                 if(!$check) {

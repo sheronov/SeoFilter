@@ -118,6 +118,26 @@ SeoFilter.window.UpdateUrls = function (config) {
         url: SeoFilter.config.connector_url,
         action: 'mgr/urls/update',
         fields: this.getFields(config),
+        buttons: [{
+            text: config.cancelBtnText || _('cancel')
+            ,scope: this
+            ,handler: function() { config.closeAction !== 'close' ? this.hide() : this.close(); }
+        },{
+            text: config.saveBtnText || _('save')
+            ,cls: 'primary-button'
+            ,scope: this
+            ,handler: this.submit
+        }],
+
+        listeners: {
+            // render: function () {
+            //     console.log('render');
+            //     MODx.loadRTE('ta'); // id поля
+            // }
+        //     'failure': {fn:this.failure,scope:this},
+        //     'success': {fn:this.success,scope:this},
+        //     'beforeSubmit': {fn:this.beforeSubmit,scope:this}
+        },
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
                 this.submit()
@@ -125,8 +145,88 @@ SeoFilter.window.UpdateUrls = function (config) {
         }]
     });
     SeoFilter.window.UpdateUrls.superclass.constructor.call(this, config);
+
+    // // this.addEvents('beforeSubmit');
+    // this.on('show', function() {
+    //     if(MODx.loadRTE !== 'undefined') {
+    //         MODx.loadRTE('ta');
+    //         this.rteLoaded = true;
+    //     }
+    //     MODx.sleep(4);
+    // }.bind(this));
 };
 Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
+    rteLoaded: false,
+
+    /*
+    beforeSubmit: function (config,values) {
+        console.log(this.rteLoaded);
+        console.log(this.fp.rteLoaded);
+        console.log('beforeSubmit',config,values);
+        if(this.rteLoaded) {
+            var content = Ext.get(config.scope.options.id + '-content');
+            if (content) {
+                var v = content.dom.value;
+                console.log(content);
+                console.log(v);
+                var hc = Ext.getCmp(config.scope.options.id + '-hiddenContent');
+                console.log(hc);
+                if (hc) {
+                    hc.setValue(v);
+                }
+            }
+        }
+        return true;
+    },
+
+    submit: function(close) {
+        console.log('submit',close);
+        var config = close;
+        close = close === false ? false : true;
+        var f = this.fp.getForm();
+        if (f.isValid() && this.beforeSubmit(config,f.getValues())) {
+            f.submit({
+                waitMsg: _('saving')
+                ,submitEmptyText: this.config.submitEmptyText !== false
+                ,scope: this
+                ,failure: function(frm,a) {
+                    if (this.fireEvent('failure',{f:frm,a:a})) {
+                        MODx.form.Handler.errorExt(a.result,frm);
+                    }
+                    this.doLayout();
+                }
+                ,success: function(frm,a) {
+                    if (this.config.success) {
+                        Ext.callback(this.config.success,this.config.scope || this,[frm,a]);
+                    }
+                    this.fireEvent('success',{f:frm,a:a});
+                    if (close) { this.config.closeAction !== 'close' ? this.hide() : this.close(); }
+                    this.doLayout();
+                }
+            });
+        }
+    },
+
+    */
+
+    loadRte: function (config) {
+        if(SeoFilter.config.richtext) {
+            if(MODx.loadRTE !== 'undefined') {
+                window.setTimeout(function() {
+                    MODx.loadRTE(config.id);
+                }, 300);
+                // console.log(config);
+                this.rteLoaded = true;
+                // config.rteLoaded = true;
+            }
+        } else {
+            window.setTimeout(function() {
+                MODx.ux.Ace.replaceComponent(config.id, 'text/x-smarty', 1);
+                MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
+                Ext.getCmp(config.id).setHeight(300);
+            }, 100);
+        }
+    },
 
     getFields: function (config) {
         return [{
@@ -245,20 +345,40 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                 id: config.id + '-text',
                 anchor: '99%',
                 description: "[[!+sf.text]] / {$_modx->getPlaceholder('sf.text')}",
+            // }, {
+            //     layout: 'form',
+            //     border:false,
+            //     style: {margin: 0},
+            //     columnWidth: 1,
+            //     items: [{
+            //         xtype: 'hidden'
+            //         ,name: 'content'
+            //         ,id: config.id + '-hiddenContent'
+            //     },{
+            //         xtype: 'textarea',
+            //         fieldLabel: '',
+            //         name: 'ta',
+            //         grow: 'false',
+            //         height:300,
+            //         id: 'ta',
+            //         anchor: '99%',
+            //         listeners: {
+            //             render: function () {
+            //                 // MODx.loadRTE("ta");
+            //             }
+            //         }
+            //     }]
             }, {
-                xtype: 'textarea',
+                xtype: SeoFilter.config.content_xtype || 'textarea',
                 heght:300,
                 fieldLabel: _('seofilter_seometa_content'),
                 name: 'content',
                 id: config.id + '-content',
                 listeners: {
-                    render: function () {
-                        window.setTimeout(function() {
-                            MODx.ux.Ace.replaceComponent(config.id+'-content', 'text/x-smarty', 1);
-                            MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
-                            Ext.getCmp(config.id+'-content').setHeight(200);
-                        }, 100);
-                    }
+                    'render': {fn:this.loadRte,scope:this},
+                    // render: function (e,v) {
+                    //
+                    // }
                 },
                 anchor: '99%',
                 description: "[[!+sf.content]] / {$_modx->getPlaceholder('sf.content')}",

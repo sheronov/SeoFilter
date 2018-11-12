@@ -215,6 +215,10 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     } else {
                         $q->select(array('DISTINCT ' . $class . '.' . $key));
                     }
+                    if($field->get('xpdo_where')) {
+//                        $q->select($this->modx->getSelectColumns($class,$class));
+                        $q->where($this->modx->fromJSON($field->get('xpdo_where')));
+                    }
                     if ($q->prepare() && $q->stmt->execute()) {
                         while ($input = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                             $relation_id = $relation_value = '';

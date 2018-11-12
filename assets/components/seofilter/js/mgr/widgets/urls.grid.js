@@ -36,6 +36,8 @@ SeoFilter.grid.Urls = function (config) {
     });
     SeoFilter.grid.Urls.superclass.constructor.call(this, config);
 
+
+
     // Clear selection on grid refresh
     this.store.on('load', function () {
         if (this._getSelectedIds().length) {
@@ -105,6 +107,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                             }
                         });
                         w.reset();
+                        r.object.ta = r.object.content || '';
                         w.setValues(r.object);
                         w.show(e.target);
                     }, scope: this

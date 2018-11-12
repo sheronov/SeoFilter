@@ -65,7 +65,7 @@ class sfMenu
         }
         $sf_seo_id = $modx->getPlaceholder('sf.seo_id');
         if (empty($config['hereId']) && !empty($sf_seo_id)) {
-            $config['hereId'] = (int)$modx->getPlaceholder('sf.seo_id');
+            $config['hereId'] = (int)$sf_seo_id;
         }
 
         $this->config = $config;
@@ -309,7 +309,7 @@ class sfMenu
         $where = $this->prepareParents($rules,$parents,'multi_id','page_id');
         $select = array(
             'sfUrls.*',
-            'sfUrlWord.id,sfUrlWord.url_id,sfUrlWord.word_id,sfUrlWord.field_id,sfUrlWord.priority',
+            'sfUrlWord.url_id,sfUrlWord.word_id,sfUrlWord.field_id,sfUrlWord.priority',
             'sfDictionary.alias,sfDictionary.input,sfDictionary.value'
         );
 
@@ -320,7 +320,7 @@ class sfMenu
         $q->leftJoin('sfUrlWord','sfUrlWord','sfUrlWord.url_id = sfUrls.id');
         $q->innerJoin('sfDictionary','sfDictionary','sfDictionary.id = sfUrlWord.word_id');
         if((int)$this->config['level'] || (int)$this->config['minlevel']) {
-            $q->leftJoin('sfUrlWord','sfUrlWordX','sfUrlWordX.url_id = sfUrls.id');
+            $q->innerJoin('sfUrlWord','sfUrlWordX','sfUrlWordX.url_id = sfUrlWord.url_id');
             $select[] = 'COUNT(sfUrlWordX.id) as level';
             $q->having($this->prepareHaving());
         }
@@ -609,7 +609,7 @@ class sfMenu
 
     public function loadHandler() {
         if (!is_object($this->countHandler)) {
-            require_once 'sfcount.class.php';
+            require_once('sfcount.class.php');
             $count_class = $this->modx->getOption('seofilter_count_handler_class', null, 'sfCountHandler', true);
             if ($count_class != 'sfCountHandler') {
                 $this->loadCustomClasses('count');
@@ -630,8 +630,8 @@ class sfMenu
         $tree = $add_where = array();
         $time = microtime(true);
 
-
         $this->loadHandler();
+
         if (!empty($this->config['count_where'])) {
             $add_where = $this->modx->fromJSON($this->config['count_where']);
         }
@@ -1310,17 +1310,16 @@ class sfMenu
         $time = microtime(true);
         $this->pdoTools->addTime('Start template menu');
 
-        if (isset($this->config['hereId'])) {
-            $parents= $this->findParents($tree,(int)$this->config['hereId']);
-            $this->parents = $parents;
-        }
-
-
         $total = count($tree);
         if((int)$this->config['groupbyrule']) {
             $idx = 0;
             foreach($tree as $group) {
                 if(isset($group['links'])) {
+                    if (isset($this->config['hereId'])) {
+                        $parents = $this->findParents($group['links'],(int)$this->config['hereId']);
+                        $this->parents = array_merge($this->parents,$parents);
+                    }
+
                     $idx++;
                     if ($total == $idx) {
                         $last = 1;
@@ -1344,6 +1343,10 @@ class sfMenu
                 }
             }
         } else {
+            if (isset($this->config['hereId'])) {
+                $parents = $this->findParents($tree,(int)$this->config['hereId']);
+                $this->parents = $parents;
+            }
             if((int)$this->config['relative'] && $this->config['hereId']) {
                 $find = 0;
                 foreach($tree as $row) {

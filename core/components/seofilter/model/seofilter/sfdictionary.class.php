@@ -1,6 +1,7 @@
 <?php
 class sfDictionary extends xPDOSimpleObject {
 
+
     public function save($cacheFlag = null) {
         $update = (int)$this->get('update');
         $decline = $this->xpdo->getOption('seofilter_decline', null, 0, true);

@@ -83,6 +83,9 @@ if(!empty($rules) || !empty($pages)) {
 
     foreach($rules as $rule_id) {
         $q = $modx->newQuery('sfUrls');
+        if(!empty($pages) && is_array($pages)) {
+            $q->where(array('page_id:IN'=>$pages));
+        }
         $q->where(array('multi_id'=>$rule_id,'active'=>1));
         $q->select(array('sfUrls.*'));
         $q->limit(1);

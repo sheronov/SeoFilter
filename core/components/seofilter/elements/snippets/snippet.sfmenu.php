@@ -1,9 +1,9 @@
 <?php
 /** @var array $scriptProperties */
-$path = $modx->getOption('seofilter_core_path', $scriptProperties,
-        $modx->getOption('core_path') . 'components/seofilter/').'model/';
-if ($sfClass = $modx->loadClass('seofilter.sfmenu',$path, false, true)) {
-
+/** @var sfMenu $sfMenu */
+$path = $modx->getOption('sfmenu_class_path', $scriptProperties, $modx->getOption('core_path') . 'components/seofilter/model/',true);
+$fqn = $modx->getOption('sfMenu.class', null, 'seofilter.sfmenu', true);
+if ($sfClass = $modx->loadClass($fqn,$path, false, true)) {
     if (!empty($sortBy)) {
         $scriptProperties['sortby'] = $sortBy;
     }
@@ -26,11 +26,11 @@ if ($sfClass = $modx->loadClass('seofilter.sfmenu',$path, false, true)) {
     } elseif(!isset($scriptProperties['fast'])) {
         $scriptProperties['fast'] = 1;
     }
-    $sfMenu = new sfMenu($modx, $scriptProperties);
+    $sfMenu = new $sfClass($modx, $scriptProperties);
 } else {
     return false;
 }
-$sfMenu->pdoTools->addTime('pdoTools loaded');
+$sfMenu->pdoTools->addTime('sfMenu loaded');
 
 $output = '';
 $links = array();
@@ -44,7 +44,6 @@ if ($cache) {
 }
 if(empty($links)) {
     $links = $sfMenu->getTree($scriptProperties['rules'],$scriptProperties['parents']);
-//    $output.= '<pre>'.print_r($links,1).'</pre>';
     if ($cache) {
         $sfMenu->pdoTools->setCache($links, $scriptProperties);
     }

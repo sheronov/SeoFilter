@@ -338,7 +338,7 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
     getTopBar: function () {
         return [{
                 text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_dictionary_create'),
-                handler: this.createField,
+                handler: this.createWord,
                 scope: this
             }, {
                 xtype: 'seofilter-combo-field'

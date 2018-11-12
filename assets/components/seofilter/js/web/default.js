@@ -80,6 +80,12 @@ jQuery(document).ready(function ($) {
                         var crumbs_separator = $(document).find('.sf_crumb').data('separator');
                         var crumbs = $(response.data.crumbs);
                         $.each(crumbs,function (index,value) {
+                            if($(value).hasClass('sf_crumb_nested')) {
+                                $(document).find('.sf_crumb').parent().append(value);
+                                if(crumbs_separator) {
+                                    $(document).find(value).before(crumbs_separator);
+                                }
+                            }
                             if($(value).hasClass('sf_crumb')) {
                                 $(document).find('.sf_crumb').replaceWith(value);
                                 $(document).find('.sf_crumb').data('separator',crumbs_separator);
@@ -89,18 +95,19 @@ jQuery(document).ready(function ($) {
                                         if(find_to_del) {
                                             $(val).remove();
                                         }
-                                       if($(val).hasClass('sf_crumb')) {
+                                        if($(val).hasClass('sf_crumb')) {
                                            find_to_del = true;
-                                       }
+                                        }
                                     });
                                 // }
                             }
                             if($(value).hasClass('sf_crumbs')) {
-                                $(document).find('.sf_crumb').after(value);
+                                $(document).find('.sf_crumb').parent().append(value);
                                 if(crumbs_separator) {
-                                    $(document).find('.sf_crumb').after(crumbs_separator);
+                                    $(document).find(value).before(crumbs_separator);
                                 }
                             }
+
                         });
                     }
 
@@ -164,22 +171,24 @@ jQuery(document).ready(function ($) {
 
         mSearch2.Hash.set = function (vars) {
             var hash = '';
-            var count = 0;
             var oldbrowser = mSearch2.Hash.oldbrowser();
 
+            var specialChars = {"%": "%25", "+": "%2B", "&" : "%26"};
             for (var i in vars) {
                 if (vars.hasOwnProperty(i)) {
-                    hash += '&' + i + '=' + vars[i];
+                    var val = vars[i].toString();
+                    for (var z in specialChars) {
+                        if (specialChars.hasOwnProperty(z) && val.indexOf(z) !== -1) {
+                            val = val.replace(new RegExp('\\' + z, 'g'), specialChars[z]);
+                        }
+                    }
+                    hash += '&' + i + '=' + val;
                 }
             }
 
             if (!oldbrowser) {
-                if (hash.length != 0) {
-                    if (count) {
-                        hash = hash.replace('%', '%25').replace('+', '%2B');
-                    } else {
-                        hash = '?' + hash.substr(1).replace('%', '%25').replace('+', '%2B');
-                    }
+                if (hash.length !== 0) {
+                    hash = '?' + hash.substr(1);
                 }
             }
             seoFilter.ajax_post(vars, hash, oldbrowser, 'getmeta');
@@ -243,9 +252,9 @@ jQuery(document).ready(function ($) {
 
                     var changed = mSearch2.Hash.get()[name] !== undefined;
                     //замена #0
-                    // if(!changed) {
-                    //     changed = seoFilterConfig.params[name] !== undefined;
-                    // }
+                    if(!changed) {
+                        changed = seoFilterConfig.params[name] !== undefined;
+                    }
                     mSearch2.sliders[name] = {
                         changed: changed,
                         user_changed: changed

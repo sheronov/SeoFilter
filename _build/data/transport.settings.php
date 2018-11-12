@@ -266,6 +266,11 @@ $tmp = array(
         'xtype' => 'combo-boolean',
         'value' => true,
         'area' => 'seofilter_jquery'
+    ),
+    'crumbs_nested' => array(
+        'xtype' => 'combo-boolean',
+        'value' => false,
+        'area' => 'seofilter_jquery'
     )
 
 );

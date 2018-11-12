@@ -9,6 +9,7 @@ class SeoFilterHomeManagerController extends modExtraManagerController
     public $SeoFilter;
 
 
+
     /**
      *
      */
@@ -76,6 +77,11 @@ class SeoFilterHomeManagerController extends modExtraManagerController
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/home.panel.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/sections/home.js');
+
+        if($this->SeoFilter->config['richtext']) {
+            $this->loadRichTextEditor();
+        }
+
         $this->addHtml('<script type="text/javascript">
         SeoFilter.config = ' . json_encode($this->SeoFilter->config) . ';
         SeoFilter.config.connector_url = "' . $this->SeoFilter->config['connectorUrl'] . '";
@@ -85,7 +91,68 @@ class SeoFilterHomeManagerController extends modExtraManagerController
         </script>
         ');
 
+
+
     }
+
+    public function loadRichTextEditor()
+    {
+        $content_xtype = 'textarea';
+        $useEditor = $this->modx->getOption('use_editor');
+        $whichEditor = $this->modx->getOption('which_editor');
+
+        if ($useEditor && !empty($whichEditor))
+        {
+            $redactor_name = strtolower(str_replace(' ','',$whichEditor));
+            $config = array();
+            foreach($this->modx->config as $param=>$value) {
+                if(strpos($param,$redactor_name) === 0) {
+                    $new_param = trim(trim(substr($param,strlen($redactor_name)),'.'),'_');
+                    $config[$new_param] = $value;
+                    $config[$param] = $value;
+                }
+            }
+
+            switch ($whichEditor) {
+                case 'CKEditor':
+                    $content_xtype = 'modx-htmleditor';
+                    break;
+                default:
+                    $content_xtype = 'textarea';
+            }
+
+
+//            $this->modx->log(1,print_r($config,1));
+            $textEditors = $this->modx->invokeEvent('OnRichTextEditorRegister');
+            // invoke the OnRichTextEditorInit event
+            $onRichTextEditorInit = $this->modx->invokeEvent('OnRichTextEditorInit',array_merge($config,array(
+                'editor' => $whichEditor, // Not necessary for Redactor
+                'mode' =>  modSystemEvent::MODE_UPD
+            )));
+            if (is_array($onRichTextEditorInit))
+            {
+                $onRichTextEditorInit = implode('', $onRichTextEditorInit);
+            }
+            if($onRichTextEditorInit) {
+                $this->addHtml($onRichTextEditorInit);
+            }
+            $this->setPlaceholder('onRichTextEditorInit', $onRichTextEditorInit);
+        }
+
+        $this->SeoFilter->config['content_xtype'] = $content_xtype;
+    }
+
+    public function loadRTE() {
+        $rte = $this->modx->getOption('which_editor');
+        if ($this->modx->context->getOption('use_editor', false, $this->modx->_userConfig) && !empty($rte)) {
+            $textEditors = $this->modx->invokeEvent('OnRichTextEditorRegister');
+            $onRichTextEditorInit = $this->modx->invokeEvent('OnRichTextEditorInit',array(
+                'editor' => $rte,
+                'mode' =>  modSystemEvent::MODE_UPD,
+            ));
+        }
+    }
+
 
     public function addCss($script)
     {

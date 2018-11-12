@@ -25,7 +25,18 @@ SeoFilter.panel.Seoedit = function (config) {
     });
     SeoFilter.panel.Seoedit.superclass.constructor.call(this, config);
     this.getForm().setValues(this.config.record);
+
+    //TODO:закончить здесь
+    // this.on('show', function() {
+        setTimeout(function () {
+            if(MODx.loadRTE !== 'undefined') {
+                MODx.loadRTE('seoedit-content');
+            }
+        },100);
+
+    // }.bind(this));
 };
+
 Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
     initialized: false
     ,setup: function() {
@@ -306,12 +317,12 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     id: 'seoedit-content',
                     listeners: {
                         render: function () {
-                            window.setTimeout(function() {
-                                MODx.ux.Ace.replaceComponent('seoedit-content', 'text/x-smarty', 1);
-                                MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
-                                Ext.getCmp('seoedit-content').setHeight(200);
-
-                            }, 100);
+                            // window.setTimeout(function() {
+                            //     MODx.ux.Ace.replaceComponent('seoedit-content', 'text/x-smarty', 1);
+                            //     MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
+                            //     Ext.getCmp('seoedit-content').setHeight(200);
+                            //
+                            // }, 100);
                         },
                     },
                     anchor: '99%'

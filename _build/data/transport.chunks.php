@@ -8,7 +8,11 @@ $tmp = array(
     'tpl.SeoFilter.crumbs.current' => array(
         'file' => 'current',
         'description' => '',
-    )
+    ),
+    'tpl.SeoFilter.crumbs.nested' => array(
+        'file' => 'nested',
+        'description' => '',
+    ),
 );
 
 // Save chunks for setup options

@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.5.4';
+    public $version = '1.5.5';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -81,11 +81,13 @@ class SeoFilter
         $jtext = $this->modx->getOption('seofilter_jtext', null, '', true);
         $jcontent = $this->modx->getOption('seofilter_jcontent', null, '', true);
 
+        $richtext = ($this->modx->getOption('seofilter_content_richtext',null,0) && $this->modx->getOption('use_editor',null,1));
         $hiddenTab = $this->modx->getOption('seofilter_hidden_tab',null,0,true);
         $superHiddenProps = $this->modx->getOption('seofilter_super_hidden_props',null,0,true);
         $tplsPath = $this->modx->getOption('seofilter_tpls_path',null,'',true);
         $urlHelp = $this->modx->getOption('seofilter_url_help',null,'',true);
         $crumbsReplace = $this->modx->getOption('seofilter_crumbs_replace',null,1,true);
+        $crumbsNested = $this->modx->getOption('seofilter_crumbs_nested',null,0,true);
         $crumbsCurrent = $this->modx->getOption('seofilter_crumbs_tpl_current',null,'tpl.SeoFilter.crumbs.current',true);
 
         $proMode = $this->modx->getOption('seofilter_pro_mode',null,0,true);
@@ -169,6 +171,7 @@ class SeoFilter
             'possibleSuffixes' => $possibleSuffixes,
             'lastModified' => $lastModified,
             'crumbsReplace' => $crumbsReplace,
+            'crumbsNested' => $crumbsNested,
             'crumbsCurrent' => $crumbsCurrent,
             'mfilterWords' => $mfilterWords,
             'superHiddenProps' => $superHiddenProps,
@@ -176,6 +179,7 @@ class SeoFilter
             'proMode' => $proMode,
             'scheme' => $scheme,
             'defaultWhere' => $defaultWhere,
+            'richtext' => $richtext
         ), $config);
 
         $this->modx->addPackage('seofilter', $this->config['modelPath']);
@@ -235,7 +239,12 @@ class SeoFilter
                 $q = $this->modx->newQuery('sfFieldIds');
                 $q->rightJoin('sfRule','sfRule','sfRule.id = sfFieldIds.multi_id');
                 $q->rightJoin('sfField','sfField','sfField.id = sfFieldIds.field_id');
-                $q->where(array('sfField.slider'=>1,'sfRule.page'=>$this->config['page']));
+                $q->where(array('sfField.slider'=>1));
+                if($this->config['proMode']) {
+                    $q->where('1=1 AND FIND_IN_SET('.$this->config['page'].',REPLACE(IFNULL(NULLIF(sfRule.pages,""),sfRule.page)," ",""))');
+                } else {
+                    $q->where(array('sfRule.page'=>$this->config['page']));
+                }
                 $this->config['slider'] = $this->modx->getCount('sfFieldIds',$q);
             }
 
@@ -660,7 +669,14 @@ class SeoFilter
     public function getHashUrl($params) {
         $urls = array();
 
+        $specialChars = array(
+            '%' => '%25',
+            '+' => '%2B',
+            '&' => '%26'
+        );
         foreach($params as $param=>$value) {
+            //замены для корректности URL, как и в JS для хэша
+            $value = str_replace(array_keys($specialChars),array_values($specialChars),$value);
             $urls[] = $param.'='.$value;
         }
 
@@ -733,8 +749,13 @@ class SeoFilter
                         $crumb_array['sflink'] = $meta['link'];
                         $crumb_array['sfurl'] = $meta['link_url'];
                     }
-                    $meta['crumbs'] = $this->pdo->getChunk($this->config['crumbsCurrent'], $crumb_array);
+                    if(!empty($meta['nested'])) {
+                        $crumb_array['sfnested'] = $meta['nested'];
+                    }
+                    $crumbs  = $this->pdo->getChunk($this->config['crumbsCurrent'], $crumb_array);
+                    $meta['crumbs'] = $crumbs;
                 }
+
 
                 $response = array(
                     'success' => true,
@@ -886,17 +907,23 @@ class SeoFilter
                 if(!$find) {
                     $meta = $this->getPageMeta($pageId);
                     $meta['find'] = 0;
+                } else {
+                    $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
                 }
 
 
                 if($this->config['crumbsReplace']) {
                     $crumb_array = $this->getCrumbs($pageId);
                     if ($find) {
-                        $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
                         $crumb_array['sflink'] = $meta['link'];
                         $crumb_array['sfurl'] = $meta['link_url'];
                     }
-                    $meta['crumbs'] = $this->pdo->getChunk($this->config['crumbsCurrent'], $crumb_array);
+                    if(!empty($meta['nested'])) {
+                        $crumb_array['sfnested'] = $meta['nested'];
+                    }
+
+                    $crumbs  = $this->pdo->getChunk($this->config['crumbsCurrent'], $crumb_array);
+                    $meta['crumbs'] = $crumbs;
                 }
 
                 if($meta['url']) {
@@ -956,6 +983,90 @@ class SeoFilter
             }
         }
         return $page_array;
+    }
+
+    public function findSeoLink($field_word = array(),$page_id = 0) {
+        $link = array();
+        $q = $this->modx->newQuery('sfUrls');
+        $q->where(array('page_id'=>$page_id));
+        $q->groupby('sfUrls.id');
+        $q->select($this->modx->getSelectColumns('sfUrls','sfUrls',''));
+        $index = 0;
+        foreach($field_word as $i => $fw) {
+            $q->rightJoin('sfUrlWord',"sfUrlWord{$index}","sfUrls.id = sfUrlWord{$index}.url_id");
+            $q->where(array("sfUrlWord{$index}.word_id" => $fw['word_id'], "sfUrlWord{$index}.field_id" => $fw['field_id']));
+            if(!$index) {
+                $q->innerJoin('sfUrlWord', 'sfUrlCount', "sfUrlWord{$index}.url_id = sfUrlCount.url_id");
+                $q->select("COUNT(sfUrlWord{$index}.id) as levels");
+            }
+            $index++;
+//            $q->sortby('sfUrlWord.priority','ASC');
+        }
+        if(count($field_word)) {
+            $q->having('levels = '.count($field_word));
+        }
+        if($q->prepare() && $q->stmt->execute()) {
+            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $row['field_word'] = $field_word;
+                $link = $row;
+            }
+        }
+
+        return $link;
+    }
+
+    public function recursiveLinkFind($field_word = array(), $page_id = 0,$skip = 0) {
+        $result = array(
+            'find' => false,
+            'link' => array()
+        );
+        $copy = $field_word;
+        foreach ($copy as $index => $row) {
+            if($index == $skip) {
+                unset($copy[$index]);
+            }
+        }
+        if($link = $this->findSeoLink($copy,$page_id)) {
+            //ссылка найдена
+            $result['link'] = $link;
+            $result['find'] = true;
+            $result['field_word'] = $copy;
+            $result['skip'] = $skip;
+        } elseif($skip < count($field_word)) {
+            $skip++;
+            $result = $this->recursiveLinkFind($field_word,$page_id,$skip);
+        }
+
+        return $result;
+    }
+
+    public function findNestedCrumbs($field_word = array(),$page_id = 0) {
+        $links = array();
+        $count = count($field_word);
+        $for_find = array();
+        foreach ($field_word as $field_id => $word_id) {
+            $for_find[] = array(
+                'field_id'=>$field_id,
+                'word_id'=>$word_id
+            );
+        }
+        $for_find = array_reverse($for_find,0);
+
+//        $this->modx->log(1,print_r($for_find,1));
+        for($i = 0;$i<$count-1;$i++) {
+            $link = $this->recursiveLinkFind($for_find,$page_id,0);
+            if($link['find']) {
+                $for_find = array_values($link['field_word']); //сброс ключей
+                $links[] = $link['link'];
+            } else {
+                array_shift($for_find);
+            }
+        }
+
+        $links = array_reverse($links);
+//        $links[] = $this->findSeoLink($for_find,$page_id);
+
+        return $links;
     }
 
     public function error($message = '', $data = array(), $placeholders = array())
@@ -1154,6 +1265,8 @@ class SeoFilter
 
         $params_to_text = array();
 
+        $sort_field_word = array();
+
 
         // если не нужно пересчитывать на странице с учётом гет параметра - то это закоментить, а ниже раскоментить
         $fields_keys = $this->getFieldsKey('alias');
@@ -1211,6 +1324,7 @@ class SeoFilter
                 $q->select(array('sfFieldIds.*'));
                 if ($q->prepare() && $q->stmt->execute()) {
                     while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $sort_field_word[$row['field_id']] = $row['priority'];
                         if ($row['where'] && $row['compare'] && $row['value']) {
                             $c = $this->modx->newQuery('sfDictionary');
                             $c->select(array('sfDictionary.*'));
@@ -1266,10 +1380,32 @@ class SeoFilter
             }
         }
 
+
         $url_array = $this->multiUrl($aliases,$rule_id,$page_id,$ajax,$new,$field_word);
         if(isset($url_array['total'])) {
             $meta['old_total'] = $url_array['total'];
         }
+
+        //синхронизация порядка с правилом
+        asort($sort_field_word );
+        foreach ($sort_field_word as $fid => $wid) {
+            $sort_field_word[$fid] = $field_word[$fid];
+        }
+        if($this->config['crumbsNested']) {
+            if ($nested = $this->findNestedCrumbs($sort_field_word, $page_id)) {
+                $meta['nested'] = array();
+                foreach ($nested as $link) {
+                    $link['url'] = $link['new_url']?:$link['old_url'];
+                    $link['sflink'] = $link['link'];
+                    $link['sfurl'] = $link['url'] . $this->config['url_suffix'];
+                    $meta['nested'][] = $link;
+                }
+                $meta['nested'] = $ajax
+                    ? $meta['nested']
+                    : $this->modx->toJSON($meta['nested']);
+            }
+        }
+
 
         if ($seo = $this->pdo->getArray('sfRule', array('id'=>$rule_id,'active'=>1))) {
             if(!empty($seo['count_parents'])) {
@@ -1685,6 +1821,7 @@ class SeoFilter
                             'field_id' => $field->get('id'),
                             'value' => $value,
                             'input' => $input,
+                            //TODO: предусмотреть добавление новых слов неактивными
                         );
 
                         if($relation_value) {
@@ -1730,6 +1867,7 @@ class SeoFilter
             'link'=>$this->config['link'],
         );
         $meta = array();
+        $meta['page_id'] = $meta['id'] = $page_id;
 
         if($page = $this->modx->getObject('modResource',$page_id)) {
             $page_keys = array_keys($page->toArray());
@@ -1762,7 +1900,7 @@ class SeoFilter
             $meta['pagetitle'] = $meta['title'];
         }
 
-        $meta['page_id'] = $page_id;
+
 
         return $meta;
     }

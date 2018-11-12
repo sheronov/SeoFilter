@@ -1,6 +1,8 @@
 <?php
 class sfUrls extends xPDOSimpleObject {
 
+
+
     public function updateUrl($priorities = array(), $words = array(),$feilds = array()) {
 
         $new_url = array();
@@ -41,4 +43,6 @@ class sfUrls extends xPDOSimpleObject {
         $this->save();
         return implode('/',$new_url);
     }
+
+
 }

@@ -3,7 +3,7 @@
 /** @var array $scriptProperties */
 switch ($modx->event->name) {
     case 'OnLoadWebDocument':
-        if($page = $modx->resource->id) {
+        if((int)$page = $modx->resource->id) {
             $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
             $proMode = $modx->getOption('seofilter_pro_mode',null,0,true);
             $q = $modx->newQuery('sfRule');
@@ -17,8 +17,9 @@ switch ($modx->event->name) {
                 $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
                         $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
                 if (!($SeoFilter instanceof SeoFilter)) break;
+//                $modx->log(1,$page.' onLoadWebDocument '.$modx->resource->context_key);
                 if(!$SeoFilter->initialized[$modx->resource->context_key]) {
-                    $SeoFilter->initialize($modx->resource->context_key, array('page' => (int)$page));
+                    $SeoFilter->initialize($modx->resource->context_key, array('page' => $page));
                 }
             }
         }
@@ -46,7 +47,7 @@ switch ($modx->event->name) {
 
         }
         $_SESSION['SeoFilter']['before'] = $before;
-        @session_write_close();
+//        @session_write_close();
         break;
     case 'OnDocFormSave':
         $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
@@ -361,13 +362,14 @@ switch ($modx->event->name) {
                 }
             }
 
+
+
             if(!$page) {
                 //если не будет найдено, то проверим, вдруг это главная страница
                 if(in_array($site_start,array_keys($aliases))) {
                     $page = $site_start;
                 }
             }
-
 
             if($page) {
                 if($page == $site_start) {
@@ -390,16 +392,17 @@ switch ($modx->event->name) {
                 }
 
 
+
                 if($between_urls == '/') {
                     if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
                         break;
                     }
                 } else {
-
                     if($url && (trim($url,'/') != str_replace($between_urls.implode('/',$tmp),'',$request))) {
                         break;
                     }
                 }
+
 
 
 
@@ -520,13 +523,14 @@ switch ($modx->event->name) {
                                 header ("Last-Modified: $modified");
                             }
 
+//                            $modx->log(1,$page. ' onPageNotFound '.$ctx);
                             $SeoFilter->initialize($ctx, array('page' => $page, 'params' => $params));
 
                             if(is_dir($modx->getOption('core_path').'components/msvendorcollections/model/')) {
                                 if ($msVC = $modx->getService('msvendorcollections', 'msVendorCollections', $modx->getOption('msvendorcollections_core_path', null,
                                         $modx->getOption('core_path') . 'components/msvendorcollections/') . 'model/msvendorcollections/', $scriptProperties)) {
-                                    if (!$msVC->initialized[$modx->resource->context_key]) {
-                                        $msVC->initialize($modx->resource->context_key);
+                                    if (!$msVC->initialized[$ctx]) {
+                                        $msVC->initialize($ctx);
                                     }
                                 }
                             }

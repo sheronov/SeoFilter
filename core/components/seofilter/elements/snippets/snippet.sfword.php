@@ -1,6 +1,7 @@
 <?php
 /** @var array $scriptProperties */
 $output = '';
+
 if(isset($options) && empty($field_id)) {
     $field_id = (int)$options;
 }

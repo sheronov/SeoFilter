@@ -1,8 +1,9 @@
 <?php
 /** @var array $scriptProperties */
-$path = $modx->getOption('seofilter_core_path', $scriptProperties,
-        $modx->getOption('core_path') . 'components/seofilter/').'model/';
-if ($sfClass = $modx->loadClass('seofilter.sfmenu',$path, false, true)) {
+/** @var sfMenu $sfMenu */
+$path = $modx->getOption('sfmenu_class_path', $scriptProperties, $modx->getOption('core_path') . 'components/seofilter/model/',true);
+$fqn = $modx->getOption('sfMenu.class', null, 'seofilter.sfmenu', true);
+if ($sfClass = $modx->loadClass($fqn,$path, false, true)) {
     $scriptProperties['nesting'] = 0;
     $scriptProperties['groupbyrule'] = 0;
     $scriptProperties['scheme'] = 'full';
@@ -20,11 +21,11 @@ if ($sfClass = $modx->loadClass('seofilter.sfmenu',$path, false, true)) {
         $scriptProperties['fast'] = 1;
     }
 
-    $sfMenu = new sfMenu($modx, $scriptProperties);
+    $sfMenu = new $sfClass($modx, $scriptProperties);
 } else {
     return false;
 }
-$sfMenu->pdoTools->addTime('pdoTools loaded');
+$sfMenu->pdoTools->addTime('sfSitemap loaded');
 
 // Default variables
 if (empty($tpl)) {

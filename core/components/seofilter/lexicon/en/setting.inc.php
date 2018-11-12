@@ -27,7 +27,7 @@ $_lang['setting_seofilter_base_get'] = 'Parameters that do not affect meta tags'
 $_lang['setting_seofilter_base_get_desc'] = 'GET-parameters that do not affect the META tags. Default "price,page,limit,tpl,sort"';
 
 $_lang['setting_seofilter_count'] = 'Counting descendants';
-$_lang['setting_seofilter_count_desc'] = 'Default no. If yes, the placeholder {$count} in SEO templates will be available';
+$_lang['setting_seofilter_count_desc'] = 'Default yes. If yes, the placeholder {$count} in SEO templates will be available';
 $_lang['setting_seofilter_choose'] = 'Selection by resource field';
 $_lang['setting_seofilter_choose_desc'] = 'For example: "msProductData.price". Several values by commos. Multiplied {choose} with fields from select and creating: min_price_{select}, max_price_{select}. Synonyms by "=", for example "msProductData.old_price=op"';
 $_lang['setting_seofilter_select'] = 'Which resource fields to choose';
