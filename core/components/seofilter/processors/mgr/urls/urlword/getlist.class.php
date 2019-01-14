@@ -54,6 +54,8 @@ class sfUrlWordGetListProcessor extends modObjectGetListProcessor
     {
 
         $array = $object->toArray();
+        $array['field_name'] = "({$array['field_id']}) {$array['field_name']}";
+        $array['word_name'] = "({$array['word_id']})  {$array['word_name']}";
 
 //        $array['pagetitle'] = '';
 //        if ($page = $array['page']) {

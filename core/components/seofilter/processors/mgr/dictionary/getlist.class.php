@@ -21,6 +21,10 @@ class sfDictionaryGetListProcessor extends modObjectGetListProcessor
             return $this->modx->lexicon('access_denied');
         }
 
+        if($this->getProperty('sort') == 'actions') {
+            $this->setProperty('sort','active');
+        }
+
         return true;
     }
 

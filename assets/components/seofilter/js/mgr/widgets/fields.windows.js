@@ -27,6 +27,8 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
             fieldLabel: _('seofilter_field_name'),
             name: 'name',
             id: config.id + '-name',
+            description: _('seofilter_field_name_help'),
+            empty_text: _('seofilter_field_name_help'),
             anchor: '99%',
             allowBlank: false,
             maxLength: 255,
@@ -42,6 +44,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                 ,items: [{
                     xtype: 'seofilter-combo-class',
                     fieldLabel: _('seofilter_field_class_more'),
+                    description: _('seofilter_field_class_help'),
                     name: 'class',
                     id: config.id + '-class',
                     anchor: '99%',
@@ -49,6 +52,8 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                 }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_field_key'),
+                    emptyText: _('seofilter_field_key_help'),
+                    description: _('seofilter_field_key_help'),
                     name: 'key',
                     id: config.id + '-key',
                     anchor: '99%',
@@ -56,6 +61,8 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_field_alias'),
+                    emptyText: _('seofilter_field_alias_help'),
+                    description: _('seofilter_field_alias_help'),
                     name: 'alias',
                     id: config.id + '-alias',
                     anchor: '99%',
@@ -70,27 +77,32 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                 ,items: [{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_hideparam'),
+                    description: _('seofilter_field_hideparam_help'),
                     name: 'hideparam',
                     id: config.id + '-hideparam',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_valuefirst'),
+                    description: _('seofilter_field_valuefirst_help'),
                     name: 'valuefirst',
                     id: config.id + '-valuefirst',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_slider'),
+                    description: _('seofilter_field_slider_help'),
                     name: 'slider',
                     id: config.id + '-slider',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_exact'),
+                    description: _('seofilter_field_exact_help'),
                     name: 'exact',
                     id: config.id + '-exact',
                     checked: true,
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),
+                    description: _('seofilter_field_active_help'),
                     name: 'active',
                     id: config.id + '-active',
                     checked: true,
@@ -100,6 +112,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
         },{
             xtype: 'xcheckbox',
             boxLabel: _('seofilter_field_xpdo'),
+            description: _('seofilter_field_xpdo_help'),
             name: 'xpdo',
             id: config.id + '-xpdo',
             listeners: {
@@ -155,6 +168,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
             ,items: [{
                 xtype: 'xcheckbox',
                 boxLabel: _('seofilter_field_relation'),
+                description: _('seofilter_field_relation_help'),
                 name: 'relation',
                 id: config.id + '-relation',
                 listeners: {
@@ -196,6 +210,7 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
         },{
             xtype: 'textfield',
             fieldLabel: _('seofilter_field_xpdo_where'),
+            description: _('seofilter_where_help'),
             name: 'xpdo_where',
             id: config.id + '-xpdo_where',
             anchor: '99%',
@@ -236,6 +251,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
         return [{
             xtype: 'textfield',
             fieldLabel: _('seofilter_field_name'),
+            description: _('seofilter_field_name_help'),
             name: 'name',
             id: config.id + '-name',
             anchor: '99%',
@@ -269,15 +285,17 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     // }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_field_class'),
+                    description: _('seofilter_field_class_help'),
                     name: 'class',
                     id: config.id + '-class',
                     // readOnly: true,
-                    style: 'background:#f9f9f9;color:#aaa;',
+                    // style: 'background:#f9f9f9;color:#aaa;',
                     anchor: '99%',
                     allowBlank:false,
                 }, {
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_field_key'),
+                    description: _('seofilter_field_key_help'),
                     name: 'key',
                     id: config.id + '-key',
                     anchor: '99%',
@@ -287,6 +305,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                 },{
                     xtype: 'textfield',
                     fieldLabel: _('seofilter_field_alias'),
+                    description: _('seofilter_field_alias_help'),
                     name: 'alias',
                     id: config.id + '-alias',
                     anchor: '99%',
@@ -301,26 +320,31 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                 ,items: [{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_hideparam'),
+                    description: _('seofilter_field_hideparam_help'),
                     name: 'hideparam',
                     id: config.id + '-hideparam',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_valuefirst'),
+                    description: _('seofilter_field_valuefirst_help'),
                     name: 'valuefirst',
                     id: config.id + '-valuefirst',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_slider'),
+                    description: _('seofilter_field_slider_help'),
                     name: 'slider',
                     id: config.id + '-slider',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_exact'),
+                    description: _('seofilter_field_exact_help'),
                     name: 'exact',
                     id: config.id + '-exact',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),
+                    description: _('seofilter_field_active_help'),
                     name: 'active',
                     id: config.id + '-active',
                 }
@@ -329,6 +353,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
         },{
             xtype: 'xcheckbox',
             boxLabel: _('seofilter_field_xpdo'),
+            description: _('seofilter_field_xpdo_help'),
             name: 'xpdo',
             id: config.id + '-xpdo',
             listeners: {
@@ -384,6 +409,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
             ,items: [{
                 xtype: 'xcheckbox',
                 boxLabel: _('seofilter_field_relation'),
+                description: _('seofilter_field_relation_help'),
                 name: 'relation',
                 id: config.id + '-relation',
                 listeners: {
@@ -425,6 +451,7 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
         },{
             xtype: 'textfield',
             fieldLabel: _('seofilter_field_xpdo_where'),
+            description: _('seofilter_where_help'),
             name: 'xpdo_where',
             id: config.id + '-xpdo_where',
             anchor: '99%',

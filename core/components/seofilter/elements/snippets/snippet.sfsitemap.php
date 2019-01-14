@@ -6,8 +6,10 @@ $fqn = $modx->getOption('sfMenu.class', null, 'seofilter.sfmenu', true);
 if ($sfClass = $modx->loadClass($fqn,$path, false, true)) {
     $scriptProperties['nesting'] = 0;
     $scriptProperties['groupbyrule'] = 0;
-    $scriptProperties['scheme'] = 'full';
 
+    if(!in_array($scriptProperties['scheme'],array('full','http','https'))) {
+        $scriptProperties['scheme'] = 'full';
+    }
     if (!empty($sortBy)) {
         $scriptProperties['sortby'] = $sortBy;
     }

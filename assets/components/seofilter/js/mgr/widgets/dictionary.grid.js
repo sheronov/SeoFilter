@@ -12,10 +12,12 @@ SeoFilter.grid.Dictionary = function (config) {
         baseParams: {
             action: 'mgr/dictionary/getlist'
         },
+        stateful: true,
+        stateId: config.id,
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
-                this.updateField(grid, e, row);
+                this.updateWord(grid, e, row);
             }
         },
         viewConfig: {
@@ -319,17 +321,17 @@ Ext.extend(SeoFilter.grid.Dictionary, MODx.grid.Grid, {
             sortable: true,
             renderer: SeoFilter.utils.formatDate,
             width: 100,
-        }, {
-            header: _('seofilter_dictionary_active'),
-            dataIndex: 'active',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: true,
-            width: 50,
+        // }, {
+        //     header: _('seofilter_dictionary_active'),
+        //     dataIndex: 'active',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: true,
+        //     width: 50,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
-            sortable: false,
+            sortable: true,
             width: 100,
             id: 'actions'
         }];

@@ -28,6 +28,10 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
             return $this->modx->lexicon('access_denied');
         }
 
+        if($this->getProperty('sort') == 'actions') {
+            $this->setProperty('sort','active');
+        }
+
         return true;
     }
 
@@ -59,6 +63,10 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
             }
         }
 
+        if($id = $this->getProperty('id',null)) {
+            $c->where(array('id'=>$id));
+        }
+
         //if($this->getProperty('page')) {
 
             $c->leftJoin('modResource', 'modResource', $this->classKey . '.page = modResource.id');
@@ -79,8 +87,13 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
      */
     public function prepareRow(xPDOObject $object)
     {
-
-        $array = $object->toArray();
+        if ($this->getProperty('combo')) {
+            $array = array(
+                'id' => $object->get('id'),
+                'name' => "({$object->get('id')}) ".$object->get('name'),
+            );
+        } else {
+            $array = $object->toArray();
 
 //        $array['pagetitle'] = '';
 //        if ($page = $array['page']) {
@@ -92,76 +105,75 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
 //            }
 //        }
 
+            $array['actions'] = array();
 
+            if ($array['active']) {
+                //recount
+                $array['actions'][] = array(
+                    'cls' => '',
+                    'icon' => 'icon icon-refresh',
+                    'title' => $this->modx->lexicon('seofilter_url_recount'),
+                    'multiple' => $this->modx->lexicon('seofilter_url_recount'),
+                    'action' => 'reCounting',
+                    'button' => false,
+                    'menu' => true,
+                );
+            }
 
-        $array['actions'] = array();
-
-        if($array['active']) {
-            //recount
+            // Edit
             $array['actions'][] = array(
                 'cls' => '',
-                'icon' => 'icon icon-refresh',
-                'title' => $this->modx->lexicon('seofilter_url_recount'),
-                'multiple' => $this->modx->lexicon('seofilter_url_recount'),
-                'action' => 'reCounting',
-                'button' => false,
-                'menu' => true,
-            );
-        }
-
-        // Edit
-        $array['actions'][] = array(
-            'cls' => '',
-            'icon' => 'icon icon-edit',
-            'title' => $this->modx->lexicon('seofilter_rule_update'),
-            //'multiple' => $this->modx->lexicon('seofilter_rules_update'),
-            'action' => 'updateField',
-            'button' => true,
-            'menu' => true,
-        );
-
-        // Duplicate
-        $array['actions'][] = array(
-            'cls' => '',
-            'icon' => 'icon icon-files-o',
-            'title' => $this->modx->lexicon('seofilter_rule_duplicate'),
-            'action' => 'duplicateRule',
-            'button' => true,
-            'menu' => true,
-        );
-
-        if (!$array['active']) {
-            $array['actions'][] = array(
-                'cls' => '',
-                'icon' => 'icon icon-power-off action-green',
-                'title' => $this->modx->lexicon('seofilter_rule_enable'),
-                'multiple' => $this->modx->lexicon('seofilter_rules_enable'),
-                'action' => 'enableField',
+                'icon' => 'icon icon-edit',
+                'title' => $this->modx->lexicon('seofilter_rule_update'),
+                //'multiple' => $this->modx->lexicon('seofilter_rules_update'),
+                'action' => 'updateRule',
                 'button' => true,
                 'menu' => true,
             );
-        } else {
+
+            // Duplicate
             $array['actions'][] = array(
                 'cls' => '',
-                'icon' => 'icon icon-power-off action-gray',
-                'title' => $this->modx->lexicon('seofilter_rule_disable'),
-                'multiple' => $this->modx->lexicon('seofilter_rules_disable'),
-                'action' => 'disableField',
+                'icon' => 'icon icon-files-o',
+                'title' => $this->modx->lexicon('seofilter_rule_duplicate'),
+                'action' => 'duplicateRule',
+                'button' => true,
+                'menu' => true,
+            );
+
+            if (!$array['active']) {
+                $array['actions'][] = array(
+                    'cls' => '',
+                    'icon' => 'icon icon-power-off action-green',
+                    'title' => $this->modx->lexicon('seofilter_rule_enable'),
+                    'multiple' => $this->modx->lexicon('seofilter_rules_enable'),
+                    'action' => 'enableRule',
+                    'button' => true,
+                    'menu' => true,
+                );
+            } else {
+                $array['actions'][] = array(
+                    'cls' => '',
+                    'icon' => 'icon icon-power-off action-gray',
+                    'title' => $this->modx->lexicon('seofilter_rule_disable'),
+                    'multiple' => $this->modx->lexicon('seofilter_rules_disable'),
+                    'action' => 'disableRule',
+                    'button' => true,
+                    'menu' => true,
+                );
+            }
+
+            // Remove
+            $array['actions'][] = array(
+                'cls' => '',
+                'icon' => 'icon icon-trash-o action-red',
+                'title' => $this->modx->lexicon('seofilter_rule_remove'),
+                'multiple' => $this->modx->lexicon('seofilter_rules_remove'),
+                'action' => 'removeRule',
                 'button' => true,
                 'menu' => true,
             );
         }
-
-        // Remove
-        $array['actions'][] = array(
-            'cls' => '',
-            'icon' => 'icon icon-trash-o action-red',
-            'title' => $this->modx->lexicon('seofilter_rule_remove'),
-            'multiple' => $this->modx->lexicon('seofilter_rules_remove'),
-            'action' => 'removeField',
-            'button' => true,
-            'menu' => true,
-        );
 
         return $array;
     }

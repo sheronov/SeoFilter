@@ -12,10 +12,12 @@ SeoFilter.grid.Urls = function (config) {
         baseParams: {
             action: 'mgr/urls/getlist'
         },
+        stateful: true,
+        stateId: config.id,
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
-                this.updateField(grid, e, row);
+                this.updateUrl(grid, e, row);
             }
         },
         viewConfig: {
@@ -58,7 +60,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         this.addContextMenuItem(menu);
     },
 
-    createField: function (btn, e) {
+    createUrl: function (btn, e) {
         var w = MODx.load({
             xtype: 'seofilter-url-window-create',
             id: Ext.id(),
@@ -76,7 +78,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         w.show(e.target);
     },
 
-    updateField: function (btn, e, row) {
+    updateUrl: function (btn, e, row) {
         if (typeof(row) != 'undefined') {
             this.menu.record = row.data;
         }
@@ -116,7 +118,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         });
     },
 
-    removeField: function () {
+    removeUrl: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -144,7 +146,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         return true;
     },
 
-    disableField: function () {
+    disableUrl: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -165,7 +167,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         })
     },
 
-    enableField: function () {
+    enableUrl: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -229,18 +231,23 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         })
     },
 
-    reCounting: function () {
+    reCounting: function (messageBox,offset,remove) {
+        var base_params = {action:'mgr/urls/recount',all:1};
+        if(offset) {base_params['offset'] = offset;}
+        if(remove) {base_params['remove'] = 1;}
         MODx.Ajax.request({
             url: this.config.url,
-            params: {
-                action: 'mgr/urls/recount',
-                all: 1
-            },
+            params: base_params,
             listeners: {
                 success: {
-                    fn: function () {
-                        Ext.MessageBox.hide();
-                        this.refresh();
+                    fn: function (response) {
+                        if(response.object.done) {
+                            messageBox.hide();
+                            this.refresh();
+                        } else {
+                            messageBox.updateProgress(response.object.value,response.object.text);
+                            this.reCounting(messageBox,response.object.offset,remove);
+                        }
                     }, scope: this
                 }
             }
@@ -253,14 +260,29 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             _('seofilter_url_recount_all_confirm'),
             function (e) {
                 if (e == 'yes') {
-                    Ext.MessageBox.show({
-                        title: _('seofilter_url_recount_wait'),
-                        msg: _('seofilter_url_recount_process'),
-                        progressText: ' ... ',
-                        progress:true,
-                        closable:false,
-                    });
-                    this.reCounting();
+                    var messageBox = Ext.MessageBox.progress(_('seofilter_url_recount_process'),_('seofilter_url_recount_wait'),'...');
+                    // Ext.MessageBox.show({
+                    //     title: _('seofilter_url_recount_wait'),
+                    //     msg: _('seofilter_url_recount_process'),
+                    //     progressText: ' ... ',
+                    //     progress:true,
+                    //     closable:false,
+                    // });
+                    this.reCounting(messageBox);
+                } else {
+                    this.fireEvent('cancel');
+                }
+            }, this);
+    },
+
+    removeEmptyLinks: function () {
+        Ext.Msg.confirm(
+            _('seofilter_remove_empty_links') || _('warning'),
+            _('seofilter_remove_empty_links_confirm'),
+            function (e) {
+                if (e == 'yes') {
+                    var messageBox = Ext.MessageBox.progress(_('seofilter_url_remove_process'),_('seofilter_url_remove_process_wait'),'...');
+                    this.reCounting(messageBox,0,1);
                 } else {
                     this.fireEvent('cancel');
                 }
@@ -290,7 +312,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
 
 
     getFields: function () {
-        return ['id', 'multi_id', 'page_id', 'name', 'link', 'total', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','menuon','multi_name','url_preview','page','pagetitle','menu_on','menutitle','menuindex','image','link_attributes'];
+        return ['id', 'multi_id', 'page_id', 'name', 'link', 'total', 'old_url', 'custom', 'new_url', 'editedon', 'createdon', 'count', 'rank', 'active', 'actions','menuon','multi_name','url_preview','page','pagetitle','rule_name','menu_on','menutitle','menuindex','image','link_attributes'];
     },
 
     getColumns: function () {
@@ -298,7 +320,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             header: _('seofilter_url_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 50
+            width: 40
         }, {
             header: _('seofilter_url_link'),
             dataIndex: 'link',
@@ -316,9 +338,10 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             width: 150,
         }, {
             header: _('seofilter_url_multi_id'),
-            dataIndex: 'name',
+            dataIndex: 'multi_id',
+            renderer: SeoFilter.utils.renderRule,
             sortable: true,
-            width: 150,
+            width: 100,
         }, {
             header: _('seofilter_url_page_id'),
             dataIndex: 'page_id',
@@ -347,12 +370,12 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             dataIndex: 'total',
             sortable: true,
             width: 70,
-        }, {
-            header: _('seofilter_url_active'),
-            dataIndex: 'active',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: true,
-            width: 75,
+        // }, {
+        //     header: _('seofilter_url_active'),
+        //     dataIndex: 'active',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: true,
+        //     width: 75,
         }, {
             header: _('seofilter_url_custom'),
             dataIndex: 'custom',
@@ -374,7 +397,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
-            sortable: false,
+            sortable: true,
             width: 125,
             id: 'actions'
         }];
@@ -482,6 +505,11 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                     cls: 'seofilter-cogs',
                     handler: this.clearCounters,
                     scope: this
+                }, {
+                    text: '<i class="icon icon-trash red"></i> ' + _('seofilter_remove_empty_links'),
+                    cls: 'seofilter-cogs',
+                    handler: this.removeEmptyLinks,
+                    scope:this
                 }]
             // }, {
             //     xtype:'button'

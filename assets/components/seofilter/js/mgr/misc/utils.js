@@ -13,15 +13,28 @@ SeoFilter.utils.renderResource = function (value, cell, row) {
     if(!pagetitle) {
         pagetitle = '';
     }
-    output = String.format('({0}) {1}', value, pagetitle)
+    output = String.format('({0}) {1}', value, pagetitle);
 
     if(proMode && row.data['pages']) {
         output = row.data['pages'];
     }
-
     return output;
     // return value
     //     ? String.format('({0}) {1}', value, row.data['pagetitle'])
+    //     : value;
+};
+
+SeoFilter.utils.renderRule = function (value, cell, row) {
+    var output = '';
+    var rule_name = row.data['rule_name'];
+    if(!rule_name) {
+        rule_name = '';
+    }
+    output = String.format('({0}) {1}', value, rule_name);
+
+    return output;
+    // return value
+    //     ? String.format('({0}) {1}', value, row.data['rule_name'])
     //     : value;
 };
 

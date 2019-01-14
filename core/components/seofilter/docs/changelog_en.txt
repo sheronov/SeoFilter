@@ -1,5 +1,22 @@
 Changelog for SeoFilter.
 
+1.6.0-beta (14.01.2019)
+======================
+- Added more popup descriptions for the fields, renamed some items
+- Seriously redone js-file for the frontend (old with a postscript -old)
+- Possibility to upload content and url to an SEO page from any filter
+- Added events for plugins when adding words, links and returning SEO data
+- Ability to connect the visual editor or Ace for any fields in the rule / page
+- New Settings tab for maximum convenience
+- Tabs and grids in the admin panel now remember the state
+- Sort by active objects is now in the Actions column
+- Step-by-step conversion and removal of empty pages in SEO pages
+- The condition for limiting the collection of field values ​​has become much more serious.
+- Nested breadcrumbs with autosearch (chunk tpl.SeoFilter.crumbs.nested)
+- Support requests with percentages, pluses and ampersands
+- Ability to change the class path for snippets
+- Improved calculations, bug fixes
+
 1.5.4-beta (16.07.2018)
 =======================
 - Setting "seofilter_url_scheme" by default "full";

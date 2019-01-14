@@ -248,11 +248,12 @@ class sfCountHandler
         return $this->getModResourceConditions($value,$field,$class_key);
     }
 
+
     public function getModResourceConditions($value = '', $field = array(),$class_key = '') {
         $where = array();
 
         if(!$class_key) {
-            $class_key = $field['class'] . '.' . $field['key'];
+            $class_key = $this->modx->escape($field['class']) . '.' . $this->modx->escape($field['key']);
         }
 
         if($field['slider']) {
@@ -273,6 +274,13 @@ class sfCountHandler
                 } else {
                     $where[$class_key . ':REGEXP'] = implode('|',$values);
                 }
+            } elseif(strpos($value,'||') !== false) {
+                $values = explode('||',$value);
+                if($field['exact']) {
+                    $where[$class_key . ':IN'] = $values;
+                } else {
+                    $where[$class_key . ':REGEXP'] = implode('|',$values);
+                }
             } elseif($field['exact']) {
                 $where[$class_key] = $value;
             } else {
@@ -280,7 +288,42 @@ class sfCountHandler
             }
         }
 
-        return array('where'=>$where);
+        $conditions = array('where'=>$where);
+
+
+
+        if($field['class'] == 'modResource' && $field['key'] == 'parent' && $this->checkMS2()) {
+            $conditions['leftjoin'] = array(
+                'msCategoryMember' => array('class'=>'msCategoryMember','on' => 'msCategoryMember.product_id = modResource.id')
+            );
+
+            $sql_where = '(';
+            foreach($where as $pre => $val) {
+                $sql_where .= str_replace(':',' ',$pre) .' ';
+                if(is_array($val)) {
+                    $sql_where .= "('".implode("', '",$val)."')";
+                } else {
+                    $sql_where .= '= '.$val;
+                }
+            }
+
+            if(strpos($value,$this->config['values_delimeter']) !== false) {
+                $values = explode($this->config['values_delimeter'],$value);
+                $sql_where .= " OR msCategoryMember.category_id IN ('".implode("', '",$values)."')";
+            } elseif(strpos($value,'||') !== false) {
+                $values = explode('||',$value);
+                $sql_where .= " OR msCategoryMember.category_id IN ('".implode("', '",$values)."')";
+            } else {
+                $sql_where .= ' OR msCategoryMember.category_id = '.$value;
+            }
+            $sql_where .= ' )';
+
+            $conditions['where'] = array($sql_where);
+        }
+
+
+
+        return $conditions;
     }
 
 
@@ -325,12 +368,14 @@ class sfCountHandler
         $conditions = array();
 
         $option = ucfirst($field['key']);
+        $tableKey = $this->modx->escape('option'.$option);
+
         $conditions['join'] = array(
             'msProductData'=> array('class' => 'msProductData', 'on' => 'msProductData.id = modResource.id'),
-            'option'.$option => array('class' => 'msProductOption', 'on' => 'option'.$option.'.product_id = msProductData.id AND option'.$option.'.key = "'.$field['key'].'"')
+            $tableKey => array('class' => 'msProductOption', 'on' => "{$tableKey}.product_id = msProductData.id AND {$tableKey}.key = \"{$field['key']}\"")
         );
 
-        $class_key = 'option'.$option.'.value';
+        $class_key = $tableKey.'.value';
 
         if($includeWhere) {
             $conditions = array_merge($conditions, $this->getModResourceConditions($value, $field, $class_key));
@@ -342,26 +387,30 @@ class sfCountHandler
     public function getTaggerConditions($value = '',$field = array(),$includeWhere = 1) {
         $group = ucfirst($field['key']);
 
+        $tableKey = $this->modx->escape('TaggerTag'.$group);
+        $groupKey = $this->modx->escape('TaggerGroup'.$group);
+        $resourceKey = $this->modx->escape('TaggerTagResource'.$group);
+
         $conditions = array(
             'models'=>array('tagger'),
             'join' => array(
-                'TaggerGroup'.$group => array(
+                $groupKey => array(
                     'class'=>'TaggerGroup',
-                    'on'=>'TaggerGroup'.$group.'.id = "'.$group.'" OR TaggerGroup'.$group.'.alias = "'.$group.'"'
+                    'on'=>"{$groupKey}.id = \"{$group}\" OR {$groupKey}.alias = \"{$group}\""
                 ),
-                'TaggerTag'.$group => array(
+                $tableKey => array(
                     'class'=>'TaggerTag',
-                    'on'=>'TaggerTag'.$group.'.group = TaggerGroup'.$group.'.id'
+                    'on'=>"{$tableKey}.group = {$groupKey}.id"
                 ),
-                'TaggerTagResource'.$group => array(
+                $resourceKey => array(
                     'class'=>'TaggerTagResource',
-                    'on'=>'TaggerTagResource'.$group.'.tag = TaggerTag'.$group.'.id AND modResource.id = TaggerTagResource'.$group.'.resource'
+                    'on'=>"{$resourceKey}.tag = {$tableKey}.id AND modResource.id = {$resourceKey}.resource"
                 )
             )
         );
 
         if($includeWhere) {
-            $class_key = 'TaggerTag'.$group.'.tag';
+            $class_key = $tableKey.'.tag';
             $conditions = array_merge($conditions,$this->getModResourceConditions($value,$field,$class_key));
         }
 
@@ -384,10 +433,11 @@ class sfCountHandler
         if(isset($field['xpdo_package']) && strtolower($field['xpdo_package']) == 'tvsuperselect') {
 //            $this->pdoTools->setConfig(array('loadModels' => 'tvsuperselect'));
             $conditions['models'][] = 'tvsuperselect';
-            $conditions['join']['tvssOption'.$tv] = array('class'=>'tvssOption','on'=>'tvssOption'. $tv .'.resource_id = modResource.id');
-            $class_key = 'tvssOption'.$tv.'.value';
+            $tvssKey = $this->modx->escape('tvssOption'.$tv);
+            $conditions['join'][$tvssKey] = array('class'=>'tvssOption','on'=>"{$tvssKey}.resource_id = modResource.id");
+            $class_key = $tvssKey.'.value';
         }  else {
-            $class_key = 'TV'.strtolower($field['key']).'.value';
+            $class_key = $this->modx->escape('TV'.strtolower($field['key'])).'.value';
         }
 
         if($includeWhere) {
@@ -399,8 +449,8 @@ class sfCountHandler
 
 
     public function getConditions($value = '', $field = array()) {
-        $where = $join = $tvs = array();
-        $conditions = array('where'=>$where,'joins'=>$join,'tvs'=>$tvs);
+        $where = $join = $leftjoin =  $tvs = array();
+        $conditions = array('where'=>$where,'join'=>$join,'leftjoin'=>$leftjoin,'tvs'=>$tvs);
 
         if(!empty($field)) {
             $method_name = 'get'.ucfirst($field['class']).'Conditions';
@@ -528,14 +578,14 @@ class sfCountHandler
     }
 
 
-    public function countByParams($params = array(),$fields = array(), $parents = '', $rule_where = array(), $class = '', $min_max = 0) {
+    public function countByParams($params = array(),$fields = array(), $parents = '', $rule_where = array(), $class = '', $min_max = 0,$returnConfig = 0) {
         $total = 0; //количество результатов удовлетворяющее условиям
 
         if(!$class) {
             $class = 'modResource';
         }
-        $where = $join = $tvs = $models = array();
-        $to_config = array('where'=>'where','join'=>'innerJoin','tvs'=>'includeTVs','models'=>'loadModels');
+        $where = $join = $leftjoin = $tvs = $models = array();
+        $to_config = array('where'=>'where','join'=>'innerJoin','leftjoin'=>'leftJoin','tvs'=>'includeTVs','models'=>'loadModels');
 
         foreach($params as $alias=>$param) {
             if(isset($fields[$alias])) {
@@ -573,29 +623,53 @@ class sfCountHandler
             $config['parents'] = $parents;
         }
 
+        $to_return = array();
         foreach($to_config as $prop=>$propConfig) {
             if (!empty(${$prop})) {
                 if($prop == 'tvs' || $prop == 'models') {
-                    $config[$propConfig] = implode(',',${$prop});
+                    $config[$propConfig] = $to_return[$propConfig] = implode(',',${$prop});
                 } else {
-                    $config[$propConfig] = ${$prop};
+                    $config[$propConfig] = $to_return[$propConfig] = ${$prop};
                 }
             }
         }
 
+        if($returnConfig) {
+            return $to_return;
+        }
+
         $check = true;
-        if(isset($config['where']['modResource.parent']) && isset($config['parents'])) {
-            if($config['parents'] != $config['where']['modResource.parent']) {
+
+        //TODO: переделать механизм с parents
+        $p_key = '`modResource`.`parent`';
+        if(isset($config['where'][$p_key]) && isset($config['parents'])) {
+            if($config['parents'] != $config['where'][$p_key]) {
                 $this->pdoTools->setConfig($config);
                 $where = $this->pdoTools->additionalConditions();
                 $check = false;
                 foreach($where as $key=>$vals) {
-                    if(is_array($vals) && in_array($config['where']['modResource.parent'],$vals)) {
-                        $check = true;
-                    }
-                    foreach($vals as $vkey=>$vvals) {
-                        if(strpos($vkey,'modResource.parent')!==false && is_array($vvals) && in_array($config['where']['modResource.parent'],$vvals)) {
+                    if($this->config['proMode'] && strpos($config['where'][$p_key],'||') !== 0) {
+                        $inp_parents = explode('||',$config['where'][$p_key]);
+                        foreach ($inp_parents as $inp_parent) {
+                            if(is_array($vals) && in_array($inp_parent,$vals)) {
+                                $check = true;
+                                $config['where'][$p_key] = $inp_parent;
+                            }
+                            foreach($vals as $vkey=>$vvals) {
+                                if(strpos($vkey,'modResource.parent')!==false && is_array($vvals) && in_array($inp_parent,$vvals)) {
+                                    $check = true;
+                                    $config['where'][$p_key] = $inp_parent;
+                                }
+                            }
+                        }
+                    } else {
+                        if(is_array($vals) && in_array($config['where'][$p_key],$vals)) {
                             $check = true;
+                        }
+                        foreach($vals as $vkey=>$vvals) {
+                            if(strpos($vkey,'modResource.parent')!==false && is_array($vvals) && in_array($config['where'][$p_key],$vvals)) {
+                                $check = true;
+                            }
                         }
                     }
                 }
@@ -604,7 +678,6 @@ class sfCountHandler
                 }
             }
         }
-
         if($check && $run = $this->run($config)) {
             if (is_array($run)) {
                 if (isset($run[0]['count'])) {
@@ -676,6 +749,7 @@ class sfCountHandler
         $conditions = array(
             'where' => array(),
             'join' => array(),
+            'leftjoin' => array(),
             'tvs' => array()
         );
         foreach($where as $key=>$cond) {
@@ -704,7 +778,7 @@ class sfCountHandler
                             break;
                         case 'msProductOption':
                         case 'Option':
-                            if(strpos($clear_key,'.value') !== 0) {
+                            if(strpos($clear_key,'.value') !== false) {
                                 $clear_key = str_replace('.value','',$clear_key);
                             }
                             if($add_conditions = $this->getMsProductOptionConditions('',array('key'=>$clear_key),0)) {
@@ -743,6 +817,7 @@ class sfCountHandler
                             break;
                         case 'Resource':
                         case 'modResource':
+                            $conditions['where'][$key] = $cond;
                             break;
                         default:
                             $method_name = 'get'.ucfirst($table).'Conditions';
@@ -973,6 +1048,12 @@ class sfCountHandler
 
             return $min_max_array;
 
+
     }
+
+    public function checkMS2() {
+        return file_exists(MODX_CORE_PATH . 'components/minishop2/model/minishop2/msproduct.class.php');
+    }
+
 
 }

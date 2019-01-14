@@ -2,9 +2,11 @@
 
 class sfUrlsCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType = 'sfUrls';
+    public $objectType = 'url';
     public $classKey = 'sfUrls';
     public $languageTopics = array('seofilter');
+    public $beforeSaveEvent = 'sfOnBeforeUrlAdd';
+    public $afterSaveEvent = 'sfOnUrlAdd';
     //public $permission = 'create';
 
 
@@ -23,7 +25,14 @@ class sfUrlsCreateProcessor extends modObjectCreateProcessor
             } else {
                 $this->modx->error->addField('old_url', $this->modx->lexicon('seofilter_url_err_url'));
             }
-        } elseif ($this->modx->getCount($this->classKey, array('old_url' => $url,'page_id'=>$page_id))) {
+        } elseif(empty($page_id)) {
+            if($from_rule) {
+                $this->modx->error->failure($this->modx->lexicon('seofilter_url_err_page'));
+            } else {
+                $this->modx->error->addField('page_id', $this->modx->lexicon('seofilter_url_err_page'));
+            }
+        }
+        elseif ($this->modx->getCount($this->classKey, array('old_url' => $url,'page_id'=>$page_id))) {
             $this->modx->error->errors[] = 'double';
             if($from_rule) {
                 $this->modx->error->failure( $this->modx->lexicon('seofilter_url_err_ae').' = '.$url);

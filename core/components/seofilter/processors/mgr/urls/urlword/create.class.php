@@ -24,6 +24,11 @@ class sfUrlWordCreateProcessor extends modObjectCreateProcessor
         return parent::beforeSet();
     }
 
+    public function logManagerAction()
+    {
+
+    }
+
 }
 
 return 'sfUrlWordCreateProcessor';

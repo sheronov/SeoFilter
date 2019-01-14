@@ -8,7 +8,7 @@ $tmp = array(
     'seofilter' => array(
         'description' => 'seofilter_menu_desc',
         'action' => 'home',
-        //'icon' => '<i class="icon icon-large icon-modx"></i>',
+        'icon' => 'SEO<i class="icon-filter icon icon-large"></i>',
     ),
 );
 

@@ -2,11 +2,12 @@
 
 class sfDictionaryCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType = 'sfDictionary';
+    public $objectType = 'word';
     public $classKey = 'sfDictionary';
     public $languageTopics = array('seofilter');
+    public $beforeSaveEvent = 'sfOnBeforeWordAdd';
+    public $afterSaveEvent = 'sfOnWordAdd';
     //public $permission = 'create';
-
 
 
     /**

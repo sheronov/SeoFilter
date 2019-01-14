@@ -75,10 +75,11 @@ class SeoFilterHomeManagerController extends modExtraManagerController
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/urls.windows.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.grid.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/dictionary.windows.js');
+        $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/settings.panel.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/widgets/home.panel.js');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/sections/home.js');
 
-        if($this->SeoFilter->config['richtext']) {
+        if($this->SeoFilter->config['content_richtext']) {
             $this->loadRichTextEditor();
         }
 

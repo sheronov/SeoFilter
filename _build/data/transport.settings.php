@@ -122,6 +122,26 @@ $tmp = array(
         'value' => false,
         'area' => 'seofilter_main'
     ),
+    'admin_version' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofilter_main'
+    ),
+    'collect_words' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofilter_main'
+    ),
+    'content_richtext' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => 'seofilter_main'
+    ),
+    'content_ace' => array(
+        'xtype' => 'textfield',
+        'value' => 'content,Rule.content',
+        'area' => 'seofilter_main'
+    ),
     'frontend_js' => array(
         'xtype' => 'textfield',
         'value' => '[[+jsUrl]]web/default.js',

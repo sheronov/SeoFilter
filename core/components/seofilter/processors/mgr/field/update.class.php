@@ -7,6 +7,16 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
     public $languageTopics = array('seofilter');
     //public $permission = 'save';
 
+    /*** @var SeoFilter $SeoFilter */
+    protected $SeoFilter;
+
+    public function initialize()
+    {
+        $this->SeoFilter = $this->modx->getService('seofilter', 'SeoFilter',
+            $this->modx->getOption('seofilter_core_path', null,
+                $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/');
+        return parent::initialize();
+    }
 
     /**
      * We doing special check of permission
@@ -114,7 +124,24 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
 
             $base_words = array();
 
+
+
             if ($class && $key) {
+                $resource_condition = '';
+                switch ($class) {
+                    case 'msProductData':
+                        $resource_condition = 'msProductData.id = modResource.id';
+                        break;
+                    case 'msProductOption':
+                        $resource_condition = 'msProductOption.product_id = modResource.id';
+                        break;
+                    case 'modTemplateVar':
+                        $resource_condition = 'modTemplateVarResource.contentid = modResource.id';
+                        break;
+                    case 'Tagger':
+                        $resource_condition = 'TaggerTagResource.resource = modResource.id';
+                        break;
+                }
 
                 $q = $this->modx->newQuery('sfDictionary');
                 $q->where(array('field_id'=>$this->object->get('id')));
@@ -139,7 +166,8 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                 if ($field->get('xpdo')) {
                     $xpdo_id = $field->get('xpdo_id');
                     $xpdo_name = $field->get('xpdo_name');
-                    if ($xpdo_class = $field->get('xpdo_class')) {
+                    $xpdo_class = $field->get('xpdo_class');
+                    if ($xpdo_class && $xpdo_id && $xpdo_name) {
                         $q = $this->modx->newQuery($xpdo_class);
                         if($field->get('relation')) {
                             $relation_column = $field->get('relation_column');
@@ -192,14 +220,43 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                             $q = $this->modx->newQuery('modTemplateVarResource');
                             $q->where(array('tmplvarid' => $tv_id, 'value:!=' => ''));
                             $q->select(array('DISTINCT modTemplateVarResource.value'));
-                            if ($q->prepare() && $q->stmt->execute()) {
+                            if($field->get('xpdo_where')) {
+                                $to_config = array('where'=>'where','join'=>'innerJoin','leftjoin'=>'leftJoin');
+                                $this->SeoFilter->loadHandler();
+                                $conditions = $this->SeoFilter->countHandler->prepareWhere($this->modx->fromJSON($field->get('xpdo_where')));
+                                if(!empty($conditions['where'])) {
+                                    if($class != 'modResource') {
+                                        $q->innerJoin('modResource', 'modResource', $resource_condition);
+                                    }
+                                    foreach ($conditions['where'] as $where_key => $where_arr ) {
+                                        if(strpos($where_key,'.') === false) {
+                                            $conditions['where']['modResource.'.$where_key] = $where_arr;
+                                            unset($conditions['where'][$where_key]);
+                                        }
+                                    }
+                                }
+                                foreach($to_config as $prop=>$propConfig) {
+                                    if (!empty($conditions[$prop])) {
+                                        if(in_array($propConfig,array('leftJoin','innerJoin'))) {
+                                            foreach ($conditions[$prop] as $join_alias => $join_array) {
+                                                $q->$propConfig($join_array['class'],$join_alias,$join_array['on']);
+                                            }
+                                        } else {
+                                            $q->$propConfig($conditions[$prop]);
+                                        }
+                                    }
+                                }
+                            }
+                            if ( $q->prepare() && $q->stmt->execute()) {
                                 while ($row = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
                                     $result = json_decode($row) ;
                                     if(json_last_error() === JSON_ERROR_NONE) {
-                                        if(is_array($result)) {
-                                            $row_arr = $result;
-                                        } else {
-                                            $row_arr = array($result);
+                                        if(!empty($result)) {
+                                            if (is_array($result)) {
+                                                $row_arr = $result;
+                                            } else {
+                                                $row_arr = array($result);
+                                            }
                                         }
                                     } else {
                                         if (strpos($row, '||') !== false) {
@@ -221,51 +278,54 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                         $words = array_diff($words,$base_words);
                     }
                     $dictionary = array(); // промежуточный массив для проверки дубликатов
-                    foreach ($words as $word) {
-                        $relation_id = $relation_value = '';
-                        if ($field->get('xpdo')) {
-                            if(is_array($values[$word])) {
-                                $relation_value = $values[$word]['relation'];
-                                $value = $values[$word]['value'];
-                            } else {
-                                $value = $values[$word];
+                    if(!empty($words)) {
+                        foreach ($words as $word) {
+                            $relation_id = $relation_value = '';
+                            if ($field->get('xpdo')) {
+                                if (is_array($values[$word])) {
+                                    $relation_value = $values[$word]['relation'];
+                                    $value = $values[$word]['value'];
+                                } else {
+                                    $value = $values[$word];
+                                }
+                            } elseif (strpos($word, '==') !== false) {
+                                $word_exp = array_map('trim', explode('==', $word));
+                                $value = $word_exp[0];
+                                $word = $word_exp[1];
                             }
-                        } elseif(strpos($word,'==') !== false) {
-                            $word_exp = array_map('trim',explode('==',$word));
-                            $value = $word_exp[0];
-                            $word = $word_exp[1];
-                        } else {
-                            $value = $word;
-                        }
+                            if(is_null($value)) {
+                                $value = $word;
+                            }
 
 
-                        if(in_array($word,$base_words) || empty($word)) {
-                            continue;
-                        }
+                            if (in_array($word, $base_words) || empty($word)) {
+                                continue;
+                            }
 
 
-                        if($relation_value) {
-                            $relation_field = $field->get('relation_field');
-                            $s = $this->modx->newQuery('sfDictionary');
-                            $s->where(array('input'=>$relation_value,'field_id'=>$relation_field));
-                            $s->select('id');
-                            $relation_id = $this->modx->getValue($s->prepare());
-                        }
+                            if ($relation_value) {
+                                $relation_field = $field->get('relation_field');
+                                $s = $this->modx->newQuery('sfDictionary');
+                                $s->where(array('input' => $relation_value, 'field_id' => $relation_field));
+                                $s->select('id');
+                                $relation_id = $this->modx->getValue($s->prepare());
+                            }
 
-                        if(isset($dictionary[$word]) && $dictionary[$word] == $value) {
-                            continue;
-                        }
-                        $dictionary[$word] = $value;
+                            if (isset($dictionary[$word]) && $dictionary[$word] == $value) {
+                                continue;
+                            }
+                            $dictionary[$word] = $value;
 
-                        $processorProps['relation_word'] = $relation_id;
-                        $processorProps['input'] = $word;
-                        $processorProps['value'] = $value;
+                            $processorProps['relation_word'] = $relation_id;
+                            $processorProps['input'] = $word;
+                            $processorProps['value'] = $value;
 
 
-                        $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
-                        if ($response->isError()) {
-                            $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
-                            $this->modx->error->reset();
+                            $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+                            if ($response->isError()) {
+                                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
+                                $this->modx->error->reset();
+                            }
                         }
                     }
                 } elseif(strtolower($class) == 'tagger') {
@@ -283,6 +343,35 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                     $q->select(array(
                         'TaggerTag.tag as input,TaggerTag.label as value,TaggerTag.alias'
                     ));
+                    if($field->get('xpdo_where')) {
+                        $q->innerJoin('TaggerTagResource','TaggerTagResource','TaggerTagResource.tag = TaggerTag.id');
+                        $to_config = array('where'=>'where','join'=>'innerJoin','leftjoin'=>'leftJoin');
+                        $this->SeoFilter->loadHandler();
+                        $conditions = $this->SeoFilter->countHandler->prepareWhere($this->modx->fromJSON($field->get('xpdo_where')));
+                        if(!empty($conditions['where'])) {
+                            if($class != 'modResource') {
+                                $q->innerJoin('modResource', 'modResource', $resource_condition);
+                            }
+                            foreach ($conditions['where'] as $where_key => $where_arr ) {
+                                if(strpos($where_key,'.') === false) {
+                                    $conditions['where']['modResource.'.$where_key] = $where_arr;
+                                    unset($conditions['where'][$where_key]);
+                                }
+                            }
+                        }
+                        foreach($to_config as $prop=>$propConfig) {
+                            if (!empty($conditions[$prop])) {
+                                if(in_array($propConfig,array('leftJoin','innerJoin'))) {
+                                    foreach ($conditions[$prop] as $join_alias => $join_array) {
+                                        $q->$propConfig($join_array['class'],$join_alias,$join_array['on']);
+                                    }
+                                } else {
+                                    $q->$propConfig($conditions[$prop]);
+                                }
+                            }
+                        }
+                        //$q->where($this->modx->fromJSON($field->get('xpdo_where')));
+                    }
                     if($q->prepare() && $q->stmt->execute()) {
                         while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                             if(in_array($row['input'],$base_words) || empty($row['input'])) {
@@ -323,8 +412,32 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                         $q->select(array('DISTINCT ' . $class . '.' . $key));
                     }
                     if($field->get('xpdo_where')) {
-//                        $q->select($this->modx->getSelectColumns($class,$class));
-                        $q->where($this->modx->fromJSON($field->get('xpdo_where')));
+                        $to_config = array('where'=>'where','join'=>'innerJoin','leftjoin'=>'leftJoin');
+                        $this->SeoFilter->loadHandler();
+                        $conditions = $this->SeoFilter->countHandler->prepareWhere($this->modx->fromJSON($field->get('xpdo_where')));
+                        if(!empty($conditions['where'])) {
+                            if($class != 'modResource') {
+                                $q->innerJoin('modResource', 'modResource', $resource_condition);
+                            }
+                            foreach ($conditions['where'] as $where_key => $where_arr ) {
+                                if(strpos($where_key,'.') === false) {
+                                    $conditions['where']['modResource.'.$where_key] = $where_arr;
+                                    unset($conditions['where'][$where_key]);
+                                }
+                            }
+                        }
+                        foreach($to_config as $prop=>$propConfig) {
+                            if (!empty($conditions[$prop])) {
+                                if(in_array($propConfig,array('leftJoin','innerJoin'))) {
+                                    foreach ($conditions[$prop] as $join_alias => $join_array) {
+                                        $q->$propConfig($join_array['class'],$join_alias,$join_array['on']);
+                                    }
+                                } else {
+                                    $q->$propConfig($conditions[$prop]);
+                                }
+                            }
+                        }
+                        //$q->where($this->modx->fromJSON($field->get('xpdo_where')));
                     }
                     if ($q->prepare() && $q->stmt->execute()) {
                         while ($input = $q->stmt->fetch(PDO::FETCH_ASSOC)) {

@@ -3,12 +3,6 @@ SeoFilter.panel.Home = function (config) {
     Ext.apply(config, {
         baseCls: 'modx-formpanel',
         layout: 'anchor',
-        /*
-         stateful: true,
-         stateId: 'seofilter-panel-home',
-         stateEvents: ['tabchange'],
-         getState:function() {return {activeTab:this.items.indexOf(this.getActiveTab())};},
-         */
         hideMode: 'offsets',
         items: [{
             html: '<h2>' + _('seofilter') + '</h2>',
@@ -18,6 +12,15 @@ SeoFilter.panel.Home = function (config) {
             xtype: 'modx-tabs',
             defaults: {border: false, autoHeight: true},
             border: true,
+            stateful: true,
+            stateId: 'seofilter-tabs',
+            stateEvents: ['tabchange'],
+            cls: 'seofilter-panel',
+            getState: function () {
+                return {
+                    activeTab: this.items.indexOf(this.getActiveTab())
+                };
+            },
             hideMode: 'offsets',
             items: [{
                 title: _('seofilter_fields'),
@@ -62,6 +65,17 @@ SeoFilter.panel.Home = function (config) {
                     xtype: 'seofilter-grid-urls',
                     id: 'seofilter-grid-urls',
                     cls: 'main-wrapper',
+                }]
+            },{
+                title: _('seofilter_settings'),
+                layout: 'anchor',
+                items: [{
+                  html: _('seofilter_settings_intro'),
+                  cls : 'panel-desc'
+                },{
+                    xtype:'seofilter-settings',
+                    id: 'seofilter-settings',
+                    cls: 'main-wrapper'
                 }]
             }]
         }]

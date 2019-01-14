@@ -12,10 +12,12 @@ SeoFilter.grid.Rules = function (config) {
         baseParams: {
             action: 'mgr/rule/getlist'
         },
+        stateful: true,
+        stateId: config.id,
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
-                this.updateField(grid, e, row);
+                this.updateRule(grid, e, row);
             }
         },
         viewConfig: {
@@ -55,7 +57,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
         this.addContextMenuItem(menu);
     },
 
-    createField: function (btn, e) {
+    createRule: function (btn, e) {
         var w = MODx.load({
             xtype: 'seofilter-rule-window-create',
             id: Ext.id(),
@@ -72,11 +74,11 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             }
         });
         w.reset();
-        w.setValues({active: true,count_where: SeoFilter.config.defaultWhere || ''});
+        w.setValues({active: true, base: true,recount:true, count_where: SeoFilter.config.defaultWhere || ''});
         w.show(e.target);
     },
 
-    updateField: function (btn, e, row) {
+    updateRule: function (btn, e, row) {
         if (typeof(row) != 'undefined') {
             this.menu.record = row.data;
         }
@@ -94,11 +96,11 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             listeners: {
                 success: {
                     fn: function (r) {
-                        // if(this.windows.updateField) {
-                        //     this.windows.updateField.close();
-                        //     this.windows.updateField.destroy();
+                        // if(this.windows.updateRule) {
+                        //     this.windows.updateRule.close();
+                        //     this.windows.updateRule.destroy();
                         // }
-                        this.windows.updateField = MODx.load({
+                        this.windows.updateRule = MODx.load({
                             xtype: 'seofilter-rule-window-update',
                             id: Ext.id(),
                             record: r,
@@ -115,16 +117,16 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
                             }
                         });
 
-                        this.windows.updateField.reset();
-                        this.windows.updateField.setValues(r.object);
-                        this.windows.updateField.show(e.target);
+                        this.windows.updateRule.reset();
+                        this.windows.updateRule.setValues(r.object);
+                        this.windows.updateRule.show(e.target);
                     }, scope: this
                 }
             }
         });
     },
 
-    removeField: function () {
+    removeRule: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -153,7 +155,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
         return true;
     },
 
-    disableField: function () {
+    disableRule: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -174,7 +176,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
         })
     },
 
-    enableField: function () {
+    enableRule: function () {
         var ids = this._getSelectedIds();
         if (!ids.length) {
             return false;
@@ -292,12 +294,12 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             sortable: true,
             renderer: SeoFilter.utils.renderBoolean,
             width: 50,
-        }, {
-            header: _('seofilter_rule_active'),
-            dataIndex: 'active',
-            renderer: SeoFilter.utils.renderBoolean,
-            sortable: true,
-            width: 50,
+        // }, {
+        //     header: _('seofilter_rule_active'),
+        //     dataIndex: 'active',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: true,
+        //     width: 50,
         }, {
             header: _('seofilter_rule_rank'),
             dataIndex: 'rank',
@@ -307,7 +309,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
-            sortable: false,
+            sortable: true,
             width: 75,
             id: 'actions'
         }];
@@ -316,7 +318,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
     getTopBar: function () {
         return [{
             text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_rule_create'),
-            handler: this.createField,
+            handler: this.createRule,
             scope: this
         },{
             xtype: 'seofilter-combo-resource'

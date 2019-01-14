@@ -12,6 +12,8 @@ SeoFilter.grid.Fields = function (config) {
         baseParams: {
             action: 'mgr/field/getlist'
         },
+        stateful: true,
+        stateId: config.id,
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
@@ -56,9 +58,14 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
     },
 
     createField: function (btn, e) {
+        var values = btn.initialConfig.data;
+        if(!values) {
+            values = {active: true,exact:true};
+        }
+        var ext_id = Ext.id();
         var w = MODx.load({
             xtype: 'seofilter-field-window-create',
-            id: Ext.id(),
+            id: ext_id,
             listeners: {
                 success: {
                     fn: function () {
@@ -71,8 +78,14 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             }
         });
         w.reset();
-        w.setValues({active: true,exact:true});
+        w.setValues(values);
         w.show(e.target);
+        if(btn.initialConfig.focus_name) {
+            var focus = Ext.getCmp(ext_id+'-'+btn.initialConfig.focus_name);
+            setTimeout(function () {
+                focus.focus();
+            },500);
+        }
     },
 
     updateField: function (btn, e, row) {
@@ -189,7 +202,7 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'page', 'pages','class', 'key', 'alias', 'translit', 'baseparam', 'priority', 'active', 'rank', 'actions','pagetitle','slider','exact','valuefirst','hideparam'];
+        return ['id', 'name', 'page', 'pages','class', 'key', 'alias', 'translit', 'baseparam', 'priority', 'xpdo', 'xpdo_where', 'relative', 'active', 'rank', 'actions','pagetitle','slider','exact','valuefirst','hideparam'];
     },
 
     getColumns: function () {
@@ -197,27 +210,27 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             header: _('seofilter_field_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 50
+            width: 40
         }, {
             header: _('seofilter_field_name'),
             dataIndex: 'name',
             sortable: true,
-            width: 140,
+            width: 150,
         }, {
             header: _('seofilter_field_class'),
             dataIndex: 'class',
             sortable: true,
-            width: 140,
+            width: 100,
         }, {
             header: _('seofilter_field_key'),
             dataIndex: 'key',
             sortable: true,
-            width: 140,
+            width: 100,
         }, {
             header: _('seofilter_field_alias'),
             dataIndex: 'alias',
             sortable: true,
-            width: 140,
+            width: 100,
         }, {
             header: _('seofilter_field_hideparam'),
             dataIndex: 'hideparam',
@@ -231,26 +244,126 @@ Ext.extend(SeoFilter.grid.Fields, MODx.grid.Grid, {
             sortable: true,
             width: 50
         }, {
-            header: _('seofilter_field_active'),
-            dataIndex: 'active',
+            header: _('seofilter_field_slider_title'),
+            dataIndex: 'slider',
             renderer: SeoFilter.utils.renderBoolean,
             sortable: true,
-            width: 50,
+            width: 50
+        }, {
+            header: _('seofilter_field_condition'),
+            dataIndex: 'xpdo_where',
+            renderer: SeoFilter.utils.renderBoolean,
+            sortable: true,
+            width: 50
+        // }, {
+        //     header: _('seofilter_field_xpdo_title'),
+        //     dataIndex: 'xpdo',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: true,
+        //     width: 50
+        // }, {
+        //     header: _('seofilter_field_relation_title'),
+        //     dataIndex: 'relation',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: true,
+        //     width: 50
+        // }, {
+        //     header: _('seofilter_field_active'),
+        //     dataIndex: 'active',
+        //     renderer: SeoFilter.utils.renderBoolean,
+        //     sortable: true,
+        //     width: 50,
         }, {
             header: _('seofilter_grid_actions'),
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
-            sortable: false,
+            sortable: true,
             width: 90,
             id: 'actions'
         }];
     },
 
     getTopBar: function () {
-        return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_field_create'),
-            handler: this.createField,
-            scope: this
+        return [ {
+            id: 'seofilter-add-new-field',
+            text: '<i class="icon icon-plus"></i> ' + _('seofilter_field_create'),
+            menu: [{
+                text:  '<i class="icon icon-plus"></i> ' + _('seofilter_field_manually'),
+                cls: 'seofilter-menu-li',
+                data: {active: true,exact:true},
+                handler: this.createField,
+                scope: this
+            },'-',{
+                text:  '<i class="icon icon-folder"></i> ' + _('seofilter_field_resource_parent'),
+                cls: 'seofilter-menu-li',
+                data: {
+                    name: _('seofilter_field_parent'),
+                    class: 'modResource',
+                    key: 'parent',
+                    xpdo:true,
+                    xpdo_class: 'modResource',
+                    xpdo_id: 'id',
+                    xpdo_name: 'pagetitle',
+                    active: true,
+                    exact:true
+                },
+                focus_name: 'alias',
+                handler: this.createField,
+                scope: this
+            },{
+                text: '<i class="icon icon-building"></i> ' + _('seofilter_field_ms_vendor'),
+                cls: 'seofilter-menu-li',
+                data: {
+                    name: _('seofilter_field_parent'),
+                    class: 'msProductData',
+                    key: 'vendor',
+                    xpdo:true,
+                    xpdo_package: 'minishop2',
+                    xpdo_class: 'msVendor',
+                    xpdo_id: 'id',
+                    xpdo_name: 'name',
+                    active: true,
+                    exact:true
+                },
+                focus_name: 'alias',
+                handler: this.createField,
+                scope: this
+            // },{
+            //     text: '<i class="icon icon-barcode"></i> ' +  _('seofilter_field_ms_category'),
+            //     cls: 'seofilter-menu-li',
+            //     data: {
+            //         name: _('seofilter_field_parent'),
+            //         class: 'modResource',
+            //         key: 'parent',
+            //         xpdo:true,
+            //         xpdo_package: '',
+            //         xpdo_class: 'modResource',
+            //         xpdo_id: 'id',
+            //         xpdo_name: 'pagetitle',
+            //         active: true,
+            //         exact:true
+            //     },
+            //     focus_name: 'alias',
+            //     handler: this.createField,
+            //     scope: this
+            // },{
+            //     text:  '<i class="icon icon-zip"></i> ' + _('seofilter_field_ms_option'),
+            //     cls: 'seofilter-menu-li',
+            //     data: {
+            //         name: _('seofilter_field_ms_option'),
+            //         class: 'msProductData',
+            //         key: 'color',
+            //         alias: 'cvet',
+            //         active: true,
+            //         exact:true
+            //     },
+            //     handler: this.createField,
+            //     scope: this
+            }]
+        // },{
+        //     text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_field_create'),
+        //     handler: this.createField,
+        //     scope: this
         }, '->', {
             xtype: 'seofilter-field-search',
             width: 250,

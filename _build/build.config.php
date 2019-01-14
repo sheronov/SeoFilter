@@ -5,7 +5,7 @@ define('PKG_NAME', 'SeoFilter');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
 
 
-define('PKG_VERSION', '1.5.4');
+define('PKG_VERSION', '1.6.0');
 define('PKG_RELEASE', 'beta');
 define('PKG_AUTO_INSTALL', true);
 define('PKG_PROVIDER_ID', 2);
@@ -40,7 +40,7 @@ define('BUILD_CHUNK_UPDATE', false);
 
 define('BUILD_SNIPPET_UPDATE', true);
 define('BUILD_PLUGIN_UPDATE', true);
-//define('BUILD_EVENT_UPDATE', true);
+define('BUILD_EVENT_UPDATE', true);
 //define('BUILD_POLICY_UPDATE', true);
 //define('BUILD_POLICY_TEMPLATE_UPDATE', true);
 //define('BUILD_PERMISSION_UPDATE', true);

@@ -207,9 +207,18 @@ Ext.extend(SeoFilter.grid.UrlWord, MODx.grid.Grid, {
             //     dataIndex: 'id',
             //     width: 50
             // },{
-            header: _('seofilter_urlword_word_id'),
-            dataIndex: 'word_id',
-            width: 75
+        //     header: _('seofilter_urlword_word_id'),
+        //     dataIndex: 'word_id',
+        //     width: 75
+        //
+        // },{
+            header: _('seofilter_urlword_field_name'),
+            dataIndex: 'field_name',
+            width: 140
+        },{
+            header: _('seofilter_urlword_field_alias'),
+            dataIndex: 'field_alias',
+            width: 140
         },{
             header: _('seofilter_urlword_word_name'),
             dataIndex: 'word_name',
@@ -217,14 +226,6 @@ Ext.extend(SeoFilter.grid.UrlWord, MODx.grid.Grid, {
         },{
             header: _('seofilter_urlword_word_alias'),
             dataIndex: 'word_alias',
-            width: 140
-        },{
-            header: _('seofilter_urlword_field_name'),
-            dataIndex: 'field_name',
-            width: 140
-        },{
-            header: _('seofilter_urlword_field_alias'),
-            dataIndex: 'field_alias',
             width: 140
         },{
         //     header: _('seofilter_urlword_priority'),

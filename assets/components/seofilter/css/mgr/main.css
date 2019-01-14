@@ -10,7 +10,7 @@
 ul.seofilter-row-actions { margin: 0; padding: 0; list-style: none; }
 ul.seofilter-row-actions li { float: left; }
 ul.seofilter-row-actions .btn { padding: 5px; margin-right: 2px; min-width: 26px; font-size: inherit; }
-.seofilter-cogs {padding: 3px 20px 3px 6px!important;}
+.seofilter-cogs,.seofilter-menu-li {padding: 3px 20px 3px 6px!important;}
 /* Action menu */
 a.x-menu-item .x-menu-item-text, a.x-menu-item .x-menu-item-text .icon { cursor: pointer; }
 a.x-menu-item .x-menu-item-text .icon { line-height: 16px; top: auto; }
@@ -27,3 +27,5 @@ ul.seofilter-row-actions .actions-menu:after { content: " \f107"; }
 .x-field-search-go { right: 31px !important; border-radius: 0 !important; }
 .x-field-search-go:before { content: '\f002' !important; }
 .x-panel.seofilter-grid {position:relative;z-index:1;}
+.seofilter-settings-wrapper .x-toolbar {background: none;border: none;position: relative;margin-bottom: -10px;margin-top: -5px;padding-top: 0;z-index: 10;padding-bottom: 0;}
+.seofilter-fieldset legend .x-fieldset-header-text {padding-left: 5px;font-weight: bold;font-size: 13px;padding-right: 10px;color: #888;cursor: default;}

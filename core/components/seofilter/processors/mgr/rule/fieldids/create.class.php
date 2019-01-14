@@ -24,8 +24,6 @@ class sfFieldIdsCreateProcessor extends modObjectCreateProcessor
     }
 
 
-
-
     public function cleanup() {
         /* @var sfFieldIds $object */
         $object = $this->object;

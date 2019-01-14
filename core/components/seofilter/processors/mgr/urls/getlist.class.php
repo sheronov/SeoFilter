@@ -7,7 +7,17 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';
     //public $permission = 'list';
+    /*** @var SeoFilter $SeoFilter */
+    protected $SeoFilter;
 
+
+    public function initialize()
+    {
+        $this->SeoFilter = $this->modx->getService('seofilter', 'SeoFilter',
+            $this->modx->getOption('seofilter_core_path', null,
+                $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/');
+        return parent::initialize();
+    }
 
     /**
      * We do a special check of permissions
@@ -21,6 +31,9 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             return $this->modx->lexicon('access_denied');
         }
 
+        if($this->getProperty('sort') == 'actions') {
+            $this->setProperty('sort','active');
+        }
 
 
         return true;
@@ -65,7 +78,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
 
         $c->leftJoin('sfRule', 'sfRule', $this->classKey.'.multi_id = sfRule.id');
         $c->leftJoin('modResource', 'modResource', $this->classKey.'.page_id = modResource.id');
-        $c->select(array($this->classKey.'.*','sfRule.page','sfRule.name','modResource.pagetitle'));
+        $c->select(array($this->classKey.'.*','sfRule.page','sfRule.name as rule_name','modResource.pagetitle'));
 
 
         return $c;
@@ -111,21 +124,14 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                 $addurl = $array['old_url'];
             }
 
-            $url = $this->modx->makeUrl($array['page_id'],'','','full');
+            $page_url = $this->modx->makeUrl($array['page_id'],'','','full');
             $container_suffix = $this->modx->getOption('container_suffix',null,'/');
             $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);
             $between_urls = $this->modx->getOption('seofilter_between_urls',null,'/',true);
             $main_alias = $this->modx->getOption('seofilter_main_alias',null,0);
             $site_start = $this->modx->context->getOption('site_start', 1);
 
-            if ($container_suffix) {
-                if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
-                    $url = substr($url, 0, -strlen($container_suffix));
-                }
-            }
-            if (substr($url,-1) == '/') {
-                $url = substr($url,0,-1);
-            }
+            $url = $this->SeoFilter->clearSuffixes($page_url);
 
             if($site_start == $array['page_id']) {
                 if($main_alias) {
@@ -157,7 +163,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                     }
                 }
                 if(count($addurl)) {
-                    $array['url_preview'] = $this->modx->makeUrl($array['page_id'],'','','full') . '?' . implode('&', $addurl);
+                    $array['url_preview'] = $page_url . '?' . implode('&', $addurl);
                 }
                // $this->modx->log(modX::LOG_LEVEL_ERROR,print_r($addurl,1));
             }
@@ -193,7 +199,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             'icon' => 'icon icon-edit',
             'title' => $this->modx->lexicon('seofilter_url_update'),
             //'multiple' => $this->modx->lexicon('seofilter_url_update'),
-            'action' => 'updateField',
+            'action' => 'updateUrl',
             'button' => true,
             'menu' => true,
         );
@@ -204,7 +210,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                 'icon' => 'icon icon-power-off action-green',
                 'title' => $this->modx->lexicon('seofilter_url_enable'),
                 'multiple' => $this->modx->lexicon('seofilter_url_enable'),
-                'action' => 'enableField',
+                'action' => 'enableUrl',
                 'button' => true,
                 'menu' => true,
             );
@@ -214,7 +220,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
                 'icon' => 'icon icon-power-off action-gray',
                 'title' => $this->modx->lexicon('seofilter_url_disable'),
                 'multiple' => $this->modx->lexicon('seofilter_url_disable'),
-                'action' => 'disableField',
+                'action' => 'disableUrl',
                 'button' => true,
                 'menu' => true,
             );
@@ -226,7 +232,7 @@ class sfUrlsGetListProcessor extends modObjectGetListProcessor
             'icon' => 'icon icon-trash-o action-red',
             'title' => $this->modx->lexicon('seofilter_url_remove'),
             'multiple' => $this->modx->lexicon('seofilter_url_remove'),
-            'action' => 'removeField',
+            'action' => 'removeUrl',
             'button' => true,
             'menu' => true,
         );

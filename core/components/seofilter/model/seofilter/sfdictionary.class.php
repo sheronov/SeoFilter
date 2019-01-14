@@ -62,7 +62,7 @@ class sfDictionary extends xPDOSimpleObject {
         if( $curl = curl_init() ) {
             curl_setopt($curl, CURLOPT_URL, $urlGet);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 5);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);

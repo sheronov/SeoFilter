@@ -342,7 +342,7 @@ if (defined('PKG_AUTO_INSTALL') && PKG_AUTO_INSTALL) {
             'updated' => null,
             'state' => 1,
             'workspace' => 1,
-            'provider' => 0,
+            'provider' => PKG_PROVIDER_ID,
             'source' => $signature . '.transport.zip',
             'package_name' => PKG_NAME,
             'version_major' => $versionSignature[0],

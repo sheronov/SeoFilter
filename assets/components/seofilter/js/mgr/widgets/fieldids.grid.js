@@ -17,7 +17,7 @@ SeoFilter.grid.FieldIds = function (config) {
                 this.updateFieldIds(grid, e, row);
             },
             sortchange: function (e,te) {
-                console.log('test',e,te);
+                // console.log('test',e,te);
             }
         },
         viewConfig: {
@@ -54,6 +54,11 @@ SeoFilter.grid.FieldIds = function (config) {
             this.getSelectionModel().clearSelections();
         }
     }, this);
+
+    this.on('statesave',function () {
+       console.log('groupchange');
+    });
+
 };
 Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
     windows: {},
@@ -77,6 +82,8 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
                     fn: function (con,i1,i2,rec) {
                         // console.log(con,i1,i2,rec);
                         this.onAfterRowMove();
+                        // var grid = con.grid;
+                        // this.updateFieldIds();
                         // this.refresh();
                     },
                     scope: this
@@ -239,19 +246,19 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             // },{
             header: _('seofilter_fieldids_field_id'),
             dataIndex: 'name',
-            width: 200
+            width: 150
         },{
             header: _('seofilter_fieldids_alias'),
             dataIndex: 'alias',
-            width: 200
+            width: 150
         },{
             header: _('seofilter_fieldids_priority'),
             dataIndex: 'priority',
-            width: 100
+            width: 80
         },{
             header: _('seofilter_fieldids_where'),
             dataIndex: 'where',
-            width: 100,
+            width: 80,
             renderer: SeoFilter.utils.renderBoolean,
         // },{
         //     header: _('seofilter_fieldids_compare'),
@@ -270,7 +277,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
             dataIndex: 'actions',
             renderer: SeoFilter.utils.renderActions,
             sortable: false,
-            width: 100,
+            width: 80,
             id: 'actions'
         }];
     },

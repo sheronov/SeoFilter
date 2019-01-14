@@ -60,7 +60,7 @@ class sfMenu
             $config['tplInner'] = $config['tplOuter'];
         }
 
-        if(empty($config['context'])){
+        if(!isset($config['context'])){
             $config['context'] = $modx->context->key;
         }
         $sf_seo_id = $modx->getPlaceholder('sf.seo_id');
@@ -69,6 +69,7 @@ class sfMenu
         }
 
         $this->config = $config;
+
 
         $fqn = $modx->getOption('pdoFetch.class', null, 'pdotools.pdofetch', true);
         $path = $modx->getOption('pdofetch_class_path', null, MODX_CORE_PATH . 'components/pdotools/model/', true);
@@ -317,6 +318,8 @@ class sfMenu
         $where = array_merge(array(
             'active'=>1,
         ),$where);
+        $q->rightJoin('sfRule','sfRule','sfRule.id = sfUrls.multi_id');
+        $q->where(array('sfRule.active' => 1));
         $q->leftJoin('sfUrlWord','sfUrlWord','sfUrlWord.url_id = sfUrls.id');
         $q->innerJoin('sfDictionary','sfDictionary','sfDictionary.id = sfUrlWord.word_id');
         if((int)$this->config['level'] || (int)$this->config['minlevel']) {
@@ -356,6 +359,7 @@ class sfMenu
                 $url = $row['new_url']?:$row['old_url'];
                 $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
                 $u_suffix = $this->config['url_suffix'];
+
                 $page_url = $this->clearSuffixes($page_url);
 
                 if($this->config['site_start'] == $row['page_id']) {

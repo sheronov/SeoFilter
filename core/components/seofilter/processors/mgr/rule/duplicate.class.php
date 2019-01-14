@@ -54,18 +54,19 @@ class sfRuleDuplicateProcessor extends modObjectDuplicateProcessor
                 } else {
                     $pages = $object->get('page');
                 }
-                $response = $this->SeoFilter->generateUrls($object->get('id'),$pages,$object->get('link_tpl'),$url_mask);
+                if($response = $this->SeoFilter->generateUrls($object->get('id'),$pages,$object->get('link_tpl'),$url_mask)) {
 
-                $total_message = $this->SeoFilter->pdo->parseChunk('@INLINE '.$this->modx->lexicon('seofilter_rule_information'),$response);
+                    $total_message = $this->SeoFilter->pdo->parseChunk('@INLINE ' . $this->modx->lexicon('seofilter_rule_information'), $response);
 
-                if($recount) {
-                    $this->SeoFilter->loadHandler();
-                    if($counts = $this->SeoFilter->countHandler->countByRule($object->id)) {
-                        $counts['rule_id'] = $object->id;
-                        $total_message .= $this->SeoFilter->pdo->parseChunk('@INLINE '.$this->modx->lexicon('seofilter_rule_recount_message'),$counts);
+                    if ($recount) {
+                        $this->SeoFilter->loadHandler();
+                        if ($counts = $this->SeoFilter->countHandler->countByRule($object->id)) {
+                            $counts['rule_id'] = $object->id;
+                            $total_message .= $this->SeoFilter->pdo->parseChunk('@INLINE ' . $this->modx->lexicon('seofilter_rule_recount_message'), $counts);
+                        }
                     }
+                    $object->set('total_message', $total_message);
                 }
-                $object->set('total_message',$total_message);
             }
         }
 

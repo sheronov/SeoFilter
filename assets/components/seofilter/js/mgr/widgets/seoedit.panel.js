@@ -26,15 +26,7 @@ SeoFilter.panel.Seoedit = function (config) {
     SeoFilter.panel.Seoedit.superclass.constructor.call(this, config);
     this.getForm().setValues(this.config.record);
 
-    //TODO:закончить здесь
-    // this.on('show', function() {
-        setTimeout(function () {
-            if(MODx.loadRTE !== 'undefined') {
-                MODx.loadRTE('seoedit-content');
-            }
-        },100);
 
-    // }.bind(this));
 };
 
 Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
@@ -73,12 +65,24 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
             border: true,
             hideMode: 'offsets',
             items: [{
-                title: _('seofilter_url_seoedit'),
+                title: _('seofilter_url_meta'),
                 layout: 'anchor',
                 items: [{
-                    html: _('seofilter_url_seoedit_intro'),
-                    cls: 'panel-desc',
-                }, {
+                    layout: 'form'
+                    ,labelAlign: 'top'
+                    ,labelSeparator: ''
+                    ,autoHeight: true
+                    ,defaults: {
+                        border: false
+                        ,msgTarget: 'under'
+                    }
+                    ,cls: 'main-wrapper'
+                    ,items:this.getMetaFields(config)
+                }]
+            },{
+                title: _('seofilter_url_data'),
+                layout: 'anchor',
+                items: [ {
                     layout: 'form',
                     items: this.getFields(config)
                     ,labelAlign: 'top'
@@ -87,7 +91,7 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     ,defaults: {
                         border: false
                         ,msgTarget: 'under'
-                        ,width: 400
+                        ,width: '100%'
                     }
                     ,cls: 'main-wrapper'
                 }]
@@ -107,7 +111,7 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                         xtype: parseInt(SeoFilter.config.superHiddenProps) === 1 ? 'seofilter-combo-tpls' : 'hidden',
                         fieldLabel: _('seofilter_rule_tpl'),
                         name: 'tpl',
-                        id: config.id + '-tpl',
+                        id: 'seoedit-tpl',
                         // value: config.record.tpl,
                         anchor: '99%',
                     }, {
@@ -135,12 +139,12 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                         anchor: '99%',
                         name: 'introtexts',
                         record: config.record,
-                        id: config.id + '-introtexts',
+                        id: 'seoedit-introtexts',
                     }, {
                         xtype: 'numberfield',
                         fieldLabel: _('seofilter_rule_introlength'),
                         name: 'introlength',
-                        id: config.id + '-introlength',
+                        id: 'seoedit-introlength',
                         anchor: '99%',
                     }]
                     , labelAlign: 'top'
@@ -158,10 +162,122 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
 
         return tabs;
 
-    }
+    },
 
+    loadRte: function (config) {
+        if(!config.height) {
+            config.height = 250;
+        }
+        Ext.getCmp(config.id).setHeight(config.height);
+        if(MODx.loadRTE !== 'undefined') {
+            window.setTimeout(function() {
+                MODx.loadRTE(config.id);
+            }, 300);
+        }
+    },
 
-    ,getFields: function (config) {
+    loadAce: function (config) {
+        if(!config.height) {
+            config.height = 250;
+        }
+        Ext.getCmp(config.id).setHeight(config.height);
+        window.setTimeout(function() {
+            MODx.ux.Ace.replaceComponent(config.id, 'text/x-smarty', 1);
+            MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
+
+        }, 100);
+    },
+
+    getMetaFields: function (config) {
+        var fields = [{
+            html: _('seofilter_url_seoedit_intro'),
+            cls: 'panel-desc',
+        },{
+            xtype: 'xcheckbox',
+            boxLabel: '<b>'+_('seofilter_seo_custom')+'</b>',
+            name: 'custom',
+            id: 'seoedit-custom',
+        }];
+        var fields_name = {
+            title : {xtype:'textfield',maxLength: 255},
+            h1 : {xtype:'textfield',maxLength: 255},
+            h2: {xtype:'textfield',maxLength: 255},
+            description: {},
+            introtext: {},
+            keywords: {},
+            text: {},
+            content: {}
+        };
+
+        var richtexts = [], aces = [];
+        if(SeoFilter.config.content_richtext) {
+            var rts = SeoFilter.config.content_richtext.replace(' ','').split(',');
+            for(rt_field in rts) {
+                if(rts.hasOwnProperty(rt_field)) {
+                    var field = rts[rt_field];
+                    if(field.indexOf('Rule.') === -1) {
+                        field = field.split(':');
+                        if (!field[1]) {
+                            field[1] = 0
+                        }
+                        richtexts[field[0]] = field[1];
+                    }
+                }
+            }
+        }
+        if(SeoFilter.config.content_ace) {
+            var ats = SeoFilter.config.content_ace.replace(' ','').split(',');
+            for(at_field in ats) {
+                if(ats.hasOwnProperty(at_field)) {
+                    var field = ats[at_field];
+                    if(field.indexOf('Rule.') === -1 && richtexts.hasOwnProperty(field) === false) {
+                        field = field.split(':');
+                        if (!field[1]) {
+                            field[1] = 0
+                        }
+                        aces[field[0]] = field[1];
+                    }
+                }
+            }
+        }
+
+        for(field in fields_name) {
+            var field_data = this.objectMerge({
+                xtype: 'textarea',
+                name: field,
+                fieldLabel: _('seofilter_seometa_'+field),
+                id: 'seoedit'+'-'+field,
+                anchor: '99%',
+                description: "[[!+sf."+field+"]] / {$_modx->getPlaceholder('sf."+field+"')}",
+                listeners: {
+                    'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
+                    'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
+                }
+            },fields_name[field]);
+
+            if(richtexts.hasOwnProperty(field)) {
+                if(richtexts[field]) {field_data['height'] = richtexts[field];}
+                field_data['listeners'] = {'render': {fn:this.loadRte,scope:this}};
+            }
+            if(aces.hasOwnProperty(field)) {
+                if(aces[field]) {field_data['height'] = aces[field];}
+                field_data['listeners'] = {'render': {fn:this.loadAce,scope:this}};
+            }
+
+            fields.push(field_data);
+        }
+
+        return fields;
+    },
+
+    objectMerge: function(obj1,obj2) {
+        var obj3 = {};
+        for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
+        for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+        return obj3;
+    },
+
+    getFields: function (config) {
         return [{
             xtype: 'hidden',
             hideLabel: true,
@@ -177,6 +293,7 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
             fieldLabel: _('seofilter_url_link'),
             name: 'link',
             id: 'seoedit-link',
+            description: _('seofilter_url_link_help'),
             anchor: '99%',
             value: config.record.link
         },{
@@ -213,119 +330,83 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     name: 'new_url',
                     id: 'seoedit-new_url',
                     anchor: '99%',
-                },{
-                    xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_seo_custom'),
-                    name: 'custom',
-                    id: 'seoedit-custom',
                 }]
             }]
         },{
-            layout:'column',
-            border: false,
-            anchor: '99%',
-            items: [{
-                columnWidth: 1
-                ,layout:'form'
-                ,defaults: { msgTarget: 'under' }
-                ,border:false
-                ,enableKeyEvents: true
-                ,items: [{
-                    html: '<b>' + _('seofilter_url_urlword') + '</b>' + ' <span style="float:right;">'+ _('seofilter_urlword_word_edit') +'</span>',
-                    cls: '',
-                    style: {margin: '10px 0 5px',color: '#555'}
-                }, {
-                    title: _('seofilter_url_urlword')
-                    , xtype: 'seofilter-grid-urlword'
-                    , record: config.record
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_seometa_title'),
-                    name: 'title',
-                    id: 'seoedit-title',
-                    anchor: '99%',
-                    listeners: {
-                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
-                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
-                    }
-                }, {
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_seometa_h1'),
-                    name: 'h1',
-                    id: 'seoedit-h1',
-                    anchor: '99%',
-                    listeners: {
-                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
-                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
-                    }
+            title: _('seofilter_url_menu_data')
+            , xtype: 'fieldset'
+            , forceLayout: true
+            , autoHeight: true
+            ,anchor: '100%'
+            , border: false
+            , items: [{
+                layout: 'column'
+                , defaults: {msgTarget: 'under'}
+                , border: false
+                , anchor: '99%'
+                , items: [{
+                    columnWidth: .64
+                    , layout: 'form'
+                    , defaults: {msgTarget: 'under'}
+                    , border: false
+                    , items: [{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_url_menutitle'),
+                        name: 'menutitle',
+                        id: 'seoedit-menutitle',
+                        anchor: '99%',
+                        description: "{$menutitle}",
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_url_image'),
+                        name: 'image',
+                        id: 'seoedit-image',
+                        anchor: '99%',
+                        description: "{$image}",
+                    },{
+                        xtype: 'numberfield',
+                        fieldLabel: _('seofilter_url_total_more'),
+                        name: 'total',
+                        //readOnly: true,
+                        id: 'seoedit-total',
+                        description: '{$total}',
+                        anchor: '99%',
+                    }]
                 },{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_seometa_h2'),
-                    name: 'h2',
-                    id: 'seoedit-h2',
-                    anchor: '99%',
-                    listeners: {
-                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
-                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
-                    }
-                }, {
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_seometa_description'),
-                    name: 'description',
-                    id: 'seoedit-description',
-                    anchor: '99%',
-                    listeners: {
-                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
-                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
-                    }
-                }, {
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_seometa_introtext'),
-                    name: 'introtext',
-                    id: 'seoedit-introtext',
-                    anchor: '99%',
-                    listeners: {
-                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
-                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
-                    }
-                },{
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_seometa_keywords'),
-                    name: 'keywords',
-                    id: 'seoedit-keywords',
-                    anchor: '99%',
-                    listeners: {
-                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
-                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
-                    }
-                },{
-                    xtype: 'textarea',
-                    fieldLabel: _('seofilter_seometa_text'),
-                    name: 'text',
-                    id: 'seoedit-text',
-                    anchor: '99%',
-                    listeners: {
-                        'keypress': function (w, e) {Ext.getCmp('seoedit-custom').setValue(true);},
-                        'keyup': function (w, e) {if(e.button == 7) {Ext.getCmp('seoedit-custom').setValue(true);}}
-                    }
-                }, {
-                    xtype: 'textarea',
-                    heght:300,
-                    fieldLabel: _('seofilter_seometa_content'),
-                    name: 'content',
-                    enableKeyEvents: true,
-                    id: 'seoedit-content',
-                    listeners: {
-                        render: function () {
-                            // window.setTimeout(function() {
-                            //     MODx.ux.Ace.replaceComponent('seoedit-content', 'text/x-smarty', 1);
-                            //     MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
-                            //     Ext.getCmp('seoedit-content').setHeight(200);
-                            //
-                            // }, 100);
-                        },
-                    },
-                    anchor: '99%'
+                    columnWidth: .35
+                    , layout: 'form'
+                    , defaults: {msgTarget: 'under'}
+                    , border: false
+                    , items: [{
+                        xtype: 'textfield',
+                        fieldLabel: _('seofilter_url_link_attributes'),
+                        name: 'link_attributes',
+                        id: 'seoedit-link_attributes',
+                        anchor: '99%',
+                        description: "{$link_attributes}",
+                    },{
+                        xtype: 'numberfield',
+                        fieldLabel: _('seofilter_url_menuindex'),
+                        name: 'menuindex',
+                        id: 'seoedit-menuindex',
+                        anchor: '99%',
+                        description: "{$menuindex}",
+                    }, {
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_url_menu_on'),
+                        name: 'menu_on',
+                        id: 'seoedit-menu_on',
+                        labelStyle:'margin-top:-5px;',
+                        description: _('seofilter_url_menu_on_help'),
+
+                    },{
+                        xtype: 'xcheckbox',
+                        boxLabel: _('seofilter_url_recount'),
+                        name: 'recount',
+                        id: 'seoedit-recount',
+                        labelStyle:'margin-top:-6px;',
+                        description: _('seofilter_url_recount_help'),
+                    }]
                 }]
             }]
         }, {
@@ -362,13 +443,6 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     anchor: '99%',
                     readOnly: true,
                     style: 'background:#f9f9f9;color:#999;',
-                },{
-                    xtype: 'numberfield',
-                    fieldLabel: _('seofilter_url_total_more'),
-                    name: 'total',
-                    //readOnly: true,
-                    id: config.id + '-total',
-                    anchor: '99%',
                 }]
             }, {
                 columnWidth: .5
@@ -400,61 +474,16 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
                     anchor: '99%',
                     readOnly: true,
                     style: 'background:#f9f9f9;color:#999;',
-                },{
-                    xtype: 'xcheckbox',
-                    boxLabel: _('seofilter_url_recount'),
-                    name: 'recount',
-                    id: config.id + '-recount',
                 }]
             }]
         }, {
-            xtype: 'xcheckbox',
-            boxLabel: _('seofilter_url_menu_on'),
-            name: 'menu_on',
-            id: 'seoedit-menu_on',
-
+            html: '<b>' + _('seofilter_url_urlword') + '</b>' + ' <span style="float:right;">'+ _('seofilter_urlword_word_edit') +'</span>',
+            cls: '',
+            style: {margin: '10px 0 5px',color: '#555'}
         }, {
-            layout: 'column'
-            , defaults: {msgTarget: 'under'}
-            , border: false
-            , anchor: '99%'
-            , items: [{
-                columnWidth: .65
-                , layout: 'form'
-                , defaults: {msgTarget: 'under'}
-                , border: false
-                , items: [{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_url_menutitle'),
-                    name: 'menutitle',
-                    id: 'seoedit-menutitle',
-                    anchor: '99%',
-                },{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_url_image'),
-                    name: 'image',
-                    id: 'seoedit-image',
-                    anchor: '99%',
-                }]
-            },{
-                columnWidth: .35
-                , layout: 'form'
-                , defaults: {msgTarget: 'under'}
-                , border: false
-                , items: [{
-                    xtype: 'textfield',
-                    fieldLabel: _('seofilter_url_link_attributes'),
-                    name: 'link_attributes',
-                    id: 'seoedit-link_attributes',
-                    anchor: '99%',
-                },{
-                    xtype: 'numberfield',
-                    fieldLabel: _('seofilter_url_menuindex'),
-                    name: 'menuindex',
-                    id: 'seoedit-menuindex',
-                    anchor: '99%',
-                }]
-            }]
+            title: _('seofilter_url_urlword')
+            , xtype: 'seofilter-grid-urlword'
+            , record: config.record
         }];
     }
 });

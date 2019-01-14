@@ -17,14 +17,13 @@ switch ($modx->event->name) {
                 $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
                         $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
                 if (!($SeoFilter instanceof SeoFilter)) break;
-//                $modx->log(1,$page.' onLoadWebDocument '.$modx->resource->context_key);
-                if(!$SeoFilter->initialized[$modx->resource->context_key]) {
-                    $SeoFilter->initialize($modx->resource->context_key, array('page' => $page));
-                }
+                $SeoFilter->initialize($modx->resource->context_key, array('page' => $page));
             }
         }
         break;
     case 'OnBeforeDocFormSave':
+        if(!$modx->getOption('seofilter_collect_words', null, 1))
+            break;
         if(!$sf_count = $modx->getOption('seofilter_count', null, 0, true))
             break;
         $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
@@ -50,6 +49,8 @@ switch ($modx->event->name) {
 //        @session_write_close();
         break;
     case 'OnDocFormSave':
+        if(!$modx->getOption('seofilter_collect_words', null, 1))
+            break;
         $sf_classes = $modx->getOption('seofilter_classes', null, 'msProduct', true);
         if($sf_classes &&!in_array($resource->get('class_key'),array_map('trim', explode(',',$sf_classes))))
             break;
@@ -188,7 +189,9 @@ switch ($modx->event->name) {
             $check = $novalue = $page = $fast_search = 0; //переменные для проверки
             $params = array(); //итоговый массив с параметром и значением
             $last_char = ''; //был ли в конце url-а слэш
-            $ctx = $modx->context->key; //если используете контексты, то переключить должны до события onPageNotFound
+            //если используете контексты, то переключить должны до события onPageNotFound
+            $ctx = $modx->getOption('seofilter_catalog_context', null, $modx->context->key);
+            //если же каталог находится строго в другом контексте, то можете добавить настройку и прописать туда свой контекст
 
             $request = trim($_REQUEST[$alias]);
 
@@ -446,7 +449,13 @@ switch ($modx->event->name) {
                         $q->select('sfUrlWord.id, sfField.id as field_id, sfField.alias as field_alias, sfDictionary.value as word_value, sfDictionary.input as word_input, sfDictionary.alias as word_alias');
                         if($q->prepare() && $q->stmt->execute()) {
                             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                                $_GET[$row['field_alias']] = $_REQUEST[$row['field_alias']] = $params[$row['field_alias']] = $row['word_input'];
+                                if($SeoFilter->config['proMode'] && strpos($row['word_input'],'||') !== 0) {
+                                    $_GET[$row['field_alias']] = $_REQUEST[$row['field_alias']] = str_replace('||',',',$row['word_input']);
+                                    $params[$row['field_alias']] = $row['word_input'];
+                                } else {
+                                    $_GET[$row['field_alias']] = $_REQUEST[$row['field_alias']] = $params[$row['field_alias']] = $row['word_input'];
+                                }
+
                                 if (!$menutitle) $menutitle = $row['word_value'];
                             }
                         }
@@ -463,7 +472,12 @@ switch ($modx->event->name) {
                                             $alias = $field['alias'];
                                             if ($field['hideparam']) {
                                                 if ($word = $pdo->getArray('sfDictionary', array('alias' => $tmp[$lkey]))) {
-                                                    $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                    if($SeoFilter->config['proMode'] && strpos($word['input'],'||') !== 0) {
+                                                        $_GET[$alias] = $_REQUEST[$alias] = str_replace('||',',',$word['input']);
+                                                        $params[$alias] = $word['input'];
+                                                    } else {
+                                                        $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                    }
                                                     if (!$menutitle) $menutitle = $word['value'];
                                                 }
                                             } else {
@@ -481,7 +495,12 @@ switch ($modx->event->name) {
                                                     }
                                                 }
                                                 if ($word_alias && $word = $pdo->getArray('sfDictionary', array('alias' => $word_alias, 'field_id' => $field['id']))) {
-                                                    $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                    if($SeoFilter->config['proMode'] && strpos($word['input'],'||') !== 0) {
+                                                        $_GET[$alias] = $_REQUEST[$alias] = str_replace('||',',',$word['input']);
+                                                        $params[$alias] = $word['input'];
+                                                    } else {
+                                                        $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                                    }
                                                     if (!$menutitle) $menutitle = $word['value'];
                                                 }
                                             }
@@ -492,7 +511,10 @@ switch ($modx->event->name) {
                         }
 
                         if (count($params)) {
-                            $original_params = array_diff_key(array_merge($params,$_GET),array_flip(array_merge(array($del_get),$base_get)));
+                            $original_params = array_diff_key(
+                                array_merge($params,$_GET),
+                                array_flip(array_merge(array($del_get),$base_get))
+                            );
                             $fast_search = true;
                             $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);
 
@@ -523,14 +545,13 @@ switch ($modx->event->name) {
                                 header ("Last-Modified: $modified");
                             }
 
-//                            $modx->log(1,$page. ' onPageNotFound '.$ctx);
                             $SeoFilter->initialize($ctx, array('page' => $page, 'params' => $params));
 
                             if(is_dir($modx->getOption('core_path').'components/msvendorcollections/model/')) {
                                 if ($msVC = $modx->getService('msvendorcollections', 'msVendorCollections', $modx->getOption('msvendorcollections_core_path', null,
                                         $modx->getOption('core_path') . 'components/msvendorcollections/') . 'model/msvendorcollections/', $scriptProperties)) {
                                     if (!$msVC->initialized[$ctx]) {
-                                        $msVC->initialize($ctx);
+                                        $msVC->initialize($ctx,array('page'=>$page));
                                     }
                                 }
                             }
@@ -551,9 +572,18 @@ switch ($modx->event->name) {
                                 $modx->switchContext($ctx);
                             }
 
-                            $meta['params'] = $modx->toJSON($params);
+                            $plugin_response = $SeoFilter->invokeEvent('sfOnReturnMeta',array('action'=>'plugin','page'=>$page,'meta'=>$meta,'SeoFilter' => $SeoFilter));
+                            if($plugin_response['success']) {
+                                $meta = $plugin_response['data']['meta'];
+                            }
 
+                            $meta['params'] = $modx->toJSON($params);
                             $modx->setPlaceholders($meta, 'sf.');
+
+                            //TODO: перепроверить нижние 3 строки
+                            $modx->resourceMethod = 'id';
+                            $modx->resourceIdentifier = $page;
+                            $modx->invokeEvent("OnWebPageInit");
                             $modx->sendForward($page);
                         } else {
                             if ($url = $modx->getObject('sfUrls', array('page_id' => $page, 'old_url' => $old_url, 'multi_id' => $rule_id))) {

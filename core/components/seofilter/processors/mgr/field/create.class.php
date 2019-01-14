@@ -7,7 +7,16 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
     public $languageTopics = array('seofilter');
     //public $permission = 'create';
 
+    /*** @var SeoFilter $SeoFilter */
+    protected $SeoFilter;
 
+    public function initialize()
+    {
+        $this->SeoFilter = $this->modx->getService('seofilter', 'SeoFilter',
+            $this->modx->getOption('seofilter_core_path', null,
+                $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/');
+        return parent::initialize();
+    }
     /**
      * @return bool
      */
@@ -43,6 +52,22 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
             $values = array();
 
             if ($class && $key) {
+                $resource_condition = '';
+                switch ($class) {
+                    case 'msProductData':
+                        $resource_condition = 'msProductData.id = modResource.id';
+                        break;
+                    case 'msProductOption':
+                        $resource_condition = 'msProductOption.product_id = modResource.id';
+                        break;
+                    case 'modTemplateVar':
+                        $resource_condition = 'modTemplateVarResource.contentid = modResource.id';
+                        break;
+                    case 'Tagger':
+                        $resource_condition = 'TaggerTagResource.resource = modResource.id';
+                        break;
+                }
+
                 $processorProps = array(
                     'class' => $class,
                     'key' => $key,
@@ -57,7 +82,8 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                 if ($field->get('xpdo')) {
                     $xpdo_id = $field->get('xpdo_id');
                     $xpdo_name = $field->get('xpdo_name');
-                    if ($xpdo_class = $field->get('xpdo_class')) {
+                    $xpdo_class = $field->get('xpdo_class');
+                    if ($xpdo_class && $xpdo_id && $xpdo_name) {
                         $q = $this->modx->newQuery($xpdo_class);
                         if($field->get('relation')) {
                             $relation_column = $field->get('relation_column');
@@ -109,6 +135,33 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                             $q = $this->modx->newQuery('modTemplateVarResource');
                             $q->where(array('tmplvarid' => $tv_id, 'value:!=' => ''));
                             $q->select(array('DISTINCT modTemplateVarResource.value'));
+                            if($field->get('xpdo_where')) {
+                                $to_config = array('where'=>'where','join'=>'innerJoin','leftjoin'=>'leftJoin');
+                                $this->SeoFilter->loadHandler();
+                                $conditions = $this->SeoFilter->countHandler->prepareWhere($this->modx->fromJSON($field->get('xpdo_where')));
+                                if(!empty($conditions['where'])) {
+                                    if($class != 'modResource') {
+                                        $q->innerJoin('modResource', 'modResource', $resource_condition);
+                                    }
+                                    foreach ($conditions['where'] as $where_key => $where_arr ) {
+                                        if(strpos($where_key,'.') === false) {
+                                            $conditions['where']['modResource.'.$where_key] = $where_arr;
+                                            unset($conditions['where'][$where_key]);
+                                        }
+                                    }
+                                }
+                                foreach($to_config as $prop=>$propConfig) {
+                                    if (!empty($conditions[$prop])) {
+                                        if(in_array($propConfig,array('leftJoin','innerJoin'))) {
+                                            foreach ($conditions[$prop] as $join_alias => $join_array) {
+                                                $q->$propConfig($join_array['class'],$join_alias,$join_array['on']);
+                                            }
+                                        } else {
+                                            $q->$propConfig($conditions[$prop]);
+                                        }
+                                    }
+                                }
+                            }
                             if ($q->prepare() && $q->stmt->execute()) {
                                 while ($row = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
                                     $result = json_decode($row) ;
@@ -182,6 +235,35 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     $q->select(array(
                        'TaggerTag.tag as input,TaggerTag.label as value,TaggerTag.alias'
                     ));
+                    if($field->get('xpdo_where')) {
+                        $q->innerJoin('TaggerTagResource','TaggerTagResource','TaggerTagResource.tag = TaggerTag.id');
+                        $to_config = array('where'=>'where','join'=>'innerJoin','leftjoin'=>'leftJoin');
+                        $this->SeoFilter->loadHandler();
+                        $conditions = $this->SeoFilter->countHandler->prepareWhere($this->modx->fromJSON($field->get('xpdo_where')));
+                        if(!empty($conditions['where'])) {
+                            if($class != 'modResource') {
+                                $q->innerJoin('modResource', 'modResource', $resource_condition);
+                            }
+                            foreach ($conditions['where'] as $where_key => $where_arr ) {
+                                if(strpos($where_key,'.') === false) {
+                                    $conditions['where']['modResource.'.$where_key] = $where_arr;
+                                    unset($conditions['where'][$where_key]);
+                                }
+                            }
+                        }
+                        foreach($to_config as $prop=>$propConfig) {
+                            if (!empty($conditions[$prop])) {
+                                if(in_array($propConfig,array('leftJoin','innerJoin'))) {
+                                    foreach ($conditions[$prop] as $join_alias => $join_array) {
+                                        $q->$propConfig($join_array['class'],$join_alias,$join_array['on']);
+                                    }
+                                } else {
+                                    $q->$propConfig($conditions[$prop]);
+                                }
+                            }
+                        }
+                        //$q->where($this->modx->fromJSON($field->get('xpdo_where')));
+                    }
                     if($q->prepare() && $q->stmt->execute()) {
                         while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                             $processorProps['value'] = $row['value'];
@@ -216,8 +298,32 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                         $q->select(array('DISTINCT ' . $class . '.' . $key));
                     }
                     if($field->get('xpdo_where')) {
-//                        $q->select($this->modx->getSelectColumns($class,$class));
-                        $q->where($this->modx->fromJSON($field->get('xpdo_where')));
+                        $to_config = array('where'=>'where','join'=>'innerJoin','leftjoin'=>'leftJoin');
+                        $this->SeoFilter->loadHandler();
+                        $conditions = $this->SeoFilter->countHandler->prepareWhere($this->modx->fromJSON($field->get('xpdo_where')));
+                        if(!empty($conditions['where'])) {
+                            if($class != 'modResource') {
+                                $q->innerJoin('modResource', 'modResource', $resource_condition);
+                            }
+                            foreach ($conditions['where'] as $where_key => $where_arr ) {
+                                if(strpos($where_key,'.') === false) {
+                                    $conditions['where']['modResource.'.$where_key] = $where_arr;
+                                    unset($conditions['where'][$where_key]);
+                                }
+                            }
+                        }
+                        foreach($to_config as $prop=>$propConfig) {
+                            if (!empty($conditions[$prop])) {
+                                if(in_array($propConfig,array('leftJoin','innerJoin'))) {
+                                    foreach ($conditions[$prop] as $join_alias => $join_array) {
+                                        $q->$propConfig($join_array['class'],$join_alias,$join_array['on']);
+                                    }
+                                } else {
+                                    $q->$propConfig($conditions[$prop]);
+                                }
+                            }
+                        }
+                        //$q->where($this->modx->fromJSON($field->get('xpdo_where')));
                     }
                     if ($q->prepare() && $q->stmt->execute()) {
                         while ($input = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
