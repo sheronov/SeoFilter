@@ -148,3 +148,5 @@ $_lang['setting_seofilter_admin_version'] = 'Versioning scripts in the admin pan
 $_lang['setting_seofilter_admin_version_desc'] = 'Enabled by default. Disable if there are problems when compressing scripts';
 $_lang['setting_seofilter_collect_words'] = 'Collect changes in fields while saving resources';
 $_lang['setting_seofilter_collect_words_desc'] = 'Enabled by default. And if calculations are included, then the results are immediately recalculated by reference. Disable if there are long delays when saving resources';
+$_lang['setting_seofilter_edit_url_mask'] = 'Allow edit url mask in rule';
+$_lang['setting_seofilter_edit_url_mask_desc'] = 'Disabled by default. Experimental setting, no checks for correct masks yet';

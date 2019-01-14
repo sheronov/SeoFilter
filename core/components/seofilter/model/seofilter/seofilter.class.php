@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.6.0';
+    public $version = '1.6.1';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -105,6 +105,8 @@ class SeoFilter
         $decline = $this->modx->getOption('seofilter_decline', null, 0, true);
         $morpher_token = $this->modx->getOption('seofilter_morpher_token', null, 0, true);
 
+        $edit_url_mask = $this->modx->getOption('seofilter_edit_url_mask', null, 0, true);
+
         $this->pdo = $this->modx->getService('pdoFetch');
         $this->pdo->setConfig(array('loadModels' => 'seofilter'));
 
@@ -193,8 +195,8 @@ class SeoFilter
             'content_ace' => $content_ace,
             'collect_words' => $collect_words,
             'classes' => $classes,
-            'templates' => $templates
-
+            'templates' => $templates,
+            'edit_url_mask' => $edit_url_mask
         ), $config);
 
         $this->modx->addPackage('seofilter', $this->config['modelPath']);
@@ -542,7 +544,12 @@ class SeoFilter
                     if ($this->modx->getCount('TaggerTagResource')) {
                         if ($q->prepare() && $q->stmt->execute()) {
                             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                                $data['tagger'][$row['group_id']][] = $row['tag'];
+                                if(in_array($row['group_id'],array_keys($fields['tagger']))) {
+                                    $data['tagger'][$row['group_id']][] = $row['tag'];
+                                } else {
+                                    $data['tagger'][$row['group_alias']][] = $row['tag'];
+                                }
+
                             }
                         }
                     }
@@ -2058,7 +2065,6 @@ class SeoFilter
                             'field_id' => $field->get('id'),
                             'value' => $value,
                             'input' => $input,
-                            //TODO: предусмотреть добавление новых слов неактивными
                         );
 
                         if($relation_value) {
@@ -2599,13 +2605,16 @@ class SeoFilter
                     foreach($link['relation'] as $relation) {
                         $words = array_merge($words,$links['fields'][$relation['field_id']]['words'][$relation['word_id']]);
                     }
-                    //TODO в $link['aliases'] хранятся синонимы для замены через Fenom
-//                    $aliases = array();
-//                    foreach ($link['aliases'] as $alias => $value) {
-//                        $aliases['{$'.$alias.'}'] = $value;
-//                    }
-//                    $link_url = str_replace(array_keys($aliases),array_values($aliases),$url_mask);
-                    $link_url = implode($this->config['level_separator'], $link['urls']);
+                    //TODO в $link['aliases'] хранятся синонимы для обработки url адреса через Fenom
+                    if($this->config['edit_url_mask']) {
+                        $aliases = array();
+                        foreach ($link['aliases'] as $alias => $value) {
+                            $aliases['{$'.$alias.'}'] = $value;
+                        }
+                        $link_url = str_replace(array_keys($aliases),array_values($aliases),$url_mask);
+                    } else {
+                        $link_url = implode($this->config['level_separator'], $link['urls']);
+                    }
 
                     foreach (array('id', 'page', 'page_id') as $pkey) {
                         if (!isset($words[$pkey])) {
@@ -2728,7 +2737,7 @@ class SeoFilter
                             $word['url_part']
                         ),
                         'aliases' => array(
-                          $alias=>$row['alias'], //TODO: благодаря aliases можно будет разрешить ввод кастомного шаблона у ссылок
+                          $alias=>$row['alias'],
                         ),
 //                        'words' => array(array('id'=>$row['id'])),
                         'field_relation' => $field['field_relation_field'],

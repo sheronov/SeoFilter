@@ -128,6 +128,10 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
         if(parseInt(SeoFilter.config.count_childrens)!==0) {
             xtype_count = 'textfield';
         }
+        var allowEditUrl = false;
+        if(parseInt(SeoFilter.config.edit_url_mask)) {
+            allowEditUrl = true;
+        }
         return {
             xtype: 'modx-tabs'
             ,deferredRender: false
@@ -186,8 +190,8 @@ Ext.extend(SeoFilter.window.CreateRule, MODx.Window, {
                     hideLabel:true,
                     fieldLabel: _('seofilter_rule_url_more'),
                     name: 'url',
-                    readOnly: true,
-                    disabled:true,
+                    readOnly: !allowEditUrl,
+                    disabled: !allowEditUrl,
                     style: 'margin-top:-11px;',
                     emptyText: _('seofilter_rule_url_more'),
                     id: config.id + '-url',
@@ -473,6 +477,10 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
         if(parseInt(SeoFilter.config.count_childrens) !== 0) {
             xtype_count = 'textfield';
         }
+        var allowEditUrl = false;
+        if(parseInt(SeoFilter.config.edit_url_mask)) {
+            allowEditUrl = true;
+        }
 
         var tabs = {
             xtype: 'modx-tabs'
@@ -550,8 +558,8 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
                     hideLabel:true,
                     fieldLabel: _('seofilter_rule_url_more'),
                     name: 'url',
-                    readOnly: true,
-                    disabled:true,
+                    readOnly: !allowEditUrl,
+                    disabled: !allowEditUrl,
                     style: 'margin-top:-11px;',
                     description: _('seofilter_rule_url_help'),
                     emptyText: _('seofilter_rule_url_more'),

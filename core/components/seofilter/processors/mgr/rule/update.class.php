@@ -77,7 +77,11 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
     {
         /*** @var sfRule $object */
         $object = $this->object;
-        $url_mask = $object->updateUrlMask(); //обновление маски
+        if($this->SeoFilter->config['edit_url_mask'] && $object->get('url')) {
+            $url_mask = $object->get('url');
+        } else {
+            $url_mask = $object->updateUrlMask(); //обновление маски
+        }
         $recount = (int)$this->getProperty('recount');
         $rename = (int)$this->getProperty('relinks');
 

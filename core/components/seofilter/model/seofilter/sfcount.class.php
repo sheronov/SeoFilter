@@ -640,7 +640,7 @@ class sfCountHandler
 
         $check = true;
 
-        //TODO: переделать механизм с parents
+        //TODO: переделать механизм с parents в 1.6.2
         $p_key = '`modResource`.`parent`';
         if(isset($config['where'][$p_key]) && isset($config['parents'])) {
             if($config['parents'] != $config['where'][$p_key]) {

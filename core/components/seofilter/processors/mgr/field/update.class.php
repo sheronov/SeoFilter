@@ -100,9 +100,10 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                                 array('{$' . $new_alias . '}', '[[+' . $new_alias . ']]','-'.$new_alias,$new_alias . '-',$new_alias . '_'),
                                 $value);
                             $rule->set($key, $new_value);
-                            $rule->save();
                         }
-                        $rule->set('url',$rule->generateUrl());
+                        if(!$this->SeoFilter->config['edit_url_mask']) {
+                            $rule->set('url', $rule->generateUrl());
+                        }
                         $rule->save();
                     }
                 }

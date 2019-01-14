@@ -42,7 +42,7 @@ class sfRule extends xPDOSimpleObject {
         return implode('/',$url);
     }
 
-    public function updateUrlMask() {
+    public function updateUrlMask($save = 1) {
         $separator = $this->xpdo->getOption('seofilter_separator', null, '-', true);
         $level_separator = $this->xpdo->getOption('seofilter_level_separator', null, '/', true);
 
@@ -75,7 +75,7 @@ class sfRule extends xPDOSimpleObject {
         }
 
         $url = implode($level_separator,$urls);
-        if($url != $this->get('url')) {
+        if($save && $url != $this->get('url')) {
             $this->set('url', $url);
             $this->save();
         }

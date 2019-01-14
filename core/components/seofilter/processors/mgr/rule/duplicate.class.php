@@ -45,7 +45,11 @@ class sfRuleDuplicateProcessor extends modObjectDuplicateProcessor
 
             /*** @var sfRule $object */
             $object = $this->newObject;
-            $url_mask = $object->updateUrlMask(); //обновление маски
+            if($this->SeoFilter->config['edit_url_mask'] && $object->get('url')) {
+                $url_mask = $object->get('url');
+            } else {
+                $url_mask = $object->updateUrlMask(); //обновление маски
+            }
             $recount = (int)$this->getProperty('recount');
 
             if($object->get('active')) {

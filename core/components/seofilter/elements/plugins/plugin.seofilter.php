@@ -39,7 +39,7 @@ switch ($modx->event->name) {
                     $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
             if (!($SeoFilter instanceof SeoFilter)) break;
 
-            $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
+//            $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
 
             $fields = $SeoFilter->getFieldsKey();
             $before = $SeoFilter->getResourceData($resource->id,$fields);
@@ -79,7 +79,11 @@ switch ($modx->event->name) {
                 if($q->prepare() && $q->stmt->execute()) {
                     while($group = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                         if($resource->get('tagger-'.$group['id'])) {
-                            $after['tagger'][$group['id']] = $tagger->explodeAndClean($resource->get('tagger-'.$group['id']));
+                            if(in_array($group['id'],array_keys($fields['tagger']))) {
+                                $after['tagger'][$group['id']] = $tagger->explodeAndClean($resource->get('tagger-' . $group['id']));
+                            } else {
+                                $after['tagger'][$group['alias']] = $tagger->explodeAndClean($resource->get('tagger-' . $group['id']));
+                            }
                         }
                     }
                 }
@@ -580,7 +584,6 @@ switch ($modx->event->name) {
                             $meta['params'] = $modx->toJSON($params);
                             $modx->setPlaceholders($meta, 'sf.');
 
-                            //TODO: перепроверить нижние 3 строки
                             $modx->resourceMethod = 'id';
                             $modx->resourceIdentifier = $page;
                             $modx->invokeEvent("OnWebPageInit");

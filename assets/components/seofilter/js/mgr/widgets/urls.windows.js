@@ -101,7 +101,7 @@ SeoFilter.window.UpdateUrls = function (config) {
     Ext.applyIf(config, {
         title: _('seofilter_url_update'),
         width: 650,
-        autoHeight: true,
+        autoHeight: false,
         url: SeoFilter.config.connector_url,
         action: 'mgr/urls/update',
         fields: this.getFields(config),
@@ -244,6 +244,7 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
             xtype: 'modx-tabs'
             ,deferredRender: false
             ,border: true
+            ,autoHeight: false
             ,items: [{
                 title: _('seofilter_url_data')
                 ,hideMode: 'offsets'
