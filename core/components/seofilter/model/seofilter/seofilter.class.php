@@ -2526,13 +2526,17 @@ class SeoFilter
         }
 
         $update_links = 0;
-        if(!empty($find_links) && $update) {
+        if(!empty($find_links)) {
             $q = $this->modx->newQuery('sfUrls');
-            $q->where(array('custom:!='=>1,'id:IN'=>array_keys($find_links)));
-            $links = $this->modx->getIterator('sfUrls',$q);
+            if($update) {
+                $q->where(array('custom:!=' => 1, 'id:IN' => array_keys($find_links)));
+            } else {
+                $q->where(array('link'=>'', 'id:IN'=>array_keys($find_links)));
+            }
+            $links = $this->modx->getIterator('sfUrls', $q);
             foreach ($links as $link) {
                 $new_name = $find_links[$link->get('id')]['name'];
-                if($link->get('link') != $new_name) {
+                if ($link->get('link') != $new_name) {
                     $update_links++;
                     $link->set('link', $new_name);
                     $link->set('editedon', strtotime(date('Y-m-d H:i:s')));
@@ -2854,6 +2858,14 @@ class SeoFilter
                 if(count($values) >= 2) {
                     $where = array('input:>' => $values[0], 'AND:input:<' => $values[1]);
                 }
+                break;
+            case 6:
+                //LIKE %value%
+                $where = array('input:LIKE'=>'%'.$value.'%');
+                break;
+            case 7:
+                //NOT LIKE %value%
+                $where = array('input:NOT LIKE'=>'%'.$value.'%');
                 break;
         }
         return $where;

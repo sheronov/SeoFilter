@@ -33,6 +33,9 @@ class sfFieldIdsCreateProcessor extends modObjectCreateProcessor
         } else {
             $url = $object->updateUrlMask($rule_id);
         }
+        $q = $this->modx->newQuery('sfField',array('id'=>$object->get('field_id')));
+        $q->select('alias');
+        $object->set('alias','{$'.$this->modx->getValue($q->prepare()).'}');
         return $this->success($url,$object);
     }
 

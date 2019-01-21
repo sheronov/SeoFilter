@@ -247,7 +247,7 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'name', 'title', 'base', 'page', 'pages','url', 'active', 'count','rank', 'fields', 'actions','link_tpl','pagetitle','editedon', 'seo_id','properties','introtexts','keywords','tpl','length'];
+        return ['id', 'name', 'title', 'base', 'page', 'pages','url', 'active', 'count','rank','fields_where', 'fields', 'actions','link_tpl','pagetitle','editedon', 'seo_id','properties','introtexts','keywords','tpl','length'];
     },
 
     getColumns: function () {
@@ -303,6 +303,11 @@ Ext.extend(SeoFilter.grid.Rules, MODx.grid.Grid, {
         }, {
             header: _('seofilter_rule_rank'),
             dataIndex: 'rank',
+            sortable: true,
+            width: 50,
+        }, {
+            header: _('seofilter_rule_fields_where'),
+            dataIndex: 'fields_where',
             sortable: true,
             width: 50,
         }, {

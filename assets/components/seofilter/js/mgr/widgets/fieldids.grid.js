@@ -100,7 +100,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
                 success: {
                     fn: function (res) {
                         if(res.a.result.success) {
-                            this.updateUrlMask(res.a.result.message);
+                            this.updateUrlMask(res.a.result);
                         }
                         this.refresh();
 
@@ -139,7 +139,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
                                 success: {
                                     fn: function (res) {
                                         if(res.a.result.success) {
-                                            this.updateUrlMask(res.a.result.message);
+                                            this.updateUrlMask(res.a.result);
                                         }
                                         this.refresh();
                                     }, scope: this
@@ -176,7 +176,7 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
                 success: {
                     fn: function (res) {
                         if(res.success) {
-                            this.updateUrlMask(res.message);
+                            this.updateUrlMask(res);
                         }
                         this.refresh();
                     }, scope: this
@@ -186,8 +186,13 @@ Ext.extend(SeoFilter.grid.FieldIds, MODx.grid.Grid, {
         return true;
     },
 
-    updateUrlMask: function (url) {
+    updateUrlMask: function (response) {
+        var url = response.message;
         var id_number = this.config.idNumber;
+        var link_tpl = Ext.getCmp(id_number+'-link_tpl');
+        if(!link_tpl.getValue()) {
+            link_tpl.setValue(response.object.alias);
+        }
         var url_mask = Ext.getCmp(id_number + '-url');
         url_mask.setValue(url);
     },

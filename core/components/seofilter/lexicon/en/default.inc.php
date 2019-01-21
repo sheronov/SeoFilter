@@ -401,3 +401,7 @@ $_lang['seofilter_remove_empty_links'] = 'Remove blank pages';
 $_lang['seofilter_url_remove_process'] = 'All pages in process';
 $_lang['seofilter_url_remove_process_wait'] = 'The first number is the results page.';
 $_lang['seofilter_remove_empty_links_confirm'] = 'Do you really want to delete pages with 0 results? Make sure the calculations are configured correctly. SeoFilter will recalculate and remove empty links forever.';
+
+$_lang['seofilter_compare_like'] = 'Value like (LIKE %x%)';
+$_lang['seofilter_compare_notlike'] = 'Value not like (NOT LIKE %x%)';
+$_lang['seofilter_rule_fields_where'] = 'Conditions of fields';

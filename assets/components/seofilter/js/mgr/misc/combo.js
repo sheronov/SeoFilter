@@ -115,7 +115,9 @@ var compares = [
     [2, _('seofilter_compare_notin')],
     [3, _('seofilter_compare_larger')],
     [4, _('seofilter_compare_less')],
-    [5, _('seofilter_compare_range')]
+    [5, _('seofilter_compare_range')],
+    [6, _('seofilter_compare_like')],
+    [7, _('seofilter_compare_notlike')]
 ];
 SeoFilter.combo.Compare = function (config) {
     config = config || {};

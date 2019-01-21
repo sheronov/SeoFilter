@@ -1,5 +1,12 @@
 Changelog for SeoFilter.
 
+1.6.1-beta (22.01.2019)
+=======================
+- Updating the name on the SEO pages, if it was empty (when adding a template for the name in the rule)
+- Automatic generation of a name template if it is empty (when adding fields to the rule)
+- Two new conditions LIKE, NOT LIKE when adding a field to the rule
+- Hidden ability to change the url mask in the rules (without validation checks)
+
 1.6.0-beta (14.01.2019)
 ======================
 - Added more popup descriptions for the fields, renamed some items

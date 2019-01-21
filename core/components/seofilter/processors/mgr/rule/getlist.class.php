@@ -70,8 +70,11 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
         //if($this->getProperty('page')) {
 
             $c->leftJoin('modResource', 'modResource', $this->classKey . '.page = modResource.id');
+            $c->leftJoin('sfFieldIds','RuleFields',$this->classKey.'.id = RuleFields.multi_id and RuleFields.where = 1');
             $c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
             $c->select($this->modx->getSelectColumns('modResource', 'modResource', '', array('pagetitle')));
+            $c->select(array('count(RuleFields.id) as fields_where'));
+            $c->groupby($this->classKey.'.id');
 
         //}
 
