@@ -147,6 +147,12 @@ class sfRule extends xPDOSimpleObject {
                                     case 5:
                                         $q->where(array('input:>'=>$values[0],'AND:input:<'=>$values[1]));
                                         break;
+                                    case 6:
+                                        $q->where(array('input:LIKE'=>'%'.$value.'%'));
+                                        break;
+                                    case 7:
+                                        $q->where(array('input:NOT LIKE'=>'%'.$value.'%'));
+                                        break;
                                 }
                             }
 

@@ -1578,6 +1578,12 @@ class SeoFilter
                                 case 5:
                                     $c->where(array('input:<' => $values[0], 'AND:input:>' => $values[1]));
                                     break;
+                                case 6:
+                                    $c->where(array('input:NOT LIKE'=>'%'.$value.'%'));
+                                    break;
+                                case 7:
+                                    $c->where(array('input:LIKE'=>'%'.$value.'%'));
+                                    break;
                             }
                             if ($c->prepare() && $c->stmt->execute()) {
                                 while ($row = $c->stmt->fetch(PDO::FETCH_ASSOC)) {
