@@ -5,7 +5,7 @@ define('PKG_NAME', 'SeoFilter');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
 
 
-define('PKG_VERSION', '1.6.1');
+define('PKG_VERSION', '1.6.2');
 define('PKG_RELEASE', 'beta');
 define('PKG_AUTO_INSTALL', true);
 define('PKG_PROVIDER_ID', 2);

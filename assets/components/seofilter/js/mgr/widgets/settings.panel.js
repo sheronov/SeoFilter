@@ -126,9 +126,6 @@ Ext.extend(SeoFilter.panel.Settings, MODx.FormPanel, {
             },
             main: {
                 ajax:{xtype: 'combo-boolean', hiddenName: 'ajax'},
-                base_get: {},
-                classes: {},
-                templates: {},
                 decline: {xtype: 'combo-boolean', hiddenName: 'decline'},
                 morpher_token: {},
                 page_key: {},
@@ -137,6 +134,8 @@ Ext.extend(SeoFilter.panel.Settings, MODx.FormPanel, {
                 content_ace: {},
                 content_richtext: {},
                 collect_words: {xtype: 'combo-boolean', hiddenName: 'collect_words', value:data['collect_words']},
+                classes: {},
+                templates: {},
 
             },
             ajax: {
@@ -155,6 +154,7 @@ Ext.extend(SeoFilter.panel.Settings, MODx.FormPanel, {
             },
             pro: {
                 pro_mode: {xtype: 'combo-boolean', hiddenName: 'pro_mode',value:data['proMode']},
+                base_get: {},
                 snippet: {value:data['prepareSnippet']},
                 last_modified: {xtype: 'combo-boolean', hiddenName: 'last_modified',value:data['lastModified']},
                 replace_host: {xtype: 'combo-boolean', hiddenName: 'replace_host'},
@@ -183,9 +183,10 @@ Ext.extend(SeoFilter.panel.Settings, MODx.FormPanel, {
                 settings[group].push(this.objectMerge({
                     xtype: 'textfield'
                     , id: 'sf-' + key
-                    , fieldLabel: _('setting_seofilter_' + key)
+                    , fieldLabel: _('setting_seofilter_' + key) + ' <span class="sf_label_span">seofilter_'+key+'</span>'
                     , description: _('setting_seofilter_' + key + '_desc')
                     , name: key
+                    , itemCls: 'sf_setting_item'
                     , value: data[key]
                     , anchor: '100%'
                 }, settings_fields[group][key]));

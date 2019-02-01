@@ -116,7 +116,7 @@ class SeoFilterHomeManagerController extends modExtraManagerController
 
             switch ($whichEditor) {
                 case 'CKEditor':
-                    $content_xtype = 'modx-htmleditor';
+                    $content_xtype = 'ckeditor';
                     break;
                 default:
                     $content_xtype = 'textarea';

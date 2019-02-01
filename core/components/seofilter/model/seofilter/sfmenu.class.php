@@ -55,6 +55,7 @@ class sfMenu
         $config['possibleSuffixes'] = array_unique(array_merge($config['possibleSuffixes'],array($config['container_suffix'])));
         $config['main_alias'] = $this->modx->getOption('seofilter_main_alias',null,0);
         $config['site_start'] = $this->modx->context->getOption('site_start', 1);
+        $config['proMode'] = $this->modx->getOption('seofilter_pro_mode',null,0,true);
 
         if (empty($config['tplInner']) && !empty($config['tplOuter'])) {
             $config['tplInner'] = $config['tplOuter'];
@@ -87,7 +88,7 @@ class sfMenu
 //            $this->pdoTools->addTime('Count parents for Current Link complete', microtime(true) - $time);
 //        }
 
-        $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
+        $modx->addPackage('seofilter', $config['corePath'].'model/');
         $modx->lexicon->load('seofilter:default');
     }
 
@@ -239,18 +240,45 @@ class sfMenu
         if(count($rules_out)) {
             $where[$rule_alias.':NOT IN'] = $rules_out;
         }
-        if(count($parents_in)){
+        if($rule_alias == 'id') {
+            //условия для правил, нужно учесть proMode
+            if($this->config['proMode']) {
+                if(count($parents_in)) {
+                    $where_pin = array();
+                    foreach ($parents_in as $p_in) {
+                        $where_pin[] = ('1=1 AND FIND_IN_SET('.$p_in.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+                    }
+                    $where[] = implode(' OR ',$where_pin);
+                }
+                if (count($parents_out)) {
+                    $where_pout = array();
+                    foreach ($parents_out as $p_out) {
+                        $where_pout[] = ('1=1 AND NOT FIND_IN_SET('.$p_out.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+                    }
+                    $where[] = implode(' AND ',$where_pout);
+                }
+            } else {
+                if (count($parents_in)) {
+                    $where[$page_alias . ':IN'] = $parents_in;
+                }
+                if (count($parents_out)) {
+                    $where[$page_alias . ':NOT IN'] = $parents_out;
+                }
+            }
+
+        } else {
+            if (count($parents_in)) {
+                $where[$page_alias . ':IN'] = $parents_in;
+            }
+            if (count($parents_out)) {
+                $where[$page_alias . ':NOT IN'] = $parents_out;
+            }
 //            if(count($rules_out) || count($parents_out)) {
 //                $where['OR:'.$page_alias.':IN'] = $parents_in;
 //            } else {
 //                $where[$page_alias.':IN'] = $parents_in;
 //            }
-            $where[$page_alias.':IN'] = $parents_in;
         }
-        if(count($parents_out)) {
-            $where[$page_alias.':NOT IN'] = $parents_out;
-        }
-
 
         return $where;
     }
@@ -350,54 +378,57 @@ class sfMenu
         }
         $q->limit((int)$this->config['limit'],(int)$this->config['offset']);
         $q->groupby('sfUrlWord.id');
-        if($q->prepare() && $q->stmt->execute()) {
-            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                if(!(int)$row['page_id']) {
-                    continue;
-                }
-
-                $url = $row['new_url']?:$row['old_url'];
-                $page_url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']);
-                $u_suffix = $this->config['url_suffix'];
-
-                $page_url = $this->clearSuffixes($page_url);
-
-                if($this->config['site_start'] == $row['page_id']) {
-                    if($this->config['main_alias']) {
-                        $qq = $this->modx->newQuery('modResource',array('id'=>$row['page_id']));
-                        $qq->select('alias');
-                        $malias = $this->modx->getValue($qq->prepare());
-                        $url = $page_url.'/'.$malias.$this->config['between_urls'].$url.$u_suffix;
-                    } else {
-                        $url = $page_url.'/'.$url.$u_suffix;
+        if($q->prepare()) {
+            $this->pdoTools->addTime('SQL '.$q->toSQL());
+            if($q->stmt->execute()) {
+                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    if (!(int)$row['page_id']) {
+                        continue;
                     }
-                } else {
-                    $url = $page_url . $this->config['between_urls'] . $url . $u_suffix;
-                }
+
+                    $url = $row['new_url'] ?: $row['old_url'];
+                    $page_url = $this->modx->makeUrl($row['page_id'], $this->config['context'], '', $this->config['scheme']);
+                    $u_suffix = $this->config['url_suffix'];
+
+                    $page_url = $this->clearSuffixes($page_url);
+
+                    if ($this->config['site_start'] == $row['page_id']) {
+                        if ($this->config['main_alias']) {
+                            $qq = $this->modx->newQuery('modResource', array('id' => $row['page_id']));
+                            $qq->select('alias');
+                            $malias = $this->modx->getValue($qq->prepare());
+                            $url = $page_url . '/' . $malias . $this->config['between_urls'] . $url . $u_suffix;
+                        } else {
+                            $url = $page_url . '/' . $url . $u_suffix;
+                        }
+                    } else {
+                        $url = $page_url . $this->config['between_urls'] . $url . $u_suffix;
+                    }
 //                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
-                $name = $row['menutitle']?:$row['link'];
-                $row['url'] = $url;
-                $row['name'] = $name;
-                $row['rule_id'] = $row['multi_id'];
+                    $name = $row['menutitle'] ?: $row['link'];
+                    $row['url'] = $url;
+                    $row['name'] = $name;
+                    $row['rule_id'] = $row['multi_id'];
 
-                $word_array = array(
-                    'multi_id'=>$row['multi_id'],
-                    'rule_id'=>$row['multi_id'],
-                    'url_id'=>$row['url_id'],
-                    'field_id'=>$row['field_id'],
-                    'word_id'=>$row['word_id'],
-                    'word_input'=>$row['input'],
-                    'word_alias'=>$row['alias'],
-                    'word_value'=>$row['value'],
-                    'priority'=>$row['priority']
-                );
+                    $word_array = array(
+                        'multi_id' => $row['multi_id'],
+                        'rule_id' => $row['multi_id'],
+                        'url_id' => $row['url_id'],
+                        'field_id' => $row['field_id'],
+                        'word_id' => $row['word_id'],
+                        'word_input' => $row['input'],
+                        'word_alias' => $row['alias'],
+                        'word_value' => $row['value'],
+                        'priority' => $row['priority']
+                    );
 
-                if(isset($links[$row['url_id']])) {
-                    $links[$row['url_id']] = array_merge($links[$row['url_id']],$row);
-                } else {
-                    $links[$row['url_id']] = $row;
+                    if (isset($links[$row['url_id']])) {
+                        $links[$row['url_id']] = array_merge($links[$row['url_id']], $row);
+                    } else {
+                        $links[$row['url_id']] = $row;
+                    }
+                    $links[$row['url_id']]['words'][] = $word_array;
                 }
-                $links[$row['url_id']]['words'][] = $word_array;
             }
         }
 
@@ -966,7 +997,8 @@ class sfMenu
         $where = $this->prepareParents($rules,$parents);
 
         $q = $this->modx->newQuery('sfRule');
-        $select = array('sfRule.*');
+//        $select = array('sfRule.*');
+        $select = array($this->modx->getSelectColumns('sfRule','sfRule'));
         if($groupsort == 'level') {
             $q->leftJoin('sfFieldIds','sfFieldIds','sfFieldIds.multi_id = sfRule.id');
             $select[] = 'COUNT(sfFieldIds.id) as level';
@@ -989,11 +1021,14 @@ class sfMenu
         }
         $q->select($select);
         $rules = array();
-        if($q->prepare() && $q->stmt->execute()) {
-            while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+        if($q->prepare()) {
+            $this->pdoTools->addTime('GROUP SQL:'.$q->toSQL());
+            if($q->stmt->execute()) {
+                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 //                $row['links'] = array();
-                $row['level'] = 0;
-                $rules[$row['id']] = $row;
+                    $row['level'] = 0;
+                    $rules[$row['id']] = $row;
+                }
             }
         }
 
@@ -1001,9 +1036,6 @@ class sfMenu
             $rules[$link['multi_id']]['links'][] = $link;
             $rules[$link['multi_id']]['level'] = $link['level'];
         }
-
-
-
 
         return $rules;
     }

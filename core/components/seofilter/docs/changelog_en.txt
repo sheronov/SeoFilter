@@ -1,5 +1,12 @@
 Changelog for SeoFilter.
 
+1.6.2-beta (01.02.2019)
+=======================
+- Added keys of settings to the tab Settings
+- Fixed work with rich editor CKEditor
+- Fixed group by rule in sfMenu in pro-mode
+- Fixed integration with FrontendManager
+
 1.6.1-beta (22.01.2019)
 =======================
 - Updating the name on the SEO pages, if it was empty (when adding a template for the name in the rule)

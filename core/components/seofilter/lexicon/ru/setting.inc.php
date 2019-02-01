@@ -23,8 +23,8 @@ $_lang['setting_seofilter_morpher_username'] = 'Логин к сервису mor
 $_lang['setting_seofilter_morpher_username_desc'] = 'Если указать, будет больше вариантов склонения, включая где, куда, откуда';
 $_lang['setting_seofilter_morpher_password'] = 'Пароль к сервису morpher.ru';
 $_lang['setting_seofilter_morpher_password_desc'] = 'Пароль к логину на morpher.ru';
-$_lang['setting_seofilter_base_get'] = 'Параметры, не влияющие на мета-теги';
-$_lang['setting_seofilter_base_get_desc'] = 'GET-параметры, не влияющие на мета-теги. По умолчанию "price,page,limit,tpl,sort"';
+$_lang['setting_seofilter_base_get'] = 'GET-параметры, не влияющие на мета-теги';
+$_lang['setting_seofilter_base_get_desc'] = 'GET-параметры, не влияющие на мета-теги и подсчёты. По умолчанию "price,page,limit,tpl,sort". Они не будут восприниматься как пункты фильтра и не будут влиять на небазовые правила.';
 
 $_lang['setting_seofilter_count'] = 'Подсчитывать результаты';
 $_lang['setting_seofilter_count_desc'] = 'По умолчанию да. Нужно для того, чтобы определять пустые страницы. В SEO-шаблонах доступен плейсхолдер {$count} для количества';
@@ -33,9 +33,9 @@ $_lang['setting_seofilter_choose_desc'] = 'Например: "msProductData.pric
 $_lang['setting_seofilter_select'] = 'Какие поля ресурса выбирать';
 $_lang['setting_seofilter_select_desc'] = 'Например: "id,msProductData.price". Образуют плейсхолдеры: min_{choose}_id, min_{choose}_price, max_{choose}_price и т.д. Допустимы синонимы "msProductData.old_price as old"';
 
-$_lang['setting_seofilter_templates'] = 'Шаблоны ресурсов для отслеживания';
+$_lang['setting_seofilter_templates'] = 'Шаблоны ресурсов для отслеживания новых значений';
 $_lang['setting_seofilter_templates_desc'] = 'Для работы плагина по добавлению значений в SEO словарь после сохранения ресурса';
-$_lang['setting_seofilter_classes'] = 'Class_key ресурсов для отслеживания';
+$_lang['setting_seofilter_classes'] = 'class_key ресурсов для отслеживания новых значений';
 $_lang['setting_seofilter_classes_desc'] = 'По умолчанию "msProduct". Для работы плагина по добавлению значений в SEO словарь после сохранения ресурса';
 $_lang['setting_seofilter_snippet'] = 'Сниппет для подготовки/обработки слов для мета-тегов';
 $_lang['setting_seofilter_snippet_desc'] = 'prepareSnippet принимает массив слов serialize($row), id правила($rule_id), и страницы($page_id), а также $pdoTools. Должен вернуть $row!';
@@ -88,8 +88,8 @@ $_lang['setting_seofilter_url_suffix'] = 'Окончание для сгенер
 $_lang['setting_seofilter_url_suffix_desc'] = 'По умолчанию пусто. Такое окончание будет подставляться через AJAX и в ссылках в меню и т.д. Например "/" или ".html"';
 $_lang['setting_seofilter_url_redirect'] = 'Перенаправлять на страницу с правильным окончанием';
 $_lang['setting_seofilter_url_redirect_desc'] = 'По умолчанию "Нет". Если да, то будет перенаправлять на страницу с верным окончанием.';
-$_lang['setting_seofilter_page_key'] = 'Имя переменной пагинации в каталоге, обычно "page" для передачи номера страницы в SEO-тексты';
-$_lang['setting_seofilter_page_key_desc'] = 'Если указать, то в SEO-шаблонах будет доступен плейсхолдер {$page_number}, а также плейсхолдер по имени - если имя pagе, то будет {$page}.';
+$_lang['setting_seofilter_page_key'] = 'Get-параметр пагинации в каталоге, обычно page';
+$_lang['setting_seofilter_page_key_desc'] = 'Обычно "page" для передачи номера страницы в SEO-тексты. Если указать, то в SEO-шаблонах будет доступен плейсхолдер {$page_number}, а также плейсхолдер по имени - если имя pagе, то будет {$page}.';
 
 $_lang['setting_seofilter_url_help'] = 'Адрес для открытия помощи в iframe';
 $_lang['setting_seofilter_tpls_path'] = 'Путь для файловых элементов';

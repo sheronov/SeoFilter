@@ -24,7 +24,9 @@ SeoFilter.panel.Seoedit = function (config) {
         items: this.getTabs(config)
     });
     SeoFilter.panel.Seoedit.superclass.constructor.call(this, config);
+
     this.getForm().setValues(this.config.record);
+
 
 
 };
@@ -172,7 +174,7 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
         if(MODx.loadRTE !== 'undefined') {
             window.setTimeout(function() {
                 MODx.loadRTE(config.id);
-            }, 300);
+            }, 100);
         }
     },
 
@@ -184,12 +186,20 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
         window.setTimeout(function() {
             MODx.ux.Ace.replaceComponent(config.id, 'text/x-smarty', 1);
             MODx.ux.Ace.replaceTextAreas(Ext.query('.modx-richtext'));
-
         }, 100);
     },
 
     getMetaFields: function (config) {
         var fields = [{
+            xtype: 'hidden',
+            hideLabel: true,
+            fieldLabel: _('seofilter_url_id'),
+            anhchor: '99%',
+            readOnly:true,
+            name: 'id',
+            id: 'seoedit-id',
+            value: config.record.id
+        },{
             html: _('seofilter_url_seoedit_intro'),
             cls: 'panel-desc',
         },{
@@ -257,7 +267,28 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
 
             if(richtexts.hasOwnProperty(field)) {
                 if(richtexts[field]) {field_data['height'] = richtexts[field];}
-                field_data['listeners'] = {'render': {fn:this.loadRte,scope:this}};
+                field_data['listeners'] = {
+                    'render': function (config) {
+                        if(!config.height) {
+                            config.height = 250;
+                        }
+                        Ext.getCmp(config.id).setHeight(config.height);
+                        if(MODx.loadRTE !== 'undefined') {
+                            window.setTimeout(function() {
+                                if(MODx.loadRTE(config.id)) {
+                                    var editor =  MODx.loadedRTEs[config.id];;
+                                    editor.editor.on('change', function() {
+                                        Ext.defer(function() {
+                                            Ext.getCmp(config.id).el.dom.value = editor.getValue();
+                                        }, 10);
+                                    });
+                                }
+
+                            }, 100);
+                        }
+                    },
+                    // 'render': {fn:this.loadRte,scope:this},
+                };
             }
             if(aces.hasOwnProperty(field)) {
                 if(aces[field]) {field_data['height'] = aces[field];}
@@ -279,16 +310,6 @@ Ext.extend(SeoFilter.panel.Seoedit, MODx.FormPanel, {
 
     getFields: function (config) {
         return [{
-            xtype: 'hidden',
-            hideLabel: true,
-            fieldLabel: _('seofilter_url_id'),
-            anhchor: '99%',
-            readOnly:true,
-            name: 'id',
-            id: 'seoedit-id',
-            submitValue: true,
-            value: config.record.id
-        }, {
             xtype: 'textfield',
             fieldLabel: _('seofilter_url_link'),
             name: 'link',

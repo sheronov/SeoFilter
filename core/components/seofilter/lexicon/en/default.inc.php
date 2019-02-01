@@ -238,7 +238,7 @@ $_lang['seofilter_url_remove'] = 'Delete URL';
 $_lang['seofilter_urls_remove'] = 'Delete URLs';
 $_lang['seofilter_urls_remove_confirm'] = 'Are you sure that you want to delete these addresses? Pages will not be available';
 $_lang['seofilter_url_remove_confirm'] = 'Are you sure that you want to delete this address? Page will not be available';
-$_lang['seofilter_multiseo_intro'] = 'Syntax for writing dynamic values to patterns: {$alias}, {$alias_r}, {$m_alias} etc, where "alias" is the alias of the field, added on the first tab. Cases are added with the "_d", "_v" etc. Plural with a prefix "{$m_".';
+$_lang['seofilter_multiseo_intro'] = 'Syntax for writing dynamic values to patterns: {$alias}, {$alias_r}, {$m_alias} etc, where "alias" is the alias of the field, added on the first tab. Cases are added with the "_d", "_v" etc. Plural with a prefix "{$m_". The fields of resource you may getting as {$id|resource:"pagetitle"}';
 
 $_lang['seofilter_url_urlword'] = 'Table of available words';
 $_lang['seofilter_urlword_word_edit'] = 'Change the word access all addresses associated with it!';

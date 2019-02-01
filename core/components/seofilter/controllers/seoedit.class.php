@@ -103,7 +103,6 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
      */
     public function loadCustomCssJs()
     {
-
         $this->addCss($this->SeoFilter->config['cssUrl'] . 'mgr/main.css');
         $this->addCss($this->SeoFilter->config['cssUrl'] . 'mgr/bootstrap.buttons.css');
         $this->addJavascript($this->SeoFilter->config['jsUrl'] . 'mgr/seofilter.js');
@@ -183,7 +182,7 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
 
             switch ($whichEditor) {
                 case 'CKEditor':
-                    $content_xtype = 'modx-htmleditor';
+                    $content_xtype = 'ckeditor';
                     break;
                 default:
                     $content_xtype = 'textarea';

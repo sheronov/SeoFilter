@@ -78,20 +78,34 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
                 if (!($addurl = $array['new_url'])) {
                     $addurl = $array['old_url'];
                 }
-//                $url = $this->modx->makeUrl($array['page_id'], '', '', 'full') . $addurl;
-                $url = $this->modx->makeUrl($array['page_id'],'','','full');
+
+                //TODO: рано или поздно определить единый метод формирования ссылки
+                $page_url = $this->modx->makeUrl($array['page_id'],'','','full');
                 $container_suffix = $this->modx->getOption('container_suffix',null,'/');
                 $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);
                 $between_urls = $this->modx->getOption('seofilter_between_urls',null,'/',true);
-                if ($container_suffix) {
-                    if (strpos($url, $container_suffix, strlen($url) - strlen($container_suffix))) {
-                        $url = substr($url, 0, -strlen($container_suffix));
+                $main_alias = $this->modx->getOption('seofilter_main_alias',null,0);
+                $site_start = $this->modx->context->getOption('site_start', 1);
+
+                $possibleSuffixes = array_map('trim',explode(',',$this->modx->getOption('seofitler_possible_suffixes',null,'/,.html,.php',true)));
+                foreach($possibleSuffixes as $possibleSuffix) {
+                    if (substr($page_url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                        $page_url = substr($page_url, 0, -strlen($possibleSuffix));
                     }
                 }
-                if (substr($url,-1) == '/') {
-                    $url = substr($url,0,-1);
+
+                if($site_start == $array['page_id']) {
+                    if($main_alias) {
+                        $q = $this->modx->newQuery('modResource',array('id'=>$array['page_id']));
+                        $q->select('alias');
+                        $malias = $this->modx->getValue($q->prepare());
+                        $url = $page_url.'/'.$malias.$between_urls.$addurl.$url_suffix;
+                    } else {
+                        $url = $page_url.'/'.$addurl.$url_suffix;
+                    }
+                } else {
+                    $url = $page_url.$between_urls.$addurl.$url_suffix;
                 }
-                $url = $url.$between_urls.$addurl.$url_suffix;
             }
         }
         return $this->success($url, $this->object);

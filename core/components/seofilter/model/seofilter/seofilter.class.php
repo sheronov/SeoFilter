@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.6.1';
+    public $version = '1.6.2';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -1404,6 +1404,16 @@ class SeoFilter
                                 if($get_param > $values[0] && $get_param < $values[1])
                                     $check++;
                                 break;
+                            case 6:
+                                if(strpos($get_param,$value) !== false) {
+                                    $check++;
+                                }
+                                break;
+                            case 7:
+                                if(strpos($get_param,$value) === false) {
+                                    $check++;
+                                }
+                                break;
                         }
 
                     } else {
@@ -1643,7 +1653,7 @@ class SeoFilter
 
 
         if ($seo = $this->pdo->getArray('sfRule', array('id'=>$rule_id,'active'=>1))) {
-            if(!empty($seo['count_parents'])) {
+            if(!empty($seo['count_parents']) || $seo['count_parents'] === '0' || $seo['count_parents'] === 0) {
                 $parents = $seo['count_parents'];
             } else {
                 $parents = $page_id;
@@ -1651,11 +1661,7 @@ class SeoFilter
 
             if(!empty($this->config['pdopage_hash'])) {
                 $meta['config'] = $this->getRuleCount($original_params,$fields_key,$parents,$seo['count_where'],false,true);
-                if($seo['count_parents'] || $seo['count_parents'] === '0' || $seo['count_parents'] === 0) {
-                    $meta['config']['parents'] = $seo['count_parents'];
-                } else {
-                    $meta['config']['parents'] = $page_id;
-                }
+                $meta['config']['parents'] = $parents;
             }
 
             if($this->config['count_choose'] && $this->config['count_select']) {
@@ -1786,7 +1792,7 @@ class SeoFilter
     }
 
 
-    public function getRuleCount($params = array(), $fields_key = array(), $parents, $count_where = array(), $min_max = 0,$returnConfig = false) {
+    public function getRuleCount($params = array(), $fields_key = array(), $parents = '', $count_where = array(), $min_max = 0,$returnConfig = false) {
         $this->loadHandler();
         return $this->countHandler->countByParams($params,$fields_key,$parents,$count_where,'',$min_max,$returnConfig);
     }

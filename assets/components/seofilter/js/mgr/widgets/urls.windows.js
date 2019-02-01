@@ -219,7 +219,28 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
 
             if(richtexts.hasOwnProperty(field)) {
                 if(richtexts[field]) {field_data['height'] = richtexts[field];}
-                field_data['listeners'] = {'render': {fn:this.loadRte,scope:this}};
+                field_data['listeners'] = {
+                    'render': function (config) {
+                        if(!config.height) {
+                            config.height = 250;
+                        }
+                        Ext.getCmp(config.id).setHeight(config.height);
+                        if(MODx.loadRTE !== 'undefined') {
+                            window.setTimeout(function() {
+                                if(MODx.loadRTE(config.id)) {
+                                    var editor =  MODx.loadedRTEs[config.id];;
+                                    editor.editor.on('change', function() {
+                                        Ext.defer(function() {
+                                            Ext.getCmp(config.id).el.dom.value = editor.getValue();
+                                        }, 10);
+                                    });
+                                }
+
+                            }, 100);
+                        }
+                    },
+                    // 'render': {fn:this.loadRte,scope:this}
+                };
             }
             if(aces.hasOwnProperty(field)) {
                 if(aces[field]) {field_data['height'] = aces[field];}
