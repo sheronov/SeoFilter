@@ -43,7 +43,12 @@ class sfUrlsReCountProcessor extends modObjectProcessor
             if(!$offset = $this->getProperty('offset')) {
                 $offset = 0;
             }
-            $q->limit($limit,$offset);
+            if((int)$this->getProperty('cron')) {
+                $q->limit(0);
+            } else {
+                $q->limit($limit,$offset);
+            }
+
             $offset += $limit;
             if($offset >= $total) {
                 $percent = 1;

@@ -257,15 +257,17 @@ class sfCountHandler
         }
 
         if($field['slider']) {
-            $slider = explode($this->config['values_delimeter'],$value);
-            $slider_arr = array();
-            $slider_arr[] = "$class_key >=  ".(float)$slider[0];
-//            $where[$class_key.':>='] = (float)$slider[0];
-            if(isset($slider[1])) {
-//                $where[$class_key.':<='] = (float)$slider[1];
-                $slider_arr[] = "$class_key <= ".(float)$slider[1];
+            if(strpos($value,$this->config['values_delimeter']) === false) {
+                $where[] = $class_key." = ".(float)$value;
+            } else {
+                $slider = explode($this->config['values_delimeter'],$value);
+                $slider_arr = array();
+                $slider_arr[] = "$class_key >=  ".str_replace(',','.',(float)$slider[0]);
+                if(isset($slider[1])) {
+                    $slider_arr[] = "$class_key <= ".str_replace(',','.',(float)$slider[1]);
+                }
+                $where[] = implode(' AND ',$slider_arr);
             }
-            $where[] = implode(' AND ',$slider_arr);
         } else {
             if(strpos($value,$this->config['values_delimeter']) !== false) {
                 $values = explode($this->config['values_delimeter'],$value);
@@ -846,8 +848,9 @@ class sfCountHandler
         return $conditions;
     }
 
-
-
+    /*
+     * Deprecated method
+     */
     public function getRuleCount($params = array(), $fields_key = array(), $parents, $count_where = array(), $min_max = 0) {
         $count = 0;
         $innerJoin = array();

@@ -88,7 +88,7 @@ var SeoFilter = {
     },
 
     setFilters: function (filters) {
-       console.log(filters);
+       // console.log(filters);
     },
 
     seoFilterHandler: function() {
@@ -133,8 +133,6 @@ var SeoFilter = {
                     data['params'] = params;
                     data['full_url'] = e.originalEvent.state[name];
                     data['page_url'] = SeoFilter.config.url;
-                    console.log(params);
-
                     SeoFilter.loadMeta(data,hash,'metabyurl');
                 }
             });

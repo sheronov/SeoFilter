@@ -49,7 +49,7 @@ $tmp = array(
     ),
     'page_key' => array(
         'xtype' => 'textfield',
-        'value' => '',
+        'value' => 'page',
         'area' => 'seofilter_main',
     ),
     'page_tpl' => array(

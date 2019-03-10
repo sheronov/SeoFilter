@@ -21,7 +21,8 @@ if (!($SeoFilter instanceof SeoFilter)) {
     exit;
 }
 $processorProps = array(
-  'all'=>1
+  'all'=>1,
+  'cron' => 1
 );
 $otherProps = array('processors_path' => $SeoFilter->config['processorsPath']);
 $response = $modx->runProcessor('mgr/urls/recount', $processorProps, $otherProps);

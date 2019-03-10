@@ -58,7 +58,7 @@ class SeoFilter
         $h2= $this->modx->getOption('seofilter_h2', null, '', true);
         $text = $this->modx->getOption('seofilter_text', null, '', true);
         $content= $this->modx->getOption('seofilter_content', null, '', true);
-        $page_key = $this->modx->getOption('seofilter_page_key',null,'',true);
+        $page_key = $this->modx->getOption('seofilter_page_key',null,'page',true);
         $page_tpl = $this->modx->getOption('seofilter_page_tpl',null,'',true);
         $lastModified = $this->modx->getOption('seofilter_last_modified',null,0,true);
         $mfilterWords = $this->modx->getOption('seofilter_mfilter_words',null,0,true);
@@ -955,7 +955,8 @@ class SeoFilter
                     $diff = array_diff_key($diff,$diff_params);
 
                     foreach($base_params as $param => $value) {
-                        if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
+                        if(strpos($value,$this->config['values_delimeter']) !== false) {
+//                        if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField','sfField','sfField.id = sfDictionary.field_id');
                             $q->where(array('sfDictionary.active'=>1,'sfField.alias'=>$param));
@@ -1031,7 +1032,6 @@ class SeoFilter
 
 
                     if($rule_id = $this->findRuleId($pageId, array_merge($base_params,$diff_params), $base_params, $diff_params)) {
-
                         $rule_fields = $this->ruleFields($rule_id);
                         $diff_fields = array_diff_key(array_merge($base_params, $diff_params), array_flip($rule_fields));
 
@@ -1102,9 +1102,13 @@ class SeoFilter
                     }
                     $meta['full_url'] = $this->clearSuffixes($this->modx->makeUrl($pageId,'','','-1')).$meta['url'];
                 } else {
-                    $meta['url'] = isset($this->config['this_page_suffix'])
-                                    ? $this->config['this_page_suffix']
-                                    : $this->config['container_suffix'];
+                    if($pageId == $this->config['site_start']) {
+                        $meta['url'] = '';
+                    } else {
+                        $meta['url'] = isset($this->config['this_page_suffix'])
+                            ? $this->config['this_page_suffix']
+                            : $this->config['container_suffix'];
+                    }
                 }
 
                 if(count($diff)) {
@@ -1491,7 +1495,7 @@ class SeoFilter
     public function getRuleMeta($params = array(), $rule_id = 0,$page_id = 0 ,$ajax = 0,$new = 0,$original_params = array()) {
         $seo_system = array('id','field_id','multi_id','name','rank','active','class','editedon','key');
         $seo_array = array('title','h1','h2','description','introtext','keywords','text','content','link','tpl','introlength');
-        $fields = $word_array = $aliases = $fields_key = $field_word = array();
+        $fields = $word_array = $aliases = $field_word = array();
         $meta = array('success'=>true,'diff'=>array());
         $countFields = $this->countRuleFields($rule_id);
         $diff_params = array();
@@ -1503,7 +1507,7 @@ class SeoFilter
 
         $sort_field_word = array();
 
-
+        $fields_key = array();
         // если не нужно пересчитывать на странице с учётом гет параметра - то это закоментить, а ниже раскоментить
         $fields_keys = $this->getFieldsKey('alias');
         foreach ($fields_keys as $fk=>$fks) {
@@ -2023,11 +2027,26 @@ class SeoFilter
         $word = array();
         $q = $this->modx->newQuery('sfDictionary');
         if($slider) {
-            $values = array_map('trim',explode($this->config['values_delimeter'],$input));
+            if(strpos($input,$this->config['values_delimeter']) === false) {
+                $values = array($input,$input);
+            } else {
+                $values = array_map('trim',explode($this->config['values_delimeter'],$input));
+            }
             $q->where(array('field_id'=>$field_id,'active'=>1));
             $q->limit(0);
-            if($this->modx->getCount('sfDictionary',$q)) {
-                $q->select(array('sfDictionary.*'));
+            $q->select(array('sfDictionary.*'));
+            $qq = clone($q);
+            $qq_count = 0;
+            if($values[0] === $values[1]) {
+                $qq->andCondition("(`sfDictionary`.`input` = '{$input}' OR `sfDictionary`.`input` = '{$values[0]}')");
+                $qq->limit(1);
+                $qq_count = $this->modx->getCount('sfDictionary',$qq);
+            }
+            if($qq_count) {
+                if ($qq->prepare() && $qq->stmt->execute()) {
+                    $word = $qq->stmt->fetch(PDO::FETCH_ASSOC);
+                }
+            } elseif($this->modx->getCount('sfDictionary',$q)) {
                 if ($q->prepare() && $q->stmt->execute()) {
                     $min_diff = 0;
                     $min_diff_word = array();
@@ -2128,6 +2147,7 @@ class SeoFilter
             $page_arr = $page->toArray();
             $page_keys = array_keys($page_arr);
 
+            $meta = array_merge($meta,$page_arr);
             $variables = $this->prepareRow($meta,$page_id);
 
             $array_diff = array_diff($system, $page_keys);

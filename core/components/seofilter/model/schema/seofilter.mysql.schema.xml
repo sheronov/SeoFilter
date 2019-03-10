@@ -48,6 +48,7 @@
 
     <object class="sfRule" table="seofilter_rules" extends="xPDOSimpleObject">
         <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
         <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="" />
         <field key="pages" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
         <field key="url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>

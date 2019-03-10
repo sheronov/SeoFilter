@@ -287,7 +287,7 @@ switch ($modx->event->name) {
             $tmp = explode($between_urls, $request);
             $r_tmp = array_reverse($tmp, 1); //перевёрнутый запрос
 
-            if($between_urls != '/') {
+            if($between_urls !== '/') {
                 //if all links in the first level
                 $page = 0;
                 $remaining_part = '';
@@ -427,6 +427,14 @@ switch ($modx->event->name) {
                                     $url = substr($url, 0, -strlen($container_suffix));
                                 }
                             }
+                            if($site_start == $page) {
+                                if($SeoFilter->config['main_alias']) {
+                                    $q = $modx->newQuery('modResource',array('id'=>$page));
+                                    $q->select('alias');
+                                    $malias = $modx->getValue($q->prepare());
+                                    $new_url = $malias.$between_urls.$new_url;
+                                }
+                            }
                             $modx->sendRedirect($url .'/'. $new_url . $url_suffix,false,'REDIRECT_HEADER','HTTP/1.1 301 Moved Permanently');
                         } elseif($url_redirect && ($url_suffix != $last_char)
                             && ((strpos($_SERVER['REQUEST_URI'],$tofind) === false) ||  (strpos($_SERVER['QUERY_STRING'],$tofind) === false)) //when server have bugs
@@ -524,7 +532,7 @@ switch ($modx->event->name) {
 
                             //обновление счётчика, если отличается количество
                             if(empty($meta['diff']) && $SeoFilter->config['count_childrens']) {
-                                if((int)$meta['url_id'] && ($meta['total'] != $meta['old_total'])) {
+                                if((int)$meta['url_id'] && ((int)$meta['total'] !== (int)$meta['old_total'])) {
                                     $SeoFilter->updateUrlTotal($meta['url_id'], $meta['total']);
                                 }
                             }
@@ -535,7 +543,7 @@ switch ($modx->event->name) {
                             }
 
                             if($SeoFilter->config['lastModified']) {
-                                if(empty($meta['editedon']) && $meta['editedon'] != '0000-00-00 00:00:00') {
+                                if(empty($meta['editedon']) && $meta['editedon'] !== '0000-00-00 00:00:00') {
                                     $modified = $meta['editedon'];
                                 } else {
                                     $modified = $meta['createdon'];
@@ -551,7 +559,7 @@ switch ($modx->event->name) {
 
                             $SeoFilter->initialize($ctx, array('page' => $page, 'params' => $params));
 
-                            if(is_dir($modx->getOption('core_path').'components/msvendorcollections/model/')) {
+                            if(is_dir($modx->getOption('core_path').'components/msvendorcollections/model/') && $modx->getOption('msvendorcollections_on_frontend',null,0)) {
                                 if ($msVC = $modx->getService('msvendorcollections', 'msVendorCollections', $modx->getOption('msvendorcollections_core_path', null,
                                         $modx->getOption('core_path') . 'components/msvendorcollections/') . 'model/msvendorcollections/', $scriptProperties)) {
                                     if (!$msVC->initialized[$ctx]) {
@@ -572,7 +580,7 @@ switch ($modx->event->name) {
                                 $meta['url'] .= $SeoFilter->config['url_suffix'];
                             }
 
-                            if($ctx != 'web') {
+                            if($ctx !== 'web') {
                                 $modx->switchContext($ctx);
                             }
 
