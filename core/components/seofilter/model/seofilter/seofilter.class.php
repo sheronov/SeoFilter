@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.6.2';
+    public $version = '1.6.3';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -1112,10 +1112,36 @@ class SeoFilter
                 }
 
                 if(count($diff)) {
-                    if(strpos($meta['url'],'?')) {
-                        $meta['url'] = $meta['url'] . str_replace('?','&', $this->getHashUrl($diff));
-                    } else {
-                        $meta['url'] = $meta['url'] . $this->getHashUrl($diff);
+                    if($this->config['page_tpl'] && array_key_exists($this->config['page_key'],$diff)) {
+                        if($diff[$this->config['page_key']] == 1) {
+                            unset($diff[$this->config['page_key']]);
+                        } else {
+                            $page_part = $this->pdo->parseChunk('@INLINE ' . $this->config['page_tpl'], array(
+                                'pageVarKey' => $this->config['page_key'],
+                                'pagevarkey' => $this->config['page_key'],
+                                $this->config['page_key'] => $diff[$this->config['page_key']]
+                            ));
+
+                            if (mb_substr($meta['url'], -1, 1) === mb_substr($page_part, 0, 1)) {
+                                $page_part = mb_substr($page_part, 1);
+                            }
+
+                            $meta['url'] .= $page_part;
+                            $meta['full_url'] .= $page_part;
+
+                            unset($diff[$this->config['page_key']]);
+                        }
+                    }
+
+                    if(!empty($diff)) {
+                        $hash_part = $this->getHashUrl($diff);
+                        if (strpos($meta['url'], '?')) {
+                            $meta['url'] .= str_replace('?', '&', $hash_part);
+                            $meta['full_url'] .= str_replace('?', '&', $hash_part);
+                        } else {
+                            $meta['url'] .= $hash_part;
+                            $meta['full_url'] .= $hash_part;
+                        }
                     }
                 }
 

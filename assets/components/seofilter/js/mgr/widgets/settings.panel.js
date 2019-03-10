@@ -108,6 +108,8 @@ Ext.extend(SeoFilter.panel.Settings, MODx.FormPanel, {
         var settings = {};
         var settings_fields = {
             url: {
+                page_key: {},
+                page_tpl: {},
                 url_suffix: {},
                 url_redirect: {xtype: 'combo-boolean', hiddenName: 'main_alias', value: data['redirect']},
                 url_scheme: {value: data['scheme']},
@@ -128,7 +130,7 @@ Ext.extend(SeoFilter.panel.Settings, MODx.FormPanel, {
                 ajax:{xtype: 'combo-boolean', hiddenName: 'ajax'},
                 decline: {xtype: 'combo-boolean', hiddenName: 'decline'},
                 morpher_token: {},
-                page_key: {},
+
                 crumbs_nested: {xtype: 'combo-boolean', hiddenName: 'crumbs_nested',value:data['crumbsNested']},
                 crumbs_tpl_current: {value:data['crumbsCurrent']},
                 content_ace: {},

@@ -115,7 +115,7 @@ $_lang['setting_seofilter_values_separator_desc'] = 'The default is ", || и ". 
 $_lang['setting_seofilter_values_delimeter'] = 'Value delimiter in the address bar';
 $_lang['setting_seofilter_values_delimeter_desc'] = 'Default ",". Override if in mFilter2 you use another delimiter';
 $_lang['setting_seofilter_page_tpl'] = 'The template for generating friendly URLs to pages of pagination';
-$_lang['setting_seofilter_page_tpl_desc'] = 'For sharing with pdoPage pageLinkScheme setting. You can specify this  "/page-[[+page]]"';
+$_lang['setting_seofilter_page_tpl_desc'] = 'For sharing with pdoPage pageLinkScheme setting. You can specify this  "/[[+pageVarKey]]-[[+page]]"';
 
 $_lang['setting_seofilter_hidden_tab'] = 'Show hidden property tab';
 $_lang['setting_seofilter_hidden_tab_desc'] = 'There is no default. Contains two property arrays and a numeric field';

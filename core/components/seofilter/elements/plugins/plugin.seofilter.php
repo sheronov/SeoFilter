@@ -410,7 +410,25 @@ switch ($modx->event->name) {
                     }
                 }
 
+                if(!empty($SeoFilter->config['page_tpl'])) {
+                    //^page-\d+$
+                    $page_part = $SeoFilter->pdo->parseChunk('@INLINE '.$SeoFilter->config['page_tpl'],array(
+                        'pageVarKey' => $SeoFilter->config['page_key'],
+                        'pagevarkey' => $SeoFilter->config['page_key'],
+                        $SeoFilter->config['page_key'] => '\d+$'
+                    ));
+                    $page_part = '/^'.trim($page_part,'/').'/';
 
+                    foreach ($tmp as $k => $s) {
+                        if(preg_match($page_part,$s)) {
+                            $page_num = preg_replace("/[^\d]+/", "", $s);
+                            unset($tmp[$k]);
+                            if($page_num > 1) {
+                                $_GET[$SeoFilter->config['page_key']] = $_REQUEST[$SeoFilter->config['page_key']] = $page_num;
+                            }
+                        }
+                    }
+                }
 
 
                 if($tmp && $url_array = $SeoFilter->findUrlArray(implode($SeoFilter->config['level_separator'],$tmp),$page)) {

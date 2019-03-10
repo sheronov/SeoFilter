@@ -115,7 +115,7 @@ $_lang['setting_seofilter_values_separator_desc'] = 'По умолчанию ", 
 $_lang['setting_seofilter_values_delimeter'] = 'Разделитель значений в адресной строке';
 $_lang['setting_seofilter_values_delimeter_desc'] = 'По умолчанию ",". Переопределите, если в mFilter2 используте другой разделитель';
 $_lang['setting_seofilter_page_tpl'] = 'Шаблон генерации ЧПУ ссылок на страницы пагинации';
-$_lang['setting_seofilter_page_tpl_desc'] = 'Для совместного использования с pdoPage настройкой pageLinkScheme. Можете указать так "/page-[[+page]]"';
+$_lang['setting_seofilter_page_tpl_desc'] = 'Для совместного использования с pdoPage настройкой pageLinkScheme. Можете указать так "/[[+pageVarKey]]-[[+page]]"';
 
 $_lang['setting_seofilter_hidden_tab'] = 'Показывать скрытую вкладку свойства';
 $_lang['setting_seofilter_hidden_tab_desc'] = 'По умолчанию нет. Содержит в себе два массива свойств и числовое поле';
