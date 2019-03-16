@@ -12,7 +12,7 @@ Changelog for SeoFilter.
 - Added support for single values for slider
 - Setting seofilter_page_key is now the default "page"
 - Added setting seofilter_page_tpl (template for fURL-pagination, for example "/[[+pageVarKey]]-[[+page]]")
-- Added support for Ajax fURL-pagination in mFilter2 (temporarily requires a mini-edit js in mSearch2)
+- Added support for Ajax fURL-pagination in mFilter2
 
 1.6.2-beta (01.02.2019)
 =======================
