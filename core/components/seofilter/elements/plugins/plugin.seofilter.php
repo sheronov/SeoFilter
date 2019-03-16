@@ -388,7 +388,7 @@ switch ($modx->event->name) {
                     $url = str_replace($modx->getOption('site_url'),'',$url);
                 }
                 if($c_suffix = $SeoFilter->config['container_suffix']) {
-                    if(strpos($url,$c_suffix,strlen($url)-strlen($c_suffix)) !== false) {
+                    if(strlen($url) && strpos($url,$c_suffix,strlen($url)-strlen($c_suffix)) !== false) {
                         $url = substr($url,0,-strlen($c_suffix));
                     }
                 }
