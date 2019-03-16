@@ -1,5 +1,12 @@
 Changelog for SeoFilter.
 
+1.6.4-beta (17.03.2019)
+======================
+- Fixed sfMenu class
+- Removed warnings while component installing/deleting
+- MODX 3 support
+- Improved adding default.js to page
+
 1.6.3-beta (11.03.2019)
 =======================
 - Added support for single values for slider

@@ -64,7 +64,11 @@ class sfMenu
         if(!isset($config['context'])){
             $config['context'] = $modx->context->key;
         }
+
         $sf_seo_id = $modx->getPlaceholder('sf.seo_id');
+        if(!isset($config['hereId'])) {
+            $config['hereId'] = 0;
+        }
         if (empty($config['hereId']) && !empty($sf_seo_id)) {
             $config['hereId'] = (int)$sf_seo_id;
         }
@@ -1351,7 +1355,7 @@ class sfMenu
             $idx = 0;
             foreach($tree as $group) {
                 if(isset($group['links'])) {
-                    if (isset($this->config['hereId'])) {
+                    if (!empty($this->config['hereId'])) {
                         $parents = $this->findParents($group['links'],(int)$this->config['hereId']);
                         $this->parents = array_merge($this->parents,$parents);
                     }
@@ -1379,7 +1383,7 @@ class sfMenu
                 }
             }
         } else {
-            if (isset($this->config['hereId'])) {
+            if (!empty($this->config['hereId'])) {
                 $parents = $this->findParents($tree,(int)$this->config['hereId']);
                 $this->parents = $parents;
             }

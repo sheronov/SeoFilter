@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.6.3';
+    public $version = '1.6.4';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */

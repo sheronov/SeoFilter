@@ -11,9 +11,9 @@ https://modx.pro/components/12921/
 https://modx.pro/components/13407/
 https://modx.pro/components/14899/
 https://modx.pro/components/15476/
-https://modx.pro/components/17313
+https://modx.pro/components/17313/
 
-Full Documentation: https://docs.modx.pro/components/seofilter/
+Full Documentation: https://docs.modx.pro/komponentyi/seofilter
 Demo: http://s9767.h8.modhost.pro
 
 Possible additional paid modifications for a specific project.

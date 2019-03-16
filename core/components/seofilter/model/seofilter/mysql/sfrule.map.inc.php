@@ -11,6 +11,7 @@ $xpdo_meta_map['sfRule']= array (
   'fields' => 
   array (
     'name' => '',
+    'description' => '',
     'page' => 0,
     'pages' => '',
     'url' => '',
@@ -26,7 +27,6 @@ $xpdo_meta_map['sfRule']= array (
     'h2' => '',
     'introtext' => '',
     'keywords' => '',
-    'description' => '',
     'text' => '',
     'content' => '',
     'properties' => NULL,
@@ -43,6 +43,13 @@ $xpdo_meta_map['sfRule']= array (
       'precision' => '255',
       'phptype' => 'string',
       'null' => false,
+      'default' => '',
+    ),
+    'description' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
       'default' => '',
     ),
     'page' => 
@@ -159,13 +166,6 @@ $xpdo_meta_map['sfRule']= array (
       'default' => '',
     ),
     'keywords' => 
-    array (
-      'dbtype' => 'text',
-      'phptype' => 'string',
-      'null' => true,
-      'default' => '',
-    ),
-    'description' => 
     array (
       'dbtype' => 'text',
       'phptype' => 'string',
