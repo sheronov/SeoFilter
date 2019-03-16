@@ -26,6 +26,6 @@ foreach ($tmp as $k => $v) {
     ), $v), '', true, true);
     $menus[] = $menu;
 }
-unset($menu, $i);
+unset($menu);
 
 return $menus;
