@@ -281,6 +281,7 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
                     $dictionary = array(); // промежуточный массив для проверки дубликатов
                     if(!empty($words)) {
                         foreach ($words as $word) {
+                            $value = null;
                             $relation_id = $relation_value = '';
                             if ($field->get('xpdo')) {
                                 if (is_array($values[$word])) {
