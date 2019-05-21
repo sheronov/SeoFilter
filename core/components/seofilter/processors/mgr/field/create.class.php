@@ -187,6 +187,7 @@ class sfFieldCreateProcessor extends modObjectCreateProcessor
                     }
                     $words = array_unique(array_merge($tvvalues, $pre));
                     foreach ($words as $word) {
+                        $value = null;
                         $relation_id = $relation_value = '';
                         if ($field->get('xpdo')) {
                             if(is_array($values[$word])) {
