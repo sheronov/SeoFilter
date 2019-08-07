@@ -9,9 +9,9 @@ class seoFilterHandler extends mse2FiltersHandler
     public $modx;
 
     protected $fields     = [];
+    protected $rules      = [];
     protected $links      = [];
     protected $requested  = [];
-    protected $collected  = [];
     protected $fieldWords = [];
     protected $pageUrl    = '';
     protected $suffix     = '';
@@ -39,7 +39,7 @@ class seoFilterHandler extends mse2FiltersHandler
         $possibleSuffixes = array_unique(array_merge($possibleSuffixes, [$c_suffix]));
 
         foreach ($possibleSuffixes as $possibleSuffix) {
-            if (substr($page_url, -strlen($possibleSuffix)) == $possibleSuffix) {
+            if (substr($page_url, -strlen($possibleSuffix)) === $possibleSuffix) {
                 $page_url = substr($page_url, 0, -strlen($possibleSuffix));
             }
         }
@@ -92,7 +92,6 @@ class seoFilterHandler extends mse2FiltersHandler
             return $r1['rank'] >= $r2['rank'];
         });
 
-        //        $this->modx->log(1, 'Rules = ' . print_r($rules, 1));
         return $rules;
     }
 
@@ -110,7 +109,6 @@ class seoFilterHandler extends mse2FiltersHandler
 
             $requested[$param] = $values;
         }
-        //        $this->modx->log(1, 'Запрос ' . print_r($requested, 1));
 
         return $requested;
     }
@@ -124,9 +122,8 @@ class seoFilterHandler extends mse2FiltersHandler
             $fields[$fieldAlias] = array_keys($values);
         }
 
-        $this->fieldWords = $this->getFieldWords($fields);
+        $this->getFieldWords($fields);
 
-        //        $this->modx->log(1, 'Собраны ' . print_r($fields, 1));
         return $filters;
     }
 
@@ -151,11 +148,73 @@ class seoFilterHandler extends mse2FiltersHandler
             }
         }
 
-        if (empty($this->requested)) {
-            $this->getSimpleSeoLinks($collectedWords);
+        $this->fieldWords = $fieldWords;
+
+        $this->getSeoLinks($collectedWords);
+    }
+
+    protected function getSeoLinks(array $wordIds = [])
+    {
+        if (empty($this->requested) || count($this->requested) > 1) {
+            $this->getSimpleSeoLinks(array_combine(array_keys($wordIds), array_keys($wordIds)));
+        } else {
+            $fieldAlias = array_keys($this->requested)[0];
+            $wordInput = $this->requested[$fieldAlias];
+            if (strpos($wordInput, ',') !== false) {
+                $this->getSimpleSeoLinks(array_combine(array_keys($wordIds), array_keys($wordIds)));
+            } else {
+                $this->getHardSeoLinks($wordIds, $fieldAlias, $wordInput);
+            }
+        }
+    }
+
+    protected function getHardSeoLinks(array $wordIds, $fieldAlias, $wordInput)
+    {
+        $fieldId = $wordId = null;
+        $doubleRules = [];
+        if (isset($this->fields[$fieldAlias])) {
+            $fieldId = $this->fields[$fieldAlias]['id'];
+            $doubleRules = $this->fields[$fieldAlias]['rules'];
         }
 
-        return $fieldWords;
+        if ($fieldId) {
+            if (isset($this->fieldWords[$fieldId][$wordInput])) {
+                $wordId = $this->fieldWords[$fieldId][$wordInput];
+            }
+        }
+
+
+        $glueFields = [];
+
+        if (!empty($doubleRules)) {
+            foreach ($doubleRules as $doubleRule) {
+                if (isset($this->rules[$doubleRule]['fields']) && count($this->rules[$doubleRule]['fields']) === 2) {
+                    foreach ($this->rules[$doubleRule]['fields'] as $field) {
+                        if ($field !== $fieldId) {
+                            $glueFields[$field] = [];
+                        }
+                    }
+                }
+            }
+        }
+
+        $links = [];
+        if (!empty($glueFields)) {
+            foreach ($this->fieldWords as $field => $words) {
+                foreach ($words as $wInput => $wId) {
+                    if (!isset($glueFields[$field])) {
+                        $links[(string)$wId] = $wId;
+                    } else {
+                        $pair = [$wordId, $wId];
+                        sort($pair);
+                        $glueFields[$field][] = $pair;
+                        $links[implode(',', $pair)] = $wId;
+                    }
+                }
+            }
+        }
+
+        $this->getSimpleSeoLinks($links);
     }
 
     protected function getSimpleSeoLinks(array $wordIds = [])
@@ -163,11 +222,11 @@ class seoFilterHandler extends mse2FiltersHandler
         $links = [];
         $q = $this->modx->newQuery('sfUrls');
         $q->leftJoin('sfUrlWord', 'Words', 'sfUrls.id = Words.url_id');
-        $q->where(['active' => 1, 'page_id' => self::PAGE_ID]);
+        $q->where(['active' => 1, 'page_id' => self::PAGE_ID, 'total:>=' => 3]);
         $q->groupby('sfUrls.id');
         $q->select($this->modx->getSelectColumns('sfUrls', 'sfUrls', '',
-            ['id', 'multi_id', 'old_url', 'new_url', 'menutitle', 'link']));
-        $q->select(['GROUP_CONCAT(Words.word_id ORDER BY Words.word_id) as wordids', 'Words.word_id']);
+            ['id', 'multi_id', 'old_url', 'new_url', 'menutitle', 'link', 'total']));
+        $q->select(['GROUP_CONCAT(Words.word_id ORDER BY Words.word_id) as wordids']);
         $q->having('wordids IN (' . implode(',', array_map(function ($value) {
                 if (is_array($value)) {
                     sort($value);
@@ -177,7 +236,7 @@ class seoFilterHandler extends mse2FiltersHandler
             }, array_keys($wordIds))) . ')');
         if ($q->prepare() && $q->stmt->execute()) {
             while ($link = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                $links[$link['word_id']] = $this->prepareLink($link, $wordIds[$link['word_id']]);
+                $links[$wordIds[$link['wordids']]] = $link;
             }
         }
 
@@ -211,7 +270,7 @@ class seoFilterHandler extends mse2FiltersHandler
                     if (isset($this->fieldWords[$fieldId][$value])) {
                         $wordId = $this->fieldWords[$fieldId][$value];
                         if (isset($this->links[$wordId])) {
-                            $title = $this->links[$wordId];
+                            $title = $this->prepareLink($this->links[$wordId], $value);
                         }
                     }
                 }
