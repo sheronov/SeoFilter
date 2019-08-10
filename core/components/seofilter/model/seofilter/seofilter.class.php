@@ -2385,9 +2385,9 @@ class SeoFilter
                 'page_id' => $page_id,
                 'rule' => serialize($rule)
             )));
-            $tmp = ($tmp[0] == '[' || $tmp[0] == '{')
+            $tmp = (strpos($tmp,'[') === 0 || strpos($tmp,'{') === 0)
                 ? json_decode($tmp, true)
-                : unserialize($tmp);
+                : unserialize($tmp,array('allowed_classes' => false));
             if (!is_array($tmp)) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,
                     '[SeoFilter]: Preparation snippet must return an array, instead of "' . gettype($tmp) . '"');

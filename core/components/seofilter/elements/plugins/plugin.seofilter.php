@@ -400,7 +400,7 @@ switch ($modx->event->name) {
 
 
 
-                if($between_urls == '/') {
+                if($between_urls === '/') {
                     if(implode('/',array_reverse(array_diff($r_tmp,$tmp))) != trim($url,'/')) {
                         break;
                     }
@@ -561,7 +561,7 @@ switch ($modx->event->name) {
                             }
 
                             if($SeoFilter->config['lastModified']) {
-                                if(empty($meta['editedon']) && $meta['editedon'] !== '0000-00-00 00:00:00') {
+                                if(!empty($meta['editedon']) && $meta['editedon'] !== '0000-00-00 00:00:00') {
                                     $modified = $meta['editedon'];
                                 } else {
                                     $modified = $meta['createdon'];

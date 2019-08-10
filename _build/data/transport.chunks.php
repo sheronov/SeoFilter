@@ -2,34 +2,38 @@
 /** @var modX $modx */
 /** @var array $sources */
 
-$chunks = array();
+$chunks = [];
 
-$tmp = array(
-    'tpl.SeoFilter.crumbs.current' => array(
-        'file' => 'current',
+$tmp = [
+    'tpl.SeoFilter.crumbs.current' => [
+        'file'        => 'current',
         'description' => '',
-    ),
-    'tpl.SeoFilter.crumbs.nested' => array(
-        'file' => 'nested',
+    ],
+    'tpl.SeoFilter.crumbs.nested'  => [
+        'file'        => 'nested',
         'description' => '',
-    ),
-);
+    ],
+    'tpl.SeoFilter.crumbs.product' => [
+        'file'        => 'product',
+        'description' => '',
+    ],
+];
 
 // Save chunks for setup options
-$BUILD_CHUNKS = array();
+$BUILD_CHUNKS = [];
 
 foreach ($tmp as $k => $v) {
     /** @var modChunk $chunk */
     $chunk = $modx->newObject('modChunk');
-    $chunk->fromArray(array(
-        'id' => 0,
-        'name' => $k,
+    $chunk->fromArray([
+        'id'          => 0,
+        'name'        => $k,
         'description' => @$v['description'],
-        'snippet' => file_get_contents($sources['source_core'] . '/elements/chunks/chunk.' . $v['file'] . '.tpl'),
-        'static' => BUILD_CHUNK_STATIC,
-        'source' => 1,
+        'snippet'     => file_get_contents($sources['source_core'] . '/elements/chunks/chunk.' . $v['file'] . '.tpl'),
+        'static'      => BUILD_CHUNK_STATIC,
+        'source'      => 1,
         'static_file' => 'core/components/' . PKG_NAME_LOWER . '/elements/chunks/chunk.' . $v['file'] . '.tpl',
-    ), '', true, true);
+    ], '', true, true);
 
     $chunks[] = $chunk;
 

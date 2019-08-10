@@ -48,6 +48,8 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
             $c->where(array(
                 'name:LIKE' => "%{$query}%",
                 'OR:id:LIKE' => "%{$query}%",
+                'OR:page:LIKE' => "%{$query}%",
+                'OR:pages:LIKE' => "%{$query}%",
                 'OR:url:LIKE' => "%{$query}%",
                 'OR:title:LIKE' => "%{$query}%",
             ));
