@@ -17,10 +17,6 @@ class sfFieldIds extends xPDOSimpleObject {
             while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $var = '{$'.$row['alias'].'}';
 
-                // TODO: раскомментировать, если маску URL будет обрабатывать Fenom
-                //if(strpos($row['alias'],'-') !== false) {
-                //   $var = '{$_pls["'.$row['alias'].'"]}';
-                //}
 
                 if($row['hideparam']) {
                     $urls[] = $var;

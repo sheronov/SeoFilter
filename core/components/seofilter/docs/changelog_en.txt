@@ -1,5 +1,14 @@
 Changelog for SeoFilter.
 
+1.7.0-beta (21.08.2019)
+======================
+- small features
+- fix error then slash in aliases
+- now sfLink give itself all rule Ids for recieven page Ids
+- add the new snippet sfNearLink for find nearest breadcrumb link on a product page (super beta)
+- add the new chunk tpl.SeoFilter.crumbs.product for paste to tplCurrent in pdoCrumbs snippet on a product page
+- now minimal PHP verison is 5.4 (was 5.3)
+
 1.6.4-beta (17.03.2019)
 ======================
 - Fixed sfMenu class

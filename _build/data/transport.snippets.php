@@ -21,6 +21,10 @@ $tmp = array(
         'file' => 'sfsitemap',
         'description' => 'This snippet make sitemap from virtual pages... Read the docs.',
     ),
+    'sfNearLink' => array(
+        'file' => 'sfnearlink',
+        'description' => 'Сниппет для поиска ближайшей хлебной крошки для товара',
+    ),
 );
 
 foreach ($tmp as $k => $v) {

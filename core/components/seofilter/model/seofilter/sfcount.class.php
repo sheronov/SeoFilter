@@ -598,7 +598,6 @@ class sfCountHandler
                     }
                 }
             } else {
-//                TODO: здесь настройку добавить, считать с учётом GET или нет
 //                $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] ERROR: The field by alias = '.$alias.' is not set to fields array. Param = '.$param);
             }
         }
@@ -642,7 +641,6 @@ class sfCountHandler
 
         $check = true;
 
-        //TODO: переделать механизм с parents в 1.6.2
         $p_key = '`modResource`.`parent`';
         if(isset($config['where'][$p_key]) && isset($config['parents'])) {
             if($config['parents'] != $config['where'][$p_key]) {

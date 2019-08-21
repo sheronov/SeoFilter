@@ -82,8 +82,6 @@ if ($modx->getCount('sfRule', $q)) {
                     continue;
                 }
                 $rules[$row['rule_id']] = $row['rule_id'];
-            } else {
-                //TODO: сделать проверку через HAVING
             }
             $fields[$row['id']] = $row;
         }
@@ -100,7 +98,6 @@ if ($modx->getCount('sfRule', $q)) {
     }
 
     foreach ($fields as $field) {
-        //TODO: добить switch по классу
         if (isset($resource[$field['key']]) && !empty($resource[$field['key']])) {
             switch (mb_strtolower($field['class'])) {
                 case 'modtemplatevar':

@@ -79,7 +79,6 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
                     $addurl = $array['old_url'];
                 }
 
-                //TODO: рано или поздно определить единый метод формирования ссылки
                 $page_url = $this->modx->makeUrl($array['page_id'],'','','full');
                 $container_suffix = $this->modx->getOption('container_suffix',null,'/');
                 $url_suffix = $this->modx->getOption('seofilter_url_suffix',null,'',true);

@@ -354,7 +354,6 @@ Ext.extend(SeoFilter.window.UpdateRule, MODx.Window, {
         });
     },
 
-    //TODO: метод для пошагового ajax-добавления ссылок
     _submit: function (close) {
         close = close === false ? false : true;
         var f = this.fp.getForm();

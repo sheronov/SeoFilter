@@ -96,7 +96,6 @@ class sfRuleUpdateProcessor extends modObjectUpdateProcessor
                 $pages = $object->get('page');
             }
             if($response = $this->SeoFilter->generateUrls($object->get('id'),$pages,$object->get('link_tpl'),$url_mask,array(),$rename,$offset)) {
-                //TODO: здесь пошаговое добавление ссылок
                 /*
                 if(empty($response['data']['done']) || $response['data']['done'] == false) {
                     $object->set('data',$response['data']);

@@ -166,8 +166,6 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
                                 $to_replace[] = '{$'.$ukey.'}';
                             }
                             $old_url = str_replace($to_replace,array_values($url_array),$url_mask);
-                            // TODO: раскомментировать, когда Fenom будет обрабатывать маску
-//                            $old_url = $pdoTools->getChunk('@INLINE '.$url_mask,$url_array);
                         }
                     }
                 }
