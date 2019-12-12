@@ -27,7 +27,8 @@ class sfRuleGetProcessor extends modObjectGetProcessor
     public function beforeOutput()
     {
         if($this->proMode) {
-            if(empty($this->object->get('pages'))) {
+            $pages = $this->object->get('pages');
+            if(empty($pages)) {
                 $this->object->set('pages',$this->object->get('page'));
             }
         }

@@ -11,7 +11,7 @@ class modMgrMiscGetlistProcessor extends modProcessor
             $dir = 'core';
         }
 
-        if(empty($contextKey)) {
+        if(!isset($contextKey) || empty($contextKey)) {
             $contextKey = 'web';
         }
         // get base path

@@ -3,11 +3,11 @@
 class seoFilterHandler extends mse2FiltersHandler
 {
 
-    const PAGE_ID     = 6;
-    const SEO_ALIASES = ['naznachenie', 'sezon', 'floor', 'area', 'dimensions', 'dop', 'bedroom'];
+    const PAGE_ID = 6;
     /** @var modX $modx */
     public $modx;
 
+    protected $seoAliases = [];
     protected $fields     = [];
     protected $rules      = [];
     protected $links      = [];
@@ -20,8 +20,9 @@ class seoFilterHandler extends mse2FiltersHandler
     public function __construct(mSearch2 $mse2, array $config = [])
     {
         parent::__construct($mse2, $config);
+        $this->seoAliases = ['naznachenie', 'sezon', 'floor', 'area', 'dimensions', 'dop', 'bedroom'];
         $this->modx->addPackage('seofilter', $this->modx->getOption('seofilter_core_path', $config,
-                $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/');
+                $this->modx->getOption('core_path').'components/seofilter/').'model/');
         $this->fields = $this->getSeoFilterFields();
         $this->rules = $this->selectRulesFromFields();
         $this->requested = $this->prepareRequest();
@@ -57,7 +58,7 @@ class seoFilterHandler extends mse2FiltersHandler
         $q->select(['group_concat(Rule.id ORDER BY Rule.rank) as rules']);
         $q->select(['group_concat(Rule.rank ORDER BY Rule.rank) as rule_ranks']);
         $q->groupby('sfField.id');
-        $q->where(['alias:IN' => self::SEO_ALIASES]);
+        $q->where(['alias:IN' => $this->seoAliases]);
         if ($q->prepare() && $q->stmt->execute()) {
             while ($field = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 if (isset($field['rules']) && !empty($field['rules'])) {
@@ -100,7 +101,7 @@ class seoFilterHandler extends mse2FiltersHandler
         $requested = [];
 
         foreach ($_REQUEST as $param => $values) {
-            if (!in_array($param, self::SEO_ALIASES, true)) {
+            if (!in_array($param, $this->seoAliases, true)) {
                 continue;
             }
             if (strpos($values, ',') !== false) {
@@ -132,7 +133,11 @@ class seoFilterHandler extends mse2FiltersHandler
         $fieldWords = [];
         $collectedWords = [];
         if (!empty($collectedFields)) {
-            $wordInputs = array_merge(...array_values($collectedFields));
+            $wordInputs = [];
+            foreach ($collectedFields as $k => $values) {
+                $wordInputs = array_merge($wordInputs, $collectedFields);
+            }
+            // $wordInputs = array_merge(...array_values($collectedFields));
         } else {
             $wordInputs = [];
         }
@@ -227,13 +232,13 @@ class seoFilterHandler extends mse2FiltersHandler
         $q->select($this->modx->getSelectColumns('sfUrls', 'sfUrls', '',
             ['id', 'multi_id', 'old_url', 'new_url', 'menutitle', 'link', 'total']));
         $q->select(['GROUP_CONCAT(Words.word_id ORDER BY Words.word_id) as wordids']);
-        $q->having('wordids IN (' . implode(',', array_map(function ($value) {
+        $q->having('wordids IN ('.implode(',', array_map(function ($value) {
                 if (is_array($value)) {
                     sort($value);
                     $value = implode(',', $value);
                 }
-                return "'" . $value . "'";
-            }, array_keys($wordIds))) . ')');
+                return "'".$value."'";
+            }, array_keys($wordIds))).')');
         if ($q->prepare() && $q->stmt->execute()) {
             while ($link = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $links[$wordIds[$link['wordids']]] = $link;
@@ -245,7 +250,7 @@ class seoFilterHandler extends mse2FiltersHandler
 
     protected function prepareLink(array $link, $as_name = '')
     {
-        $url = $this->pageUrl . '/' . ($link['new_url'] ?: $link['old_url']) . $this->suffix;
+        $url = $this->pageUrl.'/'.($link['new_url'] ?: $link['old_url']).$this->suffix;
         $name = $as_name ?: $link['menutitle'] ?: $link['link'];
 
         return strtr('<a href="{$url}">{$name}</a>', ['{$url}' => $url, '{$name}' => $name]);
