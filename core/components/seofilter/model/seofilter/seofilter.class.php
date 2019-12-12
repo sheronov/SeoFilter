@@ -1643,6 +1643,7 @@ class SeoFilter
 
                 if ($word = $this->getWordArray($input, $field_id, $field['slider'], $this->config['mfilterWords'],
                     $ajax)) {
+                    $word_id = $word['id'];
                     foreach (array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
                         if ($countFields == 1) {
                             $word_array[$tmp_key] = $tmp_array;
@@ -1650,10 +1651,12 @@ class SeoFilter
                         $word_array[str_replace('value', $alias, $tmp_key)] = $tmp_array;
                         $word_array[$alias . '_input'] = $word_array['input'];
                         $word_array[$alias . '_alias'] = $word_array['alias'];
+                        $word_array[$alias . '_word'] = $word_id;
                         $word_array['m_' . $alias] = $word_array['m_' . $alias . '_i'];
                     }
 
                     $params_to_text[$param] = [
+                        'word'  => $word_id,
                         'input' => $word['input'],
                         'value' => $word['value'],
                         'alias' => $word['alias'],
