@@ -1,6 +1,6 @@
 <?php
 
-class_alias('encryptedVehicle', 'xPDO\Transport\encryptedVehicle');
+// class_alias('encryptedVehicle', 'xPDO\Transport\encryptedVehicle');
 
 class encryptedVehicle extends xPDOObjectVehicle
 {

@@ -5,21 +5,21 @@ if (!defined('MODX_BASE_PATH')) {
 }
 
 // define sources
-$root = dirname(dirname(__FILE__)) . '/';
-$sources = array(
-    'root' => $root,
-    'build' => $root . '_build/',
-    'source_core' => $root . 'core/components/' . PKG_NAME_LOWER,
-    'model' => $root . 'core/components/' . PKG_NAME_LOWER . '/model/',
-    'schema' => $root . 'core/components/' . PKG_NAME_LOWER . '/model/schema/',
-    'xml' => $root . 'core/components/' . PKG_NAME_LOWER . '/model/schema/' . PKG_NAME_LOWER . '.mysql.schema.xml',
-);
+$root = dirname(__FILE__, 2).'/';
+$sources = [
+    'root'        => $root,
+    'build'       => $root.'_build/',
+    'source_core' => $root.'core/components/'.PKG_NAME_LOWER,
+    'model'       => $root.'core/components/'.PKG_NAME_LOWER.'/model/',
+    'schema'      => $root.'core/components/'.PKG_NAME_LOWER.'/model/schema/',
+    'xml'         => $root.'core/components/'.PKG_NAME_LOWER.'/model/schema/'.PKG_NAME_LOWER.'.mysql.schema.xml',
+];
 unset($root);
 
 /** @noinspection PhpIncludeInspection */
-require MODX_CORE_PATH . 'model/modx/modx.class.php';
+require MODX_CORE_PATH.'model/modx/modx.class.php';
 /** @noinspection PhpIncludeInspection */
-require $sources['build'] . '/includes/functions.php';
+require $sources['build'].'/includes/functions.php';
 
 $modx = new modX();
 $modx->initialize('mgr');
@@ -37,7 +37,7 @@ $manager = $modx->getManager();
 $generator = $manager->getGenerator();
 
 // Remove old model
-rrmdir($sources['model'] . PKG_NAME_LOWER . '/mysql');
+rrmdir($sources['model'].PKG_NAME_LOWER.'/mysql');
 
 // Generate a new one
 $generator->parseSchema($sources['xml'], $sources['model']);

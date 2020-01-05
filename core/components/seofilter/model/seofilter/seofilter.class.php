@@ -16,23 +16,23 @@ class SeoFilter
 
 
     /**
-     * @param modX  $modx
-     * @param array $config
+     * @param  modX  $modx
+     * @param  array  $config
      */
     function __construct(modX $modx, array $config = [])
     {
         $this->modx =& $modx;
 
         $corePath = $this->modx->getOption('seofilter_core_path', $config,
-            $this->modx->getOption('core_path') . 'components/seofilter/'
+            $this->modx->getOption('core_path').'components/seofilter/'
         );
 
         $assetsUrl = $this->modx->getOption('seofilter_assets_url', $config,
-            $this->modx->getOption('assets_url') . 'components/seofilter/'
+            $this->modx->getOption('assets_url').'components/seofilter/'
         );
-        $customPath = $this->modx->getOption('seofilter_custom_path', $config, $corePath . 'custom/');
-        $actionUrl = $assetsUrl . 'action.php';
-        $connectorUrl = $assetsUrl . 'connector.php';
+        $customPath = $this->modx->getOption('seofilter_custom_path', $config, $corePath.'custom/');
+        $actionUrl = $assetsUrl.'action.php';
+        $connectorUrl = $assetsUrl.'connector.php';
         $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
         $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
         $level_separator = $this->modx->getOption('seofilter_level_separator', null, '/', true);
@@ -114,21 +114,21 @@ class SeoFilter
 
         $this->config = array_merge([
             'assetsUrl'     => $assetsUrl,
-            'cssUrl'        => $assetsUrl . 'css/',
-            'jsUrl'         => $assetsUrl . 'js/',
-            'imagesUrl'     => $assetsUrl . 'images/',
+            'cssUrl'        => $assetsUrl.'css/',
+            'jsUrl'         => $assetsUrl.'js/',
+            'imagesUrl'     => $assetsUrl.'images/',
             'connectorUrl'  => $connectorUrl,
             'actionUrl'     => $actionUrl,
             'json_response' => true,
 
             'corePath'       => $corePath,
             'customPath'     => $customPath,
-            'modelPath'      => $corePath . 'model/',
-            'chunksPath'     => $corePath . 'elements/chunks/',
-            'templatesPath'  => $corePath . 'elements/templates/',
+            'modelPath'      => $corePath.'model/',
+            'chunksPath'     => $corePath.'elements/chunks/',
+            'templatesPath'  => $corePath.'elements/templates/',
             'chunkSuffix'    => '.chunk.tpl',
-            'snippetsPath'   => $corePath . 'elements/snippets/',
-            'processorsPath' => $corePath . 'processors/',
+            'snippetsPath'   => $corePath.'elements/snippets/',
+            'processorsPath' => $corePath.'processors/',
 
             'params'           => [],
             'ajax'             => $ajax,
@@ -208,14 +208,13 @@ class SeoFilter
     /**
      * Initializes component into different contexts.
      *
-     * @param string $ctx              The context to load. Defaults to web.
-     * @param array  $scriptProperties Properties for initialization.
+     * @param  string  $ctx  The context to load. Defaults to web.
+     * @param  array  $scriptProperties  Properties for initialization.
      *
      * @return bool
      */
     public function initialize($ctx = 'web', $scriptProperties = [])
     {
-
         if (isset($this->initialized[$ctx]) && $this->initialized[$ctx]) {
             return $this->initialized[$ctx];
         }
@@ -224,15 +223,14 @@ class SeoFilter
 
         if ($this->config['ajax']) {
             $config = $this->makePlaceholders($this->config);
-            $js = trim($this->modx->getOption('seofilter_frontend_js', null, $this->config['jsUrl'] . 'web/default.js',
+            $js = trim($this->modx->getOption('seofilter_frontend_js', null, $this->config['jsUrl'].'web/default.js',
                 false));
             if (!empty($js) && preg_match('/\.js/i', $js)) {
-
                 $js_file = str_replace($config['pl'], $config['vl'], $js);
                 //$js_file = $this->pdo->parseChunk('@INLINE ' . $js, $this->config);
 
                 if (preg_match('/\.js$/i', $js_file) && $this->config['admin_version']) {
-                    $js_file .= '?v=' . mb_substr(md5($this->version), 0, 10);
+                    $js_file .= '?v='.mb_substr(md5($this->version), 0, 10);
                 }
 
                 if (isset($this->modx->loadedjscripts[$js_file])) {
@@ -268,7 +266,7 @@ class SeoFilter
                 $q->rightJoin('sfField', 'sfField', 'sfField.id = sfFieldIds.field_id');
                 $q->where(['sfField.slider' => 1]);
                 if ($this->config['proMode']) {
-                    $q->where('1=1 AND FIND_IN_SET(' . $this->config['page'] . ',REPLACE(IFNULL(NULLIF(sfRule.pages,""),sfRule.page)," ",""))');
+                    $q->where('1=1 AND FIND_IN_SET('.$this->config['page'].',REPLACE(IFNULL(NULLIF(sfRule.pages,""),sfRule.page)," ",""))');
                 } else {
                     $q->where(['sfRule.page' => $this->config['page']]);
                 }
@@ -276,7 +274,7 @@ class SeoFilter
             }
 
             $data = json_encode([
-                'jsUrl'            => $this->config['jsUrl'] . 'web/',
+                'jsUrl'            => $this->config['jsUrl'].'web/',
                 'actionUrl'        => $this->config['actionUrl'],
                 'ctx'              => $ctx,
                 'page'             => $this->config['page'],
@@ -302,10 +300,8 @@ class SeoFilter
             ], true);
 
             $this->modx->regClientStartupScript(
-                '<script type="text/javascript">seoFilterConfig = ' . $data . ';</script>', true
+                '<script type="text/javascript">seoFilterConfig = '.$data.';</script>', true
             );
-
-
         }
         $this->initialized[$ctx] = true;
         return true;
@@ -439,7 +435,7 @@ class SeoFilter
         if (!empty($conditions['where'])) {
             foreach ($conditions['where'] as $where_key => $where_arr) {
                 if (strpos($where_key, '.') === false) {
-                    $conditions['where']['modResource.' . $where_key] = $where_arr;
+                    $conditions['where']['modResource.'.$where_key] = $where_arr;
                     unset($conditions['where'][$where_key]);
                 }
             }
@@ -464,7 +460,7 @@ class SeoFilter
      * Shorthand for original modX::invokeEvent() method with some useful additions.
      *
      * @param       $eventName
-     * @param array $params
+     * @param  array  $params
      * @param       $glue
      *
      * @return array
@@ -503,7 +499,7 @@ class SeoFilter
             if (!empty($fields[$var])) {
                 if ($var == 'tvss') {
                     $this->modx->addPackage('tvsuperselect',
-                        $this->modx->getOption('core_path') . 'components/tvsuperselect/model/');
+                        $this->modx->getOption('core_path').'components/tvsuperselect/model/');
                 }
                 foreach ($fields[$var] as $f_key => $field) {
                     if ($field['xpdo_where']) {
@@ -528,7 +524,7 @@ class SeoFilter
                         ]);
                     }
                     $q->select([
-                        'DISTINCT ' . $class . '.value',
+                        'DISTINCT '.$class.'.value',
                         'TV.id,TV.name'
                     ]);
                     if ($q->prepare() && $q->stmt->execute()) {
@@ -550,9 +546,9 @@ class SeoFilter
             }
             if (!empty($fields['tagger'])) {
                 $taggerPath = $this->modx->getOption('tagger.core_path', null,
-                    $this->modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/tagger/');
+                    $this->modx->getOption('core_path', null, MODX_CORE_PATH).'components/tagger/');
                 /** @var Tagger $tagger */
-                $tagger = $this->modx->getService('tagger', 'Tagger', $taggerPath . 'model/tagger/',
+                $tagger = $this->modx->getService('tagger', 'Tagger', $taggerPath.'model/tagger/',
                     ['core_path' => $taggerPath]);
                 if (($tagger instanceof Tagger)) {
                     $q = $this->modx->newQuery('TaggerTagResource', ['resource' => $resource_id]);
@@ -572,7 +568,6 @@ class SeoFilter
                                 } else {
                                     $data['tagger'][$row['group_alias']][] = $row['tag'];
                                 }
-
                             }
                         }
                     }
@@ -591,7 +586,6 @@ class SeoFilter
                         } else {
                             //                            $this->modx->log(1,'The values '.print_r($val,1).' don\'t satisfy field (id='.$fields['data'][$param]['id']. ') where condition = "'.$fields['data'][$param]['xpdo_where'].'"');
                         }
-
                     } else {
                         $data['data'][$param] = $val;
                     }
@@ -617,7 +611,7 @@ class SeoFilter
             $this->countHandler = new $count_class($this->modx, $this->config);
             if (!($this->countHandler instanceof sfCountHandler)) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,
-                    '[SeoFilter] Could not initialize count handler class: "' . $count_class . '"');
+                    '[SeoFilter] Could not initialize count handler class: "'.$count_class.'"');
                 return false;
             }
         }
@@ -641,19 +635,18 @@ class SeoFilter
         $pl1 = $this->pdo->makePlaceholders($placeholders, '', '[[+', ']]', false);
         $pl2 = $this->pdo->makePlaceholders($placeholders, '', '[[++', ']]', false);
         $pl3 = $this->pdo->makePlaceholders($placeholders, '', '{', '}', false);
-        $customPath = str_replace($pl1['pl'], $pl1['vl'], $customPath);
-        $customPath = str_replace($pl2['pl'], $pl2['vl'], $customPath);
-        $customPath = str_replace($pl3['pl'], $pl3['vl'], $customPath);
+        $customPath = str_replace([$pl1['pl'], $pl2['pl'], $pl3['pl']], [$pl1['vl'], $pl2['vl'], $pl3['vl']],
+            $customPath);
         if (strpos($customPath, MODX_BASE_PATH) === false && strpos($customPath, MODX_CORE_PATH) === false) {
-            $customPath = MODX_BASE_PATH . ltrim($customPath, '/');
+            $customPath = MODX_BASE_PATH.ltrim($customPath, '/');
         }
-        $customPath = rtrim($customPath, '/') . '/' . ltrim($dir, '/');
+        $customPath = rtrim($customPath, '/').'/'.ltrim($dir, '/');
 
         if (file_exists($customPath) && $files = scandir($customPath)) {
             foreach ($files as $file) {
                 if (preg_match('#\.class\.php$#i', $file)) {
                     /** @noinspection PhpIncludeInspection */
-                    include_once $customPath . '/' . $file;
+                    include_once $customPath.'/'.$file;
                 }
             }
         } else {
@@ -679,7 +672,7 @@ class SeoFilter
             $q->innerJoin('sfRule', 'sfRule', 'sfRule.id = sfFieldIds.multi_id AND sfRule.active = 1');
             $q->where(['sfFieldIds.field_id' => $field_id]);
             if ($this->config['proMode']) {
-                $q->where('1=1 AND FIND_IN_SET(' . $page_id . ',REPLACE(IFNULL(NULLIF(sfRule.pages,""),sfRule.page)," ",""))');
+                $q->where('1=1 AND FIND_IN_SET('.$page_id.',REPLACE(IFNULL(NULLIF(sfRule.pages,""),sfRule.page)," ",""))');
             } else {
                 $q->where(['sfRule.page' => $page_id]);
             }
@@ -709,7 +702,6 @@ class SeoFilter
                     }
                 }
             }
-
         }
 
         uasort($aliases, function ($a, $b) {
@@ -720,7 +712,6 @@ class SeoFilter
         });
 
         return $aliases;
-
     }
 
 
@@ -732,7 +723,7 @@ class SeoFilter
         if ($page) {
             $q->where(['active' => 1]);
             if ($this->config['proMode']) {
-                $q->where('1=1 AND FIND_IN_SET(' . $page . ',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+                $q->where('1=1 AND FIND_IN_SET('.$page.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
                 //                $q->where(array('(page = '.$page.') OR (1 = 1 AND FIND_IN_SET('.$page.',pages))'));
             } else {
                 $q->where(['page' => $page]);
@@ -764,7 +755,6 @@ class SeoFilter
                         }
                     }
                 }
-
                 //$this->modx->log(modx::LOG_LEVEL_ERROR, print_r($fields,1));
             }
             $fields = array_diff($fields, $delfields);
@@ -788,7 +778,7 @@ class SeoFilter
      *
      * @return array $array Two nested arrays With placeholders and values
      * @var string $prefix
-     * @var array  $array With keys and values
+     * @var array $array With keys and values
      */
     public function makePlaceholders(array $array = [], $prefix = '')
     {
@@ -798,10 +788,10 @@ class SeoFilter
         ];
         foreach ($array as $k => $v) {
             if (is_array($v)) {
-                $result = array_merge_recursive($result, $this->makePlaceholders($v, $prefix . $k . '.'));
+                $result = array_merge_recursive($result, $this->makePlaceholders($v, $prefix.$k.'.'));
             } else {
-                $result['pl'][$prefix . $k] = '[[+' . $prefix . $k . ']]';
-                $result['vl'][$prefix . $k] = $v;
+                $result['pl'][$prefix.$k] = '[[+'.$prefix.$k.']]';
+                $result['vl'][$prefix.$k] = $v;
             }
         }
 
@@ -826,10 +816,10 @@ class SeoFilter
         foreach ($params as $param => $value) {
             //замены для корректности URL, как и в JS для хэша
             $value = str_replace(array_keys($specialChars), array_values($specialChars), $value);
-            $urls[] = $param . '=' . $value;
+            $urls[] = $param.'='.$value;
         }
 
-        return '?' . implode('&', $urls);
+        return '?'.implode('&', $urls);
     }
 
     public function clearSuffixes($url = '')
@@ -865,7 +855,7 @@ class SeoFilter
                         $q->select('alias');
                         $alias = $this->modx->getValue($q->prepare());
                         if ($pageUrl != $fullUrl) {
-                            $pageUrl .= '/' . $alias;
+                            $pageUrl .= '/'.$alias;
                         }
                     }
                     $findUrl = $this->clearSuffixes(trim(str_replace($pageUrl, '', $fullUrl), '/'));
@@ -900,7 +890,7 @@ class SeoFilter
                 if ($this->config['crumbsReplace']) {
                     $crumb_array = $this->getCrumbs($pageId);
                     if ($findUrl) {
-                        $meta['link_url'] = $meta['url'] . $this->config['url_suffix'];
+                        $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
                         $crumb_array['sflink'] = $meta['link'];
                         $crumb_array['sfurl'] = $meta['link_url'];
                     }
@@ -993,8 +983,8 @@ class SeoFilter
                             $q->innerJoin('sfField', 'sfField', 'sfField.id = sfDictionary.field_id');
                             $q->where(['sfDictionary.active' => 1, 'sfField.alias' => $param]);
                             if ($this->config['proMode'] && strpos($value, ',') === false) {
-                                $q->where('1=1 AND FIND_IN_SET("' . str_replace(',', '&',
-                                        $value) . '",REPLACE(REPLACE(sfDictionary.input,",","&"),"||",","))');
+                                $q->where('1=1 AND FIND_IN_SET("'.str_replace(',', '&',
+                                        $value).'",REPLACE(REPLACE(sfDictionary.input,",","&"),"||",","))');
                             } else {
                                 $q->where(['sfDictionary.input' => $value]);
                             }
@@ -1026,7 +1016,6 @@ class SeoFilter
                                     unset($base_params[$param]);
                                 }
                             }
-
                         }
                     }
                     foreach ($diff_params as $param => $value) {
@@ -1035,8 +1024,8 @@ class SeoFilter
                             $q->innerJoin('sfField', 'sfField', 'sfField.id = sfDictionary.field_id');
                             $q->where(['sfDictionary.active' => 1, 'sfField.alias' => $param]);
                             if ($this->config['proMode'] && strpos($value, ',') === false) {
-                                $q->where('1=1 AND FIND_IN_SET("' . str_replace(',', '&',
-                                        $value) . '",REPLACE(REPLACE(sfDictionary.input,",","&"),"||",","))');
+                                $q->where('1=1 AND FIND_IN_SET("'.str_replace(',', '&',
+                                        $value).'",REPLACE(REPLACE(sfDictionary.input,",","&"),"||",","))');
                             } else {
                                 $q->where(['sfDictionary.input' => $value]);
                             }
@@ -1099,7 +1088,6 @@ class SeoFilter
                             $diff = $data['data'];
                         }
                         $diff = array_merge($diff, $diff_fields);
-
                     } else {
                         $diff = array_merge($diff, array_merge($base_params, $diff_params));
                     }
@@ -1109,7 +1097,7 @@ class SeoFilter
                     $meta['find'] = 0;
                     $meta['full_url'] = $this->modx->makeUrl($pageId, '', '', '-1');
                 } else {
-                    $meta['link_url'] = $meta['url'] . $this->config['url_suffix'];
+                    $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
                 }
 
 
@@ -1134,15 +1122,15 @@ class SeoFilter
                             $q->where(['id' => $pageId]);
                             $q->select('alias');
                             $alias = $this->modx->getValue($q->prepare());
-                            $meta['url'] = '/' . $alias . $this->config['between_urls'] . $meta['url'] . $this->config['url_suffix'];
+                            $meta['url'] = '/'.$alias.$this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
                         } else {
-                            $meta['url'] = '/' . $meta['url'] . $this->config['url_suffix'];
+                            $meta['url'] = '/'.$meta['url'].$this->config['url_suffix'];
                         }
                     } else {
-                        $meta['url'] = $this->config['between_urls'] . $meta['url'] . $this->config['url_suffix'];
+                        $meta['url'] = $this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
                     }
                     $meta['full_url'] = $this->clearSuffixes($this->modx->makeUrl($pageId, '', '',
-                            '-1')) . $meta['url'];
+                            '-1')).$meta['url'];
                 } else {
                     if ($pageId == $this->config['site_start']) {
                         $meta['url'] = '';
@@ -1158,7 +1146,7 @@ class SeoFilter
                         if ($diff[$this->config['page_key']] == 1) {
                             unset($diff[$this->config['page_key']]);
                         } else {
-                            $page_part = $this->pdo->parseChunk('@INLINE ' . $this->config['page_tpl'], [
+                            $page_part = $this->pdo->parseChunk('@INLINE '.$this->config['page_tpl'], [
                                 'pageVarKey'              => $this->config['page_key'],
                                 'pagevarkey'              => $this->config['page_key'],
                                 $this->config['page_key'] => $diff[$this->config['page_key']]
@@ -1310,7 +1298,7 @@ class SeoFilter
             //            $q->sortby('sfUrlWord.priority','ASC');
         }
         if (count($field_word)) {
-            $q->having('levels = ' . count($field_word));
+            $q->having('levels = '.count($field_word));
         }
         if ($q->prepare() && $q->stmt->execute()) {
             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -1511,7 +1499,6 @@ class SeoFilter
                                 }
                                 break;
                         }
-
                     } else {
                         $check++;
                     }
@@ -1533,8 +1520,8 @@ class SeoFilter
     /**
      * DEPRECATED METHOD
      *
-     * @param array $params_keys
-     * @param int   $page_id
+     * @param  array  $params_keys
+     * @param  int  $page_id
      *
      * @return int
      */
@@ -1547,17 +1534,17 @@ class SeoFilter
         $q = $this->modx->newQuery('sfFieldIds');
         $q->limit(0);
         $shift = array_shift($params);
-        $q->innerJoin('sfField', 'sfField', 'sfFieldIds.field_id = sfField.id AND sfField.alias = "' . $shift . '"');
+        $q->innerJoin('sfField', 'sfField', 'sfFieldIds.field_id = sfField.id AND sfField.alias = "'.$shift.'"');
         if (count($params)) {
             foreach ($params as $key => $alias) {
-                $q->innerJoin('sfFieldIds', 'sfFieldIds' . $key,
-                    'sfFieldIds.multi_id = sfFieldIds' . $key . '.multi_id ');
-                $q->innerJoin('sfField', 'sfField' . $key,
-                    'sfFieldIds' . $key . '.field_id = sfField' . $key . '.id AND sfField' . $key . '.alias = "' . $alias . '"');
+                $q->innerJoin('sfFieldIds', 'sfFieldIds'.$key,
+                    'sfFieldIds.multi_id = sfFieldIds'.$key.'.multi_id ');
+                $q->innerJoin('sfField', 'sfField'.$key,
+                    'sfFieldIds'.$key.'.field_id = sfField'.$key.'.id AND sfField'.$key.'.alias = "'.$alias.'"');
             }
         }
         $q->innerJoin('sfRule', 'sfRule',
-            'sfFieldIds.multi_id = sfRule.id AND sfRule.active = 1 AND sfRule.page = ' . $page_id);
+            'sfFieldIds.multi_id = sfRule.id AND sfRule.active = 1 AND sfRule.page = '.$page_id);
         $q->sortby('sfRule.rank', 'ASC');
         $q->select(['sfFieldIds.*', 'sfField.alias', 'sfRule.base']);
         if ($q->prepare() && $q->stmt->execute()) {
@@ -1649,10 +1636,10 @@ class SeoFilter
                             $word_array[$tmp_key] = $tmp_array;
                         }
                         $word_array[str_replace('value', $alias, $tmp_key)] = $tmp_array;
-                        $word_array[$alias . '_input'] = $word_array['input'];
-                        $word_array[$alias . '_alias'] = $word_array['alias'];
-                        $word_array[$alias . '_word'] = $word_id;
-                        $word_array['m_' . $alias] = $word_array['m_' . $alias . '_i'];
+                        $word_array[$alias.'_input'] = $word_array['input'];
+                        $word_array[$alias.'_alias'] = $word_array['alias'];
+                        $word_array[$alias.'_word'] = $word_id;
+                        $word_array['m_'.$alias] = $word_array['m_'.$alias.'_i'];
                     }
 
                     $params_to_text[$param] = [
@@ -1715,10 +1702,10 @@ class SeoFilter
                                     $c->where(['input:<' => $values[0], 'AND:input:>' => $values[1]]);
                                     break;
                                 case 6:
-                                    $c->where(['input:NOT LIKE' => '%' . $value . '%']);
+                                    $c->where(['input:NOT LIKE' => '%'.$value.'%']);
                                     break;
                                 case 7:
-                                    $c->where(['input:LIKE' => '%' . $value . '%']);
+                                    $c->where(['input:LIKE' => '%'.$value.'%']);
                                     break;
                             }
                             if ($c->prepare() && $c->stmt->execute()) {
@@ -1767,7 +1754,7 @@ class SeoFilter
                 foreach ($nested as $link) {
                     $link['url'] = $link['new_url'] ?: $link['old_url'];
                     $link['sflink'] = $link['link'];
-                    $link['sfurl'] = $link['url'] . $this->config['url_suffix'];
+                    $link['sfurl'] = $link['url'].$this->config['url_suffix'];
                     $meta['nested'][] = $link;
                 }
                 $meta['nested'] = $ajax
@@ -1852,7 +1839,7 @@ class SeoFilter
                     if (strpos($text, '@INLINE') !== false) {
                         $tpl = $text;
                     } else {
-                        $tpl = '@INLINE ' . $text;
+                        $tpl = '@INLINE '.$text;
                     }
                     $meta[$tag] = $this->pdo->getChunk($tpl, $word_array);
                 }
@@ -1881,7 +1868,7 @@ class SeoFilter
                     $properties = [];
                     $array_word = [];
                     foreach ($word_array as $key => $val) {
-                        $array_word['$' . $key] = "'" . $val . "'";
+                        $array_word['$'.$key] = "'".$val."'";
                     }
                     uksort($array_word, function ($a, $b) {
                         if (strlen($a) == strlen($b)) {
@@ -1896,7 +1883,6 @@ class SeoFilter
                     $meta[$prop] = $properties;
                 }
             }
-
         }
         $diff = [];
         if (!empty($url_array['diff'])) {
@@ -1971,7 +1957,7 @@ class SeoFilter
                 case 'msProductData':
                 case 'modResource':
                 case 'msProductOption':
-                    $fw = $field['class'] . '.' . $field['key'];
+                    $fw = $field['class'].'.'.$field['key'];
                     if ($field['class'] == 'msProductData') {
                         $innerJoin['msProductData'] = [
                             'class' => 'msProductData',
@@ -1979,23 +1965,23 @@ class SeoFilter
                         ];
                     }
                     if ($field['class'] == 'msProductOption') {
-                        $innerJoin['msOption' . $field['key']] = [
+                        $innerJoin['msOption'.$field['key']] = [
                             'class' => 'msProductOption',
-                            'on'    => 'msOption' . $field['key'] . '.product_id = modResource.id'
+                            'on'    => 'msOption'.$field['key'].'.product_id = modResource.id'
                         ];
-                        $fields_where['msOption' . $field['key'] . '.key'] = $field['key'];
-                        $fw = 'msOption' . $field['key'] . '.value';
+                        $fields_where['msOption'.$field['key'].'.key'] = $field['key'];
+                        $fw = 'msOption'.$field['key'].'.value';
                     }
                     if ($field['slider']) {
                         $slider = explode($this->config['values_delimeter'], $params[$field_alias]);
-                        $fields_where[$fw . ':>='] = $slider[0];
+                        $fields_where[$fw.':>='] = $slider[0];
                         if ($slider[1]) {
-                            $fields_where[$fw . ':<='] = $slider[1];
+                            $fields_where[$fw.':<='] = $slider[1];
                         }
                     } else {
                         $values = explode($this->config['values_delimeter'], $params[$field_alias]);
                         if (!isset($count_where[$fw])) {
-                            $fields_where[$fw . ':IN'] = $values;
+                            $fields_where[$fw.':IN'] = $values;
                         }
                     }
                     break;
@@ -2003,15 +1989,15 @@ class SeoFilter
                     $addTVs[] = $field['key'];
                     if (strtolower($field['xpdo_package']) == 'tvsuperselect') {
                         $this->pdo->setConfig(['loadModels' => 'tvsuperselect']);
-                        $innerJoin['tvssOption' . $field['key']] = [
+                        $innerJoin['tvssOption'.$field['key']] = [
                             'class' => 'tvssOption',
-                            'on'    => 'tvssOption' . $field['key'] . '.resource_id = modResource.id'
+                            'on'    => 'tvssOption'.$field['key'].'.resource_id = modResource.id'
                         ];
-                        $fields_where['tvssOption' . $field['key'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
+                        $fields_where['tvssOption'.$field['key'].'.value:LIKE'] = '%'.$params[$field_alias].'%';
                     } elseif ($field['exact']) {
-                        $fields_where['TV' . $field['key'] . '.value'] = $params[$field_alias];
+                        $fields_where['TV'.$field['key'].'.value'] = $params[$field_alias];
                     } else {
-                        $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $params[$field_alias] . '%';
+                        $fields_where['TV'.$field['key'].'.value:LIKE'] = '%'.$params[$field_alias].'%';
                     }
                     break;
                 case 'msVendor':
@@ -2020,7 +2006,7 @@ class SeoFilter
                         'on'    => 'msProductData.id = modResource.id'
                     ];
                     $innerJoin['msVendor'] = ['class' => 'msVendor', 'on' => 'msVendor.id = msProductData.vendor'];
-                    $fields_where[$field['class'] . '.id'] = $params[$field_alias];
+                    $fields_where[$field['class'].'.id'] = $params[$field_alias];
                     break;
                 default:
                     break;
@@ -2134,7 +2120,7 @@ class SeoFilter
                             'on'    => 'msProductOption.product_id = modResource.id'
                         ];
                     }
-                    $sortby = $class . '.' . $choose_alias;
+                    $sortby = $class.'.'.$choose_alias;
                 } else {
                     if (strpos($choose, '=')) {
                         $chooses = explode('=', $choose);
@@ -2143,12 +2129,12 @@ class SeoFilter
                     } else {
                         $choose_alias = $choose;
                     }
-                    $sortby = 'modResource.' . $choose_alias;
+                    $sortby = 'modResource.'.$choose_alias;
                 }
 
                 foreach (['max' => 'DESC', 'min' => 'ASC'] as $m => $sort) {
                     if ($m == 'min') {
-                        $where = array_merge($where, [$sortby . ':>' => 0]);
+                        $where = array_merge($where, [$sortby.':>' => 0]);
                     }
                     $this->pdo->setConfig([
                         'showLog'    => 0,
@@ -2166,10 +2152,9 @@ class SeoFilter
 
                     if ($run = $this->pdo->run()) {
                         foreach ($run[0] as $key => $value) {
-                            $min_max_array[$m . '_' . $choose_alias . '_' . $key] = $value;
+                            $min_max_array[$m.'_'.$choose_alias.'_'.$key] = $value;
                         }
                     }
-
                 }
             }
 
@@ -2249,8 +2234,8 @@ class SeoFilter
             $q->limit(1);
             $q->where(['field_id' => $field_id, 'active' => 1]);
             if ($this->config['proMode'] && strpos($input, ',') === false && $ajax) {
-                $q->where('1=1 AND FIND_IN_SET("' . str_replace(',', '&',
-                        $input) . '",REPLACE(REPLACE(input,",","&"),"||",","))');
+                $q->where('1=1 AND FIND_IN_SET("'.str_replace(',', '&',
+                        $input).'",REPLACE(REPLACE(input,",","&"),"||",","))');
             } else {
                 $q->where(['input' => $input]);
             }
@@ -2291,7 +2276,7 @@ class SeoFilter
                         $otherProps = ['processors_path' => $this->config['processorsPath']];
                         $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
                         if ($response->isError()) {
-                            $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] ' . print_r($response->response, 1));
+                            $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '.print_r($response->response, 1));
                             $this->modx->error->reset();
                         } else {
                             $word = $response->response['object'];
@@ -2332,7 +2317,7 @@ class SeoFilter
             $array_diff = array_diff($system, $page_keys);
             foreach ($array_diff as $tag => $tvname) {
                 if ($tvvalue = $page->getTVValue($tvname)) {
-                    $tpl = '@INLINE ' . $tvvalue;
+                    $tpl = '@INLINE '.$tvvalue;
                     $meta[$tag] = $this->pdo->getChunk($tpl, $variables);
                     unset($system[$tag]);
                 }
@@ -2342,9 +2327,9 @@ class SeoFilter
                     if (strpos($tagname, '@INLINE') !== false) {
                         $tpl = $tagname;
                     } elseif (strpos($tagname, '[') !== false || strpos($tagname, '{') !== false) {
-                        $tpl = '@INLINE ' . $tagname;
+                        $tpl = '@INLINE '.$tagname;
                     } else {
-                        $tpl = '@INLINE ' . $page->get($tagname);
+                        $tpl = '@INLINE '.$page->get($tagname);
                     }
                     $meta[$tag] = $this->pdo->getChunk($tpl, $variables);
                 }
@@ -2355,7 +2340,6 @@ class SeoFilter
                 $q->select('file_extensions');
                 $this->config['this_page_suffix'] = $this->modx->getValue($q->prepare());
             }
-
         }
 
         if (isset($meta['title'])) {
@@ -2393,7 +2377,7 @@ class SeoFilter
                 : unserialize($tmp, ['allowed_classes' => false]);
             if (!is_array($tmp)) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,
-                    '[SeoFilter]: Preparation snippet must return an array, instead of "' . gettype($tmp) . '"');
+                    '[SeoFilter]: Preparation snippet must return an array, instead of "'.gettype($tmp).'"');
             } else {
                 $row = array_merge($row, $tmp);
             }
@@ -2500,7 +2484,7 @@ class SeoFilter
                 }
             }
 
-            $link = $this->pdo->getChunk('@INLINE ' . $link_tpl, $all_words);
+            $link = $this->pdo->getChunk('@INLINE '.$link_tpl, $all_words);
         }
 
         $processorProps = [
@@ -2513,10 +2497,10 @@ class SeoFilter
             'link'       => $link
         ];
 
-        $otherProps = ['processors_path' => $this->config['corePath'] . 'processors/'];
+        $otherProps = ['processors_path' => $this->config['corePath'].'processors/'];
         $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
         if ($response->isError()) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]: ' . print_r($response->getMessage(), 1));
+            $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]: '.print_r($response->getMessage(), 1));
             $this->modx->error->reset();
         } else {
             $url = $response->response['object'];
@@ -2542,8 +2526,8 @@ class SeoFilter
     /**
      * DEPRECATED METHOD
      *
-     * @param string $value
-     * @param array  $field
+     * @param  string  $value
+     * @param  array  $field
      *
      * @return string
      */
@@ -2556,9 +2540,9 @@ class SeoFilter
             $url = $value;
         } else {
             if ($field['valuefirst']) {
-                $url = $value . $this->config['separator'] . $alias;
+                $url = $value.$this->config['separator'].$alias;
             } else {
-                $url = $alias . $this->config['separator'] . $value;
+                $url = $alias.$this->config['separator'].$value;
             }
         }
         return $url;
@@ -2581,7 +2565,7 @@ class SeoFilter
                 //               $url_link = $this->pdo->getChunk($tpl, $aliases);
                 $url_link = $rule['url'];
                 foreach ($aliases as $key => $value) {
-                    $url_link = str_replace('{$' . $key . '}', $value, $url_link);
+                    $url_link = str_replace('{$'.$key.'}', $value, $url_link);
                 }
                 if ($url_array = $this->pdo->getArray('sfUrls', ['page_id' => $page_id, 'old_url' => $url_link])) {
                     if ($url_array['active']) {
@@ -2607,7 +2591,6 @@ class SeoFilter
                     $url['url'] = $url_link;
                     //$this->modx->log(modx::LOG_LEVEL_ERROR, 'SeoFilter: сработало условие и создан УРЛ '.$url_link);
                 }
-
             }
         } else {
             $total = 1;
@@ -2616,7 +2599,7 @@ class SeoFilter
                 if ($total == 1) {
                     $url['url'] .= '?';
                 }
-                $url['url'] .= $param . '=' . $alias;
+                $url['url'] .= $param.'='.$alias;
                 if ($total != $count) {
                     $url['url'] .= '&';
                 }
@@ -2633,7 +2616,7 @@ class SeoFilter
         $registry = $this->modx->getService('registry', 'registry.modRegistry')
             ->getRegister('user', 'registry.modDbRegister');
         $registry->connect();
-        $registry->subscribe('/modstore/' . md5($key));
+        $registry->subscribe('/modstore/'.md5($key));
         if ($res = $registry->read(['poll_limit' => 1, 'remove_read' => false])) {
             return;
         }
@@ -2658,8 +2641,8 @@ class SeoFilter
                     : [],
                 'uuid'               => $this->modx->uuid,
                 'database'           => $this->modx->config['dbtype'],
-                'revolution_version' => $this->modx->version['code_name'] . '-' . $this->modx->version['full_version'],
-                'supports'           => $this->modx->version['code_name'] . '-' . $this->modx->version['full_version'],
+                'revolution_version' => $this->modx->version['code_name'].'-'.$this->modx->version['full_version'],
+                'supports'           => $this->modx->version['code_name'].'-'.$this->modx->version['full_version'],
                 'http_host'          => $this->modx->getOption('http_host'),
                 'php_version'        => XPDO_PHP_VERSION,
                 'language'           => $this->modx->getOption('manager_language'),
@@ -2729,7 +2712,7 @@ class SeoFilter
             ];
             $response = $this->modx->runProcessor('mgr/urls/remove', $processorProps, $otherProps);
             if ($response->isError()) {
-                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] ' . $response->getMessage());
+                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '.$response->getMessage());
                 $this->modx->error->reset();
             } else {
                 $success_delete = count($del_links);
@@ -2858,7 +2841,7 @@ class SeoFilter
                     if ($this->config['edit_url_mask']) {
                         $aliases = [];
                         foreach ($link['aliases'] as $alias => $value) {
-                            $aliases['{$' . $alias . '}'] = $value;
+                            $aliases['{$'.$alias.'}'] = $value;
                         }
                         $link_url = str_replace(array_keys($aliases), array_values($aliases), $url_mask);
                     } else {
@@ -2873,7 +2856,7 @@ class SeoFilter
 
                     $link_name = '';
                     if (!empty($tpl)) {
-                        $link_name = $this->pdo->getChunk('@INLINE ' . $tpl, $words);
+                        $link_name = $this->pdo->getChunk('@INLINE '.$tpl, $words);
                     }
                     unset($words);
 
@@ -2923,7 +2906,7 @@ class SeoFilter
 
         foreach ($row as $key => $val) {
             if ($key == 'id') {
-                $word[$alias . '_id'] = $val;
+                $word[$alias.'_id'] = $val;
                 continue;
             }
             if ($count_fields == 1) {
@@ -2931,10 +2914,10 @@ class SeoFilter
             }
             $word[str_replace('value', $alias, $key)] = $val;
         }
-        $word[$alias . '_input'] = $row['input'];
-        $word[$alias . '_image'] = $row['image'];
-        $word[$alias . '_alias'] = $row['alias'];
-        $word['m_' . $alias] = $row['m_value_i'];
+        $word[$alias.'_input'] = $row['input'];
+        $word[$alias.'_image'] = $row['image'];
+        $word[$alias.'_alias'] = $row['alias'];
+        $word['m_'.$alias] = $row['m_value_i'];
 
         return $word;
     }
@@ -2985,9 +2968,9 @@ class SeoFilter
                     if ($field['field_hideparam']) {
                         $word['url_part'] = $row['alias'];
                     } elseif ($field['field_valuefirst']) {
-                        $word['url_part'] = $row['alias'] . $this->config['separator'] . $alias;
+                        $word['url_part'] = $row['alias'].$this->config['separator'].$alias;
                     } else {
-                        $word['url_part'] = $alias . $this->config['separator'] . $row['alias'];
+                        $word['url_part'] = $alias.$this->config['separator'].$row['alias'];
                     }
 
                     $forMulti = [
@@ -3032,7 +3015,7 @@ class SeoFilter
         return ['words' => array_values($words1), 'fields' => $fields];
     }
 
-    public function mergeWords(& $a1 = [], & $a2 = [])
+    public function mergeWords(&$a1 = [], &$a2 = [])
     {
         $a3 = [];
         for ($i = 0; $i < count($a1); $i++) {
@@ -3044,7 +3027,7 @@ class SeoFilter
     }
 
 
-    public function wordsMultiplication(& $a1 = [], & $a2 = [])
+    public function wordsMultiplication(&$a1 = [], &$a2 = [])
     {
         $a3 = [];
         //        foreach($a1 as $i => &$word1)  {
@@ -3118,11 +3101,11 @@ class SeoFilter
                 break;
             case 6:
                 //LIKE %value%
-                $where = ['input:LIKE' => '%' . $value . '%'];
+                $where = ['input:LIKE' => '%'.$value.'%'];
                 break;
             case 7:
                 //NOT LIKE %value%
-                $where = ['input:NOT LIKE' => '%' . $value . '%'];
+                $where = ['input:NOT LIKE' => '%'.$value.'%'];
                 break;
         }
         return $where;
