@@ -10,6 +10,7 @@ $tmp = array(
     'sfOnReturnMeta',
     'sfOnBeforeUrlUpdate',
     'sfOnUrlUpdate',
+    'sfOnUrlBeforeRemove',
     'sfOnUrlRemove',
 );
 

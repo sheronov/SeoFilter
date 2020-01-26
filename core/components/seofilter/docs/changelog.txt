@@ -3,7 +3,7 @@ Changelog for SeoFilter.
 1.7.1-beta (27.01.2020)
 ======================
 - новые события на обновление SEO ссылки: sfOnBeforeUrlUpdate, sfOnUrlUpdate
-- новое событие после удаления SEO ссылки: sfOnUrlRemove
+- новые события на удаление SEO ссылки: sfOnBeforeUrlRemove, sfOnUrlRemove
 
 1.7.0-beta (21.08.2019)
 ======================

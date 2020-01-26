@@ -2,10 +2,11 @@
 
 class sfUrlsRemoveProcessor extends modObjectProcessor
 {
-    public $objectType       = 'sfUrls';
-    public $classKey         = 'sfUrls';
-    public $languageTopics   = ['seofilter'];
-    public $afterRemoveEvent = 'sfOnUrlRemove';
+    public $objectType        = 'sfUrls';
+    public $classKey          = 'sfUrls';
+    public $languageTopics    = ['seofilter'];
+    public $beforeRemoveEvent = 'sfOnUrlBeforeRemove';
+    public $afterRemoveEvent  = 'sfOnUrlRemove';
     //public $permission = 'remove';
 
 
@@ -29,11 +30,29 @@ class sfUrlsRemoveProcessor extends modObjectProcessor
                 return $this->failure($this->modx->lexicon('seofilter_url_err_nf'));
             }
 
+            $preventRemoval = $this->fireBeforeRemoveEvent($object);
+            if (!empty($preventRemoval)) {
+                return $this->failure($preventRemoval);
+            }
             $object->remove();
             $this->fireAfterRemoveEvent($id, $object);
         }
 
         return $this->success();
+    }
+
+    public function fireBeforeRemoveEvent($object)
+    {
+        $preventRemove = false;
+        if (!empty($this->beforeRemoveEvent)) {
+            $response = $this->modx->invokeEvent($this->beforeRemoveEvent, [
+                'id'              => $object->get('id'),
+                $this->objectType => &$object,
+                'object'          => &$object,
+            ]);
+            $preventRemove = $this->processEventResponse($response);
+        }
+        return $preventRemove;
     }
 
     public function fireAfterRemoveEvent($id, $object = null)
