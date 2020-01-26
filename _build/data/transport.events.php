@@ -7,7 +7,10 @@ $tmp = array(
     'sfOnWordAdd',
     'sfOnBeforeUrlAdd',
     'sfOnUrlAdd',
-    'sfOnReturnMeta'
+    'sfOnReturnMeta',
+    'sfOnBeforeUrlUpdate',
+    'sfOnUrlUpdate',
+    'sfOnUrlRemove',
 );
 
 foreach ($tmp as $k => $v) {

@@ -1,8 +1,9 @@
 Changelog for SeoFilter.
 
-1.7.1-beta (12.12.2019)
+1.7.1-beta (27.01.2020)
 ======================
-- some fixes for php 5.4
+- new events for updating SEO link: sfOnBeforeUrlUpdate, sfOnUrlUpdate
+- the new event after deleting SEO link: sfOnUrlRemove
 
 1.7.0-beta (21.08.2019)
 ======================
