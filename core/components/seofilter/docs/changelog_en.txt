@@ -1,9 +1,12 @@
 Changelog for SeoFilter.
 
-1.7.1-beta (27.01.2020)
+1.7.1-beta (29.01.2020)
 ======================
+- PRO-mode: all fields from linked page passed like array $resource (and $original_page) to rules for using {$resource.pagetitle} instead of {$id|resource:'pagetitle'} in each field
 - new events for updating SEO link: sfOnBeforeUrlUpdate, sfOnUrlUpdate
 - new events for deleting SEO link: sfOnBeforeUrlRemove, sfOnUrlRemove
+- added view button when editing SEO links on a separate page
+- fix to work on PHP 5.4 (but recommended 5.6+)
 
 1.7.0-beta (21.08.2019)
 ======================

@@ -15,31 +15,45 @@ SeoFilter.page.Seoedit = function (config) {
 };
 Ext.extend(SeoFilter.page.Seoedit, MODx.Component, {
 
-    cancel: function(btn,e) {
+    cancel: function (btn, e) {
         var fp = Ext.getCmp(this.config.formpanel);
         MODx.loadPage('?');
     },
 
-    getButtons: function(cfg) {
+    preview: function (btn, e) {
+        if(this.config.record.hasOwnProperty('url_preview')) {
+            document.location.href = this.config.record['url_preview'];
+        } else {
+            this.cancel();
+        }
+    },
+
+    getButtons: function (cfg) {
         var btns = [];
         btns.push({
             process: 'mgr/urls/update'
-            ,url: SeoFilter.config.connector_url
-            ,text: _('save')
-            ,id: 'seoedit-btn-save'
-            ,cls: 'primary-button'
-            ,method: 'remote'
+            , url: SeoFilter.config.connector_url
+            , text: _('save')
+            , id: 'seoedit-btn-save'
+            , cls: 'primary-button'
+            , method: 'remote'
             //,checkDirty: MODx.request.reload ? false : true
-            ,keys: [{
+            , keys: [{
                 key: MODx.config.keymap_save || 's'
-                ,ctrl: true
+                , ctrl: true
             }]
         });
         btns.push({
             text: _('cancel')
-            ,id: 'modx-abtn-cancel'
-            ,handler: this.cancel
-            ,scope: this
+            , id: 'modx-abtn-cancel'
+            , handler: this.cancel
+            , scope: this
+        });
+        btns.push({
+            text: '<i class="icon icon-eye"></i>'
+            , id: 'modx-abtn-preview'
+            , handler: this.preview
+            , scope: this
         });
         return btns;
     }

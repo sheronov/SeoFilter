@@ -62,6 +62,30 @@ class SeoFilterSeoeditManagerController extends modExtraManagerController
                     }
                 }
 
+                $pageId = $url->get('page_id');
+                if (!($seoUrl = $url->get('new_url'))) {
+                    $seoUrl = $url->get('old_url');
+                }
+                $pageUrl = $this->modx->makeUrl($url->get('page_id'), '', '', 'full');
+                $url_suffix = $this->SeoFilter->config['url_suffix'];
+                $between_urls = $this->SeoFilter->config['between_urls'];
+
+                $pageUrl = $this->SeoFilter->clearSuffixes($pageUrl);
+                if ((int)$this->SeoFilter->config['site_start'] === (int)$url->get('page_id')) {
+                    if ($this->SeoFilter->config['main_alias']) {
+                        $q = $this->modx->newQuery('modResource', ['id' => $url->get('page_id')]);
+                        $q->select('alias');
+                        $malias = $this->modx->getValue($q->prepare());
+                        $urlPreview = $pageUrl.'/'.$malias.$between_urls.$seoUrl.$url_suffix;
+                    } else {
+                        $urlPreview = $pageUrl.'/'.$seoUrl.$url_suffix;
+                    }
+                } else {
+                    $urlPreview = $pageUrl.$between_urls.$seoUrl.$url_suffix;
+                }
+
+                $this->urlArray['url_preview'] = $urlPreview;
+
 
 //                $this->urlArray['properties'] = $this->modx->toJSON($this->urlArray['properties']);
 //                $this->urlArray['introtexts'] = $this->modx->toJSON($this->urlArray['properties']);

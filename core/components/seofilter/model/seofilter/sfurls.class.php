@@ -3,19 +3,22 @@
 class sfUrls extends xPDOSimpleObject
 {
 
-    public function makeUrl(string $seoUrl, string $pageUrl, string $pageId, array $config = [])
+    public function makeUrl($seoUrl, $pageUrl, $pageId, $config = [])
     {
-        $config['betweenUrls'] = $config['betweenUrls'] ?? '/';
-        $config['urlSuffix'] = $config['urlSuffix'] ?? '';
+        $config['betweenUrls'] = empty($config['betweenUrls']) ? '/' : $config['betweenUrls'];
+        $config['urlSuffix'] = empty($config['urlSuffix']) ? '' : $config['urlSuffix'];
+        $possibleSuffixes = empty($config['possibleSuffixes']) ? [] : $config['possibleSuffixes'];
 
-        foreach ($config['possibleSuffixes'] ?? [] as $possibleSuffix) {
+        foreach ($possibleSuffixes as $possibleSuffix) {
             if (substr($pageUrl, -strlen($possibleSuffix)) === $possibleSuffix) {
                 $pageUrl = substr($pageUrl, 0, -strlen($possibleSuffix));
             }
         }
 
-        if (($config['siteStart'] ?? 1) === $pageId) {
-            if ($config['mainAlias'] ?? 0) {
+        $config['siteStart'] = empty($config['siteStart']) ? 1 : $config['siteStart'];
+        if ((int)$config['siteStart'] === (int)$pageId) {
+            $config['mainAlias'] = empty($config['mainAlias']) ? 0 : $config['mainAlias'];
+            if ($config['mainAlias']) {
                 $q = $this->xpdo->newQuery('modResource', ['id' => $pageId]);
                 $q->select('alias');
                 $mainAlias = $this->xpdo->getValue($q->prepare());

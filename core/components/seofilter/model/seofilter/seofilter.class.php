@@ -1833,6 +1833,15 @@ class SeoFilter
                 }
             }
 
+            if ($this->config['proMode'] && $pageObject = $this->modx->getObject('modResource', $page_id)) {
+                if (!isset($word_array['resource'])) {
+                    $word_array['resource'] = $pageObject->toArray();
+                }
+                if (!isset($word_array['original_page'])) {
+                    $word_array['original_page'] = $pageObject->toArray();
+                }
+            }
+
 
             foreach ($seo_array as $tag => $text) {
                 if ($text) {

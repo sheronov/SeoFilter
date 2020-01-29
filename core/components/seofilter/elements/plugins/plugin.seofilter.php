@@ -1,21 +1,22 @@
 <?php
 /** @var modX $modx */
+
 /** @var array $scriptProperties */
 switch ($modx->event->name) {
     case 'OnLoadWebDocument':
         if ((int)$page = $modx->resource->id) {
-            $modx->addPackage('seofilter', $modx->getOption('core_path') . 'components/seofilter/model/');
+            $modx->addPackage('seofilter', $modx->getOption('core_path').'components/seofilter/model/');
             $proMode = $modx->getOption('seofilter_pro_mode', null, 0, true);
             $q = $modx->newQuery('sfRule');
             $q->where(['active' => 1]);
             if ($proMode) {
-                $q->where('1=1 AND FIND_IN_SET(' . $page . ',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+                $q->where('1=1 AND FIND_IN_SET('.$page.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
             } else {
                 $q->where(['page' => $page]);
             }
             if ($modx->getCount('sfRule', $q)) {
                 $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
-                        $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/',
+                        $modx->getOption('core_path').'components/seofilter/').'model/seofilter/',
                     $scriptProperties);
                 if (!($SeoFilter instanceof SeoFilter)) {
                     break;
@@ -43,7 +44,7 @@ switch ($modx->event->name) {
         $before = [];
         if ($mode === 'upd') {
             $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
-                    $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+                    $modx->getOption('core_path').'components/seofilter/').'model/seofilter/', $scriptProperties);
             if (!($SeoFilter instanceof SeoFilter)) {
                 break;
             }
@@ -52,7 +53,6 @@ switch ($modx->event->name) {
 
             $fields = $SeoFilter->getFieldsKey();
             $before = $SeoFilter->getResourceData($resource->id, $fields);
-
         }
         $_SESSION['SeoFilter']['before'] = $before;
         //        @session_write_close();
@@ -72,7 +72,7 @@ switch ($modx->event->name) {
 
         $sf_count = $modx->getOption('seofilter_count', null, 0, true);
         $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
-                $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+                $modx->getOption('core_path').'components/seofilter/').'model/seofilter/', $scriptProperties);
         $pdo = $SeoFilter->pdo;
         if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) {
             break;
@@ -84,9 +84,9 @@ switch ($modx->event->name) {
 
         if (array_key_exists('tagger', $fields)) {
             $taggerPath = $modx->getOption('tagger.core_path', null,
-                $modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/tagger/');
+                $modx->getOption('core_path', null, MODX_CORE_PATH).'components/tagger/');
             /** @var Tagger $tagger */
-            $tagger = $modx->getService('tagger', 'Tagger', $taggerPath . 'model/tagger/',
+            $tagger = $modx->getService('tagger', 'Tagger', $taggerPath.'model/tagger/',
                 ['core_path' => $taggerPath]);
             if (($tagger instanceof Tagger)) {
                 $q = $modx->newQuery('TaggerGroup');
@@ -94,11 +94,11 @@ switch ($modx->event->name) {
                 $q->select('id,alias');
                 if ($q->prepare() && $q->stmt->execute()) {
                     while ($group = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                        if ($resource->get('tagger-' . $group['id'])) {
+                        if ($resource->get('tagger-'.$group['id'])) {
                             if (array_key_exists($group['id'], $fields['tagger'])) {
-                                $after['tagger'][$group['id']] = $tagger->explodeAndClean($resource->get('tagger-' . $group['id']));
+                                $after['tagger'][$group['id']] = $tagger->explodeAndClean($resource->get('tagger-'.$group['id']));
                             } else {
-                                $after['tagger'][$group['alias']] = $tagger->explodeAndClean($resource->get('tagger-' . $group['id']));
+                                $after['tagger'][$group['alias']] = $tagger->explodeAndClean($resource->get('tagger-'.$group['id']));
                             }
                         }
                     }
@@ -162,7 +162,6 @@ switch ($modx->event->name) {
                                 //здесь пересчитали только новые значения
                             }
                         }
-
                     }
                 }
             }
@@ -203,7 +202,7 @@ switch ($modx->event->name) {
         if (isset($_REQUEST[$alias])) {
             /** @var SeoFilter $SeoFilter */
             $SeoFilter = $modx->getService('seofilter', 'SeoFilter', $modx->getOption('seofilter_core_path', null,
-                    $modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', $scriptProperties);
+                    $modx->getOption('core_path').'components/seofilter/').'model/seofilter/', $scriptProperties);
             $pdo = $SeoFilter->pdo;
             if (!($SeoFilter instanceof SeoFilter) && !($pdo instanceof pdoFetch)) {
                 break;
@@ -262,7 +261,9 @@ switch ($modx->event->name) {
                     }
                     $pages = array_map('trim', explode(',', $pages));
                     $page_ids[$row['id']] = $pages;
-                    $all_pages = array_merge($all_pages, $pages);
+                    foreach ($pages as $linkedPageId) {
+                        $all_pages[] = $linkedPageId;
+                    }
                 }
             }
             $all_pages = array_unique($all_pages);
@@ -282,7 +283,7 @@ switch ($modx->event->name) {
             if ($q->prepare() && $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     $uri = $SeoFilter->clearSuffixes($row['uri']);
-                    if ($row['id'] == $site_start) {
+                    if ((int)$row['id'] === (int)$site_start) {
                         $uri = '';
                     }
 
@@ -296,7 +297,7 @@ switch ($modx->event->name) {
                         $alias = array_pop($uri);
                     }
 
-                    if (in_array($alias, $aliases)) {
+                    if (in_array($alias, $aliases, true)) {
                         $check_doubles = true;
                     }
                     $aliases[$row['id']] = $alias;
@@ -305,7 +306,7 @@ switch ($modx->event->name) {
 
             //обязательная сортировка массива по количеству внутренних алиасов
             uasort($uris, function ($a, $b) {
-                if (count($a) == count($b)) {
+                if (count($a) === count($b)) {
                     return 0;
                 }
                 return (count($a) > count($b)) ? -1 : 1;
@@ -333,7 +334,7 @@ switch ($modx->event->name) {
                 } elseif (array_key_exists($site_start, $aliases)) {
                     $page = $site_start;
                     if ($SeoFilter->config['main_alias']) {
-                        $upart = $aliases[$page] . $between_urls;
+                        $upart = $aliases[$page].$between_urls;
                         if (strpos($request, $upart) === 0) {
                             $tmp = explode('/', substr($request, strlen($upart)));
                         } else {
@@ -345,75 +346,75 @@ switch ($modx->event->name) {
                     //                    print_r($tmp);
                     //                    die;
                 }
-            } else {
-                if ($check_doubles) {
-                    //если есть дубли синонимов
-                    foreach ($uris as $page_id => $uri_arr) {
-                        $need_count = count($uri_arr); //сколько совпадений подряд нужно
-                        $uri_count = 0; //количество совпадений
-                        $pos_count = false; //позиция, на которой произошло сопадение
-                        $check_break = false; //проверка, чтобы в разнобой не пошло
-                        foreach ($r_tmp as $t_key => $t_alias) {
-                            foreach ($uri_arr as $u_key => $uri) {
-                                if ($uri == $t_alias) {
-                                    if ($pos_count !== false) {
-                                        if ($pos_count - $uri_count != $t_key) {
-                                            $check_break = true;
-                                            break;
-                                        }
-                                    } else {
-                                        $pos_count = $t_key;
+            } elseif ($check_doubles) {
+                //если есть дубли синонимов
+                foreach ($uris as $page_id => $uri_arr) {
+                    $need_count = count($uri_arr); //сколько совпадений подряд нужно
+                    $uri_count = 0; //количество совпадений
+                    $pos_count = false; //позиция, на которой произошло сопадение
+                    $check_break = false; //проверка, чтобы в разнобой не пошло
+                    foreach ($r_tmp as $t_key => $t_alias) {
+                        foreach ($uri_arr as $u_key => $uri) {
+                            if ($uri === $t_alias) {
+                                if ($pos_count !== false) {
+                                    if ($pos_count - $uri_count !== $t_key) {
+                                        $check_break = true;
+                                        break;
                                     }
-                                    $uri_count++;
-                                    break; //выходим из перебора uri для текущего alias-а в адресе
+                                } else {
+                                    $pos_count = $t_key;
                                 }
-                            }
-                            if ($check_break) {
-                                break;
+                                $uri_count++;
+                                break; //выходим из перебора uri для текущего alias-а в адресе
                             }
                         }
-                        if ($need_count == $uri_count) {
-                            //ссылка найдена
-                            $page = $page_id;
-                            $tmp = array_slice($tmp, ++$pos_count);
+                        if ($check_break) {
                             break;
                         }
                     }
-                } else {
-                    //простой механизм поиска
-                    $tmp_id = 0;
-                    foreach ($r_tmp as $t_key => $t_alias) {
-                        foreach ($aliases as $pageId => $pageAlias) {
-                            if (strpos($pageAlias, '/') !== false && strpos($pageAlias, $t_alias) === 0) {
-                                $pageAliases = explode('/', $pageAlias);
-                                $findPage = true;
-                                foreach ($pageAliases as $pk => $pAlias) {
-                                    if ($r_tmp[$t_key + $pk] !== $pAlias) {
-                                        $findPage = false;
-                                        break;
-                                    }
+                    if ($need_count === $uri_count) {
+                        //ссылка найдена
+                        $page = $page_id;
+                        $tmp = array_slice($tmp, ++$pos_count);
+                        break;
+                    }
+                }
+            } else {
+                //простой механизм поиска
+                $tmp_id = 0;
+
+                foreach ($r_tmp as $t_key => $t_alias) {
+                    foreach ($aliases as $pageId => $pageAlias) {
+                        if (strpos($pageAlias, '/') !== false && strpos($pageAlias, $t_alias) === 0) {
+                            $pageAliases = explode('/', $pageAlias);
+                            $findPage = true;
+                            foreach ($pageAliases as $pk => $pAlias) {
+                                if ($r_tmp[$t_key + $pk] !== $pAlias) {
+                                    $findPage = false;
+                                    break;
                                 }
-                                if ($findPage) {
-                                    $page = $pageId;
-                                    $tmp_id = $t_key + $pk;
-                                    break 2;
-                                }
-                            } elseif ($t_alias === $pageAlias) {
+                            }
+                            if ($findPage) {
                                 $page = $pageId;
-                                $tmp_id = $t_key;
+                                $tmp_id = $t_key + $pk;
                                 break 2;
                             }
+                        } elseif ($t_alias === $pageAlias) {
+                            $page = $pageId;
+                            $tmp_id = $t_key;
+                            break 2;
                         }
-                        //старый метод простой проверки
-                        //                        if ($page = array_search($t_alias, $aliases)) {
-                        //                            $tmp_id = $t_key;
-                        //                            break;
-                        //                        }
                     }
-                    if ($page) {
-                        for ($i = 0; $i <= $tmp_id; $i++) {
-                            array_shift($tmp);
-                        }
+
+                    //старый метод простой проверки
+                    //                        if ($page = array_search($t_alias, $aliases)) {
+                    //                            $tmp_id = $t_key;
+                    //                            break;
+                    //                        }
+                }
+                if ($page) {
+                    for ($i = 0; $i <= $tmp_id; $i++) {
+                        array_shift($tmp);
                     }
                 }
             }
@@ -427,45 +428,44 @@ switch ($modx->event->name) {
             }
 
             if ($page) {
-                if ($page == $site_start) {
+                if ((int)$page === (int)$site_start) {
                     $url = '';
                 } else {
                     $url = $modx->makeUrl($page, $ctx, '', -1);
                 }
-                if ($modx->getOption('site_url') && $modx->getOption('site_url') !== '/' && strpos($url,
-                        $modx->getOption('site_url')) !== false) {
+                if ($modx->getOption('site_url') && $modx->getOption('site_url') !== '/'
+                    && strpos($url, $modx->getOption('site_url')) !== false) {
                     $url = str_replace($modx->getOption('site_url'), '', $url);
                 }
-                if ($c_suffix = $SeoFilter->config['container_suffix']) {
-                    if (strlen($url) && strpos($url, $c_suffix, strlen($url) - strlen($c_suffix)) !== false) {
-                        $url = substr($url, 0, -strlen($c_suffix));
-                    }
+                if (($c_suffix = $SeoFilter->config['container_suffix'])
+                    && strlen($url) && strpos($url, $c_suffix, strlen($url) - strlen($c_suffix)) !== false) {
+                    $url = substr($url, 0, -strlen($c_suffix));
                 }
                 foreach ($SeoFilter->config['possibleSuffixes'] as $possibleSuffix) {
-                    if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
+                    if (substr($url, -strlen($possibleSuffix)) === $possibleSuffix) {
                         $url = substr($url, 0, -strlen($possibleSuffix));
                     }
                 }
 
 
                 if ($between_urls === '/') {
-                    if (implode('/', array_reverse(array_diff($r_tmp, $tmp))) != trim($url, '/')) {
+                    if (implode('/', array_reverse(array_diff($r_tmp, $tmp))) !== trim($url, '/')) {
                         break;
                     }
-                } else {
-                    if ($url && (trim($url, '/') != str_replace($between_urls . implode('/', $tmp), '', $request))) {
+                } elseif ($url) {
+                    if (trim($url, '/') !== str_replace($between_urls.implode('/', $tmp), '', $request)) {
                         break;
                     }
                 }
 
                 if (!empty($SeoFilter->config['page_tpl'])) {
                     //^page-\d+$
-                    $page_part = $SeoFilter->pdo->parseChunk('@INLINE ' . $SeoFilter->config['page_tpl'], [
+                    $page_part = $SeoFilter->pdo->parseChunk('@INLINE '.$SeoFilter->config['page_tpl'], [
                         'pageVarKey'                   => $SeoFilter->config['page_key'],
                         'pagevarkey'                   => $SeoFilter->config['page_key'],
                         $SeoFilter->config['page_key'] => '\d+$'
                     ]);
-                    $page_part = '/^' . trim($page_part, '/') . '/';
+                    $page_part = '/^'.trim($page_part, '/').'/';
 
                     foreach ($tmp as $k => $s) {
                         if (preg_match($page_part, $s)) {
@@ -478,14 +478,13 @@ switch ($modx->event->name) {
                     }
                 }
 
-
                 if ($tmp && $url_array = $SeoFilter->findUrlArray(implode($SeoFilter->config['level_separator'], $tmp),
                         $page)) {
                     if ($url_array['active']) {
                         $old_url = $url_array['old_url'];
                         $new_url = $url_array['new_url'];
                         $rule_id = $url_array['multi_id'];
-                        $tofind = implode($SeoFilter->config['level_separator'], $tmp) . $url_suffix;
+                        $tofind = implode($SeoFilter->config['level_separator'], $tmp).$url_suffix;
 
 
                         if ($new_url && ($new_url != implode($SeoFilter->config['level_separator'], $tmp))) {
@@ -500,10 +499,10 @@ switch ($modx->event->name) {
                                     $q = $modx->newQuery('modResource', ['id' => $page]);
                                     $q->select('alias');
                                     $malias = $modx->getValue($q->prepare());
-                                    $new_url = $malias . $between_urls . $new_url;
+                                    $new_url = $malias.$between_urls.$new_url;
                                 }
                             }
-                            $modx->sendRedirect($url . '/' . $new_url . $url_suffix, false, 'REDIRECT_HEADER',
+                            $modx->sendRedirect($url.'/'.$new_url.$url_suffix, false, 'REDIRECT_HEADER',
                                 'HTTP/1.1 301 Moved Permanently');
                         } elseif ($url_redirect && ($url_suffix != $last_char)
                             && ((strpos($_SERVER['REQUEST_URI'],
@@ -516,8 +515,8 @@ switch ($modx->event->name) {
                                     $url = substr($url, 0, -strlen($container_suffix));
                                 }
                             }
-                            $modx->sendRedirect($url . '/' . implode($SeoFilter->config['level_separator'],
-                                    $tmp) . $url_suffix, false, 'REDIRECT_HEADER', 'HTTP/1.1 301 Moved Permanently');
+                            $modx->sendRedirect($url.'/'.implode($SeoFilter->config['level_separator'],
+                                    $tmp).$url_suffix, false, 'REDIRECT_HEADER', 'HTTP/1.1 301 Moved Permanently');
                         }
 
                         $tmp = explode($SeoFilter->config['level_separator'], $old_url);
@@ -645,11 +644,11 @@ switch ($modx->event->name) {
 
                             $SeoFilter->initialize($ctx, ['page' => $page, 'params' => $params]);
 
-                            if (is_dir($modx->getOption('core_path') . 'components/msvendorcollections/model/') && $modx->getOption('msvendorcollections_on_frontend',
-                                    null, 0)) {
+                            if (is_dir($modx->getOption('core_path').'components/msvendorcollections/model/')
+                                && $modx->getOption('msvendorcollections_on_frontend', null, 0)) {
                                 if ($msVC = $modx->getService('msvendorcollections', 'msVendorCollections',
                                     $modx->getOption('msvendorcollections_core_path', null,
-                                        $modx->getOption('core_path') . 'components/msvendorcollections/') . 'model/msvendorcollections/',
+                                        $modx->getOption('core_path').'components/msvendorcollections/').'model/msvendorcollections/',
                                     $scriptProperties)) {
                                     if (!$msVC->initialized[$ctx]) {
                                         $msVC->initialize($ctx, ['page' => $page]);
@@ -693,7 +692,6 @@ switch ($modx->event->name) {
                                 $url->save();
                             }
                         }
-
                     } else {
                         $modx->setPlaceholder('sf.seo_id', $url_array['id']);
                     }
