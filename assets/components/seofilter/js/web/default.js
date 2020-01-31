@@ -359,6 +359,8 @@ var SeoFilter = {
             var imax = fieldset.find('input:last');
             var vmin = Number(imin.attr('value'));
             var vmax = Number(imax.attr('value'));
+            var cmin = Number(imin.data('current-value'));
+            var cmax = Number(imax.data('current-value'));
             // Check for decimals
             var ival = imin.val();
             var decimal = ival.indexOf('.') != -1;
@@ -464,6 +466,9 @@ var SeoFilter = {
                         this.value = vmin;
                     }
                 }
+                if (e.type == 'change') {
+                    mSearch2.sliders[name]['user_changed'] = true;
+                }
                 $this.slider('values', 1, this.value);
             });
 
@@ -473,6 +478,17 @@ var SeoFilter = {
             }
 
             mSearch2.sliders[name]['values'] = [vmin, vmax];
+            if (!isNaN(cmin) && !isNaN(cmax)) {
+                if (cmin != 0 && cmin != vmin) {
+                    $this.slider('values', 0, cmin);
+                    imin.val(cmin);
+                }
+                if (cmax != 0 && cmax != vmax) {
+                    $this.slider('values', 1, cmax);
+                    imax.val(cmax);
+                }
+                mSearch2.sliders[name]['changed'] = mSearch2.Hash.get()[name] !== undefined;
+            }
         });
         return true;
     }

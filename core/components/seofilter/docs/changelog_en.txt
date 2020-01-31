@@ -3,6 +3,7 @@ Changelog for SeoFilter.
 1.7.2-beta (31.01.2020)
 - returned forgotten parameter "&urls" for the sfMenu (receives ids of SEO pages for creating where condition)
 - parameters "rules", "parents" and "urls" in the sfMenu now receive ids as string "1,-2,3" and as array [1,-2,3] (when Fenom)
+- fix for slider's work (when loading, sets the lower and upper boundaries taking into account other selected filters)
 
 1.7.1-beta (29.01.2020)
 ======================
