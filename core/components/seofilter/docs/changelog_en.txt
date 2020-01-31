@@ -1,5 +1,9 @@
 Changelog for SeoFilter.
 
+1.7.2-beta (31.01.2020)
+- returned forgotten parameter "&urls" for the sfMenu (receives ids of SEO pages for creating where condition)
+- parameters "rules", "parents" and "urls" in the sfMenu now receive ids as string "1,-2,3" and as array [1,-2,3] (when Fenom)
+
 1.7.1-beta (29.01.2020)
 ======================
 - PRO-mode: all fields from linked page passed like array $resource (and $original_page) to rules for using {$resource.pagetitle} instead of {$id|resource:'pagetitle'} in each field

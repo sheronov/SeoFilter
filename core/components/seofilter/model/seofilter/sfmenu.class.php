@@ -19,7 +19,7 @@ class sfMenu
     /** @var sfCountHandler $countHandler */
     public $countHandler = null;
 
-    public function __construct(modX & $modx, $config = [])
+    public function __construct(modX $modx, $config = [])
     {
         $this->modx = &$modx;
 
@@ -44,10 +44,10 @@ class sfMenu
         );
 
         $config['corePath'] = $this->modx->getOption('seofilter_core_path', $config,
-            $this->modx->getOption('core_path') . 'components/seofilter/'
+            $this->modx->getOption('core_path').'components/seofilter/'
         );
         $config['customPath'] = $this->modx->getOption('seofilter_custom_path', $config,
-            $config['corePath'] . 'custom/');
+            $config['corePath'].'custom/');
 
         $config['between_urls'] = $this->modx->getOption('seofilter_between_urls', null, '/', true);
         $config['container_suffix'] = $this->modx->getOption('container_suffix', null, '/');
@@ -80,29 +80,21 @@ class sfMenu
 
 
         $fqn = $modx->getOption('pdoFetch.class', null, 'pdotools.pdofetch', true);
-        $path = $modx->getOption('pdofetch_class_path', null, MODX_CORE_PATH . 'components/pdotools/model/', true);
+        $path = $modx->getOption('pdofetch_class_path', null, MODX_CORE_PATH.'components/pdotools/model/', true);
         if ($pdoClass = $modx->loadClass($fqn, $path, false, true)) {
             $this->pdoTools = new $pdoClass($modx, $config);
         } else {
             return;
         }
 
-        //        if (isset($config['hereId'])) {
-        //            $time = microtime(true);
-        //            $tmp = $this->urlParents($config['hereId']);
-        //            $tmp[] = $config['hereId'];
-        //            $this->parents = $tmp;
-        //            $this->pdoTools->addTime('Count parents for Current Link complete', microtime(true) - $time);
-        //        }
-
-        $modx->addPackage('seofilter', $config['corePath'] . 'model/');
+        $modx->addPackage('seofilter', $config['corePath'].'model/');
         $modx->lexicon->load('seofilter:default');
     }
 
     public function clearSuffixes($url = '')
     {
         foreach ($this->config['possibleSuffixes'] as $possibleSuffix) {
-            if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
+            if (substr($url, -strlen($possibleSuffix)) === $possibleSuffix) {
                 $url = substr($url, 0, -strlen($possibleSuffix));
             }
         }
@@ -113,7 +105,7 @@ class sfMenu
      * DEPRECATED METHOD
      * The new findParents
      *
-     * @param int $id
+     * @param  int  $id
      *
      * @return array
      */
@@ -152,10 +144,10 @@ class sfMenu
             $select = ['sfUrls.id,sfUrls.link,sfUrls.page_id,sfUrls.multi_id'];
             foreach ($words as $key => $word) {
                 if ($key < count($words) - 1) {
-                    $q->rightJoin('sfUrlWord', 'sfUrlWord' . $key, 'sfUrlWord' . $key . '.url_id = sfUrls.id');
+                    $q->rightJoin('sfUrlWord', 'sfUrlWord'.$key, 'sfUrlWord'.$key.'.url_id = sfUrls.id');
                     $q->where([
-                        'sfUrlWord' . $key . '.field_id' => $word['field_id'],
-                        'sfUrlWord' . $key . '.word_id'  => $word['word_id'],
+                        'sfUrlWord'.$key.'.field_id' => $word['field_id'],
+                        'sfUrlWord'.$key.'.word_id'  => $word['word_id'],
                     ]);
                 }
             }
@@ -163,7 +155,7 @@ class sfMenu
             $q->groupby('sfUrls.id');
             if ($q->prepare() && $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                    if ($this->modx->getCount('sfUrlWord', ['url_id' => $row['id']]) == count($words) - 1) {
+                    if ($this->modx->getCount('sfUrlWord', ['url_id' => $row['id']]) === count($words) - 1) {
                         $parents[] = $row['id'];
                     }
                 }
@@ -181,10 +173,10 @@ class sfMenu
         $tree = [];
         $time = microtime(true);
         $this->pdoTools->addTime('Tree start built');
-        if (!$rules) {
+        if (empty($rules)) {
             $rules = $this->config['rules'];
         }
-        if (!$parents) {
+        if (empty($parents)) {
             $parents = $this->config['parents'];
         }
 
@@ -216,31 +208,35 @@ class sfMenu
         return $tree;
     }
 
-    public function prepareParents($rules = '', $parents = '', $rule_alias = 'id', $page_alias = 'page')
+    public function prepareParents($rules, $parents, $rule_alias = 'id', $page_alias = 'page')
     {
         $where = [];
         $rules_in = $rules_out = [];
         $parents_in = $parents_out = [];
-        if ($parents) {
-            $parents = array_map('trim', explode(',', $parents));
+        if (!empty($parents)) {
+            if (!is_array($parents)) {
+                $parents = array_map('trim', explode(',', $parents));
+            }
             foreach ($parents as $v) {
                 if (!is_numeric($v)) {
                     continue;
                 }
-                if ($v[0] == '-') {
+                if (mb_strpos($v, '-') === 0) {
                     $parents_out[] = abs($v);
                 } else {
                     $parents_in[] = abs($v);
                 }
             }
         }
-        if ($rules) {
-            $rules = array_map('trim', explode(',', $rules));
+        if (!empty($rules)) {
+            if (!is_array($rules)) {
+                $rules = array_map('trim', explode(',', $rules));
+            }
             foreach ($rules as $v) {
                 if (!is_numeric($v)) {
                     continue;
                 }
-                if ($v[0] == '-') {
+                if (mb_strpos($v, '-') === 0) {
                     $rules_out[] = abs($v);
                 } else {
                     $rules_in[] = abs($v);
@@ -248,49 +244,43 @@ class sfMenu
             }
         }
         if (count($rules_in)) {
-            $where[$rule_alias . ':IN'] = $rules_in;
+            $where[$rule_alias.':IN'] = $rules_in;
         }
         if (count($rules_out)) {
-            $where[$rule_alias . ':NOT IN'] = $rules_out;
+            $where[$rule_alias.':NOT IN'] = $rules_out;
         }
-        if ($rule_alias == 'id') {
+        if ($rule_alias === 'id') {
             //условия для правил, нужно учесть proMode
             if ($this->config['proMode']) {
                 if (count($parents_in)) {
                     $where_pin = [];
                     foreach ($parents_in as $p_in) {
-                        $where_pin[] = ('1=1 AND FIND_IN_SET(' . $p_in . ',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+                        $where_pin[] = ('1=1 AND FIND_IN_SET('.$p_in.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
                     }
                     $where[] = implode(' OR ', $where_pin);
                 }
                 if (count($parents_out)) {
                     $where_pout = [];
                     foreach ($parents_out as $p_out) {
-                        $where_pout[] = ('1=1 AND NOT FIND_IN_SET(' . $p_out . ',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
+                        $where_pout[] = ('1=1 AND NOT FIND_IN_SET('.$p_out.',REPLACE(IFNULL(NULLIF(pages,""),page)," ",""))');
                     }
                     $where[] = implode(' AND ', $where_pout);
                 }
             } else {
                 if (count($parents_in)) {
-                    $where[$page_alias . ':IN'] = $parents_in;
+                    $where[$page_alias.':IN'] = $parents_in;
                 }
                 if (count($parents_out)) {
-                    $where[$page_alias . ':NOT IN'] = $parents_out;
+                    $where[$page_alias.':NOT IN'] = $parents_out;
                 }
             }
-
         } else {
             if (count($parents_in)) {
-                $where[$page_alias . ':IN'] = $parents_in;
+                $where[$page_alias.':IN'] = $parents_in;
             }
             if (count($parents_out)) {
-                $where[$page_alias . ':NOT IN'] = $parents_out;
+                $where[$page_alias.':NOT IN'] = $parents_out;
             }
-            //            if(count($rules_out) || count($parents_out)) {
-            //                $where['OR:'.$page_alias.':IN'] = $parents_in;
-            //            } else {
-            //                $where[$page_alias.':IN'] = $parents_in;
-            //            }
         }
 
         return $where;
@@ -337,12 +327,12 @@ class sfMenu
         $minlevel = (int)$this->config['minlevel'];
         if ($maxlevel) {
             if ($minlevel) {
-                $having = $level . ' >= ' . $minlevel . ' AND ' . $level . ' <= ' . $maxlevel;
+                $having = $level.' >= '.$minlevel.' AND '.$level.' <= '.$maxlevel;
             } else {
-                $having = $level . ' <= ' . $maxlevel;
+                $having = $level.' <= '.$maxlevel;
             }
         } elseif ($minlevel) {
-            $having = $level . ' >= ' . $minlevel;
+            $having = $level.' >= '.$minlevel;
         }
 
         return $having;
@@ -377,9 +367,16 @@ class sfMenu
         if (!(int)$this->config['showHidden']) {
             $where['menu_on'] = 1;
         }
+        if (!empty($this->config['urls'])) {
+            if (!is_array($this->config['urls'])) {
+                $this->config['urls'] = array_map('trim', explode(',', $this->config['urls']));
+            }
+            $where['sfUrls.id:IN'] = $this->config['urls'];
+        }
         if (!empty($this->config['where'])) {
             $where = array_merge($where, $this->modx->fromJSON($this->config['where']));
         }
+
         if (!empty($this->config['wordWhere'])) {
             $where = array_merge($this->prepareWordWhere($this->config['wordWhere']), $where);
         }
@@ -395,7 +392,7 @@ class sfMenu
         $q->limit((int)$this->config['limit'], (int)$this->config['offset']);
         $q->groupby('sfUrlWord.id');
         if ($q->prepare()) {
-            $this->pdoTools->addTime('SQL ' . $q->toSQL());
+            $this->pdoTools->addTime('SQL '.$q->toSQL());
             if ($q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     if (!(int)$row['page_id']) {
@@ -409,17 +406,17 @@ class sfMenu
 
                     $page_url = $this->clearSuffixes($page_url);
 
-                    if ($this->config['site_start'] == $row['page_id']) {
+                    if ((int)$this->config['site_start'] === (int)$row['page_id']) {
                         if ($this->config['main_alias']) {
                             $qq = $this->modx->newQuery('modResource', ['id' => $row['page_id']]);
                             $qq->select('alias');
                             $malias = $this->modx->getValue($qq->prepare());
-                            $url = $page_url . '/' . $malias . $this->config['between_urls'] . $url . $u_suffix;
+                            $url = $page_url.'/'.$malias.$this->config['between_urls'].$url.$u_suffix;
                         } else {
-                            $url = $page_url . '/' . $url . $u_suffix;
+                            $url = $page_url.'/'.$url.$u_suffix;
                         }
                     } else {
-                        $url = $page_url . $this->config['between_urls'] . $url . $u_suffix;
+                        $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                     }
                     //                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                     $name = $row['menutitle'] ?: $row['link'];
@@ -461,18 +458,18 @@ class sfMenu
             //многомерный
             foreach ($wordWhere as $wwhere) {
                 foreach ($wwhere as $param => $val) {
-                    $param = 'sfDictionary.' . str_replace('word_', '', $param);
-                    $inKey = $param . ':IN';
+                    $param = 'sfDictionary.'.str_replace('word_', '', $param);
+                    $inKey = $param.':IN';
                     if (isset($where[$inKey])) {
-                        $where[$param . ':IN'][] = $val;
+                        $where[$param.':IN'][] = $val;
                     } else {
-                        $where[$param . ':IN'] = [$val];
+                        $where[$param.':IN'] = [$val];
                     }
                 }
             }
         } else {
             foreach ($wordWhere as $param => $val) {
-                $param = 'sfDictionary.' . str_replace('word_', '', $param);
+                $param = 'sfDictionary.'.str_replace('word_', '', $param);
                 $where[$param] = $val;
             }
         }
@@ -527,12 +524,12 @@ class sfMenu
                         $qq = $this->modx->newQuery('modResource', ['id' => $row['page_id']]);
                         $qq->select('alias');
                         $malias = $this->modx->getValue($qq->prepare());
-                        $url = $page_url . '/' . $malias . $this->config['between_urls'] . $url . $u_suffix;
+                        $url = $page_url.'/'.$malias.$this->config['between_urls'].$url.$u_suffix;
                     } else {
-                        $url = $page_url . '/' . $url . $u_suffix;
+                        $url = $page_url.'/'.$url.$u_suffix;
                     }
                 } else {
-                    $url = $page_url . $this->config['between_urls'] . $url . $u_suffix;
+                    $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                 }
                 // $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
                 $name = $row['menutitle'] ?: $row['link'];
@@ -632,7 +629,6 @@ class sfMenu
                         continue;
                     }
                 }
-
             } elseif (!$onlyWW) {
                 $link['level'] = 0;
             }
@@ -678,7 +674,7 @@ class sfMenu
             $this->countHandler = new $count_class($this->modx, $this->config);
             if (!($this->countHandler instanceof sfCountHandler)) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,
-                    '[SeoFilter] Could not initialize count handler class: "' . $count_class . '"');
+                    '[SeoFilter] Could not initialize count handler class: "'.$count_class.'"');
                 return false;
             }
         }
@@ -704,7 +700,6 @@ class sfMenu
             } else {
                 $tree[$link['id']] = $link;
             }
-
         }
 
         if ((int)$this->config['sortcount']) {
@@ -744,50 +739,50 @@ class sfMenu
                     case 'msProductData':
                     case 'modResource':
                     case 'msProductOption':
-                        $fw = $field['class'] . '.' . $field['key'];
-                        if ($field['class'] == 'msProductData') {
+                        $fw = $field['class'].'.'.$field['key'];
+                        if ($field['class'] === 'msProductData') {
                             $innerJoin['msProductData'] = [
                                 'class' => 'msProductData',
                                 'on'    => 'msProductData.id = modResource.id'
                             ];
                         }
-                        if ($field['class'] == 'msProductOption') {
+                        if ($field['class'] === 'msProductOption') {
                             $innerJoin['msProductOption'] = [
                                 'class' => 'msProductOption',
                                 'on'    => 'msProductOption.product_id = modResource.id'
                             ];
                             //                            $fields_where[$field['class'] . '.key:IN'][] = $field['key'];
-                            $fields_where[$field['class'] . '.key'] = $field['key'];
-                            $fw = $field['class'] . '.value';
+                            $fields_where[$field['class'].'.key'] = $field['key'];
+                            $fw = $field['class'].'.value';
                         }
                         $values = explode(',', $field['word_input']);
                         if ($field['slider']) {
-                            $fields_where[$fw . ':>='] = $values[0];
+                            $fields_where[$fw.':>='] = $values[0];
                             if (isset($values[1])) {
-                                $fields_where[$fw . ':<='] = $values[1];
+                                $fields_where[$fw.':<='] = $values[1];
                             }
-                        } elseif ($field['class'] == 'msProductOption') {
+                        } elseif ($field['class'] === 'msProductOption') {
                             //                             $tmp = count($fields_where[$fw . ':IN']) ? $fields_where[$fw . ':IN'] : array();
                             //                             $fields_where[$fw . ':IN'] = array_merge($tmp, $values);
-                            $fields_where[$fw . ':IN'] = $values;
+                            $fields_where[$fw.':IN'] = $values;
                             //                            $groupby = 'msProductOption.product_id HAVING COUNT(DISTINCT msProductOption.value) = ' . count($fields_where[$fw . ':IN']);
                         } else {
-                            $fields_where[$fw . ':IN'] = $values;
+                            $fields_where[$fw.':IN'] = $values;
                         }
                         break;
                     case 'modTemplateVar':
                         $addTVs[] = $field['key'];
-                        if (strtolower($field['xpdo_package']) == 'tvsuperselect') {
+                        if (strtolower($field['xpdo_package']) === 'tvsuperselect') {
                             $this->pdoTools->setConfig(['loadModels' => 'tvsuperselect']);
-                            $innerJoin['tvssOption' . $field['key']] = [
+                            $innerJoin['tvssOption'.$field['key']] = [
                                 'class' => 'tvssOption',
-                                'on'    => 'tvssOption' . $field['key'] . '.resource_id = modResource.id'
+                                'on'    => 'tvssOption'.$field['key'].'.resource_id = modResource.id'
                             ];
-                            $fields_where['tvssOption' . $field['key'] . '.value:LIKE'] = '%' . $field['word_input'] . '%';
+                            $fields_where['tvssOption'.$field['key'].'.value:LIKE'] = '%'.$field['word_input'].'%';
                         } elseif ($field['exact']) {
-                            $fields_where['TV' . $field['key'] . '.value'] = $field['word_input'];
+                            $fields_where['TV'.$field['key'].'.value'] = $field['word_input'];
                         } else {
-                            $fields_where['TV' . $field['key'] . '.value:LIKE'] = '%' . $field['word_input'] . '%';
+                            $fields_where['TV'.$field['key'].'.value:LIKE'] = '%'.$field['word_input'].'%';
                         }
 
                         break;
@@ -797,7 +792,7 @@ class sfMenu
                             'on'    => 'msProductData.id = modResource.id'
                         ];
                         $innerJoin['msVendor'] = ['class' => 'msVendor', 'on' => 'msVendor.id = msProductData.vendor'];
-                        $fields_where[$field['class'] . '.id'] = $field['word_input'];
+                        $fields_where[$field['class'].'.id'] = $field['word_input'];
                         break;
                     default:
                         break;
@@ -916,18 +911,17 @@ class sfMenu
         $pl1 = $this->pdoTools->makePlaceholders($placeholders, '', '[[+', ']]', false);
         $pl2 = $this->pdoTools->makePlaceholders($placeholders, '', '[[++', ']]', false);
         $pl3 = $this->pdoTools->makePlaceholders($placeholders, '', '{', '}', false);
-        $customPath = str_replace($pl1['pl'], $pl1['vl'], $customPath);
-        $customPath = str_replace($pl2['pl'], $pl2['vl'], $customPath);
-        $customPath = str_replace($pl3['pl'], $pl3['vl'], $customPath);
-        if (strpos($customPath, MODX_BASE_PATH) === false && strpos($customPath, MODX_CORE_PATH) === false) {
-            $customPath = MODX_BASE_PATH . ltrim($customPath, '/');
+        $customPath = str_replace([$pl1['pl'], $pl2['pl'], $pl3['pl']], [$pl1['vl'], $pl2['vl'], $pl3['vl']],
+            $customPath);
+        if (mb_strpos($customPath, MODX_BASE_PATH) === false && mb_strpos($customPath, MODX_CORE_PATH) === false) {
+            $customPath = MODX_BASE_PATH.ltrim($customPath, '/');
         }
-        $customPath = rtrim($customPath, '/') . '/' . ltrim($dir, '/');
+        $customPath = rtrim($customPath, '/').'/'.ltrim($dir, '/');
         if (file_exists($customPath) && $files = scandir($customPath)) {
             foreach ($files as $file) {
                 if (preg_match('#\.class\.php$#i', $file)) {
                     /** @noinspection PhpIncludeInspection */
-                    include_once $customPath . '/' . $file;
+                    include_once $customPath.'/'.$file;
                 }
             }
         } else {
@@ -957,24 +951,18 @@ class sfMenu
                                     if (isset($parent_link['words'])) {
                                         foreach ($words as $word) {
                                             foreach ($parent_link['words'] as $word_find) {
-                                                if (($word_find['field_id'] == $word['field_id'])
-                                                    && ($word_find['word_id'] == $word['word_id'])) {
+                                                if (((int)$word_find['field_id'] === (int)$word['field_id'])
+                                                    && ((int)$word_find['word_id'] === (int)$word['word_id'])) {
                                                     $find++;
                                                     break;
                                                 }
-                                                //                                             странный старый метод
-                                                //                                                $f_arr = array_flip(array_uintersect_assoc($word_find, $word, "strcasecmp"));
-                                                //                                                if (in_array('field_id', $f_arr) && in_array('word_id', $f_arr)) {
-                                                //                                                    $find++;
-                                                //                                                    break;
-                                                //                                                }
                                             }
-                                            if ($find == $level - 1) {
+                                            if ($find === $level - 1) {
                                                 break;
                                             }
                                         }
                                     }
-                                    if ($find == $level - 1) {
+                                    if ($find === $level - 1) {
                                         $parents[] = $parent_link['id'];
                                         $parent_find++;
 
@@ -995,7 +983,6 @@ class sfMenu
                                     }
                                 }
                             }
-                            //                        $link['parents'] = $parents;
                         }
                     }
                 }
@@ -1019,17 +1006,8 @@ class sfMenu
     public function linksNesting($links = [])
     {
         $time = microtime(true);
-        //        uasort($links,  function ($a, $b) {
-        //            if ($a['level'] == $b['level']) {return 0;}
-        //            return ($a['level'] > $b['level']) ? -1 : 1;
-        //        });
 
         $tree = $this->recursiveNesting($links);
-
-        //        uasort($links,  function ($a, $b) {
-        //            if ($a['level'] == $b['level']) {return 0;}
-        //            return ($a['level'] < $b['level']) ? -1 : 1;
-        //        });
 
         if ($tree = $this->multiSort($tree)) {
             foreach ($tree as $key => $link) {
@@ -1056,14 +1034,14 @@ class sfMenu
         $q = $this->modx->newQuery('sfRule');
         //        $select = array('sfRule.*');
         $select = [$this->modx->getSelectColumns('sfRule', 'sfRule')];
-        if ($groupsort == 'level') {
+        if ($groupsort === 'level') {
             $q->leftJoin('sfFieldIds', 'sfFieldIds', 'sfFieldIds.multi_id = sfRule.id');
             $select[] = 'COUNT(sfFieldIds.id) as level';
             $q->groupby('sfRule.id');
         }
-        if ($groupsort == 'total' || $groupsort == 'children' || $groupsort == 'count') {
+        if ($groupsort === 'total' || $groupsort === 'children' || $groupsort === 'count') {
             $q->leftJoin('sfUrls', 'sfUrls', 'sfUrls.multi_id = sfRule.id');
-            $select[] = 'COUNT(sfUrls.id) as ' . $groupsort;
+            $select[] = 'COUNT(sfUrls.id) as '.$groupsort;
             $q->groupby('sfRule.id');
             $where['sfUrls.id:IN'] = array_keys($links);
         }
@@ -1074,12 +1052,12 @@ class sfMenu
         } elseif ($groupsort) {
             $q->sortby($groupsort);
         } elseif ($rules) {
-            $q->sortby("FIELD(sfRule.id," . $rules . ")");
+            $q->sortby('FIELD(sfRule.id,'.$rules.')');
         }
         $q->select($select);
         $rules = [];
         if ($q->prepare()) {
-            $this->pdoTools->addTime('GROUP SQL:' . $q->toSQL());
+            $this->pdoTools->addTime('GROUP SQL:'.$q->toSQL());
             if ($q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     //                $row['links'] = array();
@@ -1143,7 +1121,7 @@ class sfMenu
         $groupsort = $this->config['groupsort'];
         $groupdir = $this->config['groupdir'];
 
-        if ($a[$groupsort] == $b[$groupsort]) {
+        if ($a[$groupsort] === $b[$groupsort]) {
             if ((int)$this->config['userank']) {
                 if ($a['rank'] == $b['rank']) {
                     return 0;
@@ -1169,35 +1147,37 @@ class sfMenu
             $sortby = 'total';
         }
         if ((int)$this->config['userank']) {
-            if ($a['rank'] == $b['rank']) {
+            if ($a['rank'] === $b['rank']) {
                 if ($sortby) {
-                    if ($a[$sortby] == $b[$sortby]) {
+                    if ($a[$sortby] === $b[$sortby]) {
                         return 0;
-                    } else {
-                        if ($sortdir == 'DESC') {
-                            return ($a[$sortby] > $b[$sortby]) ? -1 : 1;
-                        } else {
-                            return ($a[$sortby] < $b[$sortby]) ? -1 : 1;
-                        }
                     }
-                } else {
-                    return 0;
-                }
-            }
-            return ($a['rank'] < $b['rank']) ? -1 : 1;
-        } elseif ($sortby) {
-            if ($a[$sortby] == $b[$sortby]) {
-                return 0;
-            } else {
-                if ($sortdir == 'DESC') {
-                    return ($a[$sortby] > $b[$sortby]) ? -1 : 1;
-                } else {
+
+                    if (mb_strtolower($sortdir) === 'desc') {
+                        return ($a[$sortby] > $b[$sortby]) ? -1 : 1;
+                    }
+
                     return ($a[$sortby] < $b[$sortby]) ? -1 : 1;
                 }
+
+                return 0;
             }
-        } else {
-            return 0;
+            return ($a['rank'] < $b['rank']) ? -1 : 1;
         }
+
+        if ($sortby) {
+            if ($a[$sortby] === $b[$sortby]) {
+                return 0;
+            }
+
+            if (mb_strtolower($sortdir) === 'desc') {
+                return ($a[$sortby] > $b[$sortby]) ? -1 : 1;
+            }
+
+            return ($a[$sortby] < $b[$sortby]) ? -1 : 1;
+        }
+
+        return 0;
     }
 
 
@@ -1216,7 +1196,7 @@ class sfMenu
             $count = count($row['inner']);
             foreach ($row['inner'] as $v) {
                 $v['idx'] = $idx++;
-                $v['last'] = (int)$v['idx'] == $count;
+                $v['last'] = (int)$v['idx'] === $count;
                 $children .= $this->linkTemplate($v);
             }
             $this->level--;
@@ -1229,7 +1209,7 @@ class sfMenu
         if (!empty($children)) {
             $pls = [
                 'wrapper'    => $children,
-                'classes'    => ' class="' . $this->config['innerClass'] . '"',
+                'classes'    => ' class="'.$this->config['innerClass'].'"',
                 'classnames' => $this->config['innerClass'],
                 'classNames' => $this->config['innerClass'],
                 'level'      => $this->level,
@@ -1243,7 +1223,7 @@ class sfMenu
 
         if (!empty($classes)) {
             $row['classNames'] = $row['classnames'] = $classes;
-            $row['classes'] = ' class="' . $classes . '"';
+            $row['classes'] = ' class="'.$classes.'"';
         } else {
             $row['classNames'] = $row['classnames'] = $row['classes'] = '';
         }
@@ -1272,12 +1252,12 @@ class sfMenu
                 'sfMenu'   => $this,
                 'pdoTools' => $this->pdoTools,
             ]));
-            $tmp = ($tmp[0] == '[' || $tmp[0] == '{')
+            $tmp = (mb_strpos($tmp, '[') === 0 || mb_strpos($tmp, '{') === 0)
                 ? json_decode($tmp, true)
                 : unserialize($tmp);
             if (!is_array($tmp)) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR,
-                    '[SeoFilter]: Preparation snippet must return an array, instead of "' . gettype($tmp) . '"');
+                    '[SeoFilter]: Preparation snippet must return an array, instead of "'.gettype($tmp).'"');
             } else {
                 $row = array_merge($row, $tmp);
             }
@@ -1299,13 +1279,13 @@ class sfMenu
         if (!empty($this->config['rowClass'])) {
             $classes[] = $this->config['rowClass'];
         }
-        if ($row['idx'] == 1 && !empty($this->config['firstClass'])) {
+        if ((int)$row['idx'] === 1 && !empty($this->config['firstClass'])) {
             $classes[] = $this->config['firstClass'];
         } elseif (!empty($row['last']) && !empty($this->config['lastClass'])) {
             $classes[] = $this->config['lastClass'];
         }
         if (!empty($this->config['levelClass'])) {
-            $classes[] = $this->config['levelClass'] . $row['level'];
+            $classes[] = $this->config['levelClass'].$row['level'];
         }
         if ($row['children'] && !empty($this->config['parentClass']) && ($row['level'] < $this->config['level'] || empty($this->config['level']))) {
             $classes[] = $this->config['parentClass'];
@@ -1314,7 +1294,7 @@ class sfMenu
         if ($this->isHere($row_id) && !empty($this->config['hereClass'])) {
             $classes[] = $this->config['hereClass'];
         }
-        if ($row_id == $this->config['hereId'] && !empty($this->config['selfClass'])) {
+        if ((int)$row_id === (int)$this->config['hereId'] && !empty($this->config['selfClass'])) {
             $classes[] = $this->config['selfClass'];
         }
 
@@ -1323,16 +1303,16 @@ class sfMenu
 
     public function isHere($id = 0)
     {
-        return in_array($id, $this->parents);
+        return in_array($id, $this->parents, true);
     }
 
     public function getTpl($row = [])
     {
         if ($row['children'] && $row['id'] == $this->config['hereId'] && !empty($this->config['tplParentRowHere'])) {
             $tpl = 'tplParentRowHere';
-        } elseif ($row['level'] > 1 && $row['id'] == $this->config['hereId'] && !empty($this->config['tplInnerHere'])) {
+        } elseif ($row['level'] > 1 && (int)$row['id'] === (int)$this->config['hereId'] && !empty($this->config['tplInnerHere'])) {
             $tpl = 'tplInnerHere';
-        } elseif ($row['id'] == $this->config['hereId'] && !empty($this->config['tplHere'])) {
+        } elseif ((int)$row['id'] === (int)$this->config['hereId'] && !empty($this->config['tplHere'])) {
             $tpl = 'tplHere';
         } elseif ($row['children'] && $this->isHere($row['id']) && !empty($this->config['tplParentRowActive'])) {
             $tpl = 'tplParentRowActive';
@@ -1350,7 +1330,6 @@ class sfMenu
 
     public function getTemplate($tree = [])
     {
-        //        $this->tree = $tree;
         $idx = $this->idx;
         $count = count($tree);
         $output = '';
@@ -1360,7 +1339,7 @@ class sfMenu
             }
             $this->level = 1;
             $row['idx'] = $idx++;
-            $row['last'] = (integer)$row['idx'] == $count;
+            $row['last'] = (int)$row['idx'] === $count;
 
             $row['children'] = $row['total'];
 
@@ -1370,7 +1349,7 @@ class sfMenu
         if (!empty($output)) {
             $output = $this->pdoTools->parseChunk($this->config['tplOuter'], [
                     'wrapper'    => $output,
-                    'classes'    => ' class="' . $this->config['outerClass'] . '"',
+                    'classes'    => ' class="'.$this->config['outerClass'].'"',
                     'classnames' => $this->config['outerClass'],
                     'classNames' => $this->config['outerClass'],
                 ]
@@ -1378,29 +1357,22 @@ class sfMenu
         }
 
         return $output;
-
     }
 
     public function findParents($links = [], $id = 0)
     {
         $parents = [];
         foreach ($links as $row) {
-            if ($row['id'] == $id) {
+            if ((int)$row['id'] ===  (int)$id) {
                 $parents[] = $row['id'];
                 continue;
             }
-            if (isset($row['childrens'])) {
-                if (in_array($id, $row['childrens'])) {
-                    $parents[] = $row['id'];
-                    //                    continue;
-                }
+            if (isset($row['childrens']) && in_array($id, $row['childrens'], true)) {
+                $parents[] = $row['id'];
             }
-            if (isset($row['inner'])) {
-                if ($inner = $this->findParents($row['inner'], $id)) {
-                    $parents = array_merge($parents, $inner);
-                    $parents[] = $row['id'];
-                }
-
+            if (isset($row['inner']) && $inner = $this->findParents($row['inner'], $id)) {
+                $parents = array_merge($parents, $inner);
+                $parents[] = $row['id'];
             }
         }
         return array_unique($parents);
@@ -1424,12 +1396,12 @@ class sfMenu
                     }
 
                     $idx++;
-                    if ($total == $idx) {
+                    if ($total === $idx) {
                         $last = 1;
                     } else {
                         $last = 0;
                     }
-                    if ($idx == 1) {
+                    if ($idx === 1) {
                         $first = 1;
                     } else {
                         $first = 0;
@@ -1454,17 +1426,14 @@ class sfMenu
             if ((int)$this->config['relative'] && $this->config['hereId']) {
                 $find = 0;
                 foreach ($tree as $row) {
-                    if (in_array($row['id'], $this->parents)) {
-                        if (isset($row['inner'])) {
-                            $find++;
-                            $output = $this->getTemplate($row['inner']);
-                        }
+                    if (in_array($row['id'], $this->parents, true) && isset($row['inner'])) {
+                        $find++;
+                        $output = $this->getTemplate($row['inner']);
                     }
                 }
             } else {
                 $output = $this->getTemplate($tree);
             }
-
         }
         $this->pdoTools->addTime('End template menu', microtime(true) - $time);
         return $output;
