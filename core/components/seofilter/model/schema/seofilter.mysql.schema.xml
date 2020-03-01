@@ -22,11 +22,14 @@
         <field key="xpdo_where" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
         <field key="relation" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
-        <field key="relation_field" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="false" default=""/>
+        <field key="relation_field" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="false"
+               default=""/>
         <field key="relation_column" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
 
-        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true"
+               default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="tagmanager" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
 
         <index alias="class" name="class" primary="false" unique="false" type="BTREE">
             <column key="class" length="" collation="A" null="false"/>
@@ -41,16 +44,17 @@
             <column key="active" length="" collation="A" null="false"/>
         </index>
 
-        <composite alias="Words" class="sfDictionary" local="id" foreign="field_id" cardinality="many" owner="local" />
-        <composite alias="Links" class="sfFieldIds" local="id" foreign="field_id" cardinality="many" owner="local" />
+        <composite alias="Words" class="sfDictionary" local="id" foreign="field_id" cardinality="many" owner="local"/>
+        <composite alias="Links" class="sfFieldIds" local="id" foreign="field_id" cardinality="many" owner="local"/>
     </object>
 
 
     <object class="sfRule" table="seofilter_rules" extends="xPDOSimpleObject">
         <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="description" dbtype="text" phptype="string" null="true" default=""/>
-        <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="" />
-        <field key="pages" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
+        <field key="page" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true"
+               default=""/>
+        <field key="pages" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="link_tpl" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="base" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="1"/>
@@ -58,12 +62,13 @@
         <field key="count_parents" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="count_where" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
-        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
+        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true"
+               default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
-        <field key="link" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
-        <field key="title" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
-        <field key="h1" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
+        <field key="link" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="title" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="h1" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="h2" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="introtext" dbtype="text" phptype="string" null="true" default=""/>
         <field key="keywords" dbtype="text" phptype="string" null="true" default=""/>
@@ -73,10 +78,10 @@
 
         <field key="properties" dbtype="text" phptype="json" null="true"/>
         <field key="introtexts" dbtype="text" phptype="json" null="true"/>
-        <field key="introlength" dbtype="integer" precision="10" phptype="integer" null="true" default="0" />
+        <field key="introlength" dbtype="integer" precision="10" phptype="integer" null="true" default="0"/>
         <field key="tpl" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
-        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" />
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true"/>
 
         <index alias="url" name="url" primary="false" unique="false" type="BTREE">
             <column key="url" length="" collation="A" null="false"/>
@@ -94,21 +99,25 @@
             <column key="base" length="" collation="A" null="false"/>
         </index>
 
-        <composite alias="Links" class="sfFieldIds" local="id" foreign="multi_id" cardinality="many" owner="local" />
-        <composite alias="Urls" class="sfUrls" local="id" foreign="multi_id" cardinality="many" owner="local" />
+        <composite alias="Links" class="sfFieldIds" local="id" foreign="multi_id" cardinality="many" owner="local"/>
+        <composite alias="Urls" class="sfUrls" local="id" foreign="multi_id" cardinality="many" owner="local"/>
     </object>
 
 
     <object class="sfFieldIds" table="seofilter_fieldids" extends="xPDOSimpleObject">
-        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
+        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
 
-        <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
         <field key="where" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
-        <field key="compare" dbtype="integer" precision="2"  attributes="unsigned" phptype="integer" null="true" default=""/>
-        <field key="value" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
+        <field key="compare" dbtype="integer" precision="2" attributes="unsigned" phptype="integer" null="true"
+               default=""/>
+        <field key="value" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="condition" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
         <field key="hideparam" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
@@ -127,24 +136,23 @@
             <column key="active" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
-        <aggregate alias="Rule" class="sfRule" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign"/>
+        <aggregate alias="Rule" class="sfRule" local="multi_id" foreign="id" cardinality="one" owner="foreign"/>
 
     </object>
 
 
-
-
-
     <object class="sfDictionary" table="seofilter_dictionary" extends="xPDOSimpleObject">
-        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
         <field key="input" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="value" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="alias" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="class" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="key" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
-        <field key="relation_word" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default=""/>
+        <field key="relation_word" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true"
+               default=""/>
         <field key="image" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
         <field key="value_i" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
@@ -166,8 +174,8 @@
         <field key="value_in" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_to" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="value_from" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP" />
-        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" />
+        <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP"/>
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true"/>
 
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
@@ -193,38 +201,46 @@
             <column key="active" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign" />
-        <composite alias="UrlWords" class="sfUrlWord" local="id" foreign="word_id" cardinality="many" owner="local" />
+        <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign"/>
+        <composite alias="UrlWords" class="sfUrlWord" local="id" foreign="word_id" cardinality="many" owner="local"/>
     </object>
 
     <object class="sfUrls" table="seofilter_urls" extends="xPDOSimpleObject">
-        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-        <field key="page_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="multi_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
+        <field key="page_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
 
         <field key="name" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="link" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="old_url" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
         <field key="new_url" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
-        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true" />
-        <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP" />
+        <field key="editedon" dbtype="timestamp" phptype="timestamp" null="true"/>
+        <field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP"/>
 
         <field key="menu_on" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
-        <field key="menutitle" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
-        <field key="menuindex" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
-        <field key="link_attributes" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
-        <field key="image" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
+        <field key="menutitle" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="menuindex" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true"
+               default="0"/>
+        <field key="link_attributes" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="image" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
-        <field key="total" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
-        <field key="count" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
-        <field key="ajax" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
-        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true" default="0"/>
-        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" attributes="unsigned" null="true" default="1"/>
+        <field key="total" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true"
+               default="0"/>
+        <field key="count" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true"
+               default="0"/>
+        <field key="ajax" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true"
+               default="0"/>
+        <field key="rank" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="true"
+               default="0"/>
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" attributes="unsigned" null="true"
+               default="1"/>
 
         <field key="params" dbtype="text" phptype="json" null="true" default=""/>
 
         <field key="custom" dbtype="tinyint" precision="1" phptype="boolean" null="false" default="0"/>
-        <field key="title" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
-        <field key="h1" dbtype="varchar" precision="255"  phptype="string" null="true" default=""/>
+        <field key="title" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
+        <field key="h1" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="h2" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
         <field key="introtext" dbtype="text" phptype="string" null="true" default=""/>
         <field key="keywords" dbtype="text" phptype="string" null="true" default=""/>
@@ -234,7 +250,7 @@
 
         <field key="properties" dbtype="text" phptype="json" null="true"/>
         <field key="introtexts" dbtype="text" phptype="json" null="true"/>
-        <field key="introlength" dbtype="integer" precision="10" phptype="integer" null="true" default="0" />
+        <field key="introlength" dbtype="integer" precision="10" phptype="integer" null="true" default="0"/>
         <field key="tpl" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
 
         <index alias="page_id" name="page_id" primary="false" unique="false" type="BTREE">
@@ -259,17 +275,21 @@
             <column key="active" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="Rule" class="sfRule" local="multi_id" foreign="id" cardinality="one" owner="foreign" />
-        <composite alias="UrlWords" class="sfUrlWord" local="id" foreign="url_id" cardinality="many" owner="local" />
+        <aggregate alias="Rule" class="sfRule" local="multi_id" foreign="id" cardinality="one" owner="foreign"/>
+        <composite alias="UrlWords" class="sfUrlWord" local="id" foreign="url_id" cardinality="many" owner="local"/>
     </object>
 
 
     <object class="sfUrlWord" table="seofilter_urlwords" extends="xPDOSimpleObject">
-        <field key="url_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-        <field key="word_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="url_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
+        <field key="word_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
+        <field key="field_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
 
-        <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+        <field key="priority" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false"
+               default="0"/>
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
 
         <index alias="word_id" name="word_id" primary="false" unique="false" type="BTREE">
@@ -282,8 +302,8 @@
             <column key="url_id" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="Word" class="sfDictionary" local="word_id" foreign="id" cardinality="one" owner="foreign" />
-        <aggregate alias="Url" class="sfUrls" local="url_id" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Word" class="sfDictionary" local="word_id" foreign="id" cardinality="one" owner="foreign"/>
+        <aggregate alias="Url" class="sfUrls" local="url_id" foreign="id" cardinality="one" owner="foreign"/>
 
     </object>
 

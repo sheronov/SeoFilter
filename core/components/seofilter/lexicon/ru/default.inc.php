@@ -1,10 +1,10 @@
 <?php
+
 include_once 'setting.inc.php';
 
 $_lang['seofilter'] = 'SeoFilter';
 $_lang['seofilter_menu_desc'] = 'Управление ЧПУ и SEO для фильтров';
 $_lang['seofilter_intro_msg'] = 'Вы можете выделять сразу несколько предметов при помощи Shift или Ctrl.';
-
 
 
 $_lang['seofilter_field'] = 'Поле';
@@ -405,3 +405,6 @@ $_lang['seofilter_remove_empty_links_confirm'] = 'Вы действительн�
 $_lang['seofilter_compare_like'] = 'Значение совпадает с (LIKE %x%)';
 $_lang['seofilter_compare_notlike'] = 'Значение не совпадает с (NOT LIKE %x%)';
 $_lang['seofilter_rule_fields_where'] = 'Условия полей';
+
+$_lang['seofilter_field_tagmanager'] = 'Для использования в tagManager2';
+$_lang['seofilter_field_tagmanager_help'] = 'Поставьте галочку, если используете Shopkeeper + tmFilters';

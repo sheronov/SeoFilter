@@ -1,10 +1,10 @@
 <?php
+
 include_once 'setting.inc.php';
 
 $_lang['seofilter'] = 'SeoFilter';
 $_lang['seofilter_menu_desc'] = 'The managing friendly URLs and SEO for filters';
 $_lang['seofilter_intro_msg'] = 'You can select several items at once with Shift or Ctrl';
-
 
 
 $_lang['seofilter_field'] = 'Field';
@@ -405,3 +405,6 @@ $_lang['seofilter_remove_empty_links_confirm'] = 'Do you really want to delete p
 $_lang['seofilter_compare_like'] = 'Value like (LIKE %x%)';
 $_lang['seofilter_compare_notlike'] = 'Value not like (NOT LIKE %x%)';
 $_lang['seofilter_rule_fields_where'] = 'Conditions of fields';
+
+$_lang['seofilter_field_tagmanager'] = 'Using with tagManager2';
+$_lang['seofilter_field_tagmanager_help'] = 'Mark this, if you are using Shopkeeper + tmFilters';

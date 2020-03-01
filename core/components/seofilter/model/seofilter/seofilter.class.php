@@ -19,191 +19,18 @@ class SeoFilter
      * @param  modX  $modx
      * @param  array  $config
      */
-    function __construct(modX $modx, array $config = [])
+    public function __construct(modX $modx, array $config = [])
     {
         $this->modx =& $modx;
 
-        $corePath = $this->modx->getOption('seofilter_core_path', $config,
-            $this->modx->getOption('core_path').'components/seofilter/'
-        );
-
-        $assetsUrl = $this->modx->getOption('seofilter_assets_url', $config,
-            $this->modx->getOption('assets_url').'components/seofilter/'
-        );
-        $customPath = $this->modx->getOption('seofilter_custom_path', $config, $corePath.'custom/');
-        $actionUrl = $assetsUrl.'action.php';
-        $connectorUrl = $assetsUrl.'connector.php';
-        $ajax = $this->modx->getOption('seofilter_ajax', null, 1, true);
-        $separator = $this->modx->getOption('seofilter_separator', null, '-', true);
-        $level_separator = $this->modx->getOption('seofilter_level_separator', null, '/', true);
-        $between_urls = $this->modx->getOption('seofilter_between_urls', null, '/', true);
-        $base_get = $this->modx->getOption('seofilter_base_get', null, '', true);
-        $values_delimeter = $this->modx->getOption('seofilter_values_delimeter', null, ',', true);
-        $site_start = $this->modx->context->getOption('site_start', 1);
-        $site_url = $this->modx->context->getOption('site_url', '');
-        $charset = $this->modx->context->getOption('modx_charset', 'UTF-8');
-
-        $container_suffix = $this->modx->getOption('container_suffix', null, '/');
-        $seo_container_suffix = $this->modx->getOption('seofilter_container_suffix', null, $container_suffix, true);
-        $url_suffix = $this->modx->getOption('seofilter_url_suffix', null, '', true);
-        $redirect = $this->modx->getOption('seofilter_url_redirect', null, 0, true);
-        $replace_host = $this->modx->getOption('seofilter_replace_host', null, 0, true);
-
-        $title = $this->modx->getOption('seofilter_title', null, '', true);
-        $description = $this->modx->getOption('seofilter_description', null, '', true);
-        $introtext = $this->modx->getOption('seofilter_introtext', null, '', true);
-        $keywords = $this->modx->getOption('seofilter_keywords', null, '', true);
-        $link = $this->modx->getOption('seofilter_link', null, '', true);
-        $h1 = $this->modx->getOption('seofilter_h1', null, '', true);
-        $h2 = $this->modx->getOption('seofilter_h2', null, '', true);
-        $text = $this->modx->getOption('seofilter_text', null, '', true);
-        $content = $this->modx->getOption('seofilter_content', null, '', true);
-        $page_key = $this->modx->getOption('seofilter_page_key', null, 'page', true);
-        $page_tpl = $this->modx->getOption('seofilter_page_tpl', null, '', true);
-        $lastModified = $this->modx->getOption('seofilter_last_modified', null, 0, true);
-        $mfilterWords = $this->modx->getOption('seofilter_mfilter_words', null, 0, true);
-
-        $count_childrens = $this->modx->getOption('seofilter_count', null, 0, true);
-        $count_choose = $this->modx->getOption('seofilter_choose', null, '', true);
-        $count_select = $this->modx->getOption('seofilter_select', null, '', true);
-        $prepareSnippet = $this->modx->getOption('seofilter_snippet', null, '', true);
-        $hideEmpty = $this->modx->getOption('seofilter_hide_empty', null, 0, true);
-
-        $replacebefore = $this->modx->getOption('seofilter_replacebefore', null, 0, true);
-        $replaceseparator = $this->modx->getOption('seofilter_replaceseparator', null, ' / ', true);
-        $jtitle = $this->modx->getOption('seofilter_jtitle', null, '', true);
-        $jlink = $this->modx->getOption('seofilter_jlink', null, '', true);
-        $jdescription = $this->modx->getOption('seofilter_jdescription', null, '', true);
-        $jintrotext = $this->modx->getOption('seofilter_jintrotext', null, '', true);
-        $jkeywords = $this->modx->getOption('seofilter_jkeywords', null, '', true);
-        $jh1 = $this->modx->getOption('seofilter_jh1', null, '', true);
-        $jh2 = $this->modx->getOption('seofilter_jh2', null, '', true);
-        $jtext = $this->modx->getOption('seofilter_jtext', null, '', true);
-        $jcontent = $this->modx->getOption('seofilter_jcontent', null, '', true);
-
-        $content_richtext = $this->modx->getOption('seofilter_content_richtext', null, '');
-        $content_ace = $this->modx->getOption('seofilter_content_ace', null, 'content,Rule.content');
-        $collect_words = $this->modx->getOption('seofilter_collect_words', null, 1);
-        $hiddenTab = $this->modx->getOption('seofilter_hidden_tab', null, 0, true);
-        $superHiddenProps = $this->modx->getOption('seofilter_super_hidden_props', null, 0, true);
-        $tplsPath = $this->modx->getOption('seofilter_tpls_path', null, '', true);
-        $urlHelp = $this->modx->getOption('seofilter_url_help', null, '', true);
-        $crumbsReplace = $this->modx->getOption('seofilter_crumbs_replace', null, 1, true);
-        $crumbsNested = $this->modx->getOption('seofilter_crumbs_nested', null, 0, true);
-        $crumbsCurrent = $this->modx->getOption('seofilter_crumbs_tpl_current', null, 'tpl.SeoFilter.crumbs.current',
-            true);
-
-        $proMode = $this->modx->getOption('seofilter_pro_mode', null, 0, true);
-        $scheme = $this->modx->getOption('seofilter_url_scheme', null, $this->modx->getOption('link_tag_scheme'), true);
-        $defaultWhere = $this->modx->getOption('seofilter_default_where', null, '{"published":1,"deleted":0}', true);
-
-        $possibleSuffixes = array_map('trim',
-            explode(',', $this->modx->getOption('seofitler_possible_suffixes', null, '/,.html,.php', true)));
-        $admin_version = $this->modx->getOption('seofilter_admin_version', null, 1);
-        $main_alias = $this->modx->getOption('seofilter_main_alias', null, 0);
-        $count_class = $this->modx->getOption('seofilter_count_handler_class', null, 'sfCountHandler', true);
-        $classes = $this->modx->getOption('seofilter_classes', null, 'msProduct', true);
-        $templates = $this->modx->getOption('seofilter_templates', null, '', true);
-        $decline = $this->modx->getOption('seofilter_decline', null, 0, true);
-        $morpher_token = $this->modx->getOption('seofilter_morpher_token', null, 0, true);
-
-        $edit_url_mask = $this->modx->getOption('seofilter_edit_url_mask', null, 0, true);
-
+        $this->config = $this->prepareConfig($config);
         $this->pdo = $this->modx->getService('pdoFetch');
         $this->pdo->setConfig(['loadModels' => 'seofilter']);
-
-        $this->config = array_merge([
-            'assetsUrl'     => $assetsUrl,
-            'cssUrl'        => $assetsUrl.'css/',
-            'jsUrl'         => $assetsUrl.'js/',
-            'imagesUrl'     => $assetsUrl.'images/',
-            'connectorUrl'  => $connectorUrl,
-            'actionUrl'     => $actionUrl,
-            'json_response' => true,
-
-            'corePath'       => $corePath,
-            'customPath'     => $customPath,
-            'modelPath'      => $corePath.'model/',
-            'chunksPath'     => $corePath.'elements/chunks/',
-            'templatesPath'  => $corePath.'elements/templates/',
-            'chunkSuffix'    => '.chunk.tpl',
-            'snippetsPath'   => $corePath.'elements/snippets/',
-            'processorsPath' => $corePath.'processors/',
-
-            'params'           => [],
-            'ajax'             => $ajax,
-            'separator'        => $separator,
-            'level_separator'  => $level_separator,
-            'between_urls'     => $between_urls,
-            'redirect'         => $redirect,
-            'site_start'       => $site_start,
-            'site_url'         => $site_url,
-            'charset'          => $charset,
-            'base_get'         => $base_get,
-            'values_delimeter' => $values_delimeter,
-            'container_suffix' => $seo_container_suffix,
-            'url_suffix'       => $url_suffix,
-            'decline'          => $decline,
-            'morpher_token'    => $morpher_token,
-
-            'count_childrens' => $count_childrens,
-            'count_choose'    => $count_choose,
-            'count_select'    => $count_select,
-            'count_class'     => $count_class,
-            'prepareSnippet'  => $prepareSnippet,
-
-            'title'         => $title,
-            'description'   => $description,
-            'introtext'     => $introtext,
-            'keywords'      => $keywords,
-            'link'          => $link,
-            'h1'            => $h1,
-            'h2'            => $h2,
-            'text'          => $text,
-            'content'       => $content,
-            'page_key'      => $page_key,
-            'page_tpl'      => $page_tpl,
-            'page_number'   => 1,
-            'admin_version' => $admin_version,
-            'main_alias'    => $main_alias,
-
-            'replace_host'     => $replace_host,
-            'replacebefore'    => $replacebefore,
-            'replaceseparator' => $replaceseparator,
-            'jtitle'           => $jtitle,
-            'jdescription'     => $jdescription,
-            'jintrotext'       => $jintrotext,
-            'jkeywords'        => $jkeywords,
-            'jlink'            => $jlink,
-            'jh1'              => $jh1,
-            'jh2'              => $jh2,
-            'jtext'            => $jtext,
-            'jcontent'         => $jcontent,
-            'tpls_path'        => $tplsPath,
-            'url_help'         => $urlHelp,
-            'hideEmpty'        => $hideEmpty,
-            'possibleSuffixes' => $possibleSuffixes,
-            'lastModified'     => $lastModified,
-            'crumbsReplace'    => $crumbsReplace,
-            'crumbsNested'     => $crumbsNested,
-            'crumbsCurrent'    => $crumbsCurrent,
-            'mfilterWords'     => $mfilterWords,
-            'superHiddenProps' => $superHiddenProps,
-            'hiddenTab'        => $hiddenTab,
-            'proMode'          => $proMode,
-            'scheme'           => $scheme,
-            'defaultWhere'     => $defaultWhere,
-            'content_richtext' => $content_richtext,
-            'content_ace'      => $content_ace,
-            'collect_words'    => $collect_words,
-            'classes'          => $classes,
-            'templates'        => $templates,
-            'edit_url_mask'    => $edit_url_mask
-        ], $config);
 
         $this->modx->addPackage('seofilter', $this->config['modelPath']);
         $this->modx->lexicon->load('seofilter:default');
     }
+
 
     /**
      * Initializes component into different contexts.
@@ -219,7 +46,6 @@ class SeoFilter
             return $this->initialized[$ctx];
         }
         $this->config = array_merge($this->config, $scriptProperties);
-        //        $this->config['ctx'] = $ctx;
 
         if ($this->config['ajax']) {
             $config = $this->makePlaceholders($this->config);
@@ -227,21 +53,17 @@ class SeoFilter
                 false));
             if (!empty($js) && preg_match('/\.js/i', $js)) {
                 $js_file = str_replace($config['pl'], $config['vl'], $js);
-                //$js_file = $this->pdo->parseChunk('@INLINE ' . $js, $this->config);
 
-                if (preg_match('/\.js$/i', $js_file) && $this->config['admin_version']) {
+                if ($this->config['admin_version'] && preg_match('/\.js$/i', $js_file)) {
                     $js_file .= '?v='.mb_substr(md5($this->version), 0, 10);
                 }
 
-                if (isset($this->modx->loadedjscripts[$js_file])) {
-                    unset($this->modx->loadedjscripts[$js_file]);
+                if (!isset($this->modx->loadedjscripts[$js_file])) {
+                    $this->modx->regClientScript($js_file);
                 }
-                $this->modx->regClientScript($js_file);
             }
 
             if ($this->config['page']) {
-                //                    $aliases = $this->fieldsAliases($this->config['page'], 1);
-                //                    $this->config['aliases'] = $aliases;
                 $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', $this->config['scheme']);
 
                 if ($this->config['replace_host']) {
@@ -279,6 +101,7 @@ class SeoFilter
                 'ctx'              => $ctx,
                 'page'             => $this->config['page'],
                 'params'           => $this->config['params'],
+                'hash'             => $this->config['hash'],
                 //                    'aliases' => $this->config['aliases'],
                 'slider'           => $this->config['slider'],
                 'crumbs'           => $this->config['crumbsReplace'],
@@ -2967,12 +2790,10 @@ class SeoFilter
             if ($field['where'] && $field['compare']) {
                 $q->where($this->fieldWhere($field['compare'], $field['value']));
             }
-            //            $q->select($this->modx->getSelectColumns('sfDictionary','sfDictionary','',array('id','relation_word','input','value','alias')));
             $q->select($this->modx->getSelectColumns('sfDictionary', 'sfDictionary', '', $seo_system, 1));
             if ($q->prepare() && $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     $word = $this->prepareWordsToLink($row, ['alias' => $alias], count($fields));
-                    //                    $word = $row;
 
                     if ($field['field_hideparam']) {
                         $word['url_part'] = $row['alias'];
@@ -3024,47 +2845,26 @@ class SeoFilter
         return ['words' => array_values($words1), 'fields' => $fields];
     }
 
-    public function mergeWords(&$a1 = [], &$a2 = [])
-    {
-        $a3 = [];
-        for ($i = 0; $i < count($a1); $i++) {
-            for ($j = 0; $j < count($a2); $j++) {
-                $a3[] = $a1[$i] + $a2[$j];
-            }
-        }
-        return $a3;
-    }
-
 
     public function wordsMultiplication(&$a1 = [], &$a2 = [])
     {
         $a3 = [];
-        //        foreach($a1 as $i => &$word1)  {
-        for ($i = 0; $i < count($a1); $i++) {
-            if ($i) {
-                //                unset($a1[$i-1]);
-            }
-            //            foreach($a2 as $j => &$word2) {
-            for ($j = 0; $j < count($a2); $j++) {
+        for ($i = 0, $iMax = count($a1); $i < $iMax; $i++) {
+            for ($j = 0, $jMax = count($a2); $j < $jMax; $j++) {
                 $delete = $a1[$i]['delete'] || $a2[$j]['delete'];
 
                 $arr = [
                     'urls'     => array_merge($a1[$i]['urls'], $a2[$j]['urls']),
-                    //                    'urls' => $a1[$i]['urls'],
                     'aliases'  => array_merge($a1[$i]['aliases'], $a2[$j]['aliases']),
-                    //                    'aliases' => $a1[$i]['aliases'],
-                    //                    'words'=>array_merge($a1[$i]['words'],$a2[$j]['words']),
-                    //                    'words'=> $a1[$i]['words'],
                     'relation' => array_merge($a1[$i]['relation'], $a2[$j]['relation']),
-                    //                    'relation'=>$a1[$i]['relation'],
                     'delete'   => $delete
                 ];
                 $find = 1;
                 if ($a2[$j]['field_relation'] && $a2[$j]['word_relation']) {
                     $find = 0;
                     foreach ($a1[$i]['relation'] as $relation) {
-                        if ($relation['field_id'] == $a2[$j]['field_relation']
-                            && $relation['word_id'] == $a2[$j]['word_relation']) {
+                        if ($relation['field_id'] === $a2[$j]['field_relation']
+                            && $relation['word_id'] === $a2[$j]['word_relation']) {
                             $find = 1;
                             break;
                         }
@@ -3119,4 +2919,768 @@ class SeoFilter
         }
         return $where;
     }
+
+    /**
+     * Основной метод компонента, который по URL находит SEO-страницу
+     *
+     * @param  string  $requestUrl
+     */
+    public function processUrl($requestUrl)
+    {
+        if (!$request = $this->prepareUrl($requestUrl)) {
+            return;
+        }
+
+        $this->superMethod($request);
+
+        // if (!$page = $this->_findPageId($request)) {
+        //     return;
+        // }
+        // if (!$page = $this->_findPageId($request)) {
+        //     return;
+        // }
+    }
+
+    /**
+     * Небольшая подготовка адреса
+     *
+     * @param  string  $request
+     *
+     * @return string
+     */
+    protected function prepareUrl($request)
+    {
+        if (!empty($this->config['url_suffix'])) {
+            $urlSuffix = $this->config['url_suffix'];
+            if (mb_strpos($request, $urlSuffix, mb_strlen($request) - mb_strlen($urlSuffix)) !== false) {
+                $request = mb_substr($request, 0, -mb_strlen($urlSuffix));
+            }
+        }
+        return trim($request, '/');
+    }
+
+    /**
+     * Поиск ID страницы, привязанной к SEO-правилам по URL части
+     *
+     * @param  string  $request
+     *
+     * @return int|null
+     */
+    protected function _findPageId($request)
+    {
+        $seoPageId = null;
+
+        if (!$pageIds = $this->getPageIdsFromRules()) {
+            return null;
+        }
+        if (!$pages = $this->getPagesFromRules()) {
+            return null;
+        }
+        $this->modx->log(1, print_r($pages, 1));
+
+
+        return $seoPageId;
+    }
+
+
+    /**
+     * Новый метод.Получение основных данных по страницам, привязанным к правилам
+     *
+     * @return array|null
+     */
+    protected function getPagesFromRules()
+    {
+        $pages = [];
+
+        if (!$pageIds = $this->getPageIdsFromRules()) {
+            return null;
+        }
+
+        $contextKey = $this->modx->getOption('seofilter_catalog_context', null, $this->modx->context->key);
+        if (($q = $this->modx->newQuery('modResource')
+                ->where([
+                    'id:IN'       => $pageIds,
+                    'deleted'     => false,
+                    'published'   => true,
+                    'context_key' => $contextKey// TODO: вроде как-лишнее. Достаточно сортировки по контексту
+                ])
+                ->select($this->modx->getSelectColumns('modResource', 'modResource', '',
+                    ['id', 'alias', 'uri', 'uri_override', 'context_key']))
+                ->sortby("context_key = '{$contextKey}'", 'DESC')
+                ->prepare())
+            && $q->execute()) {
+            while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+                $url = $this->clearSuffixes($row['uri']);
+                if ($row['uri_override']) {
+                    $url = explode('/', $url);
+                    $row['url'] = array_pop($url);
+                } elseif ((int)$row['id'] === (int)$this->config['site_start']) {
+                    $row['url'] = '';
+                } else {
+                    $row['url'] = $url;
+                }
+
+                $pages[$row['id']] = $row;
+            }
+        }
+
+        return $pages;
+    }
+
+    /**
+     * Новый метод. Получение ID всех страниц, привязанных к правилам
+     *
+     * @return array
+     */
+    protected function getPageIdsFromRules()
+    {
+        $pageIds = [];
+        if (($q = $this->modx->newQuery('sfRule')
+                ->where(['active' => true])
+                ->select($this->modx->getSelectColumns('sfRule', 'sfRule', '', ['page', 'pages']))
+                ->groupby('page,pages')
+                ->prepare())
+            && $q->execute()) {
+            while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+                if ($this->config['proMode'] && !empty($row['pages'])) {
+                    foreach (array_map('trim', explode(',', $row['pages'])) as $pageId) {
+                        if (!in_array((int)$pageId, $pageIds, true)) {
+                            $pageIds[] = (int)$pageId;
+                        }
+                    }
+                } elseif (!in_array((int)$row['page'], $pageIds, true)) {
+                    $pageIds[] = (int)$row['page'];
+                }
+            }
+        }
+        return $pageIds;
+    }
+
+    public function superMethod($request)
+    {
+        $container_suffix = $this->config['container_suffix'];
+        $url_suffix = $this->config['url_suffix'];
+        $url_redirect = $this->config['redirect'];
+
+        $base_get = array_map('trim', explode(',', $this->config['base_get']));
+        $separator = $this->config['separator'];
+        $params = []; //итоговый массив с параметром и значением
+        $last_char = ''; //был ли в конце url-а слэш
+        //если используете контексты, то переключить должны до события onPageNotFound
+        //если же каталог находится строго в другом контексте, то можете добавить настройку и прописать туда свой контекст
+
+        $between_urls = $this->config['between_urls'];
+        $site_start = $this->config['site_start'];
+        $page = $fast_search = 0; //переменные для проверки
+        //если используете контексты, то переключить должны до события onPageNotFound
+        $ctx = $this->modx->getOption('seofilter_catalog_context', null, $this->modx->context->key);
+        //если же каталог находится строго в другом контексте, то можете добавить настройку и прописать туда свой контекст
+
+        $check_doubles = false;
+        $uris = $aliases = [];
+
+        $q = $this->modx->newQuery('sfRule');
+        $q->where(['active' => 1]);
+        $q->select(['sfRule.*']);
+        $all_pages = [];
+        if ($q->prepare() && $q->stmt->execute()) {
+            while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                if ($this->config['proMode']) {
+                    $pages = $row['pages'];
+                    if (empty($pages)) {
+                        $pages = $row['page'];
+                    }
+                } else {
+                    $pages = $row['page'];
+                    if (empty($pages) && !empty($row['pages'])) {
+                        $pages = $row['pages'];
+                    }
+                }
+                $pages = array_map('trim', explode(',', $pages));
+                foreach ($pages as $linkedPageId) {
+                    $all_pages[] = $linkedPageId;
+                }
+            }
+        }
+        $all_pages = array_unique($all_pages);
+        if (empty($all_pages)) {
+            return null;
+        }
+        $q = $this->modx->newQuery('modResource');
+        $q->where([
+            'id:IN'       => $all_pages,
+            'deleted'     => 0,
+            'published'   => 1,
+            'context_key' => $ctx
+        ]);
+        $q->select([
+            'modResource.id,modResource.alias,modResource.uri,modResource.uri_override'
+        ]);
+        if ($q->prepare() && $q->stmt->execute()) {
+            while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $uri = $this->clearSuffixes($row['uri']);
+                if ((int)$row['id'] === (int)$site_start) {
+                    $uri = '';
+                }
+
+                $uris[$row['id']] = array_reverse(explode('/', $uri), 1);
+                //переворот для удобства поиска
+
+                $alias = $row['alias'];
+                if ($row['uri_override']) {
+                    //если url заморожен
+                    $uri = explode('/', $uri);
+                    $alias = array_pop($uri);
+                }
+
+                if (in_array($alias, $aliases, true)) {
+                    $check_doubles = true;
+                }
+                $aliases[$row['id']] = $alias;
+            }
+        }
+
+        //обязательная сортировка массива по количеству внутренних алиасов
+        uasort($uris, function ($a, $b) {
+            if (count($a) === count($b)) {
+                return 0;
+            }
+            return (count($a) > count($b)) ? -1 : 1;
+        });
+
+        $tmp = explode($between_urls, $request);
+        $r_tmp = array_reverse($tmp, 1); //перевёрнутый запрос
+
+        if ($between_urls !== '/') {
+            //if all links in the first level
+            $page = 0;
+            $remaining_part = '';
+            foreach ($uris as $page_id => $uri_arr) {
+                $uri_part = implode('/', array_reverse($uri_arr, 1));
+                if (strpos($request, $uri_part) === 0) {
+                    $page = $page_id;
+                    $remaining_part = trim(str_replace($uri_part, '', $request), $between_urls);
+                    break;
+                }
+            }
+
+            if ($page && $remaining_part) {
+                //we found one page
+                $tmp = explode('/', $remaining_part);
+            } elseif (array_key_exists($site_start, $aliases)) {
+                $page = $site_start;
+                if ($this->config['main_alias']) {
+                    $upart = $aliases[$page].$between_urls;
+                    if (strpos($request, $upart) === 0) {
+                        $tmp = explode('/', substr($request, strlen($upart)));
+                    } else {
+                        return null;
+                    }
+                } else {
+                    $tmp = explode('/', $request);
+                }
+            }
+        } elseif ($check_doubles) {
+            //если есть дубли синонимов
+            foreach ($uris as $page_id => $uri_arr) {
+                $need_count = count($uri_arr); //сколько совпадений подряд нужно
+                $uri_count = 0; //количество совпадений
+                $pos_count = false; //позиция, на которой произошло сопадение
+                $check_break = false; //проверка, чтобы в разнобой не пошло
+                foreach ($r_tmp as $t_key => $t_alias) {
+                    foreach ($uri_arr as $u_key => $uri) {
+                        if ($uri === $t_alias) {
+                            if ($pos_count !== false) {
+                                if ($pos_count - $uri_count !== $t_key) {
+                                    $check_break = true;
+                                    break;
+                                }
+                            } else {
+                                $pos_count = $t_key;
+                            }
+                            $uri_count++;
+                            break; //выходим из перебора uri для текущего alias-а в адресе
+                        }
+                    }
+                    if ($check_break) {
+                        break;
+                    }
+                }
+                if ($need_count === $uri_count) {
+                    //ссылка найдена
+                    $page = $page_id;
+                    $tmp = array_slice($tmp, ++$pos_count);
+                    break;
+                }
+            }
+        } else {
+            //простой механизм поиска
+            $tmp_id = 0;
+
+            foreach ($r_tmp as $t_key => $t_alias) {
+                foreach ($aliases as $pageId => $pageAlias) {
+                    if (strpos($pageAlias, '/') !== false && strpos($pageAlias, $t_alias) === 0) {
+                        $pageAliases = explode('/', $pageAlias);
+                        $findPage = true;
+                        foreach ($pageAliases as $pk => $pAlias) {
+                            if ($r_tmp[$t_key + $pk] !== $pAlias) {
+                                $findPage = false;
+                                break;
+                            }
+                        }
+                        if ($findPage) {
+                            $page = $pageId;
+                            $tmp_id = $t_key + $pk;
+                            break 2;
+                        }
+                    } elseif ($t_alias === $pageAlias) {
+                        $page = $pageId;
+                        $tmp_id = $t_key;
+                        break 2;
+                    }
+                }
+            }
+            if ($page) {
+                for ($i = 0; $i <= $tmp_id; $i++) {
+                    array_shift($tmp);
+                }
+            }
+        }
+
+        //если страница не найдена, то проверим, вдруг это главная страница
+        if (!$page && array_key_exists($site_start, $aliases)) {
+            $page = $site_start;
+        }
+
+
+        if ($page) {
+            if ((int)$page === (int)$site_start) {
+                $url = '';
+            } else {
+                $url = $this->modx->makeUrl($page, $ctx, '', -1);
+            }
+            if ($this->modx->getOption('site_url') && $this->modx->getOption('site_url') !== '/'
+                && strpos($url, $this->modx->getOption('site_url')) !== false) {
+                $url = str_replace($this->modx->getOption('site_url'), '', $url);
+            }
+            if (($c_suffix = $this->config['container_suffix'])
+                && strlen($url) && strpos($url, $c_suffix, strlen($url) - strlen($c_suffix)) !== false) {
+                $url = substr($url, 0, -strlen($c_suffix));
+            }
+            foreach ($this->config['possibleSuffixes'] as $possibleSuffix) {
+                if (substr($url, -strlen($possibleSuffix)) === $possibleSuffix) {
+                    $url = substr($url, 0, -strlen($possibleSuffix));
+                }
+            }
+
+            if ($between_urls === '/') {
+                if (implode('/', array_reverse(array_diff($r_tmp, $tmp))) !== trim($url, '/')) {
+                    return;
+                }
+            } elseif ($url) {
+                if (trim($url, '/') !== str_replace($between_urls.implode('/', $tmp), '', $request)) {
+                    return;
+                }
+            }
+
+            if (!empty($this->config['page_tpl'])) {
+                //^page-\d+$
+                $page_part = $this->pdo->parseChunk('@INLINE '.$this->config['page_tpl'], [
+                    'pageVarKey'              => $this->config['page_key'],
+                    'pagevarkey'              => $this->config['page_key'],
+                    $this->config['page_key'] => '\d+$'
+                ]);
+                $page_part = '/^'.trim($page_part, '/').'/';
+
+                foreach ($tmp as $k => $s) {
+                    if (preg_match($page_part, $s)) {
+                        $page_num = preg_replace("/\D+/", '', $s);
+                        unset($tmp[$k]);
+                        if ($page_num > 1) {
+                            $_GET[$this->config['page_key']] = $_REQUEST[$this->config['page_key']] = $page_num;
+                        }
+                    }
+                }
+            }
+
+            if ($tmp && $url_array = $this->findUrlArray(implode($this->config['level_separator'], $tmp),
+                    $page)) {
+                if ($url_array['active']) {
+                    $old_url = $url_array['old_url'];
+                    $new_url = $url_array['new_url'];
+                    $rule_id = $url_array['multi_id'];
+                    $toFind = implode($this->config['level_separator'], $tmp).$url_suffix;
+
+
+                    if ($new_url && ($new_url !== implode($this->config['level_separator'], $tmp))) {
+                        if ($container_suffix && strpos($url, $container_suffix,
+                                strlen($url) - strlen($container_suffix)) !== false) {
+                            $url = substr($url, 0, -strlen($container_suffix));
+                        }
+                        if (((int)$site_start === (int)$page) && $this->config['main_alias']) {
+                            $q = $this->modx->newQuery('modResource', ['id' => $page]);
+                            $q->select('alias');
+                            $malias = $this->modx->getValue($q->prepare());
+                            $new_url = $malias.$between_urls.$new_url;
+                        }
+                        $this->modx->sendRedirect($url.'/'.$new_url.$url_suffix, [
+                            'type'         => 'REDIRECT_HEADER',
+                            'responseCode' => 'HTTP/1.1 301 Moved Permanently'
+                        ]);
+                    } elseif ($url_redirect && ($url_suffix !== $last_char)
+                        && ((strpos($_SERVER['REQUEST_URI'],
+                                    $toFind) === false) || (strpos($_SERVER['QUERY_STRING'],
+                                    $toFind) === false)) //when server have bugs
+                    ) {
+                        if ($container_suffix && strpos($url, $container_suffix,
+                                strlen($url) - strlen($container_suffix)) !== false) {
+                            $url = substr($url, 0, -strlen($container_suffix));
+                        }
+                        $this->modx->sendRedirect($url.'/'.implode($this->config['level_separator'],
+                                $tmp).$url_suffix, [
+                            'type'         => 'REDIRECT_HEADER',
+                            'responseCode' => 'HTTP/1.1 301 Moved Permanently'
+                        ]);
+                    }
+
+                    $tmp = explode($this->config['level_separator'], $old_url);
+                    $menuTitle = '';
+                    if ($url_array['menu_on']) {
+                        $menuTitle = $url_array['menutitle'];
+                    }
+
+                    $q = $this->modx->newQuery('sfUrlWord');
+                    $q->sortby('priority', 'ASC');
+                    $q->leftJoin('sfField', 'sfField', 'sfUrlWord.field_id = sfField.id');
+                    $q->leftJoin('sfDictionary', 'sfDictionary', 'sfUrlWord.word_id = sfDictionary.id');
+                    $q->where(['sfUrlWord.url_id' => $url_array['id']]);
+                    $q->select('sfUrlWord.id, sfField.id as field_id, sfField.alias as field_alias,sfField.key as field_key,sfField.tagmanager as field_tm2,sfDictionary.value as word_value, sfDictionary.input as word_input, sfDictionary.alias as word_alias');
+                    if ($q->prepare() && $q->stmt->execute()) {
+                        while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                            if ($this->config['proMode'] && mb_strpos($row['word_input'], '||') !== false) {
+                                $_GET[$row['field_alias']] = $_REQUEST[$row['field_alias']] = str_replace('||', ',',
+                                    $row['word_input']);
+                                $params[$row['field_alias']] = $row['word_input'];
+                            } elseif ($row['field_tm2']) {
+                                $tm2Multitags = array_map('trim', explode(',', $this->config['tm2_multitags']));
+                                $tm2Numeric = array_map('trim', explode(',', $this->config['tm2_numeric']));
+                                $fieldKey = 'f_'.$row['field_key'];
+
+                                if (in_array($row['field_key'], $tm2Multitags, true)) {
+                                    if (isset($_GET[$fieldKey]['like'])) {
+                                        $input = $_GET[$fieldKey];
+                                        $input['like'][] = trim($row['word_input'], $this->config['tm2_tags_guard']);
+                                    } else {
+                                        $input = [
+                                            'like' => [
+                                                trim($row['word_input'], $this->config['tm2_tags_guard'])
+                                            ]
+                                        ];
+                                    }
+                                } elseif (in_array($row['field_key'], $tm2Numeric, true)) {
+                                    $numbers = array_map('trim', explode(',', $row['word_input']));
+                                    $input = ['from' => $numbers[0]];
+                                    if (isset($numbers[1])) {
+                                        $input['to'] = $numbers[1];
+                                    }
+                                } elseif (isset($_GET[$fieldKey])) {
+                                    $input = $_GET[$fieldKey];
+                                    $input[] = $row['word_input'];
+                                } else {
+                                    $input = [$row['word_input']];
+                                }
+
+                                $_GET[$fieldKey] = $_REQUEST[$fieldKey] = $input;
+                                $params[$row['field_alias']] = $row['word_input'];
+                            } else {
+                                $_GET[$row['field_alias']] = $_REQUEST[$row['field_alias']] = $params[$row['field_alias']] = $row['word_input'];
+                            }
+
+                            if (!$menuTitle) {
+                                $menuTitle = $row['word_value'];
+                            }
+                        }
+                    }
+
+                    $q = $this->modx->newQuery('sfFieldIds');
+                    $q->where(['multi_id' => $rule_id]);
+                    $urlFields = $this->modx->getCount('sfFieldIds', $q);
+
+                    //Доп проверка на изменения в базе
+                    if ((count($params) !== $urlFields)
+                        && ($links = $this->pdo->getCollection('sfFieldIds', ['multi_id' => $rule_id],
+                            ['sortby' => 'priority']))
+                        && count($tmp) === count($links)) {  //дополнительная проверка на количество параметров в адресе и пересечении
+                        foreach ($links as $lkey => $link) {
+                            if ($field = $this->pdo->getArray('sfField', $link['field_id'])) {
+                                $alias = $field['alias'];
+                                if ($field['hideparam']) {
+                                    if ($word = $this->pdo->getArray('sfDictionary', ['alias' => $tmp[$lkey]])) {
+                                        if ($this->config['proMode'] && strpos($word['input'],
+                                                '||') !== 0) {
+                                            $_GET[$alias] = $_REQUEST[$alias] = str_replace('||', ',',
+                                                $word['input']);
+                                            $params[$alias] = $word['input'];
+                                        } else {
+                                            $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                        }
+                                        if (!$menuTitle) {
+                                            $menuTitle = $word['value'];
+                                        }
+                                    }
+                                } else {
+                                    $tmp_arr = explode($separator, $tmp[$lkey]);
+                                    $word_alias = '';
+                                    if ($field['valuefirst']) {
+                                        $del = array_pop($tmp_arr);
+                                        if ($del === $alias) {
+                                            $word_alias = implode($separator, $tmp_arr);
+                                        }
+                                    } else {
+                                        $del = array_shift($tmp_arr);
+                                        if ($del === $alias) {
+                                            $word_alias = implode($separator, $tmp_arr);
+                                        }
+                                    }
+                                    if ($word_alias && $word = $this->pdo->getArray('sfDictionary',
+                                            ['alias' => $word_alias, 'field_id' => $field['id']])) {
+                                        if ($this->config['proMode'] && strpos($word['input'],
+                                                '||') !== 0) {
+                                            $_GET[$alias] = $_REQUEST[$alias] = str_replace('||', ',',
+                                                $word['input']);
+                                            $params[$alias] = $word['input'];
+                                        } else {
+                                            $_GET[$alias] = $_REQUEST[$alias] = $params[$alias] = $word['input'];
+                                        }
+                                        if (!$menuTitle) {
+                                            $menuTitle = $word['value'];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (count($params)) {
+                        $original_params = array_diff_key(
+                            array_merge($_GET, $params),
+                            array_flip(array_merge([$this->modx->context->getOption('request_param_alias', 'q')],
+                                $base_get))
+                        );
+
+
+                        $fast_search = true;
+                        $meta = $this->getRuleMeta($params, $rule_id, $page, 0, 0, $original_params);
+
+                        //обновление счётчика, если отличается количество
+                        if (empty($meta['diff']) && $this->config['count_childrens']
+                            && (int)$meta['url_id'] && ((int)$meta['total'] !== (int)$meta['old_total'])) {
+                            $this->updateUrlTotal($meta['url_id'], $meta['total']);
+                        }
+
+                        if ($this->config['hideEmpty'] && $this->config['count_childrens'] && empty($meta['total'])) {
+                            $this->modx->setPlaceholder('sf.seo_id', $url_array['id']);
+                            return;
+                        }
+
+                        if ($this->config['lastModified']) {
+                            if (empty($meta['editedon']) && $meta['editedon'] !== '0000-00-00 00:00:00') {
+                                $modified = $meta['editedon'];
+                            } else {
+                                $modified = $meta['createdon'];
+                            }
+                            $modified = date('r', strtotime($modified));
+                            $qtime = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? $_SERVER['HTTP_IF_MODIFIED_SINCE'] : '';
+                            if (strtotime($qtime) >= strtotime($modified)) {
+                                header('HTTP/1.1 304 Not Modified ');
+                                exit();
+                            }
+                            header("Last-Modified: $modified");
+                        }
+
+                        $this->initialize($ctx, [
+                            'page'   => $page,
+                            'params' => $params,
+                            'hash'   => http_build_query(array_intersect_key($_GET, $params))
+                        ]);
+
+                        if ($this->modx->getOption('msvendorcollections_on_frontend', null, 0)
+                            && is_dir($this->modx->getOption('core_path').'components/msvendorcollections/model/')
+                            && ($msVC = $this->modx->getService('msvendorcollections', 'msVendorCollections',
+                                $this->modx->getOption('msvendorcollections_core_path', null,
+                                    $this->modx->getOption('core_path').'components/msvendorcollections/').'model/msvendorcollections/',
+                                []))
+                            && !$msVC->initialized[$ctx]) {
+                            $msVC->initialize($ctx, ['page' => $page]);
+                        }
+
+
+                        $meta['menutitle'] = $menuTitle;
+                        if (isset($meta['properties'])) {
+                            $meta['properties'] = $this->modx->toJSON($meta['properties']);
+                        }
+                        if (isset($meta['introtexts'])) {
+                            $meta['introtexts'] = $this->modx->toJSON($meta['introtexts']);
+                        }
+                        if (isset($meta['url'])) {
+                            $meta['url'] .= $this->config['url_suffix'];
+                        }
+
+                        if ($ctx !== 'web') {
+                            $this->modx->switchContext($ctx);
+                        }
+
+                        $plugin_response = $this->invokeEvent('sfOnReturnMeta',
+                            ['action' => 'plugin', 'page' => $page, 'meta' => $meta, 'SeoFilter' => $this]);
+                        if ($plugin_response['success']) {
+                            $meta = $plugin_response['data']['meta'];
+                        }
+
+                        $meta['params'] = $this->modx->toJSON($params);
+                        $this->modx->setPlaceholders($meta, 'sf.');
+
+                        $this->modx->resourceMethod = 'id';
+                        $this->modx->resourceIdentifier = $page;
+                        $this->modx->invokeEvent('OnWebPageInit');
+                        $this->modx->sendForward($page);
+                    } elseif ($url = $this->modx->getObject('sfUrls',
+                        ['page_id' => $page, 'old_url' => $old_url, 'multi_id' => $rule_id])) {
+                        $url->set('active', 0);
+                        $url->save();
+                    }
+                } else {
+                    $this->modx->setPlaceholder('sf.seo_id', $url_array['id']);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param  array  $config
+     *
+     * @return array
+     */
+    protected function prepareConfig($config = [])
+    {
+        $corePath = $this->modx->getOption('seofilter_core_path', $config,
+            $this->modx->getOption('core_path').'components/seofilter/'
+        );
+
+        $assetsUrl = $this->modx->getOption('seofilter_assets_url', $config,
+            $this->modx->getOption('assets_url').'components/seofilter/'
+        );
+
+        return array_merge([
+            'assetsUrl'     => $assetsUrl,
+            'cssUrl'        => $assetsUrl.'css/',
+            'jsUrl'         => $assetsUrl.'js/',
+            'imagesUrl'     => $assetsUrl.'images/',
+            'connectorUrl'  => $assetsUrl.'connector.php',
+            'actionUrl'     => $assetsUrl.'action.php',
+            'json_response' => true,
+
+            'corePath'       => $corePath,
+            'customPath'     => $this->getOption('custom_path', $corePath.'custom/'),
+            'modelPath'      => $corePath.'model/',
+            'chunksPath'     => $corePath.'elements/chunks/',
+            'templatesPath'  => $corePath.'elements/templates/',
+            'chunkSuffix'    => '.chunk.tpl',
+            'snippetsPath'   => $corePath.'elements/snippets/',
+            'processorsPath' => $corePath.'processors/',
+
+            'hash'             => '',
+            'params'           => [],
+            'ajax'             => $this->getOption('ajax', 1),
+            'separator'        => $this->getOption('separator', '-'),
+            'level_separator'  => $this->getOption('level_separator', '/'),
+            'between_urls'     => $this->getOption('between_urls', '/'),
+            'redirect'         => $this->getOption('url_redirect', 0),
+            'site_start'       => $this->modx->context->getOption('site_start', 1),
+            'site_url'         => $this->modx->context->getOption('site_url',
+                $this->modx->getOption('site_url', null, '')),
+            'charset'          => $this->modx->context->getOption('modx_charset', 'UTF-8'),
+            'base_get'         => $this->getOption('base_get', ''),
+            'values_delimeter' => $this->getOption('values_delimeter', ','),
+            'container_suffix' => $this->getOption('container_suffix',
+                $this->modx->getOption('container_suffix', null, '/')),
+            'url_suffix'       => $this->getOption('url_suffix', ''),
+            'decline'          => $this->getOption('decline', 0),
+            'morpher_token'    => $this->getOption('morpher_token', 0),
+
+            'count_childrens' => $this->getOption('count', 0),
+            'count_choose'    => $this->getOption('choose', ''),
+            'count_select'    => $this->getOption('select', ''),
+            'count_class'     => $this->getOption('count_handler_class', 'sfCountHandler'),
+            'prepareSnippet'  => $this->getOption('snippet', ''),
+
+            'title'       => $this->getOption('title', ''),
+            'description' => $this->getOption('description', ''),
+            'introtext'   => $this->getOption('introtext', ''),
+            'keywords'    => $this->getOption('keywords', ''),
+            'link'        => $this->getOption('link', ''),
+            'h1'          => $this->getOption('h1', ''),
+            'h2'          => $this->getOption('h2', ''),
+            'text'        => $this->getOption('text', ''),
+            'content'     => $this->getOption('content', ''),
+
+            'page_key'      => $this->getOption('page_key', 'page'),
+            'page_tpl'      => $this->getOption('page_tpl', ''),
+            'page_number'   => 1,
+            'admin_version' => $this->getOption('admin_version', 1),
+            'main_alias'    => $this->getOption('main_alias', 0),
+
+            'replace_host'     => $this->getOption('replace_host', 0),
+            'replacebefore'    => $this->getOption('replacebefore', 0),
+            'replaceseparator' => $this->getOption('replaceseparator', ' / '),
+
+            'jtitle'       => $this->getOption('jtitle', ''),
+            'jdescription' => $this->getOption('jdescription', ''),
+            'jintrotext'   => $this->getOption('jintrotext', ''),
+            'jkeywords'    => $this->getOption('jkeywords', ''),
+            'jlink'        => $this->getOption('jlink', ''),
+            'jh1'          => $this->getOption('jh1', ''),
+            'jh2'          => $this->getOption('jh2', ''),
+            'jtext'        => $this->getOption('jtext', ''),
+            'jcontent'     => $this->getOption('jcontent', ''),
+
+            'tpls_path'        => $this->getOption('tpls_path', ''),
+            'url_help'         => $this->getOption('url_help', ''),
+            'hideEmpty'        => $this->getOption('hide_empty', 0),
+            'possibleSuffixes' => array_map('trim',
+                explode(',', $this->getOption('possible_suffixes', '/,.html,.php'))),
+            'lastModified'     => $this->getOption('last_modified', 0),
+            'crumbsReplace'    => $this->getOption('crumbs_replace', 1),
+            'crumbsNested'     => $this->getOption('crumbs_nested', 0),
+            'crumbsCurrent'    => $this->getOption('crumbs_tpl_current', 'tpl.SeoFilter.crumbs.current'),
+            'mfilterWords'     => $this->getOption('mfilter_words', 0),
+            'superHiddenProps' => $this->getOption('super_hidden_props', 0),
+            'hiddenTab'        => $this->getOption('hidden_tab', 0),
+            'proMode'          => $this->getOption('pro_mode', 0),
+            'scheme'           => $this->getOption('url_scheme', $this->modx->getOption('link_tag_scheme')),
+            'defaultWhere'     => $this->getOption('default_where', '{"published":1,"deleted":0}'),
+            'content_richtext' => $this->getOption('content_richtext', ''),
+            'content_ace'      => $this->getOption('content_ace', 'content,Rule.content'),
+            'collect_words'    => $this->getOption('collect_words', 1),
+            'classes'          => $this->getOption('classes', 'msProduct'),
+            'templates'        => $this->getOption('templates', ''),
+            'edit_url_mask'    => $this->getOption('edit_url_mask', 0),
+            'tm2_multitags'    => $this->modx->getOption('tag_mgr2.multitags', null, ''),
+            'tm2_tags_guard'   => $this->modx->getOption('tag_mgr2.guard_key', null, ''),
+            'tm2_numeric'      => $this->modx->getOption('tag_mgr2.numeric', null, '')
+        ], $config);
+    }
+
+    /**
+     * @param $option
+     * @param  null  $default
+     * @param  string  $ns
+     *
+     * @return mixed
+     */
+    protected function getOption($option, $default = null, $ns = 'seofilter_')
+    {
+        return $this->modx->getOption($ns.$option, null, $default, true);
+    }
+
+
 }

@@ -101,6 +101,12 @@ Ext.extend(SeoFilter.window.CreateField, MODx.Window, {
                     checked: true,
                 },{
                     xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_field_tagmanager'),
+                    description: _('seofilter_field_tagmanager_help'),
+                    name: 'tagmanager',
+                    id: config.id + '-tagmanager',
+                },{
+                    xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),
                     description: _('seofilter_field_active_help'),
                     name: 'active',
@@ -341,6 +347,12 @@ Ext.extend(SeoFilter.window.UpdateField, MODx.Window, {
                     description: _('seofilter_field_exact_help'),
                     name: 'exact',
                     id: config.id + '-exact',
+                },{
+                    xtype: 'xcheckbox',
+                    boxLabel: _('seofilter_field_tagmanager'),
+                    description: _('seofilter_field_tagmanager_help'),
+                    name: 'tagmanager',
+                    id: config.id + '-tagmanager',
                 },{
                     xtype: 'xcheckbox',
                     boxLabel: _('seofilter_field_active'),

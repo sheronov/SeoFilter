@@ -23,25 +23,21 @@ class sfMenu
     {
         $this->modx = &$modx;
 
-        $config = array_merge(
-            [
-                'firstClass'   => 'first',
-                'lastClass'    => 'last',
-                'hereClass'    => 'active',
-                'parentClass'  => '',
-                'rowClass'     => '',
-                'outerClass'   => '',
-                'innerClass'   => '',
-                'levelClass'   => '',
-                'selfClass'    => '',
-                'webLinkClass' => '',
-                'limit'        => 0,
-            ],
-            $config,
-            [
-                'return' => 'data',
-            ]
-        );
+        $config = array_merge([
+            'firstClass'   => 'first',
+            'lastClass'    => 'last',
+            'hereClass'    => 'active',
+            'parentClass'  => '',
+            'rowClass'     => '',
+            'outerClass'   => '',
+            'innerClass'   => '',
+            'levelClass'   => '',
+            'selfClass'    => '',
+            'webLinkClass' => '',
+            'limit'        => 0,
+        ], $config, [
+            'return' => 'data',
+        ]);
 
         $config['corePath'] = $this->modx->getOption('seofilter_core_path', $config,
             $this->modx->getOption('core_path').'components/seofilter/'
@@ -1363,7 +1359,7 @@ class sfMenu
     {
         $parents = [];
         foreach ($links as $row) {
-            if ((int)$row['id'] ===  (int)$id) {
+            if ((int)$row['id'] === (int)$id) {
                 $parents[] = $row['id'];
                 continue;
             }
