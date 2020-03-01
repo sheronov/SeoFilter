@@ -1,19 +1,26 @@
-if(typeof(seoFilterConfig) === 'undefined') {var seoFilterConfig = {};}
-if(typeof(mse2Config) === 'undefined') {var mse2Config = {};}
-if(typeof(sfConfig) === 'undefined') {var sfConfig = {};}
+if (typeof (seoFilterConfig) === 'undefined') {
+    var seoFilterConfig = {};
+}
+if (typeof (mse2Config) === 'undefined') {
+    var mse2Config = {};
+}
+if (typeof (sfConfig) === 'undefined') {
+    var sfConfig = {};
+}
 var SeoFilter = {
     config: seoFilterConfig,
     mse_config: mse2Config,
     other_config: sfConfig,
-    count :  Object.keys(seoFilterConfig.params).length || 0,
+    count: Object.keys(seoFilterConfig.params).length || 0,
     initialized: false,
 
     initialize: function () {
-        if(this.initialized) {
+        if (this.initialized) {
             return false;
         }
 
         this.mFilter2Handlers();
+        this.tmFiltersHandlers();
         this.seoFilterHandler();
         this.initialized = true;
 
@@ -21,24 +28,24 @@ var SeoFilter = {
 
     getCustomFilters: function (element) {
         var params = {};
-        if(!element) {
+        if (!element) {
             element = $(document).find('.sf_filters');
         }
         $(element).find('input, select').each(function () {
-            if(!this.name || this.name == 'undefined') {
+            if (!this.name || this.name == 'undefined') {
                 return;
             }
-            var name = this.name.replace('[]','');
-            if(this.tagName == 'SELECT') {
-                if($(this).find('option:selected').length) {
-                    if($(this).find('option:selected').attr('value')) {
+            var name = this.name.replace('[]', '');
+            if (this.tagName == 'SELECT') {
+                if ($(this).find('option:selected').length) {
+                    if ($(this).find('option:selected').attr('value')) {
                         params[name] = $(this).find('option:selected').attr('value');
                     }
                 }
             } else {
-                if($(this).is(':checked')) {
-                    if(params[name]) {
-                        params[name] += ','+$(this).val();
+                if ($(this).is(':checked')) {
+                    if (params[name]) {
+                        params[name] += ',' + $(this).val();
                     } else {
                         params[name] = $(this).val();
                     }
@@ -46,15 +53,15 @@ var SeoFilter = {
             }
         });
         var sort = this.getCustomSort();
-        if(Object.keys(sort).length) {
-            params = $.extend(params,sort);
+        if (Object.keys(sort).length) {
+            params = $.extend(params, sort);
         }
-        if (typeof(pdoPage) != 'undefined') {
+        if (typeof (pdoPage) != 'undefined') {
             params['hash'] = pdoPage.configs.page.hash;
-            if(pdoPage.keys.page && pdoPage.keys.page > 1) {
+            if (pdoPage.keys.page && pdoPage.keys.page > 1) {
                 // params['page'] = pdoPage.keys.page;
             }
-            this.loadMeta(params,'','meta_results');
+            this.loadMeta(params, '', 'meta_results');
         } else {
             this.loadMeta(params);
         }
@@ -64,18 +71,18 @@ var SeoFilter = {
     getCustomSort: function (submit) {
         var sort = {};
         var elems = $(document).find('.sf_sorting [name="sort"]');
-        if(elems.length) {
-            $.each(elems,function (i) {
-                if(this.tagName == 'SELECT') {
-                    if($(this).find('option:selected').length) {
-                        if($(this).find('option:selected').attr('value')) {
+        if (elems.length) {
+            $.each(elems, function (i) {
+                if (this.tagName == 'SELECT') {
+                    if ($(this).find('option:selected').length) {
+                        if ($(this).find('option:selected').attr('value')) {
                             sort['sort'] = $(this).find('option:selected').attr('value');
                         }
                         return false;
                     }
                 } else {
-                    if($(this).is(':checked')) {
-                        if($(this).val()) {
+                    if ($(this).is(':checked')) {
+                        if ($(this).val()) {
                             sort['sort'] = $(this).val();
                         }
                         return false;
@@ -88,16 +95,16 @@ var SeoFilter = {
     },
 
     setFilters: function (filters) {
-       // console.log(filters);
+        // console.log(filters);
     },
 
-    seoFilterHandler: function() {
-        if($(document).find('.sf_filters').length) {
-            $(document).on('change','.sf_filters',function (e) {
+    seoFilterHandler: function () {
+        if ($(document).find('.sf_filters').length) {
+            $(document).on('change', '.sf_filters', function (e) {
                 SeoFilter.getCustomFilters(this);
             });
 
-            $(document).on('change','.sf_sorting [name="sort"]',function (e) {
+            $(document).on('change', '.sf_sorting [name="sort"]', function (e) {
                 SeoFilter.getCustomFilters();
             });
 
@@ -112,7 +119,7 @@ var SeoFilter = {
     },
 
     registerPopstate: function (name) {
-        window.setTimeout(function() {
+        window.setTimeout(function () {
             $(window).unbind('popstate');
             $(window).on('popstate', function (e) {
                 if (e.originalEvent.state && e.originalEvent.state[name]) {
@@ -133,18 +140,22 @@ var SeoFilter = {
                     data['params'] = params;
                     data['full_url'] = e.originalEvent.state[name];
                     data['page_url'] = SeoFilter.config.url;
-                    SeoFilter.loadMeta(data,hash,'metabyurl');
+                    SeoFilter.loadMeta(data, hash, 'metabyurl');
                 }
             });
         }, 1100);
     },
 
     mFilter2Handlers: function () {
-        if(typeof(mSearch2) !== 'undefined') {
-            mSearch2.Hash.set = function(vars){SeoFilter.mFilter2HashSet(vars);};
+        if (typeof (mSearch2) !== 'undefined') {
+            mSearch2.Hash.set = function (vars) {
+                SeoFilter.mFilter2HashSet(vars);
+            };
 
-            if(parseInt(this.config.slider)) {
-                mSearch2.handleSlider = function () {SeoFilter.mFilter2HandleSlider()};
+            if (parseInt(this.config.slider)) {
+                mSearch2.handleSlider = function () {
+                    SeoFilter.mFilter2HandleSlider()
+                };
                 mSearch2.handleSlider();
             }
 
@@ -153,31 +164,44 @@ var SeoFilter = {
 
     },
 
+    tmFiltersHandlers: function () {
+        if (typeof (tmFilters) !== 'undefined') {
+            tmFilters.getUrlVars = function () {
+                return SeoFilter.tmFiltersGetUrlVars()
+            };
+            tmFilters.pushState = function () {
+                SeoFilter.tmFiltersPushState();
+            }
+        }
+    },
+
     oldbrowser: function () {
         return !(window.history && history.pushState);
     },
 
 
-    loadMeta: function (params,hash,action) {
-        if(!action) {action = 'getmeta';}
+    loadMeta: function (params, hash, action) {
+        if (!action) {
+            action = 'getmeta';
+        }
         var pageUrl = this.config.url || document.location.pathname;
         var data = {data: params, sf_action: action, pageId: this.config.page};
         $('body').addClass('sf_loading');
-        $.post(this.config.actionUrl,data,function (response) {
+        $.post(this.config.actionUrl, data, function (response) {
             $('body').removeClass('sf_loading');
             response.params = params;
             response.action = action;
             $(document).trigger('seofilter_load', response);
-            if(response.success) {
+            if (response.success) {
                 var url = response.data.url;
                 SeoFilter.prepareResponseData(response.data);
-                switch(action) {
+                switch (action) {
                     case 'metabyurl':
                         var filters = params['params'];
-                        if(response.data.params) {
+                        if (response.data.params) {
                             filters = $.extend(filters, response.data.params);
                         }
-                        if(typeof(mSearch2) !== 'undefined') {
+                        if (typeof (mSearch2) !== 'undefined') {
                             mSearch2.setFilters(filters);
                             mSearch2.load(filters);
                         } else {
@@ -190,13 +214,13 @@ var SeoFilter = {
                     case 'meta_results':
                         var all_url = pageUrl + url;
                         SeoFilter.changeUrl(all_url);
-                        if (typeof(pdoPage) != 'undefined') {
+                        if (typeof (pdoPage) != 'undefined') {
                             var tmp = all_url.split('?');
                             // if(!params['page']) {
-                                pdoPage.keys.page = 0;
+                            pdoPage.keys.page = 0;
                             // }
                             var pdo_config = pdoPage.configs.page;
-                            if(response.data.full_url) {
+                            if (response.data.full_url) {
                                 // pdo_config = $.extend(pdo_config,{q:response.data.full_url});
                             }
                             pdoPage.loadPage(tmp[0], pdo_config);
@@ -204,19 +228,19 @@ var SeoFilter = {
                         break;
                 }
             } else {
-                SeoFilter.changeUrl(document.location.pathname + hash,hash);
+                SeoFilter.changeUrl(document.location.pathname + hash, hash);
             }
         });
     },
 
-    changeUrl: function (url,hash) {
-        if(!this.oldbrowser()) {
-            if(typeof(mSearch2) !== 'undefined') {
+    changeUrl: function (url, hash) {
+        if (!this.oldbrowser()) {
+            if (typeof (mSearch2) !== 'undefined') {
                 window.history.pushState({mSearch2: url}, '', url);
             } else {
                 window.history.pushState({SeoFilter: url}, '', url);
             }
-        } else if(!hash) {
+        } else if (!hash) {
             window.location = url;
         } else {
             window.location.hash = hash.substr(1);
@@ -224,7 +248,7 @@ var SeoFilter = {
     },
 
     updateTitle: function (data) {
-        if(data.title) {
+        if (data.title) {
             var newtitle = data.title.toString();
             if (parseInt(this.config.replacebefore)) {
                 var separator = this.config.replaceseparator || ' / ';
@@ -259,44 +283,60 @@ var SeoFilter = {
     },
 
     updateTexts: function (data) {
-        if(data.description) {$(this.config.jdescription).attr("content", data.description);}
-        if(data.link) {$(this.config.jlink).html(data.link);}
-        if(data.h1) {$(this.config.jh1).html(data.h1);}
-        if(data.h2) {$(this.config.jh2).html(data.h2);}
-        if(data.introtext) {$(this.config.jintrotext).html(data.introtext);}
-        if(data.keywords) {$(this.config.jkeywords).html(data.keywords);}
-        if(data.text) {$(this.config.jtext).html(data.text);}
-        if(data.content) {$(this.config.jcontent).html(data.content);}
+        if (data.description) {
+            $(this.config.jdescription).attr("content", data.description);
+        }
+        if (data.link) {
+            $(this.config.jlink).html(data.link);
+        }
+        if (data.h1) {
+            $(this.config.jh1).html(data.h1);
+        }
+        if (data.h2) {
+            $(this.config.jh2).html(data.h2);
+        }
+        if (data.introtext) {
+            $(this.config.jintrotext).html(data.introtext);
+        }
+        if (data.keywords) {
+            $(this.config.jkeywords).html(data.keywords);
+        }
+        if (data.text) {
+            $(this.config.jtext).html(data.text);
+        }
+        if (data.content) {
+            $(this.config.jcontent).html(data.content);
+        }
         $(document).find('.sf_total').html(data.total);
     },
 
-    updateCrumbs:function (data) {
-        if(data.crumbs && parseInt(this.config.crumbs)) {
+    updateCrumbs: function (data) {
+        if (data.crumbs && parseInt(this.config.crumbs)) {
             var crumbs_separator = $(document).find('.sf_crumb').data('separator');
             var crumbs = $(data.crumbs);
-            $.each(crumbs,function (index,value) {
-                if($(value).hasClass('sf_crumb_nested')) {
+            $.each(crumbs, function (index, value) {
+                if ($(value).hasClass('sf_crumb_nested')) {
                     $(document).find('.sf_crumb').parent().append(value);
-                    if(crumbs_separator) {
+                    if (crumbs_separator) {
                         $(document).find(value).before(crumbs_separator);
                     }
                 }
-                if($(value).hasClass('sf_crumb')) {
+                if ($(value).hasClass('sf_crumb')) {
                     $(document).find('.sf_crumb').replaceWith(value);
-                    $(document).find('.sf_crumb').data('separator',crumbs_separator);
+                    $(document).find('.sf_crumb').data('separator', crumbs_separator);
                     var find_to_del = false;
-                    $.each($(document).find('.sf_crumb').parent().contents(),function (i,val) {
-                        if(find_to_del) {
+                    $.each($(document).find('.sf_crumb').parent().contents(), function (i, val) {
+                        if (find_to_del) {
                             $(val).remove();
                         }
-                        if($(val).hasClass('sf_crumb')) {
+                        if ($(val).hasClass('sf_crumb')) {
                             find_to_del = true;
                         }
                     });
                 }
-                if($(value).hasClass('sf_crumbs')) {
+                if ($(value).hasClass('sf_crumbs')) {
                     $(document).find('.sf_crumb').parent().append(value);
-                    if(crumbs_separator) {
+                    if (crumbs_separator) {
                         $(document).find(value).before(crumbs_separator);
                     }
                 }
@@ -312,10 +352,10 @@ var SeoFilter = {
     },
 
     toggleFrontendManagerButton: function (data) {
-        if($(document).find('.fm-seofilter').length) {
+        if ($(document).find('.fm-seofilter').length) {
             var fm_link = $(document).find('.fm-seofilter');
-            if(data.seo_id) {
-                fm_link.attr('href',fm_link.data('url')+data.seo_id);
+            if (data.seo_id) {
+                fm_link.attr('href', fm_link.data('url') + data.seo_id);
                 $(document).find('.fm-seofilter').removeClass('hidden');
             } else {
                 $(document).find('.fm-seofilter').addClass('hidden');
@@ -334,7 +374,7 @@ var SeoFilter = {
         if (!this.oldbrowser()) {
             if (hash.length !== 0) {
                 hash = '?' + hash.substr(1);
-                var specialChars = {"%": "%25", "+": "%2B", "&" : "%26"}; //add last char
+                var specialChars = {"%": "%25", "+": "%2B", "&": "%26"}; //added last char
                 for (i in specialChars) {
                     if (specialChars.hasOwnProperty(i) && hash.indexOf(i) !== -1) {
                         hash = hash.replace(new RegExp('\\' + i, 'g'), specialChars[i]);
@@ -342,14 +382,13 @@ var SeoFilter = {
                 }
             }
         }
-        this.loadMeta(vars,hash);
+        this.loadMeta(vars, hash);
     },
 
     mFilter2HandleSlider: function () {
         if (!$(mSearch2.options.slider).length) {
             return false;
-        }
-        else if (!$.ui || !$.ui.slider) {
+        } else if (!$.ui || !$.ui.slider) {
             return mSearch2.loadJQUI(mSearch2.handleSlider);
         }
         $(mSearch2.options.slider).each(function () {
@@ -404,7 +443,7 @@ var SeoFilter = {
 
             var changed = mSearch2.Hash.get()[name] !== undefined;
             //replace #1
-            if(!changed) {
+            if (!changed) {
                 changed = SeoFilter.config.params[name] !== undefined;
             }
             mSearch2.sliders[name] = {
@@ -442,8 +481,7 @@ var SeoFilter = {
                 if (e.type != 'keyup' && e.type != 'input') {
                     if (this.value > vmax) {
                         this.value = vmax;
-                    }
-                    else if (this.value < vmin) {
+                    } else if (this.value < vmin) {
                         this.value = vmin;
                     }
                 }
@@ -461,8 +499,7 @@ var SeoFilter = {
                 if (e.type != 'keyup' && e.type != 'input') {
                     if (this.value > vmax) {
                         this.value = vmax;
-                    }
-                    else if (this.value < vmin) {
+                    } else if (this.value < vmin) {
                         this.value = vmin;
                     }
                 }
@@ -491,8 +528,124 @@ var SeoFilter = {
             }
         });
         return true;
-    }
+    },
+    tmFiltersGetUrlVars: function () {
+        var vars = {}, hash, is_arr = false;
+
+        var location_hash = document.location.search.length >= 3 ? document.location.search.substr(1) : window.location.hash.substr(1);
+        location_hash = SeoFilter.config.hash || location_hash;
+        location_hash = decodeURIComponent(location_hash.replace(/\+/g, ' '));
+        if (location_hash.indexOf('?') > -1) location_hash = location_hash.substr(location_hash.indexOf('?') + 1);
+        if (location_hash.length == 0) return vars;
+
+        var hashes = location_hash.split('&');
+
+        for (var i = 0; i < hashes.length; i++) {
+
+            hash = hashes[i].split('=');
+            if (hash[0].indexOf('[from]') > -1 || hash[0].indexOf('[to]') > -1) {
+                var f_name = hash[0].replace(/\[.*\]/, '');
+                if (typeof vars[f_name] == 'undefined') {
+                    vars[f_name] = {};
+                }
+                if (hash[0].indexOf('[from]') > -1) {
+                    vars[f_name].from = parseFloat(hash[1]);
+                } else {
+                    vars[f_name].to = parseFloat(hash[1]);
+                }
+            } else if (hash[0].indexOf('[') > -1) {
+                f_name = hash[0].substr(0, (hash[0].indexOf('[')));
+                if (typeof vars[f_name] == 'undefined') {
+                    vars[f_name] = [];
+                }
+                vars[f_name].push(hash[1]);
+            } else {
+                vars[hash[0]] = hash[1];
+            }
+
+        }
+
+        return vars;
+    },
+    tmFiltersPushState: function () {
+
+        $('input[name="page_id"]', tmFilters.config.filters_cont).prop('disabled', false);
+
+        var params = {};
+        var form_data = $('form', tmFilters.config.filters_cont).serializeArray();
+
+        $.map($('form', tmFilters.config.filters_cont).serializeArray(), function (n) {
+            if (n.value === '') {
+                return;
+            }
+            if (params[n.name]) {
+                params[n.name] += ',' + n.value;
+            } else {
+                params[n.name] = n.value;
+            }
+        });
+
+        console.log(params,form_data);
+
+        var form_data_push = [];
+        var search_uri = '';
+
+        if (!tmFilters.filtered && !tmFilters.sorted) {
+
+            for (var i in form_data) {
+                if (!form_data.hasOwnProperty(i)) continue;
+                if ($.inArray(form_data[i].name, ['page']) > -1) {
+                    if (form_data[i].name != 'page' || form_data[i].value != 1) {
+                        search_uri += '&' + form_data[i].name + '=' + form_data[i].value;
+                        form_data_push.push(form_data[i]);
+                    }
+                }
+                if ($.inArray(form_data[i].name, ['page_id']) > -1) {
+                    form_data_push.push(form_data[i]);
+                }
+            }
+
+        } else if (tmFilters.sorted && !tmFilters.filtered) {
+
+            for (var i in form_data) {
+                if (!form_data.hasOwnProperty(i)) continue;
+                if ($.inArray(form_data[i].name, ['page', 'sortby', 'sortdir', 'limit']) > -1) {
+                    if (form_data[i].name != 'page' || form_data[i].value != 1) {
+                        search_uri += '&' + form_data[i].name + '=' + form_data[i].value;
+                        form_data_push.push(form_data[i]);
+                    }
+                }
+                if ($.inArray(form_data[i].name, ['page_id']) > -1) {
+                    form_data_push.push(form_data[i]);
+                }
+            }
+
+        } else {
+
+            for (var i in form_data) {
+                if (!form_data.hasOwnProperty(i)) continue;
+                if ($.inArray(form_data[i].name, ['page_id']) == -1) {
+                    if (form_data[i].name != 'page' || form_data[i].value != 1) {
+                        search_uri += '&' + form_data[i].name + '=' + form_data[i].value;
+                        form_data_push.push(form_data[i]);
+                    }
+                }
+                if ($.inArray(form_data[i].name, ['page_id']) > -1) {
+                    form_data_push.push(form_data[i]);
+                }
+            }
+
+        }
+
+        if (search_uri) search_uri = '?' + search_uri.substring(1);
+
+        tmFilters.filtersActive = true;
+        var loc_path = window.location.pathname;
+
+        window.History.pushState(form_data_push, $('title').text(), loc_path + search_uri);
+
+    },
 };
 jQuery(document).ready(function ($) {
-   SeoFilter.initialize();
+    SeoFilter.initialize();
 });
