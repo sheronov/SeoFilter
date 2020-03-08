@@ -170,6 +170,12 @@ var SeoFilter = {
                 SeoFilter.mFilter2HashSet(vars);
             };
 
+            if (!mSearch2.options.autoLoad) {
+                mSearch2.submit = function (params) {
+                    return SeoFilter.mFilter2Submit(params);
+                }
+            }
+
             if (parseInt(this.config.slider)) {
                 mSearch2.handleSlider = function () {
                     SeoFilter.mFilter2HandleSlider()
@@ -180,6 +186,44 @@ var SeoFilter = {
             this.registerPopstate('mSearch2');
         }
 
+    },
+
+    mFilter2Submit: function (params) {
+        if (mSearch2.loading) {
+            return false;
+        } else if (!params || !Object.keys(params).length) {
+            params = mSearch2.getFilters();
+        } else {
+            delete (params['action']);
+            delete (params['key']);
+            delete (params['pageId']);
+        }
+        delete (params['page']);
+
+        var action = $(mSearch2.options.filters).attr('action');
+        if (!mSearch2.options.autoLoad && !mSearch2.options.ajax) {
+            var vars = '';
+            for (var i in params) {
+                if (params.hasOwnProperty(i)) {
+                    vars += '&' + i + '=' + params[i];
+                }
+            }
+
+
+            SeoFilter.loadMeta(params, vars, 'getmeta');
+            // if (!action.match(/\?/)) {
+            //     document.location = action + vars.replace(/^&/, '?');
+            // } else {
+            //     document.location = action + vars;
+            // }
+
+            return false;
+        } else {
+            mse2Config['page'] = '';
+            mSearch2.Hash.set(params);
+            mSearch2.load(params);
+            return false;
+        }
     },
 
     tmFiltersHandlers: function () {
@@ -267,7 +311,11 @@ var SeoFilter = {
     changeUrl: function (url, hash, params) {
         if (!this.oldbrowser()) {
             if (typeof (mSearch2) !== 'undefined') {
-                window.history.pushState({mSearch2: url}, '', url);
+                if (!mSearch2.options.autoLoad && !mSearch2.options.ajax) {
+                    document.location = url;
+                } else {
+                    window.history.pushState({mSearch2: url}, '', url);
+                }
             } else if (typeof (tmFilters) !== 'undefined') {
                 window.history.pushState({tmFilters: params}, '', url);
             } else {
