@@ -120,6 +120,7 @@ class SeoFilter
                 'jh2'              => $this->config['jh2'],
                 'jtext'            => $this->config['jtext'],
                 'jcontent'         => $this->config['jcontent'],
+                'delimeter'        => $this->config['values_delimeter']
             ], true);
 
             $this->modx->regClientStartupScript(
@@ -755,11 +756,59 @@ class SeoFilter
                     ? $this->modx->toJSON($response)
                     : $response;
                 break;
+            case 'getmetatm':
             case 'getmeta':
                 $diff = $original_params = [];
-                $params = $copyparams = $data['data'];
+                $params = $copyparams = [];
                 $pageId = (int)$data['pageId'];
-                //                $aliases = $data['aliases'];
+
+                if ($action === 'getmetatm') {
+                    $guard = $this->config['tm2_tags_guard'];
+                    foreach ($data['data'] as $tmVal) {
+                        if (!isset($tmVal['name'], $tmVal['value']) || $tmVal['name'] === 'page_id') {
+                            continue;
+                        }
+                        $value = $tmVal['value'];
+                        $fieldKey = $tmVal['name'];
+
+                        //значит поле фильтра
+                        if ($pos = mb_strpos($fieldKey, '[like][]')) {
+                            $fieldKey = mb_substr($fieldKey, 0, $pos);
+                            if (isset($params[$fieldKey])) {
+                                $params[$fieldKey] .= $this->config['values_delimeter'].$guard.$value.$guard;
+                            } else {
+                                $params[$fieldKey] = $guard.$value.$guard;
+                            }
+                        } elseif ($pos = mb_strpos($fieldKey, '[from]')) {
+                            $fieldKey = mb_substr($fieldKey, 0, $pos);
+                            if (isset($params[$fieldKey])) {
+                                $params[$fieldKey] = $value.$this->config['values_delimeter'].$params[$fieldKey];
+                            } else {
+                                $params[$fieldKey] = $value;
+                            }
+                        } elseif ($pos = mb_strpos($fieldKey, '[to]')) {
+                            $fieldKey = mb_substr($fieldKey, 0, $pos);
+                            if (isset($params[$fieldKey])) {
+                                $params[$fieldKey] .= $this->config['values_delimeter'].$value;
+                            } else {
+                                $params[$fieldKey] = $value;
+                            }
+                        } elseif ($pos = mb_strpos($fieldKey, '[]')) {
+                            $fieldKey = mb_substr($fieldKey, 0, $pos);
+                            if (isset($params[$fieldKey])) {
+                                $params[$fieldKey] .= $this->config['values_delimeter'].$value;
+                            } else {
+                                $params[$fieldKey] = $value;
+                            }
+                        } else {
+                            $params[$fieldKey] = $value;
+                        }
+                    }
+                    $copyparams = $params;
+                } else {
+                    $params = $copyparams = $data['data'];
+                }
+
                 $aliases = $this->fieldsAliases($pageId, 1);
 
                 $base_get = array_map('trim', explode(',', $this->config['base_get']));
@@ -800,8 +849,8 @@ class SeoFilter
                     $diff = array_diff_key($diff, $diff_params);
 
                     foreach ($base_params as $param => $value) {
-                        if (strpos($value, $this->config['values_delimeter']) !== false) {
-                            //                        if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
+                        if (!is_array($value) && strpos($value, $this->config['values_delimeter']) !== false) {
+                            // if(count(array_map('trim', explode($this->config['values_delimeter'],$value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField', 'sfField', 'sfField.id = sfDictionary.field_id');
                             $q->where(['sfDictionary.active' => 1, 'sfField.alias' => $param]);
@@ -826,8 +875,6 @@ class SeoFilter
                                                 explode($this->config['values_delimeter'], $inp['input']));
                                             if ($values[0] >= $i_values[0] && $values[1] <= $i_values[1]) {
                                                 $find_range = 1;
-                                                //unset($base_params[$param]);
-                                                //$base_params[$param] = $inp['input'];
                                                 break;
                                             }
                                         }
@@ -842,7 +889,8 @@ class SeoFilter
                         }
                     }
                     foreach ($diff_params as $param => $value) {
-                        if (count(array_map('trim', explode($this->config['values_delimeter'], $value))) > 1) {
+                        if (is_array($value) && count(array_map('trim',
+                                explode($this->config['values_delimeter'], $value))) > 1) {
                             $q = $this->modx->newQuery('sfDictionary');
                             $q->innerJoin('sfField', 'sfField', 'sfField.id = sfDictionary.field_id');
                             $q->where(['sfDictionary.active' => 1, 'sfField.alias' => $param]);
@@ -900,7 +948,7 @@ class SeoFilter
                             if ($meta['success']) {
                                 $meta['find'] = $find = 1;
                                 //обновление счётчика, если отличается количество
-                                if (empty($diff) && empty($diff_fields) && ($meta['total'] != $meta['old_total']) && !$meta['has_slider']) {
+                                if (empty($diff) && empty($diff_fields) && ((int)$meta['total'] !== (int)$meta['old_total']) && !$meta['has_slider']) {
                                     $this->updateUrlTotal($meta['url_id'], $meta['total']);
                                 }
                             } else {
@@ -921,6 +969,19 @@ class SeoFilter
                     $meta['full_url'] = $this->modx->makeUrl($pageId, '', '', '-1');
                 } else {
                     $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
+
+                    $hash = [];
+                    foreach($data['data'] as $tmVal) {
+                        if (!isset($tmVal['name'], $tmVal['value']) || $tmVal['name'] === 'page_id') {
+                            continue;
+                        }
+                        foreach($params as $param => $value) {
+                            if(mb_strpos($tmVal['name'],$param) === 0) {
+                                $hash[] = $tmVal['name'].'='.$tmVal['value'];
+                            }
+                        }
+                    }
+                    $meta['hash'] = implode('&',$hash);
                 }
 
 
@@ -939,7 +1000,7 @@ class SeoFilter
                 }
 
                 if ($meta['url']) {
-                    if ($pageId == $this->config['site_start']) {
+                    if ((int)$pageId === (int)$this->config['site_start']) {
                         if ($this->config['main_alias']) {
                             $q = $this->modx->newQuery('modResource');
                             $q->where(['id' => $pageId]);
@@ -954,14 +1015,12 @@ class SeoFilter
                     }
                     $meta['full_url'] = $this->clearSuffixes($this->modx->makeUrl($pageId, '', '',
                             '-1')).$meta['url'];
+                } elseif ((int)$pageId === (int)$this->config['site_start']) {
+                    $meta['url'] = '';
                 } else {
-                    if ($pageId == $this->config['site_start']) {
-                        $meta['url'] = '';
-                    } else {
-                        $meta['url'] = isset($this->config['this_page_suffix'])
-                            ? $this->config['this_page_suffix']
-                            : $this->config['container_suffix'];
-                    }
+                    $meta['url'] = isset($this->config['this_page_suffix'])
+                        ? $this->config['this_page_suffix']
+                        : $this->config['container_suffix'];
                 }
 
                 if (count($diff)) {
@@ -987,7 +1046,11 @@ class SeoFilter
                     }
 
                     if (!empty($diff)) {
-                        $hash_part = $this->getHashUrl($diff);
+                        if ($action === 'getmetatm') {
+                            $hash_part = $this->getHashUrlForTM2($diff, $data['data']);
+                        } else {
+                            $hash_part = $this->getHashUrl($diff);
+                        }
                         if (strpos($meta['url'], '?')) {
                             $meta['url'] .= str_replace('?', '&', $hash_part);
                             $meta['full_url'] .= str_replace('?', '&', $hash_part);
@@ -1015,6 +1078,27 @@ class SeoFilter
             default:
                 return $this->error('sf_err_ajax_nf', [], ['action' => $action]);
         }
+    }
+
+    protected function getHashUrlForTM2($diff, $original)
+    {
+        $hash = [];
+        foreach ($original as $tmVal) {
+            if (!isset($tmVal['name'], $tmVal['value']) || $tmVal['name'] === 'page_id') {
+                continue;
+            }
+            $value = $tmVal['value'];
+            $fieldKey = $tmVal['name'];
+            foreach ($diff as $key => $vals) {
+                if (mb_strpos($fieldKey, $key) === 0) {
+                    $hash[] = $fieldKey.'='.$value;
+                }
+            }
+        }
+        if (!empty($hash)) {
+            $hash = '?'.implode('&', $hash);
+        }
+        return $hash;
     }
 
     public function getCrumbs($pageId = 0)
@@ -1297,7 +1381,7 @@ class SeoFilter
                                 }
                                 break;
                             case 3:
-                                if ($get_param < $value) {
+                                if ($get_param > $value) {
                                     $check++;
                                 }
                                 break;

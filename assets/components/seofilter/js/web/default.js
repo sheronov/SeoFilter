@@ -146,6 +146,24 @@ var SeoFilter = {
         }, 1100);
     },
 
+    replaceTm2Statechange: function (name = 'tmFilters') {
+        window.setTimeout(function () {
+            $(window).unbind('statechange');
+            $(window).on('popstate', function (e) {
+                if (e.originalEvent.state && e.originalEvent.state[name]) {
+                    var f_state = e.originalEvent.state[name];
+                    SeoFilter.loadMeta(f_state, true, 'getmetatm', tmFilters.filterSelected);
+                    tmFilters.ajaxRequest(f_state);
+                }
+            });
+
+            var params = SeoFilter.tmFiltersInitialState();
+            window.history.pushState({
+                tmFilters: params
+            }, '', document.location.pathname + document.location.search);
+        }, 1100);
+    },
+
     mFilter2Handlers: function () {
         if (typeof (mSearch2) !== 'undefined') {
             mSearch2.Hash.set = function (vars) {
@@ -171,7 +189,9 @@ var SeoFilter = {
             };
             tmFilters.pushState = function () {
                 SeoFilter.tmFiltersPushState();
-            }
+            };
+
+            this.replaceTm2Statechange();
         }
     },
 
@@ -180,7 +200,7 @@ var SeoFilter = {
     },
 
 
-    loadMeta: function (params, hash, action) {
+    loadMeta: function (params, hash, action, callback) {
         if (!action) {
             action = 'getmeta';
         }
@@ -194,6 +214,7 @@ var SeoFilter = {
             $(document).trigger('seofilter_load', response);
             if (response.success) {
                 var url = response.data.url;
+                SeoFilter.config.hash = response.data.hash || '';
                 SeoFilter.prepareResponseData(response.data);
                 switch (action) {
                     case 'metabyurl':
@@ -210,6 +231,16 @@ var SeoFilter = {
                         break;
                     case 'getmeta':
                         SeoFilter.changeUrl(pageUrl + url);
+                        break;
+                    case 'getmetatm':
+                        if (callback) {
+                            if (!SeoFilter.config.hash) {
+                                SeoFilter.config.hash = 'reset=1';
+                            }
+                            callback.apply(tmFilters);
+                        } else {
+                            SeoFilter.changeUrl(pageUrl + url, '', params);
+                        }
                         break;
                     case 'meta_results':
                         var all_url = pageUrl + url;
@@ -233,10 +264,12 @@ var SeoFilter = {
         });
     },
 
-    changeUrl: function (url, hash) {
+    changeUrl: function (url, hash, params) {
         if (!this.oldbrowser()) {
             if (typeof (mSearch2) !== 'undefined') {
                 window.history.pushState({mSearch2: url}, '', url);
+            } else if (typeof (tmFilters) !== 'undefined') {
+                window.history.pushState({tmFilters: params}, '', url);
             } else {
                 window.history.pushState({SeoFilter: url}, '', url);
             }
@@ -533,7 +566,10 @@ var SeoFilter = {
         var vars = {}, hash, is_arr = false;
 
         var location_hash = document.location.search.length >= 3 ? document.location.search.substr(1) : window.location.hash.substr(1);
-        location_hash = SeoFilter.config.hash || location_hash;
+        //fix #1
+        if (SeoFilter.config.hash) {
+            location_hash = location_hash ? SeoFilter.config.hash + '&' + location_hash : SeoFilter.config.hash;
+        }
         location_hash = decodeURIComponent(location_hash.replace(/\+/g, ' '));
         if (location_hash.indexOf('?') > -1) location_hash = location_hash.substr(location_hash.indexOf('?') + 1);
         if (location_hash.length == 0) return vars;
@@ -567,31 +603,21 @@ var SeoFilter = {
 
         return vars;
     },
-    tmFiltersPushState: function () {
 
+    tmFiltersInitialState: function () {
         $('input[name="page_id"]', tmFilters.config.filters_cont).prop('disabled', false);
-
-        var params = {};
         var form_data = $('form', tmFilters.config.filters_cont).serializeArray();
 
-        $.map($('form', tmFilters.config.filters_cont).serializeArray(), function (n) {
-            if (n.value === '') {
-                return;
-            }
-            if (params[n.name]) {
-                params[n.name] += ',' + n.value;
-            } else {
-                params[n.name] = n.value;
-            }
-        });
+        return form_data;
+    },
 
-        console.log(params,form_data);
-
+    tmFiltersPushState: function () {
+        $('input[name="page_id"]', tmFilters.config.filters_cont).prop('disabled', false);
+        var form_data = $('form', tmFilters.config.filters_cont).serializeArray();
         var form_data_push = [];
         var search_uri = '';
 
         if (!tmFilters.filtered && !tmFilters.sorted) {
-
             for (var i in form_data) {
                 if (!form_data.hasOwnProperty(i)) continue;
                 if ($.inArray(form_data[i].name, ['page']) > -1) {
@@ -604,9 +630,7 @@ var SeoFilter = {
                     form_data_push.push(form_data[i]);
                 }
             }
-
         } else if (tmFilters.sorted && !tmFilters.filtered) {
-
             for (var i in form_data) {
                 if (!form_data.hasOwnProperty(i)) continue;
                 if ($.inArray(form_data[i].name, ['page', 'sortby', 'sortdir', 'limit']) > -1) {
@@ -619,9 +643,7 @@ var SeoFilter = {
                     form_data_push.push(form_data[i]);
                 }
             }
-
         } else {
-
             for (var i in form_data) {
                 if (!form_data.hasOwnProperty(i)) continue;
                 if ($.inArray(form_data[i].name, ['page_id']) == -1) {
@@ -634,15 +656,19 @@ var SeoFilter = {
                     form_data_push.push(form_data[i]);
                 }
             }
-
         }
 
         if (search_uri) search_uri = '?' + search_uri.substring(1);
 
-        tmFilters.filtersActive = true;
-        var loc_path = window.location.pathname;
 
-        window.History.pushState(form_data_push, $('title').text(), loc_path + search_uri);
+        //fix #2
+        tmFilters.filtersActive = true;
+        this.loadMeta(form_data_push, '', 'getmetatm');
+        tmFilters.ajaxRequest(form_data_push);
+
+        //fix #3
+        // var loc_path = window.location.pathname;
+        // window.History.pushState(form_data_push, $('title').text(), loc_path + search_uri);
 
     },
 };
