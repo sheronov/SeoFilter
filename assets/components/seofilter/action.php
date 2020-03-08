@@ -5,6 +5,7 @@ if (!file_exists(dirname(dirname(dirname(__DIR__))) . '/index.php')) {
     /** @noinspection PhpIncludeInspection */
     require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/index.php';
 } else {
+    /** @noinspection PhpIncludeInspection */
     require_once dirname(dirname(dirname(__DIR__))) . '/index.php';
 }
 $response = array();
