@@ -30,6 +30,7 @@ $xpdo_meta_map['sfField']= array (
     'relation_column' => '',
     'rank' => 0,
     'active' => 1,
+    'tagmanager' => 0,
   ),
   'fieldMeta' => 
   array (
@@ -194,6 +195,14 @@ $xpdo_meta_map['sfField']= array (
       'phptype' => 'boolean',
       'null' => true,
       'default' => 1,
+    ),
+    'tagmanager' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'phptype' => 'boolean',
+      'null' => true,
+      'default' => 0,
     ),
   ),
   'indexes' => 
