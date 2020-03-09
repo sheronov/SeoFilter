@@ -1,5 +1,9 @@
 Changelog for SeoFilter.
 
+1.8.1-beta (10.03.2020)
+======================
+- slider's fix in tagManager2
+
 1.8.0-beta (08.03.2020)
 ======================
 - fixed registration two scripts on page

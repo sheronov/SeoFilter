@@ -653,13 +653,23 @@ var SeoFilter = {
     },
 
     tmFiltersInitialState: function () {
-        $('input[name="page_id"]', tmFilters.config.filters_cont).prop('disabled', false);
-        var form_data = $('form', tmFilters.config.filters_cont).serializeArray();
+        var form_data = SeoFilter.tmFiltersPushState(true);
+        var params = SeoFilter.tmFiltersGetUrlVars();
+        if (params.page && params.page > 1) {
+            form_data.push({name: 'page', value: params.page});
+            tmFilters.setFormValue('page', params.page);
+        }
+        ['sortby', 'sortdir', 'limit'].forEach(function (param) {
+            if (params.hasOwnProperty(param) && params[param]) {
+                form_data.push({name: param, value: params[param]});
+                tmFilters.setFormValue(param, params[param]);
+            }
+        });
 
         return form_data;
     },
 
-    tmFiltersPushState: function () {
+    tmFiltersPushState: function (needReturn = false) {
         $('input[name="page_id"]', tmFilters.config.filters_cont).prop('disabled', false);
         var form_data = $('form', tmFilters.config.filters_cont).serializeArray();
         var form_data_push = [];
@@ -706,8 +716,24 @@ var SeoFilter = {
             }
         }
 
-        if (search_uri) search_uri = '?' + search_uri.substring(1);
+        $(tmFilters.config.filter_slider).each(function (i) {
+            var sliderName = 'f_' + $(this).attr('id').replace('range_', '');
+            var sliderValues = $(this).slider('values') || [];
+            var sliderMin = $(this).slider('option', 'min') || 0;
+            var sliderMax = $(this).slider('option', 'max') || 0;
+            if (sliderValues[0] === sliderMin && sliderValues[1] === sliderMax) {
+                form_data_push = form_data_push.filter(function (filterPair) {
+                    return filterPair.name !== sliderName + '[from]'
+                        && filterPair.name !== sliderName + '[to]';
+                });
+            }
+        });
 
+        if (needReturn) {
+            return form_data_push;
+        }
+
+        if (search_uri) search_uri = '?' + search_uri.substring(1);
 
         //fix #2
         tmFilters.filtersActive = true;
