@@ -605,7 +605,9 @@ var SeoFilter = {
                     $this.slider('values', 1, cmax);
                     imax.val(cmax);
                 }
-                mSearch2.sliders[name]['changed'] = mSearch2.Hash.get()[name] !== undefined;
+                //replace #4
+                mSearch2.sliders[name]['changed'] = mSearch2.Hash.get()[name] !== undefined ||
+                    SeoFilter.config.params[name] !== undefined;
             }
         });
         return true;
