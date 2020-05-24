@@ -60,8 +60,8 @@ class sfMenu
             $config['tplInner'] = $config['tplOuter'];
         }
 
-        if (!isset($config['context'])) {
-            $config['context'] = $modx->context->key;
+        if (!empty($config['context']) && !is_array($config['context'])) {
+            $config['context'] = array_map('trim', explode(',', $config['context']));
         }
 
         $sf_seo_id = $modx->getPlaceholder('sf.seo_id');
@@ -74,9 +74,9 @@ class sfMenu
 
         $this->config = $config;
 
-
         $fqn = $modx->getOption('pdoFetch.class', null, 'pdotools.pdofetch', true);
         $path = $modx->getOption('pdofetch_class_path', null, MODX_CORE_PATH.'components/pdotools/model/', true);
+        /** @var pdoFetch $pdoClass */
         if ($pdoClass = $modx->loadClass($fqn, $path, false, true)) {
             $this->pdoTools = new $pdoClass($modx, $config);
         } else {
@@ -337,31 +337,36 @@ class sfMenu
     public function fastGetLinks($rules = '', $parents = '')
     {
         $links = [];
-        $where = $this->prepareParents($rules, $parents, 'multi_id', 'page_id');
+        $where = $this->prepareParents($rules, $parents, 'sfUrls.multi_id', 'sfUrls.page_id');
         $select = [
             'sfUrls.*',
             'sfUrlWord.url_id,sfUrlWord.word_id,sfUrlWord.field_id,sfUrlWord.priority',
-            'sfDictionary.alias,sfDictionary.input,sfDictionary.value'
+            'sfDictionary.alias,sfDictionary.input,sfDictionary.value',
+            'modResource.context_key'
         ];
 
         $q = $this->modx->newQuery('sfUrls');
         $where = array_merge([
-            'active' => 1,
+            'sfUrls.active' => 1,
         ], $where);
-        $q->rightJoin('sfRule', 'sfRule', 'sfRule.id = sfUrls.multi_id');
+        $q->innerJoin('modResource', 'modResource', 'sfUrls.page_id = modResource.id');
+        $q->innerJoin('sfRule', 'sfRule', 'sfUrls.multi_id = sfRule.id');
+        $q->innerJoin('sfUrlWord', 'sfUrlWord', 'sfUrls.id = sfUrlWord.url_id');
+        $q->innerJoin('sfDictionary', 'sfDictionary', 'sfUrlWord.word_id = sfDictionary.id');
         $q->where(['sfRule.active' => 1]);
-        $q->leftJoin('sfUrlWord', 'sfUrlWord', 'sfUrlWord.url_id = sfUrls.id');
-        $q->innerJoin('sfDictionary', 'sfDictionary', 'sfDictionary.id = sfUrlWord.word_id');
+        if (!empty($this->config['context'])) {
+            $q->where(['modResource.context_key:IN' => $this->config['context']]);
+        }
         if ((int)$this->config['level'] || (int)$this->config['minlevel']) {
             $q->innerJoin('sfUrlWord', 'sfUrlWordX', 'sfUrlWordX.url_id = sfUrlWord.url_id');
             $select[] = 'COUNT(sfUrlWordX.id) as level';
             $q->having($this->prepareHaving());
         }
         if ($mincount = (int)$this->config['mincount']) {
-            $where['total:>='] = $mincount;
+            $where['sfUrls.total:>='] = $mincount;
         }
         if (!(int)$this->config['showHidden']) {
-            $where['menu_on'] = 1;
+            $where['sfUrls.menu_on'] = 1;
         }
         if (!empty($this->config['urls'])) {
             if (!is_array($this->config['urls'])) {
@@ -378,25 +383,26 @@ class sfMenu
         }
         $q->select($select);
         $q->where($where);
+        $q->groupby('sfUrlWord.id');
 
         if ((int)$this->config['sortcount']) {
-            $q->sortby($this->config['total'], 'DESC');
+            $q->sortby('sfUrls.count', 'DESC');
+            $q->groupby('sfUrls.count');
         }
         if ($this->config['sortby'] && $this->config['sortdir']) {
+            if (mb_strpos($this->config['sortby'], '.') === false) {
+                $this->config['sortby'] = 'sfUrls.'.$this->config['sortby'];
+            }
             $q->sortby($this->config['sortby'], $this->config['sortdir']);
+            $q->groupby($this->config['sortby']);
         }
         $q->limit((int)$this->config['limit'], (int)$this->config['offset']);
-        $q->groupby('sfUrlWord.id');
         if ($q->prepare()) {
             $this->pdoTools->addTime('SQL '.$q->toSQL());
             if ($q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                    if (!(int)$row['page_id']) {
-                        continue;
-                    }
-
                     $url = $row['new_url'] ?: $row['old_url'];
-                    $page_url = $this->modx->makeUrl($row['page_id'], $this->config['context'], '',
+                    $page_url = $this->modx->makeUrl($row['page_id'], $row['context_key'], '',
                         $this->config['scheme']);
                     $u_suffix = $this->config['url_suffix'];
 
@@ -414,7 +420,7 @@ class sfMenu
                     } else {
                         $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                     }
-                    //                $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
+
                     $name = $row['menutitle'] ?: $row['link'];
                     $row['url'] = $url;
                     $row['name'] = $name;
@@ -479,11 +485,11 @@ class sfMenu
         $links = [];
         $q = $this->modx->newQuery('sfUrls');
         $where = [
-            'active'      => 1,
-            'multi_id:IN' => array_keys($pre_array)
+            'sfUrls.active'      => 1,
+            'sfUrls.multi_id:IN' => array_keys($pre_array)
         ];
         if (!(int)$this->config['showHidden']) {
-            $where['menu_on'] = 1;
+            $where['sfUrls.menu_on'] = 1;
         }
         if ($this->config['where']) {
             $where_add = $this->modx->fromJSON($this->config['where']);
@@ -492,13 +498,18 @@ class sfMenu
             }
             $where = array_merge($where, $where_add);
         }
+        $q->innerJoin('modResource', 'modResource', 'sfUrls.page_id = modResource.id');
         $q->leftJoin('sfUrlWord', 'sfUrlWord', 'sfUrlWord.url_id = sfUrls.id');
         $q->innerJoin('sfDictionary', 'sfDictionary', 'sfDictionary.id = sfUrlWord.word_id');
         $q->select([
             'sfUrls.*',
             'sfUrlWord.word_id,sfUrlWord.field_id',
-            'sfDictionary.alias,sfDictionary.input,sfDictionary.value'
+            'sfDictionary.alias,sfDictionary.input,sfDictionary.value',
+            'modResource.context_key'
         ]);
+        if (!empty($this->config['context'])) {
+            $q->where(['modResource.context_key:IN' => $this->config['context']]);
+        }
         $q->where($where);
         if ($this->config['sortby'] && $this->config['sortdir']) {
             $q->sortby($this->config['sortby'], $this->config['sortdir']);
@@ -510,7 +521,7 @@ class sfMenu
                     continue;
                 }
                 $url = $row['new_url'] ?: $row['old_url'];
-                $page_url = $this->modx->makeUrl($row['page_id'], $this->config['context'], '',
+                $page_url = $this->modx->makeUrl($row['page_id'], $row['context_key'], '',
                     $this->config['scheme']);
                 $u_suffix = $this->config['url_suffix'];
                 $page_url = $this->clearSuffixes($page_url);
@@ -527,7 +538,7 @@ class sfMenu
                 } else {
                     $url = $page_url.$this->config['between_urls'].$url.$u_suffix;
                 }
-                // $url = $this->modx->makeUrl($row['page_id'],$this->config['context'],'',$this->config['scheme']).$url;
+
                 $name = $row['menutitle'] ?: $row['link'];
                 $row['url'] = $url;
                 $row['name'] = $name;
@@ -925,7 +936,7 @@ class sfMenu
         }
     }
 
-    public function recursiveNesting($links = [], $level = 1)
+    public function recursiveNesting($links = [])
     {
         $tree = [];
         $double = (int)$this->config['double'];

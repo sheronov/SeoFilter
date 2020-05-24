@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.8.2';
+    public $version = '1.9.0';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -135,19 +135,19 @@ class SeoFilter
     {
         $fields = [];
         $q = $this->modx->newQuery('sfField');
-        //        $q->where(array('active'=>1));
+        //$q->where(array('active'=>1));
         $q->select(['sfField.*']);
         if ($q->prepare() && $q->stmt->execute()) {
             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                if ($row['class'] == 'modTemplateVar') {
-                    if (strtolower($row['xpdo_package']) == 'tvsuperselect') {
+                if (mb_strtolower($row['class']) === 'modtemplatevar') {
+                    if (mb_strtolower($row['xpdo_package']) === 'tvsuperselect') {
                         $fields['tvss'][$row[$key]] = $row;
                     } else {
                         $fields['tvs'][$row[$key]] = $row;
                     }
-                } elseif (strtolower($row['class']) == 'tagger') {
+                } elseif (mb_strtolower($row['class']) === 'tagger') {
                     $fields['tagger'][$row[$key]] = $row;
-                } elseif ($row['class'] == 'msVendor') {
+                } elseif (mb_strtolower($row['class']) === 'msvendor') {
                     $fields['data']['vendor'] = $row;
                 } else {
                     $fields['data'][$row[$key]] = $row;
@@ -321,20 +321,18 @@ class SeoFilter
         $data = [];
         foreach (['tvs' => 'modTemplateVarResource', 'tvss' => 'tvssOption'] as $var => $class) {
             if (!empty($fields[$var])) {
-                if ($var == 'tvss') {
+                if ($var === 'tvss') {
                     $this->modx->addPackage('tvsuperselect',
                         $this->modx->getOption('core_path').'components/tvsuperselect/model/');
                 }
                 foreach ($fields[$var] as $f_key => $field) {
-                    if ($field['xpdo_where']) {
-                        if (!$this->checkResourceCondition($resource_id, $field['xpdo_where'])) {
-                            unset($fields[$var][$f_key]);
-                        }
+                    if ($field['xpdo_where'] && !$this->checkResourceCondition($resource_id, $field['xpdo_where'])) {
+                        unset($fields[$var][$f_key]);
                     }
                 }
                 if (!empty($fields[$var])) {
                     $q = $this->modx->newQuery($class);
-                    if ($var == 'tvss') {
+                    if ($var === 'tvss') {
                         $q->innerJoin('modTemplateVar', 'TV', 'TV.id = tvssOption.tv_id');
                         $q->where([
                             'resource_id' => $resource_id,
@@ -360,12 +358,10 @@ class SeoFilter
             }
         }
 
-        if (in_array('tagger', array_keys($fields))) {
+        if (array_key_exists('tagger', $fields)) {
             foreach ($fields['tagger'] as $f_key => $field) {
-                if ($field['xpdo_where']) {
-                    if (!$this->checkResourceCondition($resource_id, $field['xpdo_where'])) {
-                        unset($fields['tagger'][$f_key]);
-                    }
+                if ($field['xpdo_where'] && !$this->checkResourceCondition($resource_id, $field['xpdo_where'])) {
+                    unset($fields['tagger'][$f_key]);
                 }
             }
             if (!empty($fields['tagger'])) {
@@ -387,7 +383,7 @@ class SeoFilter
                     if ($this->modx->getCount('TaggerTagResource')) {
                         if ($q->prepare() && $q->stmt->execute()) {
                             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                                if (in_array($row['group_id'], array_keys($fields['tagger']))) {
+                                if (array_key_exists($row['group_id'], $fields['tagger'])) {
                                     $data['tagger'][$row['group_id']][] = $row['tag'];
                                 } else {
                                     $data['tagger'][$row['group_alias']][] = $row['tag'];
@@ -403,12 +399,12 @@ class SeoFilter
         if ($resource = $this->modx->getObject('modResource', $resource_id)) {
             $resource = $resource->toArray();
             foreach ($resource as $param => $val) {
-                if (!empty($fields['data']) && in_array($param, array_keys($fields['data']))) {
+                if (!empty($fields['data']) && array_key_exists($param, $fields['data'])) {
                     if ($fields['data'][$param]['xpdo_where']) {
                         if ($this->checkResourceCondition($resource_id, $fields['data'][$param]['xpdo_where'])) {
                             $data['data'][$param] = $val;
                         } else {
-                            //                            $this->modx->log(1,'The values '.print_r($val,1).' don\'t satisfy field (id='.$fields['data'][$param]['id']. ') where condition = "'.$fields['data'][$param]['xpdo_where'].'"');
+                            //$this->modx->log(1,'The values '.print_r($val,1).' don\'t satisfy field (id='.$fields['data'][$param]['id']. ') where condition = "'.$fields['data'][$param]['xpdo_where'].'"');
                         }
                     } else {
                         $data['data'][$param] = $val;
@@ -426,7 +422,7 @@ class SeoFilter
         if (!is_object($this->countHandler)) {
             require_once 'sfcount.class.php';
             $count_class = $this->config['count_class'];
-            if ($count_class != 'sfCountHandler') {
+            if ($count_class !== 'sfCountHandler') {
                 $this->loadCustomClasses('count');
             }
             if (!class_exists($count_class)) {
@@ -459,8 +455,9 @@ class SeoFilter
         $pl1 = $this->pdo->makePlaceholders($placeholders, '', '[[+', ']]', false);
         $pl2 = $this->pdo->makePlaceholders($placeholders, '', '[[++', ']]', false);
         $pl3 = $this->pdo->makePlaceholders($placeholders, '', '{', '}', false);
-        $customPath = str_replace([$pl1['pl'], $pl2['pl'], $pl3['pl']], [$pl1['vl'], $pl2['vl'], $pl3['vl']],
-            $customPath);
+        $customPath = str_replace($pl1['pl'], $pl1['vl'], $customPath);
+        $customPath = str_replace($pl2['pl'], $pl2['vl'], $customPath);
+        $customPath = str_replace($pl3['pl'], $pl3['vl'], $customPath);
         if (strpos($customPath, MODX_BASE_PATH) === false && strpos($customPath, MODX_CORE_PATH) === false) {
             $customPath = MODX_BASE_PATH.ltrim($customPath, '/');
         }
@@ -971,17 +968,17 @@ class SeoFilter
                     $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
 
                     $hash = [];
-                    foreach($data['data'] as $tmVal) {
+                    foreach ($data['data'] as $tmVal) {
                         if (!isset($tmVal['name'], $tmVal['value']) || $tmVal['name'] === 'page_id') {
                             continue;
                         }
-                        foreach($params as $param => $value) {
-                            if(mb_strpos($tmVal['name'],$param) === 0) {
+                        foreach ($params as $param => $value) {
+                            if (mb_strpos($tmVal['name'], $param) === 0) {
                                 $hash[] = $tmVal['name'].'='.$tmVal['value'];
                             }
                         }
                     }
-                    $meta['hash'] = implode('&',$hash);
+                    $meta['hash'] = implode('&', $hash);
                 }
 
 
