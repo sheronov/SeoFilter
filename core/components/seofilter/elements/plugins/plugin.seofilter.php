@@ -52,7 +52,7 @@ switch ($modx->event->name) {
                 break;
             }
 
-            $fields = $SeoFilter->getFieldsKey();
+            $fields = $SeoFilter->getFieldsKey('key', $resource->id);
             $before = $SeoFilter->getResourceData($resource->id, $fields);
         }
         $_SESSION['SeoFilter']['before'] = $before;
@@ -81,7 +81,7 @@ switch ($modx->event->name) {
         }
 
         $dictionary = $changes = $before = [];
-        $fields = $SeoFilter->getFieldsKey();
+        $fields = $SeoFilter->getFieldsKey('key', $resource->id);
         $after = $SeoFilter->getResourceData($resource->id, $fields);
 
         if (array_key_exists('tagger', $fields)) {
