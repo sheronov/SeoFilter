@@ -6,6 +6,7 @@ Changelog for SeoFilter.
 - new parameter &context in snippets sfMenu and sfSitemap (by default it shows links from all contexts);
 - the parameter &context can recieve array or string with comma separated values;
 - new conditions in &where parameter of sfMenu snippet by site pages (&where=`{"modResource.template":1}`)
+- required minimum PHP version 5.5 (it will rise later)
 
 1.8.2-beta (30.04.2020)
 ======================
