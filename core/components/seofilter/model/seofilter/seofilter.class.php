@@ -1034,6 +1034,11 @@ class SeoFilter
                         $rule_id = $this->findRuleId($pageId, array_merge($base_params, $diff_params), $base_params,
                             $diff_params);
                     }
+                    // $this->modx->log(1, 'base_params = '.print_r($base_params, 1));
+                    // $this->modx->log(1, 'diff params = '.print_r($diff_params, 1));
+                    // $this->modx->log(1, 'field ids  = '.print_r($allFieldIds, 1));
+                    // $this->modx->log(1, 'diff ids  = '.print_r($diffFieldIds, 1));
+                    // $this->modx->log(1, 'rule_id = '.$rule_id);
 
                     if ($rule_id) {
                         $rule_fields = $this->ruleFields($rule_id);
@@ -1407,9 +1412,10 @@ class SeoFilter
     public function fastFindRuleId($pageId = 0, $baseParams = [], $diffParams = [], $fieldIds = [], $diffFieldIds = [])
     {
         $params_keys = array_keys(array_merge($baseParams, $diffParams));
+        $allFieldsIds =  array_merge(array_keys($fieldIds),array_keys($diffFieldIds));
         $ruleId = $rid_count = 0;
         $rule_aliases = [];
-        $pageAliases = $this->fastPageAliases($pageId, array_merge(array_keys($fieldIds), array_keys($diffFieldIds)));
+        $pageAliases = $this->fastPageAliases($pageId, array_keys($fieldIds));
 
         foreach ($pageAliases as $rule => $ralias) {
             $sort = $ralias['sort'];
@@ -1418,14 +1424,14 @@ class SeoFilter
             foreach ($ralias as $ra) {
                 $rule_aliases[$rule]['sort'] = $sort;
                 $rule_aliases[$rule]['base'] = $base;
-                $rule_aliases[$rule]['fields'][$ra['alias']] = [
+                $rule_aliases[$rule]['fields'][$ra['id']] = [
                     'where'   => $ra['where'],
                     'compare' => $ra['compare'],
-                    'value'   => $ra['value']
+                    'value'   => $ra['value'],
+                    'alias'   => $ra['alias']
                 ];
             }
         }
-
 
         foreach ($rule_aliases as $rule => $rarray) {
             $fields = $rarray['fields'];
@@ -1443,14 +1449,14 @@ class SeoFilter
             }
             if (count($fields) > $rid_count) {
                 $check = 0;
-                foreach ($fields as $alias => $row) {
-                    if (!in_array($alias, $params_keys, true)) {
+                foreach ($fields as $fieldId => $row) {
+                    if (!in_array($fieldId, $fieldIds, true)) {
                         continue;
                     }
                     if ($row['where'] && $row['compare']) {
                         $value = $row['value'];
                         $values = explode($this->config['values_delimeter'], $value);
-                        $get_param = array_merge($baseParams, $diffParams)[$alias];
+                        $get_param = array_merge($baseParams, $diffParams)[$row['alias']];
                         switch ($row['compare']) { //Обратный механизм поиска
                             case 1:
                                 if (in_array($get_param, $values, true)) {
@@ -2709,6 +2715,7 @@ class SeoFilter
                     foreach ($field_word as $field_id => $word_id) {
                         $field_words[] = ['field_id' => $field_id, 'word_id' => $word_id];
                     }
+
                     $url = $this->newUrl($url_link, $multi_id, $page_id, $ajax, $new, $field_words, $link_tpl);
                     $url['url'] = $url_link;
                     //$this->modx->log(modx::LOG_LEVEL_ERROR, 'SeoFilter: сработало условие и создан УРЛ '.$url_link);
@@ -2854,7 +2861,7 @@ class SeoFilter
                 ];
                 $response = $this->modx->runProcessor('mgr/urls/create', $processorProps, $otherProps);
                 if ($response->isError()) {
-                    if (in_array('double', $response->response['errors'],true)) {
+                    if (in_array('double', $response->response['errors'], true)) {
                         $doubles++;
                         //                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter]' . $response->getMessage());
                     }
@@ -2956,11 +2963,8 @@ class SeoFilter
 
                     $words = [];
                     foreach ($link['relation'] as $relation) {
-                        if (!empty($links['fields'][$relation['field_id']]['words'][$relation['word_id']])) {
-                            foreach ($links['fields'][$relation['field_id']]['words'][$relation['word_id']] as $tK => $tV) {
-                                $words[$tK] = $tV;
-                            }
-                        }
+                        $words = array_merge($words,
+                            $links['fields'][$relation['field_id']]['words'][$relation['word_id']]);
                     }
 
                     if ($this->config['edit_url_mask']) {
@@ -3072,7 +3076,7 @@ class SeoFilter
             return false;
         }
 
-        foreach ($fields as $field_id => $field) {
+        foreach ($fields as $field_id => &$field) {
             $alias = $field['field_alias'];
             $q = $this->modx->newQuery('sfDictionary');
             $q->where(['field_id' => $field_id, 'active' => 1]);
@@ -3116,7 +3120,7 @@ class SeoFilter
                         'delete'         => 0
                     ];
 
-                    $fields[$field_id]['words'][$row['id']] = $word;
+                    $field['words'][$row['id']] = $word;
                     $words[$field_id][] = $forMulti;
                 }
             }
