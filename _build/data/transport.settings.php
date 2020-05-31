@@ -159,7 +159,7 @@ $tmp = array(
     ),
     'ajax_recount' => array(
         'xtype' => 'combo-boolean',
-        'value' => true,
+        'value' => false,
         'area' => 'seofilter_count',
     ),
     'choose' => array(
