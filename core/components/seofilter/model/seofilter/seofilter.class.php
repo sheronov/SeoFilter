@@ -14,6 +14,9 @@ class SeoFilter
     /** @var sfCountHandler $countHandler */
     public $countHandler = null;
 
+    /** @var modResource */
+    protected $object = null;
+
 
     /**
      * @param  modX  $modx
@@ -704,7 +707,7 @@ class SeoFilter
     public function clearSuffixes($url = '')
     {
         foreach ($this->config['possibleSuffixes'] as $possibleSuffix) {
-            if (substr($url, -strlen($possibleSuffix)) == $possibleSuffix) {
+            if (substr($url, -strlen($possibleSuffix)) === $possibleSuffix) {
                 $url = substr($url, 0, -strlen($possibleSuffix));
             }
         }
@@ -733,7 +736,7 @@ class SeoFilter
                         $q->where(['id' => $pageId]);
                         $q->select('alias');
                         $alias = $this->modx->getValue($q->prepare());
-                        if ($pageUrl != $fullUrl) {
+                        if ($pageUrl !== $fullUrl) {
                             $pageUrl .= '/'.$alias;
                         }
                     }
@@ -863,6 +866,13 @@ class SeoFilter
                 } else {
                     $params = $copyparams = $data['data'];
                 }
+
+                if (!$result = $this->findSeoPageByParams($pageId, $params)) {
+                    return $this->error('no_results', [], ['action' => $action]);
+                }
+
+                $data = $this->preparePageMeta($result, $action, $params);
+
 
                 $aliases = $this->fieldsAliases($pageId, 1);
 
@@ -1034,11 +1044,6 @@ class SeoFilter
                         $rule_id = $this->findRuleId($pageId, array_merge($base_params, $diff_params), $base_params,
                             $diff_params);
                     }
-                    // $this->modx->log(1, 'base_params = '.print_r($base_params, 1));
-                    // $this->modx->log(1, 'diff params = '.print_r($diff_params, 1));
-                    // $this->modx->log(1, 'field ids  = '.print_r($allFieldIds, 1));
-                    // $this->modx->log(1, 'diff ids  = '.print_r($diffFieldIds, 1));
-                    // $this->modx->log(1, 'rule_id = '.$rule_id);
 
                     if ($rule_id) {
                         $rule_fields = $this->ruleFields($rule_id);
@@ -1188,6 +1193,767 @@ class SeoFilter
         }
     }
 
+    /**
+     * Основной метод для поиска SEO-страниц по параметрам с фронта
+     *
+     * @param  int  $pageId
+     * @param  array  $params
+     * @param  string  $objectClass
+     *
+     * @return null|array
+     */
+    public function findSeoPageByParams($pageId, $params, $objectClass = 'modResource')
+    {
+        // 0. Сохранить данные по странице в память
+        if (!$this->object = $this->modx->getObject($objectClass, $pageId)) {
+            return null;
+        }
+
+        // 1. Получить поля для страницы с ключом-псевдонимом
+        $fields = $this->fieldsForPage($pageId, 'alias');
+
+        if (empty($fields)) {
+            return $this->metaForExistedPage($pageId, $params);
+        }
+
+        // 1.1. Оставим только параметры, для которых у нас есть поля
+        $fieldsParams = array_intersect_key($params, $fields);
+        $diffParams = array_diff_key($params, $fieldsParams);
+
+        if (empty($fieldsParams)) {
+            return $this->metaForExistedPage($pageId, $diffParams);
+        }
+
+        $usageFields = array_intersect_key($fields, $fieldsParams);
+
+        // 2. Получить массив слов из словаря (если надо - добавить)
+        $words = $this->wordsByParamsAndFields($fieldsParams, $usageFields);
+
+        $fieldsParams = array_intersect_key($fieldsParams, $words); //не все слова могли быть, усечём ещё раз
+        $diffParams = array_diff_key($params, $fieldsParams); //diff на этом этапе мог увеличиться
+
+        $usageFields = array_intersect_key($usageFields, $fieldsParams);
+
+        if (empty($fieldsParams) || empty($usageFields)) {
+            return $this->metaForExistedPage($pageId, $diffParams);
+        }
+
+        // 3. Найти правила для страницы по полям (с учётом условий)
+        $rules = $this->rulesByPageFieldsParams($pageId, $usageFields, $fieldsParams);
+        if (empty($rules)) {
+            return $this->metaForExistedPage($pageId, $params);
+        }
+
+        // 4. Найти SEO страницу с учётом найденных слов, правил
+
+        $links = $this->linksByRulesWordsIds($pageId, array_column($rules, 'id'), array_column($words, 'id'));
+
+        if (empty($links)) {
+            return $this->metaForExistedPage($pageId, $params);
+        }
+
+        $linkFound = null;
+
+        foreach ($links as $link) {
+            // 5. Пересчитать результаты, если их 0.
+            if ($this->config['count_childrens'] && (!(int)$link['total'] || $this->config['ajax_recount'])) {
+                $this->loadHandler();
+                $link['total'] = $this->countHandler->countByLink($link['id']); //внутри объект ссылки обновится
+            }
+
+            if ((int)$link['total'] || !$this->config['hideEmpty']) {
+                $linkFound = $link;
+                break;
+            }
+        }
+
+        // 6. Вернуть ссылку, если есть результаты, подставив мета-теги
+        if ($linkFound) {
+            $sortForParams = [];
+            foreach ($fieldsParams as $alias => $input) {
+                if (mb_strpos($linkFound['old_url'], $alias) === false) {
+                    $diffParams[$alias] = $input;
+                    unset($words[$alias], $fieldsParams[$alias]);
+                } else {
+                    $sortForParams[$alias] = mb_strpos($linkFound['old_url'], $alias);
+                }
+            }
+
+            uksort($words, function ($a, $b) use ($sortForParams) {
+                $indexA = 0;
+                $indexB = 0;
+                if (isset($sortForParams[$a])) {
+                    $indexA = $sortForParams[$a];
+                }
+                if (isset($sortForParams[$b])) {
+                    $indexB = $sortForParams[$b];
+                }
+                if ($indexA === $indexB) {
+                    return 0;
+                }
+                return ($indexA < $indexB) ? -1 : 1;
+            });
+
+            return $this->metaForSeoPage($linkFound, $words, $rules[$linkFound['multi_id']], $diffParams);
+        }
+
+
+        // 6.1. Если нет результатов, то вернуть содержимое страницы
+        return $this->metaForExistedPage($pageId, $diffParams);
+    }
+
+    /**
+     * @param  array  $meta
+     * @param  string  $action
+     * @param  array  $params
+     *
+     * @return array
+     */
+    public function preparePageMeta($meta, $action, $params)
+    {
+        if ($meta['find'] && !empty($meta['diff'])) {
+            $hash = [];
+            foreach ($meta['diff'] as $tmVal) {
+                if (!isset($tmVal['name'], $tmVal['value']) || $tmVal['name'] === 'page_id') {
+                    continue;
+                }
+                foreach ($params as $param => $value) {
+                    if (mb_strpos($tmVal['name'], $param) === 0) {
+                        $hash[] = $tmVal['name'].'='.$tmVal['value'];
+                    }
+                }
+            }
+            $meta['hash'] = implode('&', $hash);
+        }
+
+        if (!empty($meta['url'])) {
+            if ((int)$this->object->id === (int)$this->config['site_start']) {
+                if ($this->config['main_alias']) {
+                    $alias = $this->object->alias;
+                    $meta['url'] = '/'.$alias.$this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
+                } else {
+                    $meta['url'] = '/'.$meta['url'].$this->config['url_suffix'];
+                }
+            } else {
+                $meta['url'] = $this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
+            }
+            $meta['full_url'] = $this->clearSuffixes($this->modx->makeUrl($this->object->id, $this->object->context_key,
+                    '', '-1')).$meta['url'];
+        } elseif ((int)$this->object->id === (int)$this->config['site_start']) {
+            $meta['url'] = '';
+        } else {
+            $meta['url'] = isset($this->config['this_page_suffix'])
+                ? $this->config['this_page_suffix']
+                : $this->config['container_suffix'];
+        }
+
+        if (!empty($meta['diff'])) {
+            if ($this->config['page_tpl'] && array_key_exists($this->config['page_key'], $meta['diff'])) {
+                if ((int)$meta['diff'][$this->config['page_key']] === 1) {
+                    unset($meta['diff'][$this->config['page_key']]);
+                } else {
+                    $page_part = $this->pdo->parseChunk('@INLINE '.$this->config['page_tpl'], [
+                        'pageVarKey'              => $this->config['page_key'],
+                        'pagevarkey'              => $this->config['page_key'],
+                        $this->config['page_key'] => $meta['diff'][$this->config['page_key']]
+                    ]);
+
+                    if (mb_strpos($page_part, mb_substr($meta['url'], -1, 1)) === 0) {
+                        $page_part = mb_substr($page_part, 1);
+                    }
+
+                    $meta['url'] .= $page_part;
+                    $meta['full_url'] .= $page_part;
+
+                    unset($meta['diff'][$this->config['page_key']]);
+                }
+            }
+
+
+            if ($action === 'getmetatm') {
+                $hash_part = $this->getHashUrlForTM2($meta['diff'], $params);
+            } else {
+                $hash_part = $this->getHashUrl($meta['diff']);
+            }
+            if (mb_strpos($meta['url'], '?') !== false) {
+                $meta['url'] .= str_replace('?', '&', $hash_part);
+                $meta['full_url'] .= str_replace('?', '&', $hash_part);
+            } else {
+                $meta['url'] .= $hash_part;
+                $meta['full_url'] .= $hash_part;
+            }
+        }
+
+        if ($this->config['crumbsReplace']) {
+            $crumb_array = $this->getCrumbs($this->object->id);
+            if ($meta['find']) {
+                $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
+                $crumb_array['sflink'] = $meta['link'];
+                $crumb_array['sfurl'] = $meta['link_url'];
+            }
+            if (!empty($meta['nested'])) {
+                $crumb_array['sfnested'] = $meta['nested'];
+            }
+            $crumbs = $this->pdo->getChunk($this->config['crumbsCurrent'], $crumb_array);
+            $meta['crumbs'] = $crumbs;
+        }
+
+        $pluginResponse = $this->invokeEvent('sfOnReturnMeta',
+            ['action' => $action, 'page' => $this->object->id, 'meta' => $meta, 'SeoFilter' => $this]);
+
+        if ($pluginResponse['success']) {
+            $meta = $pluginResponse['data']['meta'];
+        }
+
+        return $meta;
+    }
+
+    /**
+     * Подбор мета-тегов для обычной страницы (без параметров, влияющих на SEO)
+     *
+     * @param  int  $pageId
+     * @param  array  $params
+     *
+     * @return array
+     */
+    protected function metaForExistedPage($pageId, $params)
+    {
+        $meta = [
+            'find'     => 0,
+            'full_url' => $this->modx->makeUrl($pageId, $this->object->context_key, '', '-1'),
+            'page_id'  => $pageId,
+            'id'       => $pageId
+        ];
+
+        $system = [
+            'title'       => $this->config['title'],
+            'description' => $this->config['description'],
+            'introtext'   => $this->config['introtext'],
+            'keywords'    => $this->config['keywords'],
+            'h1'          => $this->config['h1'],
+            'h2'          => $this->config['h2'],
+            'text'        => $this->config['text'],
+            'content'     => $this->config['content'],
+            'link'        => $this->config['link'],
+        ];
+
+
+        $page_arr = $this->object->toArray();
+        $page_keys = array_keys($page_arr);
+
+        $meta = array_merge($meta, $page_arr);
+        $variables = $this->prepareRow($meta, $pageId);
+
+        $array_diff = array_diff($system, $page_keys);
+        foreach ($array_diff as $tag => $tvName) {
+            if ($tvValue = $this->object->getTVValue($tvName)) {
+                $tpl = '@INLINE '.$tvValue;
+                $meta[$tag] = $this->pdo->getChunk($tpl, $variables);
+                unset($system[$tag]);
+            }
+        }
+        foreach ($system as $tag => $tagName) {
+            if ($tagName) {
+                if (strpos($tagName, '@INLINE') !== false) {
+                    $tpl = $tagName;
+                } elseif (mb_strpos($tagName, '[') !== false || mb_strpos($tagName, '{') !== false) {
+                    $tpl = '@INLINE '.$tagName;
+                } else {
+                    $tpl = '@INLINE '.$this->object->get($tagName);
+                }
+                $meta[$tag] = $this->pdo->getChunk($tpl, $variables);
+            }
+        }
+
+        if (empty($page_arr['isfolder'])) {
+            $q = $this->modx->newQuery('modContentType', ['name' => 'HTML']);
+            $q->select('file_extensions');
+            $this->config['this_page_suffix'] = $this->modx->getValue($q->prepare());
+        }
+
+
+        if (isset($meta['title'])) {
+            $meta['pagetitle'] = $meta['title'];
+        }
+
+
+        return $meta;
+    }
+
+    /**
+     * @param  array  $link
+     * @param  array  $words
+     * @param  array  $rule
+     * @param  array  $diffParams
+     *
+     * @return array
+     */
+    protected function metaForSeoPage($link, $words, $rule, $diffParams)
+    {
+        $meta = [
+            'find'       => 1,
+            'diff'       => $diffParams,
+            'params'     => array_combine(array_keys($words), array_column($words, 'input')),
+            'seo_id'     => $link['id'],
+            'url_id'     => $link['id'],
+            'link'       => $link['link'],
+            'url'        => !empty($link['new_url']) ? $link['new_url'] : $link['old_url'],
+            'createdon'  => $link['createdon'],
+            'editedon'   => $link['editedon'] === '0000-00-00 00:00:00' ? $link['createdon'] : $link['editedon'],
+            'rule_id'    => $rule['id'],
+            'success'    => true,
+            'page_id'    => $link['page_id'],
+            'total'      => (int)$link['total'],
+            'old_total'  => (int)$link['total'],
+            'has_slider' => array_reduce($words, function ($carry, $word) {
+                if (!empty($word['field']['slider'])) {
+                    $carry++;
+                }
+                return $carry;
+            }, 0)
+        ];
+        $seo_system = ['id', 'field_id', 'multi_id', 'name', 'rank', 'active', 'class', 'key'];
+        $seo_array = [
+            'title',
+            'h1',
+            'h2',
+            'description',
+            'introtext',
+            'keywords',
+            'text',
+            'content',
+            'link',
+            'tpl',
+            'introlength'
+        ];
+
+
+        $fields = array_column(array_column($words, 'field'), null, 'alias');
+
+        $wordsToText = [
+            'total' => (int)$link['total'],
+            'count' => (int)$link['total'],
+        ];
+        $paramsToText = [];
+
+        foreach ($words as $fieldAlias => $word) {
+            foreach (array_diff_key($word, array_flip($seo_system)) as $key => $value) {
+                if (count($words) === 1) {
+                    $wordsToText[$key] = $value;
+                }
+                if (mb_strpos($key, 'value') !== false) {
+                    $wordsToText[str_replace('value', $fieldAlias, $key)] = $value;
+                }
+            }
+            $wordsToText[$fieldAlias.'_input'] = $word['input'];
+            $wordsToText[$fieldAlias.'_alias'] = $word['alias'];
+            $wordsToText[$fieldAlias.'_word'] = $word['id'];
+            $wordsToText['m_'.$fieldAlias] = $wordsToText['m_'.$fieldAlias.'_i'];
+            $paramsToText[$fieldAlias] = [
+                'word'  => $word['id'],
+                'input' => $word['input'],
+                'value' => $word['value'],
+                'alias' => $word['alias'],
+                'field' => $word['field_id'],
+                'class' => $word['field']['class'],
+                'key'   => $word['field']['key']
+            ];
+        }
+
+
+        if (!empty($rule['count_parents']) || $rule['count_parents'] === '0' || $rule['count_parents'] === 0) {
+            $parents = $rule['count_parents'];
+        } else {
+            $parents = $link['page_id'];
+        }
+
+        if (!empty($this->config['pdopage_hash'])) {
+            $meta['config'] = $this->getRuleCount($meta['params'], $fields, $parents, $rule['count_where'],
+                false, true);
+            $meta['config']['parents'] = $parents;
+        }
+
+        if ($this->config['count_choose'] && $this->config['count_select']) {
+            if ($minMax = $this->getRuleCount($meta['params'], $fields, $parents, $rule['count_where'], 1)) {
+                $wordsToText = array_merge($minMax, $wordsToText);
+            }
+        }
+
+        if ($this->config['page_key']) {
+            $wordsToText['page_number'] = $wordsToText[$this->config['page_key']] = $this->config['page_number'];
+        }
+
+        foreach (['id', 'page', 'page_id'] as $pkey) {
+            if (!isset($wordsToText[$pkey])) {
+                $wordsToText[$pkey] = $link['page_id'];
+            }
+        }
+
+        $wordsToText['params'] = $paramsToText;
+
+        $wordsToText = $this->prepareRow($wordsToText, $parents, $rule['id'], $rule);
+
+        if ($link['custom']) {
+            $seo_array = array_intersect_key($link, array_flip($seo_array));
+        } else {
+            $seo_array = array_intersect_key($rule, array_flip($seo_array));
+        }
+
+        if (!isset($wordsToText['resource'])) {
+            $wordsToText['resource'] = $this->object->toArray();
+        }
+        if (!isset($wordsToText['original_page'])) {
+            $wordsToText['original_page'] = $this->object->toArray();
+        }
+
+        foreach ($seo_array as $tag => $text) {
+            if ($text) {
+                if (strpos($text, '@INLINE') !== false) {
+                    $tpl = $text;
+                } else {
+                    $tpl = '@INLINE '.$text;
+                }
+                $meta[$tag] = $this->pdo->getChunk($tpl, $wordsToText);
+            }
+        }
+
+        if (!empty($link['tpl'])) {
+            $meta['tpl'] = $link['tpl'];
+        } elseif (!empty($rule['tpl'])) {
+            $meta['tpl'] = $rule['tpl'];
+        }
+
+        if (!empty($link['introlength'])) {
+            $meta['introlength'] = $link['introlength'];
+        } elseif (!empty($rule['introlength'])) {
+            $meta['introlength'] = $rule['introlength'];
+        }
+
+        foreach (['properties', 'introtexts'] as $prop) {
+            $seo_values = [];
+            if (!empty($link[$prop]) && !empty($link[$prop]['values'])) {
+                $seo_values = $link[$prop]['values'];
+            } elseif (!empty($rule[$prop]) && !empty($rule[$prop]['values'])) {
+                $seo_values = $rule[$prop]['values'];
+            }
+            if (!empty($seo_values)) {
+                $properties = [];
+                $array_word = [];
+                foreach ($wordsToText as $key => $val) {
+                    $array_word['$'.$key] = "'".$val."'";
+                }
+                uksort($array_word, function ($a, $b) {
+                    if (mb_strlen($a) === mb_strlen($b)) {
+                        return 0;
+                    } else {
+                        return mb_strlen($a) < mb_strlen($b);
+                    }
+                });
+                foreach ($seo_values as $value) {
+                    $properties[] = str_replace(array_keys($array_word), array_values($array_word), $value);
+                }
+                $meta[$prop] = $properties;
+            }
+        }
+
+        if (isset($meta['title'])) {
+            $meta['pagetitle'] = $meta['title'];
+        }
+
+        $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
+
+        return $meta;
+    }
+
+    /**
+     * Поля, которые используются для категории
+     * Следите, чтобы для одной категории не было двух полей с одинаковым псевдонимом
+     *
+     * @param  int  $pageId
+     * @param  null|string  $key
+     *
+     * @return array
+     */
+    protected function fieldsForPage($pageId, $key = 'id')
+    {
+        $fields = [];
+
+        $q = $this->modx->newQuery('sfField')
+            ->select($this->modx->getSelectColumns('sfField', 'sfField', ''))
+            ->innerJoin('sfFieldIds', 'FieldRule', 'sfField.id = FieldRule.field_id')
+            ->innerJoin('sfRule', 'sfRule', 'FieldRule.multi_id = sfRule.id')
+            ->where([
+                'sfField.active' => 1,
+                'sfRule.active'  => 1,
+            ])
+            ->groupby('sfField.id');
+
+        if ($this->config['proMode']) {
+            $q->where("1=1 and FIND_IN_SET({$pageId}, REPLACE(IFNULL(NULLIF(sfRule.pages, ''), sfRule.page), ' ', ''))");
+        } else {
+            $q->where(['sfRule.page' => $pageId]);
+        }
+
+        if ($q->prepare() && $q->stmt->execute()) {
+            while ($field = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                if ($key && isset($field[$key])) {
+                    $fields[$field[$key]] = $field;
+                } else {
+                    $fields[] = $field;
+                }
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * Поиск правил для страницы по переданным полям
+     * Также учитываются условия для полей, добавленных в правило
+     *
+     * @param  int  $pageId
+     * @param  array  $fields
+     * @param  array  $params
+     *
+     * @return array
+     */
+    protected function rulesByPageFieldsParams($pageId, $fields, $params)
+    {
+        $rules = [];
+
+        $fieldsCondition = 'FoundFields.field_id IN ('.implode(',', array_column($fields, 'id')).')';
+
+        foreach ($fields as $field) {
+            $fieldsCondition .= str_replace('?', $this->modx->quote($params[$field['alias']]),
+                " AND IF(FoundFields.where and FoundFields.field_id = {$field['id']},
+                    case FoundFields.compare
+                        when 1 then FIND_IN_SET(?, FoundFields.value) > 0
+                        when 2 then FIND_IN_SET(?, FoundFields.value) = 0
+                        when 3 then ? > FoundFields.value
+                        when 4 then ? < FoundFields.value
+                        when 5 then (? >= FoundFields.value and ? <= FoundFields.value)
+                        when 5 then (? >= CONVERT(substring_index(FoundFields.value, ',', 1), SIGNED) 
+                                    AND ? <= CONVERT(substring_index(FoundFields.value, ',', -1), SIGNED))
+                        when 6 then ? LIKE CONCAT('%',FoundFields.value,'%')
+                        when 7 then ? NOT LIKE CONCAT('%',FoundFields.value,'%')
+                        else 1
+                        end
+                , 1)");
+        }
+
+
+        $q = $this->modx->newQuery('sfRule')
+            ->select($this->modx->getSelectColumns('sfRule', 'sfRule', ''))
+            ->select('count(FieldRule.id) as rule_fields, count(FoundFields.id) as found_fields')
+            ->innerJoin('sfFieldIds', 'FieldRule', 'sfRule.id = FieldRule.multi_id')
+            ->leftJoin('sfFieldIds', 'FoundFields', 'FieldRule.id = FoundFields.id AND '.$fieldsCondition)
+            ->where(['sfRule.active' => 1])
+            ->groupby('sfRule.id')
+            ->groupby('sfRule.rank')
+            ->having('found_fields > 0 AND found_fields = rule_fields')
+            ->sortby('found_fields', 'DESC')
+            ->sortby('sfRule.rank', 'DESC');
+
+        if ($this->config['proMode']) {
+            $q->where("1=1 AND FIND_IN_SET({$pageId},REPLACE(IFNULL(NULLIF(sfRule.pages,''),sfRule.page),' ',''))");
+        } else {
+            $q->where(['sfRule.page' => $pageId]);
+        }
+
+        if ($q->prepare() && $q->stmt->execute()) {
+            while ($rule = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $rules[$rule['id']] = $rule;
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Ищет и сопоставляет слова в словаре
+     * Добавляет новые, если разрешено
+     *
+     * @param  array  $params
+     * @param  array  $fields
+     *
+     * @return array
+     */
+    protected function wordsByParamsAndFields($params, $fields)
+    {
+        $words = [];
+
+        $fieldsById = array_column($fields, null, 'id');
+
+        $q = $this->modx->newQuery('sfDictionary')
+            ->select($this->modx->getSelectColumns('sfDictionary', 'sfDictionary', ''))
+            ->where(['field_id:IN' => array_keys($fieldsById)])
+            ->where(['input:IN' => array_values($params)]);
+
+        if ($q->prepare() && $q->stmt->execute()) {
+            while ($word = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $fieldAlias = $fieldsById[$word['field_id']]['alias'];
+                if (mb_strtolower($word['input']) === mb_strtolower($params[$fieldAlias])) {
+                    $word['field'] = $fieldsById[$word['field_id']];
+                    $words[$fieldAlias] = $word;
+                }
+            }
+        }
+
+        foreach ($params as $alias => $input) {
+            if (!isset($words[$alias]) && $this->config['mfilterWords']
+                && mb_strpos($input, $this->config['values_delimeter']) === false
+                && $word = $this->addNewWord($input, $fields[$alias])
+            ) {
+                $words[$alias] = $word;
+            }
+        }
+
+        return $words;
+    }
+
+    /**
+     * Добавление нового слова в словарь с фронта
+     *
+     * @param  string  $input
+     * @param  array  $field
+     *
+     * @return array
+     */
+    protected function addNewWord($input, $field)
+    {
+        $word = null;
+
+        if ($input && $value = $this->getValueByInputField($input, $field)) {
+            $relation_id = $relation_value = '';
+            if (is_array($value)) {
+                $relation_value = $value['relation'];
+                $value = $value['value'];
+            }
+            $processorProps = [
+                'class'    => $field['class'],
+                'key'      => $field['key'],
+                'field_id' => $field['id'],
+                'value'    => $value,
+                'input'    => $input,
+            ];
+
+            if ($relation_value) {
+                $relation_field = $field['relation_field'];
+                $s = $this->modx->newQuery('sfDictionary');
+                $s->where(['input' => $relation_value, 'field_id' => $relation_field, 'active' => 1]);
+                $s->select('id');
+                $relation_id = $this->modx->getValue($s->prepare());
+            }
+
+            if ($relation_id) {
+                $processorProps['relation_word'] = $relation_id;
+            }
+
+            $otherProps = ['processors_path' => $this->config['processorsPath']];
+            $response = $this->modx->runProcessor('mgr/dictionary/create', $processorProps, $otherProps);
+            if ($response->isError()) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] '.print_r($response->response, 1));
+                $this->modx->error->reset();
+            } else {
+                $word = $response->response['object'];
+            }
+        }
+
+        return $word;
+    }
+
+    /**
+     * @param  string  $input
+     * @param  array  $field
+     *
+     * @return string|array
+     */
+    protected function getValueByInputField($input, $field)
+    {
+        $value = $input;
+
+        if (mb_strtolower($field['class']) === 'msvendor') {
+            $q = $this->modx->newQuery('msVendor');
+            $q->limit(1);
+            $q->where(['id' => $input]);
+            $q->select('name');
+            if ($q->prepare() && $q->stmt->execute()) {
+                $value = $q->stmt->fetch(PDO::FETCH_COLUMN);
+            }
+        } elseif ($field['xpdo']) {
+            $xpdo_id = $field['xpdo_id'];
+            $xpdo_name = $field['xpdo_name'];
+            if ($xpdo_class = $field['xpdo_class']) {
+                if ($package = $field['xpdo_package']) {
+                    $this->modx->addPackage(strtolower($package),
+                        $this->modx->getOption('core_path').'components/'.strtolower($package).'/model/');
+                }
+                $q = $this->modx->newQuery($xpdo_class);
+                $q->where([$xpdo_id => $input]);
+                $q->limit(1);
+                if ($field['relation']) {
+                    $relation_field = $field['relation_field'];
+                    $relation_column = $field['relation_column'];
+                    if ($relation_column) {
+                        $q->select($xpdo_name.','.$relation_column);
+                        if ($q->prepare() && $q->stmt->execute() && $row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                            $value = ['value' => $row[$xpdo_name], 'relation' => $row[$relation_column]];
+                        }
+                    } else {
+                        $q->select($xpdo_name);
+                        if ($q->prepare() && $q->stmt->execute()) {
+                            $value = $q->stmt->fetch(PDO::FETCH_COLUMN);
+                        }
+                    }
+                } else {
+                    $q->select($xpdo_name);
+                    if ($q->prepare() && $q->stmt->execute()) {
+                        $value = $q->stmt->fetch(PDO::FETCH_COLUMN);
+                    }
+                }
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param  int  $pageId
+     * @param  array  $ruleIds
+     * @param  array  $wordIds
+     *
+     * @return array
+     */
+    protected function linksByRulesWordsIds($pageId, $ruleIds, $wordIds)
+    {
+        $links = [];
+
+        $q = $this->modx->newQuery('sfUrls')
+            ->select($this->modx->getSelectColumns('sfUrls', 'sfUrls', ''))
+            ->select('count(FoundWords.id) as found_words')
+            ->select('count(UrlWords.id) as url_words')
+            ->innerJoin('sfUrlWord', 'UrlWords', 'sfUrls.id = UrlWords.url_id')
+            ->leftJoin('sfUrlWord', 'FoundWords',
+                'UrlWords.id = FoundWords.id AND FoundWords.word_id in ('.implode(',', $wordIds).')')
+            ->where([
+                'sfUrls.active'      => 1,
+                'sfUrls.page_id'     => $pageId,
+                'sfUrls.multi_id:IN' => $ruleIds
+            ])
+            ->groupby('sfUrls.id')
+            ->groupby('sfUrls.multi_id')
+            ->having('found_words > 0 and found_words = url_words')
+            ->sortby('FIELD(sfUrls.multi_id, '.implode(',', $ruleIds).')')
+            ->sortby('found_words', 'desc');
+
+        if ($q->prepare() && $q->stmt->execute()) {
+            while ($link = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $links[] = $link;
+            }
+        }
+
+        return $links;
+    }
+
     protected function getHashUrlForTM2($diff, $original)
     {
         $hash = [];
@@ -1212,18 +1978,16 @@ class SeoFilter
     public function getCrumbs($pageId = 0)
     {
         $page_array = [];
-        if ($pageId) {
-            if ($page_array = $this->pdo->getArray('modResource', $pageId)) {
-                if (empty($page_array['menutitle'])) {
-                    $page_array['menutitle'] = $page_array['pagetitle'];
-                }
-                if ($page_array['class_key'] == 'modWebLink') {
-                    $page_array['link'] = is_numeric(trim($page_array['content'], '[]~ '))
-                        ? $this->pdo->makeUrl(intval(trim($page_array['content'], '[]~ ')), $page_array)
-                        : $page_array['content'];
-                } else {
-                    $page_array['link'] = $this->pdo->makeUrl($page_array['id'], $page_array);
-                }
+        if ($pageId && $page_array = $this->pdo->getArray('modResource', $pageId)) {
+            if (empty($page_array['menutitle'])) {
+                $page_array['menutitle'] = $page_array['pagetitle'];
+            }
+            if (mb_strtolower($page_array['class_key']) === 'modweblink') {
+                $page_array['link'] = is_numeric(trim($page_array['content'], '[]~ '))
+                    ? $this->pdo->makeUrl((int)trim($page_array['content'], '[]~ '), $page_array)
+                    : $page_array['content'];
+            } else {
+                $page_array['link'] = $this->pdo->makeUrl($page_array['id'], $page_array);
             }
         }
         return $page_array;
@@ -1412,7 +2176,7 @@ class SeoFilter
     public function fastFindRuleId($pageId = 0, $baseParams = [], $diffParams = [], $fieldIds = [], $diffFieldIds = [])
     {
         $params_keys = array_keys(array_merge($baseParams, $diffParams));
-        $allFieldsIds =  array_merge(array_keys($fieldIds),array_keys($diffFieldIds));
+        $allFieldsIds = array_merge(array_keys($fieldIds), array_keys($diffFieldIds));
         $ruleId = $rid_count = 0;
         $rule_aliases = [];
         $pageAliases = $this->fastPageAliases($pageId, array_keys($fieldIds));
@@ -1484,12 +2248,12 @@ class SeoFilter
                                 }
                                 break;
                             case 6:
-                                if (strpos($get_param, $value) !== false) {
+                                if (mb_strpos($get_param, $value) !== false) {
                                     $check++;
                                 }
                                 break;
                             case 7:
-                                if (strpos($get_param, $value) === false) {
+                                if (mb_strpos($get_param, $value) === false) {
                                     $check++;
                                 }
                                 break;
@@ -2473,7 +3237,6 @@ class SeoFilter
         if (isset($meta['title'])) {
             $meta['pagetitle'] = $meta['title'];
         }
-
 
         return $meta;
     }
@@ -3910,6 +4673,7 @@ class SeoFilter
             'morpher_token'    => $this->getOption('morpher_token', 0),
 
             'count_childrens' => $this->getOption('count', 0),
+            'ajax_recount'    => $this->getOption('ajax_recount', 0),
             'count_choose'    => $this->getOption('choose', ''),
             'count_select'    => $this->getOption('select', ''),
             'count_class'     => $this->getOption('count_handler_class', 'sfCountHandler'),

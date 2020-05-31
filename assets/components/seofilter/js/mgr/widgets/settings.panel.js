@@ -120,6 +120,7 @@ Ext.extend(SeoFilter.panel.Settings, MODx.FormPanel, {
             },
             count: {
                 count: {xtype:'combo-boolean',hiddenName:'count',value:data['count_childrens']},
+                ajax_recount: {xtype:'combo-boolean',hiddenName:'ajax_recount',value:data['ajax_recount']},
                 hide_empty: {xtype:'combo-boolean',hiddenName:'hide_empty',value:data['hideEmpty']},
                 default_where: {value:data['defaultWhere']},
                 count_handler_class: {value:data['count_class']},

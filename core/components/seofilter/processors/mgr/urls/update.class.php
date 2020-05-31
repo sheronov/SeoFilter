@@ -53,6 +53,7 @@ class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
     public function afterSave()
     {
         if((int)$this->getProperty('recount')) {
+            /** @var SeoFilter $SeoFilter */
             $SeoFilter = $this->modx->getService('seofilter', 'SeoFilter', $this->modx->getOption('seofilter_core_path', null,
                     $this->modx->getOption('core_path') . 'components/seofilter/') . 'model/seofilter/', array());
             $SeoFilter->loadHandler();

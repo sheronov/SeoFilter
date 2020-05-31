@@ -157,6 +157,11 @@ $tmp = array(
         'value' => true,
         'area' => 'seofilter_count',
     ),
+    'ajax_recount' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => 'seofilter_count',
+    ),
     'choose' => array(
         'xtype' => 'textfield',
         'value' => '',

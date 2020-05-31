@@ -178,7 +178,7 @@ class sfCountHandler
                 foreach ($row as $k => $v) {
                     if (strpos($k, 'field.') === 0) {
                         $new_k = str_replace('field.', '', $k);
-                        if ($new_k == 'alias') {
+                        if ($new_k === 'alias') {
                             $field_alias = $v;
                         }
                         $field[$new_k] = $v;
@@ -229,7 +229,7 @@ class sfCountHandler
             $total = $this->countByParams($params, $fields, $parents, $rule_where, $class, $min_max);
         }
 
-        if ($update && $total != $old_total) {
+        if ($update && (int)$total !== (int)$old_total) {
             if ($url = $this->modx->getObject('sfUrls', $url_id)) {
                 $url->set('total', $total);
                 $url->set('editedon', strtotime(date('Y-m-d H:i:s')));
@@ -237,7 +237,7 @@ class sfCountHandler
             }
         }
 
-        return $total;
+        return (int)$total;
     }
 
 

@@ -66,7 +66,6 @@ class sfRuleCreateProcessor extends modObjectCreateProcessor
         $recount = (int)$this->getProperty('recount');
 
         if($object->get('active')) {
-
             if($this->SeoFilter->config['proMode']) {
                 $pages = $object->get('pages');
             } else {

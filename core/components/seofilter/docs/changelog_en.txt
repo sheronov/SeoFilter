@@ -1,12 +1,13 @@
 Changelog for SeoFilter.
 
-1.9.0-beta (25.05.2020)
+1.9.0-beta (31.05.2020)
 ======================
 - improved work with contexts, now you can add condition to field for values collecting (e.g. ({"context_key":"web"}))
 - new parameter &context in snippets sfMenu and sfSitemap (by default it shows links from all contexts);
 - the parameter &context can recieve array or string with comma separated values;
 - new conditions in &where parameter of sfMenu snippet by site pages (&where=`{"modResource.template":1}`)
 - required minimum PHP version 5.5 (it will rise later)
+- added a new setting seofilter_ajax_recount for recounting results in ajax queries (by default no)
 
 1.8.2-beta (30.04.2020)
 ======================
