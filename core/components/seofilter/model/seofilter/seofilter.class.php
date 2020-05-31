@@ -871,7 +871,15 @@ class SeoFilter
                     return $this->error('no_results', [], ['action' => $action]);
                 }
 
-                $data = $this->preparePageMeta($result, $action, $params);
+                $meta = $this->preparePageMeta($result, $action, $params);
+
+                $response = [
+                    'success' => true,
+                    'data'    => $meta,
+                ];
+                return $this->config['json_response']
+                    ? $this->modx->toJSON($response)
+                    : $response;
 
 
                 $aliases = $this->fieldsAliases($pageId, 1);
@@ -1270,12 +1278,14 @@ class SeoFilter
         // 6. Вернуть ссылку, если есть результаты, подставив мета-теги
         if ($linkFound) {
             $sortForParams = [];
-            foreach ($fieldsParams as $alias => $input) {
-                if (mb_strpos($linkFound['old_url'], $alias) === false) {
-                    $diffParams[$alias] = $input;
-                    unset($words[$alias], $fieldsParams[$alias]);
-                } else {
-                    $sortForParams[$alias] = mb_strpos($linkFound['old_url'], $alias);
+            if (!empty($rules[$linkFound['multi_id']]['url'])) {
+                foreach ($fieldsParams as $alias => $input) {
+                    if (mb_strpos($rules[$linkFound['multi_id']]['url'], $alias) === false) {
+                        $diffParams[$alias] = $input;
+                        unset($words[$alias], $fieldsParams[$alias]);
+                    } else {
+                        $sortForParams[$alias] = mb_strpos($rules[$linkFound['multi_id']]['url'], $alias);
+                    }
                 }
             }
 
@@ -1387,7 +1397,11 @@ class SeoFilter
         if ($this->config['crumbsReplace']) {
             $crumb_array = $this->getCrumbs($this->object->id);
             if ($meta['find']) {
-                $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
+                if (mb_strpos($meta['url'], '?') === false) {
+                    $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
+                } else {
+                    $meta['link_url'] = $meta['url'];
+                }
                 $crumb_array['sflink'] = $meta['link'];
                 $crumb_array['sfurl'] = $meta['link_url'];
             }
@@ -1422,7 +1436,8 @@ class SeoFilter
             'find'     => 0,
             'full_url' => $this->modx->makeUrl($pageId, $this->object->context_key, '', '-1'),
             'page_id'  => $pageId,
-            'id'       => $pageId
+            'id'       => $pageId,
+            'diff'     => $params
         ];
 
         $system = [
@@ -1528,6 +1543,22 @@ class SeoFilter
         ];
 
 
+        if ($this->config['crumbsNested']
+            && $nested = $this->findNestedCrumbs(array_column($words, 'id', 'field_id'), $link['page_id'],
+                $link['id'])) {
+            $meta['nested'] = [];
+            foreach ($nested as $nestedLink) {
+                $nestedLink['url'] = $nestedLink['new_url'] ?: $nestedLink['old_url'];
+                $nestedLink['sflink'] = $nestedLink['link'];
+                $nestedLink['sfurl'] = $nestedLink['url'].$this->config['url_suffix'];
+                $meta['nested'][] = $nestedLink;
+            }
+            $meta['nested'] = $this->config['json_response']
+                ? $meta['nested']
+                : $this->modx->toJSON($meta['nested']);
+        }
+
+
         $fields = array_column(array_column($words, 'field'), null, 'alias');
 
         $wordsToText = [
@@ -1567,14 +1598,16 @@ class SeoFilter
             $parents = $link['page_id'];
         }
 
+
         if (!empty($this->config['pdopage_hash'])) {
-            $meta['config'] = $this->getRuleCount($meta['params'], $fields, $parents, $rule['count_where'],
-                false, true);
+            $meta['config'] = $this->getRuleCount($meta['params'], $fields, $parents,
+                $this->modx->fromJSON($rule['count_where']), false, true);
             $meta['config']['parents'] = $parents;
         }
 
         if ($this->config['count_choose'] && $this->config['count_select']) {
-            if ($minMax = $this->getRuleCount($meta['params'], $fields, $parents, $rule['count_where'], 1)) {
+            if ($minMax = $this->getRuleCount($meta['params'], $fields, $parents,
+                $this->modx->fromJSON($rule['count_where']), 1)) {
                 $wordsToText = array_merge($minMax, $wordsToText);
             }
         }
@@ -1631,10 +1664,10 @@ class SeoFilter
 
         foreach (['properties', 'introtexts'] as $prop) {
             $seo_values = [];
-            if (!empty($link[$prop]) && !empty($link[$prop]['values'])) {
-                $seo_values = $link[$prop]['values'];
-            } elseif (!empty($rule[$prop]) && !empty($rule[$prop]['values'])) {
-                $seo_values = $rule[$prop]['values'];
+            if (!empty($link[$prop]) && !empty($this->modx->fromJSON($link[$prop])['values'])) {
+                $seo_values = $this->modx->fromJSON($link[$prop])['values'];
+            } elseif (!empty($rule[$prop]) && !empty($this->modx->fromJSON($rule[$prop])['values'])) {
+                $seo_values = $this->modx->fromJSON($rule[$prop])['values'];
             }
             if (!empty($seo_values)) {
                 $properties = [];
@@ -1645,9 +1678,8 @@ class SeoFilter
                 uksort($array_word, function ($a, $b) {
                     if (mb_strlen($a) === mb_strlen($b)) {
                         return 0;
-                    } else {
-                        return mb_strlen($a) < mb_strlen($b);
                     }
+                    return mb_strlen($a) < mb_strlen($b);
                 });
                 foreach ($seo_values as $value) {
                     $properties[] = str_replace(array_keys($array_word), array_values($array_word), $value);
@@ -1659,8 +1691,6 @@ class SeoFilter
         if (isset($meta['title'])) {
             $meta['pagetitle'] = $meta['title'];
         }
-
-        $meta['link_url'] = $meta['url'].$this->config['url_suffix'];
 
         return $meta;
     }
@@ -2075,7 +2105,7 @@ class SeoFilter
                 $q->select("COUNT(sfUrlWord{$index}.id) as levels");
             }
             $index++;
-            //            $q->sortby('sfUrlWord.priority','ASC');
+            //$q->sortby('sfUrlWord.priority','ASC');
         }
         if (count($field_word)) {
             $q->having('levels = '.count($field_word));
@@ -2129,7 +2159,7 @@ class SeoFilter
         }
         $for_find = array_reverse($for_find, 0);
 
-        //        $this->modx->log(1,print_r($for_find,1));
+        //$this->modx->log(1,print_r($for_find,1));
         for ($i = 0; $i < $count - 1; $i++) {
             $link = $this->recursiveLinkFind($for_find, $page_id, 0, $url_id);
             if ($link['find']) {
@@ -2141,7 +2171,7 @@ class SeoFilter
         }
 
         $links = array_reverse($links);
-        //        $links[] = $this->findSeoLink($for_find,$page_id);
+        //$links[] = $this->findSeoLink($for_find,$page_id);
 
         return $links;
     }
@@ -3254,7 +3284,7 @@ class SeoFilter
             });
             $tmp = $this->modx->runSnippet($name, array_merge($this->config, [
                 'row'       => serialize($row),
-                'input'     => $row['input'] ? $row['input'] : 0,
+                'input'     => !empty($row['input']) ? $row['input'] : 0,
                 'seoFilter' => $this,
                 'SeoFilter' => $this,
                 'pdoTools'  => $this->pdo,
