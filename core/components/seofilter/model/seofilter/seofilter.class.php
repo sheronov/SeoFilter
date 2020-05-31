@@ -1212,6 +1212,10 @@ class SeoFilter
      */
     public function findSeoPageByParams($pageId, $params, $objectClass = 'modResource')
     {
+        if(!is_array($params)) {
+            $params = [];
+        }
+
         // 0. Сохранить данные по странице в память
         if (!$this->object = $this->modx->getObject($objectClass, $pageId)) {
             return null;
