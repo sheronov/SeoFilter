@@ -1308,6 +1308,15 @@ class SeoFilter
                 return ($indexA < $indexB) ? -1 : 1;
             });
 
+            $counterUpdate = "UPDATE {$this->modx->getTableName('sfUrls')} SET count = count + 1";
+            if ($this->config['json_response']) {
+                $counterUpdate .= ', ajax = ajax + 1';
+            }
+            $counterUpdate .= " WHERE id = {$linkFound['id']}";
+            if ($q = $this->modx->prepare($counterUpdate)) {
+                $q->execute();
+            }
+
             return $this->metaForSeoPage($linkFound, $words, $rules[$linkFound['multi_id']], $diffParams);
         }
 
@@ -1717,7 +1726,7 @@ class SeoFilter
             ->innerJoin('sfFieldIds', 'FieldRule', 'sfField.id = FieldRule.field_id')
             ->innerJoin('sfRule', 'sfRule', 'FieldRule.multi_id = sfRule.id')
             ->where([
-                'sfRule.active'  => 1,
+                'sfRule.active' => 1,
             ])
             ->groupby('sfField.id');
 
