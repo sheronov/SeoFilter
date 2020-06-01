@@ -1796,8 +1796,6 @@ class SeoFilter
             $q->where(['sfRule.page' => $pageId]);
         }
 
-        $q->prepare();
-        $this->modx->log(1,$q->toSQL());
         if ($q->prepare() && $q->stmt->execute()) {
             while ($rule = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $rules[$rule['id']] = $rule;
