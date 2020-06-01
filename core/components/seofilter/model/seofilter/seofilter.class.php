@@ -1717,7 +1717,6 @@ class SeoFilter
             ->innerJoin('sfFieldIds', 'FieldRule', 'sfField.id = FieldRule.field_id')
             ->innerJoin('sfRule', 'sfRule', 'FieldRule.multi_id = sfRule.id')
             ->where([
-                'sfField.active' => 1,
                 'sfRule.active'  => 1,
             ])
             ->groupby('sfField.id');
