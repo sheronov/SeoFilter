@@ -1212,7 +1212,7 @@ class SeoFilter
      */
     public function findSeoPageByParams($pageId, $params, $objectClass = 'modResource')
     {
-        if(!is_array($params)) {
+        if (!is_array($params)) {
             $params = [];
         }
 
@@ -1783,9 +1783,12 @@ class SeoFilter
             ->where(['sfRule.active' => 1])
             ->groupby('sfRule.id')
             ->groupby('sfRule.rank')
+            ->groupby('sfRule.base')
             ->having('found_fields > 0 AND found_fields = rule_fields')
+            ->having('(sfRule.base = 1 OR (sfRule.base = 0 AND found_fields = '.count($params).'))')
             ->sortby('found_fields', 'DESC')
-            ->sortby('sfRule.rank', 'DESC');
+            ->sortby('sfRule.rank', 'ASC')
+            ->sortby('sfRule.base', 'DESC');
 
         if ($this->config['proMode']) {
             $q->where("1=1 AND FIND_IN_SET({$pageId},REPLACE(IFNULL(NULLIF(sfRule.pages,''),sfRule.page),' ',''))");
@@ -1793,6 +1796,8 @@ class SeoFilter
             $q->where(['sfRule.page' => $pageId]);
         }
 
+        $q->prepare();
+        $this->modx->log(1,$q->toSQL());
         if ($q->prepare() && $q->stmt->execute()) {
             while ($rule = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $rules[$rule['id']] = $rule;
