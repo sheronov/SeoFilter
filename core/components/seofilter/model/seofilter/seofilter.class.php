@@ -1796,7 +1796,8 @@ class SeoFilter
             ->having('(sfRule.base = 1 OR (sfRule.base = 0 AND found_fields = '.count($params).'))')
             ->sortby('found_fields', 'DESC')
             ->sortby('sfRule.rank', 'ASC')
-            ->sortby('sfRule.base', 'DESC');
+            ->sortby('sfRule.base', 'DESC')
+            ->sortby('sfRule.id', 'ASC');
 
         if ($this->config['proMode']) {
             $q->where("1=1 AND FIND_IN_SET({$pageId},REPLACE(IFNULL(NULLIF(sfRule.pages,''),sfRule.page),' ',''))");
