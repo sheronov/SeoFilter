@@ -3763,6 +3763,16 @@ class SeoFilter
         $total = 0;
 
         if ($links = $this->gettingUrls($rule_id, $where)) {
+            $pageData = [];
+            $q = $this->modx->newQuery('modResource');
+            $q->select($this->modx->getSelectColumns('modResource','modResource'));
+            $q->where(['id:IN'=>$pages]);
+            if($q->prepare() && $q->stmt->execute()) {
+                while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $pageData[$row['id']] = $row;
+                }
+            }
+
             foreach ($pages as $page_id) {
                 $total = count($links['words']) * count($pages);
                 foreach ($links['words'] as $index => $link) {
@@ -3790,6 +3800,10 @@ class SeoFilter
                         if (!isset($words[$pkey])) {
                             $words[$pkey] = $page_id;
                         }
+                    }
+
+                    if(!isset($words['resource']) && isset($pageData[$page_id])) {
+                        $words['resource']  = $pageData[$page_id];
                     }
 
                     $link_name = '';
