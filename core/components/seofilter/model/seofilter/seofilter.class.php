@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.9.0';
+    public $version = '1.9.1';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -1827,29 +1827,61 @@ class SeoFilter
     {
         $words = [];
 
-        $fieldsById = array_column($fields, null, 'id');
+        $fieldsById = array_column(array_filter($fields, function ($field) {
+            return empty($field['slider']);
+        }), null, 'id');
 
-        $q = $this->modx->newQuery('sfDictionary')
-            ->select($this->modx->getSelectColumns('sfDictionary', 'sfDictionary', ''))
-            ->where(['field_id:IN' => array_keys($fieldsById)])
-            ->where(['input:IN' => array_values($params)]);
+        if ($sliderFields = array_filter($fields, function ($field) {
+            return !empty($field['slider']);
+        })) {
+            foreach ($sliderFields as $field) {
+                $values = array_map('trim', explode(',', $params[$field['alias']]));
+                $min = (float)$values[0];
+                $max = $min;
+                if (isset($values[1])) {
+                    $max = (float)$values[1];
+                }
+                unset($params[$field['alias']]);
 
-        if ($q->prepare() && $q->stmt->execute()) {
-            while ($word = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-                $fieldAlias = $fieldsById[$word['field_id']]['alias'];
-                if (mb_strtolower($word['input']) === mb_strtolower($params[$fieldAlias])) {
-                    $word['field'] = $fieldsById[$word['field_id']];
-                    $words[$fieldAlias] = $word;
+                $q = $this->modx->newQuery('sfDictionary')
+                    ->select($this->modx->getSelectColumns('sfDictionary', 'sfDictionary', ''))
+                    ->where(['field_id' => $field['id']])
+                    ->where([
+                        "substring_index(`sfDictionary`.input, ',', 1) <= {$min}",
+                        "substring_index(`sfDictionary`.input, ',', -1) >= {$max}"
+                    ])
+                    ->sortby("sqrt(pow({$min} - CONVERT(substring_index(`sfDictionary`.input, ',', 1), SIGNED), 2)
+                                + pow({$max} - CONVERT(substring_index(`sfDictionary`.input, ',', -1), SIGNED), 2))")
+                    ->limit(1);
+                if ($q->prepare() && $q->stmt->execute() && $word = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $words[$field['alias']] = $word;
                 }
             }
         }
 
-        foreach ($params as $alias => $input) {
-            if (!isset($words[$alias]) && $this->config['mfilterWords']
-                && mb_strpos($input, $this->config['values_delimeter']) === false
-                && $word = $this->addNewWord($input, $fields[$alias])
-            ) {
-                $words[$alias] = $word;
+        if ($fieldsById) {
+            $q = $this->modx->newQuery('sfDictionary')
+                ->select($this->modx->getSelectColumns('sfDictionary', 'sfDictionary', ''))
+                ->where(['field_id:IN' => array_keys($fieldsById)])
+                ->where(['input:IN' => array_values($params)]);
+
+            if ($q->prepare() && $q->stmt->execute()) {
+                while ($word = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $fieldAlias = $fieldsById[$word['field_id']]['alias'];
+                    if (mb_strtolower($word['input']) === mb_strtolower($params[$fieldAlias])) {
+                        $word['field'] = $fieldsById[$word['field_id']];
+                        $words[$fieldAlias] = $word;
+                    }
+                }
+            }
+
+            foreach ($params as $alias => $input) {
+                if (!isset($words[$alias]) && $this->config['mfilterWords']
+                    && mb_strpos($input, $this->config['values_delimeter']) === false
+                    && $word = $this->addNewWord($input, $fields[$alias])
+                ) {
+                    $words[$alias] = $word;
+                }
             }
         }
 
@@ -3765,10 +3797,10 @@ class SeoFilter
         if ($links = $this->gettingUrls($rule_id, $where)) {
             $pageData = [];
             $q = $this->modx->newQuery('modResource');
-            $q->select($this->modx->getSelectColumns('modResource','modResource'));
-            $q->where(['id:IN'=>$pages]);
-            if($q->prepare() && $q->stmt->execute()) {
-                while($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+            $q->select($this->modx->getSelectColumns('modResource', 'modResource'));
+            $q->where(['id:IN' => $pages]);
+            if ($q->prepare() && $q->stmt->execute()) {
+                while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     $pageData[$row['id']] = $row;
                 }
             }
@@ -3802,8 +3834,8 @@ class SeoFilter
                         }
                     }
 
-                    if(!isset($words['resource']) && isset($pageData[$page_id])) {
-                        $words['resource']  = $pageData[$page_id];
+                    if (!isset($words['resource']) && isset($pageData[$page_id])) {
+                        $words['resource'] = $pageData[$page_id];
                     }
 
                     $link_name = '';
