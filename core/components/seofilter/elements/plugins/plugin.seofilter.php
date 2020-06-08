@@ -39,8 +39,8 @@ switch ($modx->event->name) {
             break;
         }
         $sf_templates = $modx->getOption('seofilter_templates', null, '', true);
-        if ($sf_templates && !in_array($resource->get('template'), array_map('trim', explode(',', $sf_templates)),
-                true)) {
+        if ($sf_templates && !in_array((int)$resource->get('template'),
+                array_map('intval', array_map('trim', explode(',', $sf_templates))), true)) {
             break;
         }
 
@@ -67,8 +67,8 @@ switch ($modx->event->name) {
             break;
         }
         $sf_templates = $modx->getOption('seofilter_templates', null, '', true);
-        if ($sf_templates && !in_array($resource->get('template'), array_map('trim', explode(',', $sf_templates)),
-                true)) {
+        if ($sf_templates && !in_array((int)$resource->get('template'),
+                array_map('intval', array_map('trim', explode(',', $sf_templates))), true)) {
             break;
         }
 
