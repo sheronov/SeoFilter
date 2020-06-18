@@ -311,7 +311,7 @@ var SeoFilter = {
     changeUrl: function (url, hash, params) {
         if (!this.oldbrowser()) {
             if (typeof (mSearch2) !== 'undefined') {
-                if (!mSearch2.options.autoLoad && !mSearch2.options.ajax) {
+                if (mSearch2.options.hasOwnProperty('autoLoad') && !mSearch2.options.autoLoad && !mSearch2.options.ajax) {
                     document.location = url;
                 } else {
                     window.history.pushState({mSearch2: url}, '', url);
