@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.9.2';
+    public $version = '1.9.3';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -4332,7 +4332,7 @@ class SeoFilter
                             $modified = date('r', strtotime($modified));
                             $qtime = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? $_SERVER['HTTP_IF_MODIFIED_SINCE'] : '';
                             if ($qtime && strtotime($qtime) >= strtotime($modified)) {
-                                header('HTTP/1.1 304 Not Modified');
+                                header($_SERVER['SERVER_PROTOCOL'].' 304 Not Modified');
                                 exit();
                             }
                             header("Last-Modified: $modified");

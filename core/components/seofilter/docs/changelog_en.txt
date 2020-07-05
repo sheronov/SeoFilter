@@ -1,5 +1,10 @@
 Changelog for SeoFilter.
 
+1.9.3-beta (05.07.2020)
+=====================
+- fix frontend js
+- fix last modified
+
 1.9.2-beta (09.06.2020)
 =====================
 - fixed the error for collecting new values by templates
