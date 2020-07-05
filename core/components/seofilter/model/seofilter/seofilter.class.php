@@ -4331,7 +4331,7 @@ class SeoFilter
                             }
                             $modified = date('r', strtotime($modified));
                             $qtime = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? $_SERVER['HTTP_IF_MODIFIED_SINCE'] : '';
-                            if (strtotime($qtime) >= strtotime($modified)) {
+                            if ($qtime && strtotime($qtime) >= strtotime($modified)) {
                                 header('HTTP/1.1 304 Not Modified ');
                                 exit();
                             }
