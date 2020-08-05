@@ -1,5 +1,9 @@
 Changelog for SeoFilter.
 
+1.9.4-beta (05.08.2020)
+=====================
+- fix error with placeholders page_number in seo templates
+
 1.9.3-beta (05.07.2020)
 =====================
 - fix frontend js

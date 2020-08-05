@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.9.3';
+    public $version = '1.9.4';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -722,6 +722,7 @@ class SeoFilter
             unset($data['data']['hash']);
         }
         switch ($action) {
+            //TODO: переделать
             case 'metabyurl':
                 $meta = [];
                 $delArray = ['http://www.', 'https://www.', 'http://', 'https://'];
@@ -742,9 +743,32 @@ class SeoFilter
                     }
                     $findUrl = $this->clearSuffixes(trim(str_replace($pageUrl, '', $fullUrl), '/'));
                     $findUrl = trim($findUrl, $this->config['between_urls']);
+
+                    if (!empty($this->config['page_tpl'])) {
+                        $pageTplMask = str_replace([
+                            '/',
+                            '[[+pagevarkey]]',
+                            '{$pagevarkey}',
+                            '[[+'.$this->config['page_key'].']]',
+                            '{$'.$this->config['page_key'].'}',
+
+                        ], [
+                            '\/',
+                            $this->config['page_key'],
+                            $this->config['page_key'],
+                            '(\d+)',
+                            '(\d+)',
+
+                        ], mb_strtolower($this->config['page_tpl']));
+
+                        if (preg_match('/^(.*)'.$pageTplMask.'$/', $findUrl, $matches)) {
+                            $findUrl = $matches[1];
+                            $this->config['page_number'] = (int)$matches[2];
+                        }
+                    }
                 }
                 if ($findUrl) {
-                    if ($url_words = $this->getParamsByUrl($findUrl)) {
+                    if ($url_words = $this->getParamsByUrl($findUrl, $pageId)) {
                         $rule_id = 0;
                         $params = [];
                         foreach ($url_words as $row) {
@@ -1128,6 +1152,11 @@ class SeoFilter
      */
     protected function metaForExistedPage($pageId, $params)
     {
+        if ($params && array_key_exists($this->config['page_key'], $params)) {
+            $this->config['page_number'] = $params[$this->config['page_key']];
+            unset($params[$this->config['page_key']]);
+        }
+
         $meta = [
             'find'     => 0,
             'full_url' => $this->modx->makeUrl($pageId, $this->object->context_key, '', '-1'),
@@ -1201,6 +1230,11 @@ class SeoFilter
      */
     protected function metaForSeoPage($link, $words, $rule, $diffParams)
     {
+        if ($diffParams && array_key_exists($this->config['page_key'], $diffParams)) {
+            $this->config['page_number'] = $diffParams[$this->config['page_key']];
+            unset($diffParams[$this->config['page_key']]);
+        }
+
         $meta = [
             'find'       => 1,
             'diff'       => $diffParams,
@@ -3044,13 +3078,14 @@ class SeoFilter
         return $row;
     }
 
-    public function getParamsByUrl($url = '')
+    public function getParamsByUrl($url, $pageId)
     {
         $params = [];
 
         $q = $this->modx->newQuery('sfUrls');
         $q->where(['old_url' => $url, 'OR:new_url:=' => $url]);
-        $q->leftJoin('sfUrlWord', 'sfUrlWord', 'sfUrlWord.url_id = sfUrls.id');
+        $q->where(['page_id' => $pageId]);
+        $q->innerJoin('sfUrlWord', 'sfUrlWord', 'sfUrlWord.url_id = sfUrls.id');
         $q->innerJoin('sfField', 'Field', 'Field.id = sfUrlWord.field_id');
         $q->innerJoin('sfDictionary', 'Word', 'Word.id = sfUrlWord.word_id AND Word.active = 1');
         $q->sortby('sfUrlWord.priority', 'ASC');
@@ -3062,11 +3097,13 @@ class SeoFilter
             'Word.input as word_input,Word.value as word_value,Word.alias as word_alias'
 
         ]);
+
         if ($q->prepare() && $q->stmt->execute()) {
             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $params[] = $row;
             }
         }
+
 
         return $params;
     }
@@ -4466,7 +4503,7 @@ class SeoFilter
 
             'page_key'      => $this->getOption('page_key', 'page'),
             'page_tpl'      => $this->getOption('page_tpl', ''),
-            'page_number'   => 1,
+            'page_number'   => $this->modx->getOption($this->getOption('page_key', 'page'), $config, 1),
             'admin_version' => $this->getOption('admin_version', 1),
             'main_alias'    => $this->getOption('main_alias', 0),
 
