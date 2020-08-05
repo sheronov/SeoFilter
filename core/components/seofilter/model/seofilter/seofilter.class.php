@@ -1154,7 +1154,6 @@ class SeoFilter
     {
         if ($params && array_key_exists($this->config['page_key'], $params)) {
             $this->config['page_number'] = $params[$this->config['page_key']];
-            unset($params[$this->config['page_key']]);
         }
 
         $meta = [
@@ -1232,7 +1231,6 @@ class SeoFilter
     {
         if ($diffParams && array_key_exists($this->config['page_key'], $diffParams)) {
             $this->config['page_number'] = $diffParams[$this->config['page_key']];
-            unset($diffParams[$this->config['page_key']]);
         }
 
         $meta = [
@@ -4169,6 +4167,7 @@ class SeoFilter
                         $page_num = preg_replace("/\D+/", '', $s);
                         unset($tmp[$k]);
                         if ($page_num > 1) {
+                            $this->config['page_number'] = (int)$page_num;
                             $_GET[$this->config['page_key']] = $_REQUEST[$this->config['page_key']] = $page_num;
                         }
                     }
