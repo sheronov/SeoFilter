@@ -680,7 +680,7 @@ class sfCountHandler
         $to_return = [];
         foreach ($to_config as $prop => $propConfig) {
             if (!empty(${$prop})) {
-                if ($prop == 'tvs' || $prop == 'models') {
+                if (in_array($prop, ['tvs', 'models'], true)) {
                     $config[$propConfig] = $to_return[$propConfig] = implode(',', ${$prop});
                 } else {
                     $config[$propConfig] = $to_return[$propConfig] = ${$prop};
@@ -736,13 +736,11 @@ class sfCountHandler
             }
         }
         if ($check && $run = $this->run($config)) {
-            if (is_array($run)) {
-                if (isset($run[0]['count'])) {
-                    $total = $run[0]['count'];
-                }
+            if (is_array($run) && isset($run[0]['count'])) {
+                $total = $run[0]['count'];
             }
-            //            $this->modx->log(1,print_r($config,1));
-            //            $this->modx->log(1,print_r($run,1));
+            // $this->modx->log(1,print_r($config,1));
+            // $this->modx->log(1,print_r($run,1));
             // если проблема с подсчётами - проверить здесь в первую очередь
         }
 
@@ -753,10 +751,16 @@ class sfCountHandler
             if (!empty($conditions['choose']) && !empty($conditions['select'])) {
                 unset($config['select']);
                 if (!empty($conditions['select'])) {
-                    foreach ($conditions['select'] as $table => $fields) {
-                        $config['select'][$table] = implode(',', $fields);
+                    foreach ($conditions['select'] as $table => $selectFields) {
+                        $config['select'][$table] = implode(',', $selectFields);
                     }
                 }
+
+                if (!empty($conditions['tvs']) && is_array($conditions['tvs'])) {
+                    $config['includeTVs'] = implode(',', $conditions['tvs']);
+                    unset($config['select']['modTemplateVar']);
+                }
+
                 if (!empty($conditions['join'])) {
                     if (isset($config['innerJoin'])) {
                         $config['innerJoin'] = array_merge($config['innerJoin'], $conditions['join']);
@@ -765,17 +769,27 @@ class sfCountHandler
                     }
                 }
 
-                foreach ($conditions['choose'] as $sortby => $alias) {
+                foreach ($conditions['choose'] as $sortBy => $alias) {
                     $config_where = [];
                     if (!empty($config['where'])) {
                         $config_where = $config['where'];
                     }
-                    foreach (['max' => 'DESC', 'min' => 'ASC'] as $m => $sortdir) {
-                        if ($m == 'min') {
-                            $config['where'] = array_merge($config_where, [$sortby.':>' => 0]);
+                    foreach (['max' => 'DESC', 'min' => 'ASC'] as $m => $sortDir) {
+                        if (mb_strpos($sortBy, 'modTemplateVar.') !== false) {
+                            $sortBy = str_replace('modTemplateVar.', '', $sortBy);
+                            if ($m === 'min') {
+                                $config['tvFilters'] = $sortBy.'>0';
+                            }
+                            $config['sortbyTV'] = $sortBy;
+                            $config['sortdirTV'] = $sortDir;
+                        } else {
+                            if ($m === 'min') {
+                                $config['where'] = array_merge($config_where, [$sortBy.':>' => 0]);
+                            }
+                            $config['sortby'] = $sortBy;
+                            $config['sortdir'] = $sortDir;
                         }
-                        $config['sortby'] = $sortby;
-                        $config['sortdir'] = $sortdir;
+
 
                         if ($run = $this->run($config)) {
                             if (!empty($run[0])) {
@@ -796,9 +810,7 @@ class sfCountHandler
     public function run($config = [], $count = 1)
     {
         $this->pdoTools->setConfig($config);
-        $run = $this->pdoTools->run();
-
-        return $run;
+        return $this->pdoTools->run();
     }
 
 

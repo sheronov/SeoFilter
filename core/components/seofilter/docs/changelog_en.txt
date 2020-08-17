@@ -1,5 +1,9 @@
 Changelog for SeoFilter.
 
+1.9.5-beta (17.08.2020)
+=====================
+- added support TV fields to selection settings: seofilter_select, seofilter_choose in format "TV.name"
+
 1.9.4-beta (05.08.2020)
 =====================
 - fix error with placeholders page_number in seo templates
