@@ -651,7 +651,7 @@ class sfCountHandler
                     }
                 }
             } else {
-                //                $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] ERROR: The field by alias = '.$alias.' is not set to fields array. Param = '.$param);
+                //$this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] ERROR: The field by alias = '.$alias.' is not set to fields array. Param = '.$param);
             }
         }
 
@@ -695,44 +695,40 @@ class sfCountHandler
         $check = true;
 
         $p_key = '`modResource`.`parent`';
-        if (isset($config['where'][$p_key]) && isset($config['parents'])) {
-            if ($config['parents'] != $config['where'][$p_key]) {
-                $this->pdoTools->setConfig($config);
-                $where = $this->pdoTools->additionalConditions();
-                $check = false;
-                foreach ($where as $key => $vals) {
-                    if ($this->config['proMode'] && strpos($config['where'][$p_key], '||') !== 0) {
-                        $inp_parents = explode('||', $config['where'][$p_key]);
-                        foreach ($inp_parents as $inp_parent) {
-                            if (is_array($vals) && in_array($inp_parent, $vals)) {
+        if (isset($config['where'][$p_key], $config['parents']) && (string)$config['parents'] !== (string)$config['where'][$p_key]) {
+            $this->pdoTools->setConfig($config);
+            $where = $this->pdoTools->additionalConditions();
+            $check = false;
+            foreach ($where as $key => $vals) {
+                if ($this->config['proMode'] && strpos($config['where'][$p_key], '||') !== 0) {
+                    $inp_parents = explode('||', $config['where'][$p_key]);
+                    foreach ($inp_parents as $inp_parent) {
+                        if (is_array($vals) && in_array($inp_parent, $vals, true)) {
+                            $check = true;
+                            $config['where'][$p_key] = $inp_parent;
+                        }
+                        foreach ($vals as $vkey => $vvals) {
+                            if (mb_strpos($vkey, 'modResource.parent') !== false
+                                && (is_array($vvals) && in_array($inp_parent, $vvals, true))) {
                                 $check = true;
                                 $config['where'][$p_key] = $inp_parent;
                             }
-                            foreach ($vals as $vkey => $vvals) {
-                                if (strpos($vkey,
-                                        'modResource.parent') !== false && is_array($vvals) && in_array($inp_parent,
-                                        $vvals)) {
-                                    $check = true;
-                                    $config['where'][$p_key] = $inp_parent;
-                                }
-                            }
                         }
-                    } else {
-                        if (is_array($vals) && in_array($config['where'][$p_key], $vals)) {
+                    }
+                } else {
+                    if (is_array($vals) && in_array($config['where'][$p_key], $vals, true)) {
+                        $check = true;
+                    }
+                    foreach ($vals as $vkey => $vvals) {
+                        if (mb_strpos($vkey, 'modResource.parent') !== false
+                            && (is_array($vvals) && in_array($config['where'][$p_key], $vvals, true))) {
                             $check = true;
-                        }
-                        foreach ($vals as $vkey => $vvals) {
-                            if (strpos($vkey,
-                                    'modResource.parent') !== false && is_array($vvals) && in_array($config['where'][$p_key],
-                                    $vvals)) {
-                                $check = true;
-                            }
                         }
                     }
                 }
-                if (!$check) {
-                    $total = 0;
-                }
+            }
+            if (!$check) {
+                $total = 0;
             }
         }
         if ($check && $run = $this->run($config)) {
@@ -757,7 +753,11 @@ class sfCountHandler
                 }
 
                 if (!empty($conditions['tvs']) && is_array($conditions['tvs'])) {
-                    $config['includeTVs'] = implode(',', $conditions['tvs']);
+                    if (!empty($config['includeTVs'])) {
+                        $config['includeTVs'] .= ','.implode(',', $conditions['tvs']);
+                    } else {
+                        $config['includeTVs'] = implode(',', $conditions['tvs']);
+                    }
                     unset($config['select']['modTemplateVar']);
                 }
 
@@ -789,7 +789,6 @@ class sfCountHandler
                             $config['sortby'] = $sortBy;
                             $config['sortdir'] = $sortDir;
                         }
-
 
                         if ($run = $this->run($config)) {
                             if (!empty($run[0])) {

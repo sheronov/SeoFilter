@@ -1,11 +1,10 @@
 <?php
-
-if (file_exists(dirname(dirname(dirname(__DIR__))) . '/config.core.php')) {
+/** @var modX $modx */
+if (file_exists(dirname(dirname(dirname(__DIR__))).'/config.core.php')) {
     /** @noinspection PhpIncludeInspection */
-    require_once dirname(dirname(dirname(__DIR__))) . '/config.core.php';
-}
-else {
-    require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/config.core.php';
+    require_once dirname(dirname(dirname(__DIR__))).'/config.core.php';
+} else {
+    require_once dirname(dirname(dirname(dirname(__DIR__)))).'/config.core.php';
 }
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CORE_PATH . 'config/' . MODX_CONFIG_KEY . '.inc.php';
