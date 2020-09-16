@@ -651,7 +651,7 @@ class sfCountHandler
                     }
                 }
             } else {
-                //                $this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] ERROR: The field by alias = '.$alias.' is not set to fields array. Param = '.$param);
+                //$this->modx->log(modX::LOG_LEVEL_ERROR,'[SeoFilter] ERROR: The field by alias = '.$alias.' is not set to fields array. Param = '.$param);
             }
         }
 
@@ -680,7 +680,7 @@ class sfCountHandler
         $to_return = [];
         foreach ($to_config as $prop => $propConfig) {
             if (!empty(${$prop})) {
-                if ($prop == 'tvs' || $prop == 'models') {
+                if (in_array($prop, ['tvs', 'models'], true)) {
                     $config[$propConfig] = $to_return[$propConfig] = implode(',', ${$prop});
                 } else {
                     $config[$propConfig] = $to_return[$propConfig] = ${$prop};
@@ -695,71 +695,66 @@ class sfCountHandler
         $check = true;
 
         $p_key = '`modResource`.`parent`';
-        if(isset($config['where'][$p_key])) {
+        if (isset($config['where'][$p_key])) {
             $parentsWhere = $config['where'][$p_key];
-        } elseif(isset($config['where'][0]) && mb_strpos($config['where'][0],$p_key) !== false) {
+        } elseif (isset($config['where'][0]) && mb_strpos($config['where'][0], $p_key) !== false) {
             $parentsWhere = $config['where'][0];
             $p_key = 0;
         }
-        if (isset($parentsWhere, $config['parents'])) {
-            if ($config['parents'] != $parentsWhere) {
-                $this->pdoTools->setConfig($config);
-                $where = $this->pdoTools->additionalConditions();
-                $check = false;
-                foreach ($where as $key => $vals) {
-                    if ($this->config['proMode'] && strpos($parentsWhere, '||') !== false) {
-                        $inp_parents = explode('||', $parentsWhere);
-                        foreach ($inp_parents as $inp_parent) {
-                            if (is_array($vals) && in_array($inp_parent, $vals)) {
+        if (isset($parentsWhere, $config['parents']) && (string)$config['parents'] !== (string)$parentsWhere) {
+            $this->pdoTools->setConfig($config);
+            $where = $this->pdoTools->additionalConditions();
+            $check = false;
+            foreach ($where as $key => $vals) {
+                if ($this->config['proMode'] && mb_strpos($parentsWhere, '||') !== false) {
+                    $inp_parents = explode('||', $parentsWhere);
+                    foreach ($inp_parents as $inp_parent) {
+                        if (is_array($vals) && in_array($inp_parent, $vals)) {
+                            $check = true;
+                            $config['where'][$p_key] = $inp_parent;
+                        }
+                        foreach ($vals as $vkey => $vvals) {
+                            if (mb_strpos($vkey, 'modResource.parent') !== false
+                                && (is_array($vvals) && in_array($inp_parent, $vvals))) {
                                 $check = true;
                                 $config['where'][$p_key] = $inp_parent;
                             }
-                            foreach ($vals as $vkey => $vvals) {
-                                if (strpos($vkey,
-                                        'modResource.parent') !== false && is_array($vvals) && in_array($inp_parent,
-                                        $vvals)) {
-                                    $check = true;
-                                    $config['where'][$p_key] = $inp_parent;
-                                }
-                            }
                         }
+                    }
+                } else {
+                    if (mb_stripos($parentsWhere, 'in') !== false) {
+                        $tmpWhere = explode('in', mb_strtolower($parentsWhere));
+                        $lastPart = trim(array_pop($tmpWhere), ' \t\n\r\0\x0B()');
+                        $parentIds = array_map('trim', explode(',', $lastPart));
                     } else {
-                        $parentIds = null;
-                        if(mb_stripos($parentsWhere, 'in') !== false) {
-                            $tmpWhere = explode('in',mb_strtolower($parentsWhere));
-                            $lastPart = trim(array_pop($tmpWhere),' \t\n\r\0\x0B()');
-                            $parentIds = array_map('trim',explode(',',$lastPart));
-                        } else {
-                            $tmpWhere = explode('=',mb_strtolower($parentsWhere));
-                            $parentIds = [trim(array_pop($tmpWhere),' \t\n\r\0\x0B()')];
-                        }
+                        $tmpWhere = explode('=', mb_strtolower($parentsWhere));
+                        $parentIds = [trim(array_pop($tmpWhere), ' \t\n\r\0\x0B()')];
+                    }
 
-                        foreach($parentIds as $parentId) {
-                            if (is_array($vals) && in_array($parentId, $vals)) {
+                    foreach ($parentIds as $parentId) {
+                        if (is_array($vals) && in_array($parentId, $vals)) {
+                            $check = true;
+                        }
+                        foreach ($vals as $vkey => $vvals) {
+                            if (mb_strpos($vkey, 'modResource.parent') !== false
+                                && (is_array($vvals) && in_array($parentId, $vvals))) {
                                 $check = true;
-                            }
-                            foreach ($vals as $vkey => $vvals) {
-                                if (strpos($vkey, 'modResource.parent') !== false
-                                    && is_array($vvals) && in_array($parentId, $vvals)) {
-                                    $check = true;
-                                }
                             }
                         }
                     }
                 }
-                if (!$check) {
-                    $total = 0;
-                }
+            }
+            if (!$check) {
+                $total = 0;
             }
         }
+
         if ($check && $run = $this->run($config)) {
-            if (is_array($run)) {
-                if (isset($run[0]['count'])) {
-                    $total = $run[0]['count'];
-                }
+            if (is_array($run) && isset($run[0]['count'])) {
+                $total = $run[0]['count'];
             }
-            //            $this->modx->log(1,print_r($config,1));
-            //            $this->modx->log(1,print_r($run,1));
+            // $this->modx->log(1,print_r($config,1));
+            // $this->modx->log(1,print_r($run,1));
             // если проблема с подсчётами - проверить здесь в первую очередь
         }
 
@@ -770,10 +765,20 @@ class sfCountHandler
             if (!empty($conditions['choose']) && !empty($conditions['select'])) {
                 unset($config['select']);
                 if (!empty($conditions['select'])) {
-                    foreach ($conditions['select'] as $table => $fields) {
-                        $config['select'][$table] = implode(',', $fields);
+                    foreach ($conditions['select'] as $table => $selectFields) {
+                        $config['select'][$table] = implode(',', $selectFields);
                     }
                 }
+
+                if (!empty($conditions['tvs']) && is_array($conditions['tvs'])) {
+                    if (!empty($config['includeTVs'])) {
+                        $config['includeTVs'] .= ','.implode(',', $conditions['tvs']);
+                    } else {
+                        $config['includeTVs'] = implode(',', $conditions['tvs']);
+                    }
+                    unset($config['select']['modTemplateVar']);
+                }
+
                 if (!empty($conditions['join'])) {
                     if (isset($config['innerJoin'])) {
                         $config['innerJoin'] = array_merge($config['innerJoin'], $conditions['join']);
@@ -782,17 +787,26 @@ class sfCountHandler
                     }
                 }
 
-                foreach ($conditions['choose'] as $sortby => $alias) {
+                foreach ($conditions['choose'] as $sortBy => $alias) {
                     $config_where = [];
                     if (!empty($config['where'])) {
                         $config_where = $config['where'];
                     }
-                    foreach (['max' => 'DESC', 'min' => 'ASC'] as $m => $sortdir) {
-                        if ($m == 'min') {
-                            $config['where'] = array_merge($config_where, [$sortby.':>' => 0]);
+                    foreach (['max' => 'DESC', 'min' => 'ASC'] as $m => $sortDir) {
+                        if (mb_strpos($sortBy, 'modTemplateVar.') !== false) {
+                            $sortBy = str_replace('modTemplateVar.', '', $sortBy);
+                            if ($m === 'min') {
+                                $config['tvFilters'] = $sortBy.'>0';
+                            }
+                            $config['sortbyTV'] = $sortBy;
+                            $config['sortdirTV'] = $sortDir;
+                        } else {
+                            if ($m === 'min') {
+                                $config['where'] = array_merge($config_where, [$sortBy.':>' => 0]);
+                            }
+                            $config['sortby'] = $sortBy;
+                            $config['sortdir'] = $sortDir;
                         }
-                        $config['sortby'] = $sortby;
-                        $config['sortdir'] = $sortdir;
 
                         if ($run = $this->run($config)) {
                             if (!empty($run[0])) {
@@ -813,11 +827,7 @@ class sfCountHandler
     public function run($config = [], $count = 1)
     {
         $this->pdoTools->setConfig($config);
-        $run = $this->pdoTools->run();
-
-        // $this->modx->log(1,$this->pdoTools->getTime());
-
-        return $run;
+        return $this->pdoTools->run();
     }
 
 

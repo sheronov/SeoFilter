@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=UTF-8');
+/** @var modX $modx */
 define('MODX_API_MODE', true);
 if (!file_exists(dirname(dirname(dirname(__DIR__))) . '/index.php')) {
     /** @noinspection PhpIncludeInspection */
@@ -10,8 +11,11 @@ if (!file_exists(dirname(dirname(dirname(__DIR__))) . '/index.php')) {
 }
 $response = array();
 $modx->getService('error', 'error.modError');
+$modx->getRequest();
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');
+$modx->error->reset();
+
 // Switch context if need
 if (!empty($_REQUEST['pageId']) && $resource = $modx->getObject('modResource', (int)$_REQUEST['pageId'])) {
     if ($resource->get('context_key') !== 'web') {
@@ -28,6 +32,7 @@ if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'
 } elseif (empty($_REQUEST['sf_action'])) {
     $response =  $SeoFilter->error('sf_err_action_ns');
 } else {
+    $modx->invokeEvent('OnHandleRequest');
     $response =  $SeoFilter->process($_REQUEST['sf_action'], $_REQUEST);
 }
 @session_write_close();

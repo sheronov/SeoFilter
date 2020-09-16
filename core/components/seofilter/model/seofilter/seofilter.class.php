@@ -2,7 +2,7 @@
 
 class SeoFilter
 {
-    public $version = '1.9.4';
+    public $version = '1.9.6';
     /** @var modX $modx */
     public $modx;
     /** @var array $config */
@@ -61,9 +61,9 @@ class SeoFilter
                     $js_file .= '?v='.mb_substr(md5($this->version), 0, 10);
                 }
 
-                if (!isset($this->modx->loadedjscripts[$js_file])) {
+                // if (!isset($this->modx->loadedjscripts[$js_file])) {
                     $this->modx->regClientScript($js_file);
-                }
+                // }
             }
 
             if ($this->config['page']) {
