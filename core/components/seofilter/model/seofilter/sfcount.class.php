@@ -695,14 +695,20 @@ class sfCountHandler
         $check = true;
 
         $p_key = '`modResource`.`parent`';
-        if (isset($config['where'][$p_key]) && isset($config['parents'])) {
-            if ($config['parents'] != $config['where'][$p_key]) {
+        if(isset($config['where'][$p_key])) {
+            $parentsWhere = $config['where'][$p_key];
+        } elseif(isset($config['where'][0]) && mb_strpos($config['where'][0],$p_key) !== false) {
+            $parentsWhere = $config['where'][0];
+            $p_key = 0;
+        }
+        if (isset($parentsWhere, $config['parents'])) {
+            if ($config['parents'] != $parentsWhere) {
                 $this->pdoTools->setConfig($config);
                 $where = $this->pdoTools->additionalConditions();
                 $check = false;
                 foreach ($where as $key => $vals) {
-                    if ($this->config['proMode'] && strpos($config['where'][$p_key], '||') !== 0) {
-                        $inp_parents = explode('||', $config['where'][$p_key]);
+                    if ($this->config['proMode'] && strpos($parentsWhere, '||') !== false) {
+                        $inp_parents = explode('||', $parentsWhere);
                         foreach ($inp_parents as $inp_parent) {
                             if (is_array($vals) && in_array($inp_parent, $vals)) {
                                 $check = true;
@@ -718,14 +724,25 @@ class sfCountHandler
                             }
                         }
                     } else {
-                        if (is_array($vals) && in_array($config['where'][$p_key], $vals)) {
-                            $check = true;
+                        $parentIds = null;
+                        if(mb_stripos($parentsWhere, 'in') !== false) {
+                            $tmpWhere = explode('in',mb_strtolower($parentsWhere));
+                            $lastPart = trim(array_pop($tmpWhere),' \t\n\r\0\x0B()');
+                            $parentIds = array_map('trim',explode(',',$lastPart));
+                        } else {
+                            $tmpWhere = explode('=',mb_strtolower($parentsWhere));
+                            $parentIds = [trim(array_pop($tmpWhere),' \t\n\r\0\x0B()')];
                         }
-                        foreach ($vals as $vkey => $vvals) {
-                            if (strpos($vkey,
-                                    'modResource.parent') !== false && is_array($vvals) && in_array($config['where'][$p_key],
-                                    $vvals)) {
+
+                        foreach($parentIds as $parentId) {
+                            if (is_array($vals) && in_array($parentId, $vals)) {
                                 $check = true;
+                            }
+                            foreach ($vals as $vkey => $vvals) {
+                                if (strpos($vkey, 'modResource.parent') !== false
+                                    && is_array($vvals) && in_array($parentId, $vvals)) {
+                                    $check = true;
+                                }
                             }
                         }
                     }
@@ -797,6 +814,8 @@ class sfCountHandler
     {
         $this->pdoTools->setConfig($config);
         $run = $this->pdoTools->run();
+
+        // $this->modx->log(1,$this->pdoTools->getTime());
 
         return $run;
     }
