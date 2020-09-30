@@ -6,7 +6,7 @@ $xpdo_meta_map['sfUrls']= array (
   'extends' => 'xPDOSimpleObject',
   'tableMeta' => 
   array (
-    'engine' => 'MyISAM',
+    'engine' => 'InnoDB',
   ),
   'fields' => 
   array (
