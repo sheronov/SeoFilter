@@ -385,17 +385,8 @@ class sfMenu
         $q->where($where);
         $q->groupby('sfUrlWord.id');
 
-        if ((int)$this->config['sortcount']) {
-            $q->sortby('sfUrls.count', 'DESC');
-            $q->groupby('sfUrls.count');
-        }
-        if ($this->config['sortby'] && $this->config['sortdir']) {
-            if (mb_strpos($this->config['sortby'], '.') === false) {
-                $this->config['sortby'] = 'sfUrls.'.$this->config['sortby'];
-            }
-            $q->sortby($this->config['sortby'], $this->config['sortdir']);
-            $q->groupby($this->config['sortby']);
-        }
+        $q = $this->addSort($q);
+
         $q->limit((int)$this->config['limit'], (int)$this->config['offset']);
         if ($q->prepare()) {
             $this->pdoTools->addTime('SQL '.$q->toSQL());
@@ -449,6 +440,62 @@ class sfMenu
         }
 
         return $links;
+    }
+
+    protected function addSort(xPDOQuery $q)
+    {
+        $sort = [];
+
+        if ((int)$this->config['sortcount']) {
+            $sort['sfUrls.count'] = 'DESC';
+        }
+
+        if (empty($this->config['sortby'])
+            || (is_string($this->config['sortby']) && in_array(strtolower($this->config['sortby']), ['ids', 'urls']))) {
+            if (!empty($this->config['urls'])) {
+                $urls = $this->config['urls'];
+                if (is_array($urls)) {
+                    $urls = implode(',', $urls);
+                }
+                $sort['FIELD(sfUrls.id, '.$urls.')'] = '';
+            } else {
+                $sort['sfUrls.id'] = !empty($this->config['sortdir']) ? $this->config['sortdir'] : 'ASC';
+            }
+            $q->groupby('sfUrls.id');
+        } elseif (is_string($this->config['sortby'])) {
+            if ($this->config['sortby'][0] === '{' || $this->config['sortby'][0] === '[') {
+                $sort = json_decode($this->config['sortby'], true);
+            } else {
+                $sort[$this->config['sortby']] = !empty($this->config['sortdir']) ? $this->config['sortdir'] : 'ASC';
+            }
+        } elseif(is_array($this->config['sortby'])) {
+            $sort = $this->config['sortby'];
+        }
+
+        $urlFields = $this->modx->getFields('sfUrls');
+        foreach ($sort as $sortBy => $sortDir) {
+            if (array_key_exists($sortBy, $urlFields) && mb_strpos($sortBy, '.') === false) {
+                $sortBy = 'sfUrls.'.$sortBy;
+            }
+
+            $tmp = explode(',', $sortBy);
+            array_walk($tmp, function (&$value) {
+                if (strpos($value, '`') === false) {
+                    $value = preg_replace('#(.*?)\.(.*?)\s#', '`$1`.`$2`', $value);
+                }
+            });
+            $sortBy = implode(',', $tmp);
+            if (!in_array(strtoupper($sortDir), ['ASC', 'DESC', ''], true)) {
+                $sortDir = 'ASC';
+            }
+
+            $q->sortby($sortBy, $sortDir);
+            if (mb_strpos($sortBy, '.') !== false) {
+                $q->groupby($sortBy);
+            }
+        }
+
+        return $q;
     }
 
     public function prepareWordWhere($wordWhere = '')
@@ -584,7 +631,6 @@ class sfMenu
     {
         $tree = [];
         $time = microtime(true);
-
 
         $wordWhere = [];
         if (isset($this->config['wordWhere'])) {
@@ -1108,7 +1154,6 @@ class sfMenu
         return $tree;
     }
 
-
     public function multiSort($links = [])
     {
         if ($links) {
@@ -1187,7 +1232,6 @@ class sfMenu
         return 0;
     }
 
-
     public function linkTemplate($row = [])
     {
         $children = '';
@@ -1195,7 +1239,6 @@ class sfMenu
         $relative = (int)$this->config['relative'];
         $active = (int)$this->config['hereId'];
         $find = 0;
-
 
         if (!empty($row['inner']) && ($this->isHere($row['id']) || empty($this->config['hideSubMenus']))) {
             $idx = $this->idx;
@@ -1211,7 +1254,6 @@ class sfMenu
         } else {
             $row['children'] = isset($row['inner']) ? count($row['inner']) : 0;
         }
-
 
         if (!empty($children)) {
             $pls = [
@@ -1334,7 +1376,6 @@ class sfMenu
         return $this->config[$tpl];
     }
 
-
     public function getTemplate($tree = [])
     {
         $idx = $this->idx;
@@ -1384,7 +1425,6 @@ class sfMenu
         }
         return array_unique($parents);
     }
-
 
     public function makeMenu($tree = [], $par = 0)
     {
@@ -1445,6 +1485,5 @@ class sfMenu
         $this->pdoTools->addTime('End template menu', microtime(true) - $time);
         return $output;
     }
-
 
 }
