@@ -89,7 +89,7 @@ $_lang['setting_seofilter_url_suffix_desc'] = 'The default is empty. Such an end
 $_lang['setting_seofilter_url_redirect'] = 'Redirect to a page with the correct suffix';
 $_lang['setting_seofilter_url_redirect_desc'] = 'The default is "No". If so, it will redirect to the page with the correct url suffix.';
 $_lang['setting_seofilter_page_key'] = 'The name of the pagination variable, usually "page", for the page number in SEO-texts';
-$_lang['setting_seofilter_page_key_desc'] = 'If you specify, then in the SEO-templates will be available placeholder {$ page_number}, as well as a placeholder by name - if the name is pagе, it will be {$ page}.';
+$_lang['setting_seofilter_page_key_desc'] = 'If you specify, then in the SEO-templates will be available placeholder {$ page_number}, as well as a placeholder by name - if the name is page, it will be {$ page}.';
 
 $_lang['setting_seofilter_url_help'] = 'URL address for opening help in iframe';
 $_lang['setting_seofilter_tpls_path'] = 'Path for file elements';

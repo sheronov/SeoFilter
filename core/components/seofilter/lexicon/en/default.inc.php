@@ -131,7 +131,7 @@ $_lang['seofilter_seometa_h2'] = 'Title H2';
 $_lang['seofilter_seometa_active'] = 'Activated';
 $_lang['seofilter_seometa_description'] = 'Description';
 $_lang['seofilter_seometa_introtext'] = 'Introtext';
-$_lang['seofilter_seometa_keywords'] = 'Лeywords';
+$_lang['seofilter_seometa_keywords'] = 'Keywords';
 $_lang['seofilter_seometa_text'] = 'Text field';
 $_lang['seofilter_seometa_content'] = 'Content';
 $_lang['seofilter_seometa_create'] = 'Add values';
@@ -319,12 +319,12 @@ $_lang['seofilter_url_total_desc'] = 'Interim counted for speeding up the menu';
 $_lang['seofilter_combo_relation_select'] = 'Will be available with the dependent field';
 $_lang['seofilter_info'] = 'Information';
 $_lang['seofilter_rule_information'] = '{if $was_links?} <nobr> Related links to the rule: <b> {$was_links} </b> </nobr> <br> {/if}
-                                         {if $remove_links?} Removed <b> {$remove_links} </b> old links <br> {/if}
-                                         {if $old_links && ($old_links != $was_links)} Old links left: <b> {$old_links} </b> <br> {/if}
-                                         {if $add_links?} New links added: <b> {$add_links} </b> <br> {/if}
-                                         {if $doubles_links?} No links added: <b> {$doubles_links} </b> (doubles) <br> {/if}
-                                         {if $update_links?}Names of links updated: <b>{$update_links}</b><br>{/if}
-                                         {if $all_links && ($remove_links || $add_links || $doubles_links)} Total links to the rule: <b> {$all_links} </b> pcs <br> {/if}';
+                                        {if $remove_links?} Removed <b> {$remove_links} </b> old links <br> {/if}
+                                        {if $old_links && ($old_links != $was_links)} Old links left: <b> {$old_links} </b> <br> {/if}
+                                        {if $add_links?} New links added: <b> {$add_links} </b> <br> {/if}
+                                        {if $doubles_links?} No links added: <b> {$doubles_links} </b> (doubles) <br> {/if}
+                                        {if $update_links?}Names of links updated: <b>{$update_links}</b><br>{/if}
+                                        {if $all_links && ($remove_links || $add_links || $doubles_links)} Total links to the rule: <b> {$all_links} </b> pcs <br> {/if}';
 $_lang['seofilter_word_recount'] = 'Recounting results by word';
 $_lang['seofilter_words_recount'] = 'Recounting results by words';
 $_lang['seofilter_word_recount_message'] = '<b>Counting results by word (id={$word_id}):</b><br>Total links associated with the word: {$all_links}. <br> Links that have results: <b>{$links}</b>. <br> Number of results (not unique): {$total}.<br><br>';
