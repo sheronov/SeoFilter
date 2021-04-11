@@ -240,7 +240,6 @@ class sfCountHandler
         return (int)$total;
     }
 
-
     /**
      * The user method for changing the class by the rule id or fields for counting results
      *
@@ -259,7 +258,6 @@ class sfCountHandler
     {
         return $this->getModResourceConditions($value, $field, $class_key);
     }
-
 
     public function getModResourceConditions($value = '', $field = [], $class_key = '')
     {
@@ -305,7 +303,6 @@ class sfCountHandler
 
         $conditions = ['where' => $where];
 
-
         if ($field['class'] == 'modResource' && $field['key'] == 'parent' && $this->checkMS2()) {
             $conditions['leftjoin'] = [
                 'msCategoryMember' => [
@@ -338,10 +335,8 @@ class sfCountHandler
             $conditions['where'] = [$sql_where];
         }
 
-
         return $conditions;
     }
-
 
     public function getDataConditions($value = '', $field = [], $includeWhere = 1)
     {
@@ -481,7 +476,6 @@ class sfCountHandler
         return $conditions;
     }
 
-
     public function getConditions($value = '', $field = [])
     {
         $where = $join = $leftjoin = $tvs = [];
@@ -524,21 +518,49 @@ class sfCountHandler
 
             $sclass = $this->classCanonical($sclass);
 
-            $conditions['select'][$sclass][] = $cselect;
-            if ($sclass == $class) {
+            if($sclass === $class) {
+                $conditions['select'][$sclass][] = $cselect;
                 continue;
             }
+
             $clear_key = explode(' ', $cselect);
             $clear_key = array_shift($clear_key);
             $method_name = 'get'.ucfirst($sclass).'Conditions';
             if (method_exists($this, $method_name)) {
                 if ($add_conditions = call_user_func_array([$this, $method_name], ['', ['key' => $clear_key], 0])) {
                     foreach ($add_conditions as $add => $vals) {
+                        if($add === 'join') {
+                            switch($sclass) {
+                                case 'msVendor':
+                                case 'msProductOption':
+                                    $vals = array_filter($vals,function($value, $table) {return $table !=='msProductData';},ARRAY_FILTER_USE_BOTH);
+                                    $conditions['join']['msProductData'] = ['class' => 'msProductData', 'on' => 'msProductData.id = modResource.id'];
+                                    $add = 'leftJoin';
+                                    break;
+                            }
+                        }
                         if (isset($conditions[$add])) {
                             $conditions[$add] = array_merge($conditions[$add], $vals);
                         } else {
                             $conditions[$add] = $vals;
                         }
+                    }
+                    switch($sclass) {
+                        case 'msProductOption':
+                            $option = ucfirst($clear_key);
+                            $table = $this->modx->escape('option'.$option);
+                            $column = $table.'.`value`';
+                            if(mb_strpos($cselect,' ') !== false) {
+                                $tmpSelect = explode(' ',$cselect);
+                                $column .= ' as '.array_pop($tmpSelect);
+                            } else {
+                                $column .= ' as '.$clear_key;
+                            }
+                            $conditions['select'][$table][] = $column;
+                            break;
+                        default:
+                            $conditions['select'][$sclass][] = $cselect;
+                            break;
                     }
                 }
             } else {
@@ -556,8 +578,7 @@ class sfCountHandler
                 if ($sclass != $class) {
                     $method_name = 'get'.ucfirst($sclass).'Conditions';
                     if (method_exists($this, $method_name)) {
-                        if ($add_conditions = call_user_func_array([$this, $method_name],
-                            ['', ['key' => $clear_key], 0])) {
+                        if ($add_conditions = call_user_func_array([$this, $method_name], ['', ['key' => $clear_key], 0])) {
                             foreach ($add_conditions as $add => $vals) {
                                 if (isset($conditions[$add])) {
                                     $conditions[$add] = array_merge($conditions[$add], $vals);
@@ -617,7 +638,6 @@ class sfCountHandler
 
         return $class;
     }
-
 
     public function countByParams(
         $params = [],
@@ -787,6 +807,14 @@ class sfCountHandler
                     }
                 }
 
+                if(!empty($conditions['leftJoin'])) {
+                    if(isset($config['leftJoin'])) {
+                        $config['leftJoin'] = array_merge($config['leftJoin'],$conditions['leftJoin']);
+                    } else {
+                        $config['leftJoin'] = $conditions['leftJoin'];
+                    }
+                }
+
                 foreach ($conditions['choose'] as $sortBy => $alias) {
                     $config_where = [];
                     if (!empty($config['where'])) {
@@ -818,6 +846,7 @@ class sfCountHandler
                     }
                 }
             }
+
             return $min_max_array;
         }
 
@@ -829,7 +858,6 @@ class sfCountHandler
         $this->pdoTools->setConfig($config);
         return $this->pdoTools->run();
     }
-
 
     public function prepareWhere($where = [], $fields = [])
     {
@@ -947,7 +975,6 @@ class sfCountHandler
         $fields_where = [];
         $params_keys = array_diff(array_keys($params), array_keys($fields_key));
 
-
         foreach ($params_keys as $param) {
             if ($field = $this->pdoTools->getArray('sfField', ['alias' => $param])) {
                 $alias = $field['alias'];
@@ -962,7 +989,6 @@ class sfCountHandler
         if (count(array_diff(array_keys($params), array_keys($fields_key)))) {
             //            $this->modx->log(modx::LOG_LEVEL_ERROR,"[SeoFilter] don't known this fields. Please add this fields to the first tab in component (Fields)".print_r(array_diff(array_keys($params), array_keys($fields_key)),1));
         }
-
 
         foreach ($fields_key as $field_alias => $field) {
             switch ($field['class']) {
@@ -1078,7 +1104,6 @@ class sfCountHandler
             }
         }
 
-
         $select = $min_max_array = $count_choose = $count_select = [];
         $sortby = '';
         if ($this->config['count_choose']) {
@@ -1108,7 +1133,6 @@ class sfCountHandler
                 $select[$class] = implode(',', $sel);
             }
         }
-
 
         foreach ($count_choose as $choose) {
             if (strpos($choose, '.')) {
@@ -1182,6 +1206,5 @@ class sfCountHandler
     {
         return file_exists(MODX_CORE_PATH.'components/minishop2/model/minishop2/msproduct.class.php');
     }
-
 
 }
