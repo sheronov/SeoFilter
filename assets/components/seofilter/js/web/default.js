@@ -364,29 +364,18 @@ var SeoFilter = {
     },
 
     updateTexts: function (data) {
-        if (data.description) {
-            $(this.config.jdescription).attr("content", data.description);
-        }
-        if (data.link) {
-            $(this.config.jlink).html(data.link);
-        }
-        if (data.h1) {
-            $(this.config.jh1).html(data.h1);
-        }
-        if (data.h2) {
-            $(this.config.jh2).html(data.h2);
-        }
-        if (data.introtext) {
-            $(this.config.jintrotext).html(data.introtext);
-        }
-        if (data.keywords) {
-            $(this.config.jkeywords).html(data.keywords);
-        }
-        if (data.text) {
-            $(this.config.jtext).html(data.text);
-        }
-        if (data.content) {
-            $(this.config.jcontent).html(data.content);
+        var tags = ['description', 'link', 'h1', 'h2', 'introtext', 'keywords', 'text', 'content'];
+        for (var i = 0; i < tags.length; i++) {
+            if (tags.hasOwnProperty(i) && data.hasOwnProperty(tags[i]) && data[tags[i]] && this.config.hasOwnProperty('j' + tags[i])) {
+                var jElements = $(document).find(this.config['j' + tags[i]]);
+                if (jElements.length) {
+                    if (jElements[0].tagName === 'META') {
+                        jElements.attr('content', data[tags[i]]);
+                    } else {
+                        jElements.html(data[tags[i]]);
+                    }
+                }
+            }
         }
         $(document).find('.sf_total').html(data.total);
     },
