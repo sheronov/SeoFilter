@@ -1,5 +1,11 @@
 Changelog for SeoFilter.
 
+1.10.2-beta (13.04.2021)
+=====================
+- added msProductOption support to seofilter_select setting
+- fixed warning in the modx action log
+- more correct replacement for meta[name="keywords"], etc.
+
 1.10.1-beta (27.10.2020)
 =====================
 - improved sorting in sfMenu, added support of arrays, json, RAND() and more (the syntax like in pdoMenu)
