@@ -2,7 +2,7 @@
 
 class sfUrlsGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'sfUrls';
+    public $objectType = 'seofilter.url';
     public $classKey = 'sfUrls';
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';

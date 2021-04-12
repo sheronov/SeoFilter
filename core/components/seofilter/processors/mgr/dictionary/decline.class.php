@@ -2,8 +2,8 @@
 
 class sfDictionaryDeclineProcessor extends modObjectProcessor
 {
-    public $objectType = 'sfDictionary';
-    public $classKey = 'sfDictionary';
+    public $objectType     = 'seofilter.word';
+    public $classKey       = 'sfDictionary';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';
 

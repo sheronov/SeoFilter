@@ -2,7 +2,7 @@
 
 class sfDictionaryCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType      = 'word';
+    public $objectType      = 'seofilter.word';
     public $classKey        = 'sfDictionary';
     public $languageTopics  = ['seofilter'];
     public $beforeSaveEvent = 'sfOnBeforeWordAdd';

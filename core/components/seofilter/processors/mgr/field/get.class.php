@@ -2,7 +2,7 @@
 
 class sfFieldGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'sfField';
+    public $objectType = 'seofilter.field';
     public $classKey = 'sfField';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';

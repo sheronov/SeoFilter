@@ -2,7 +2,7 @@
 
 class sfUrlWordCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType = 'sfUrlWord';
+    public $objectType = 'seofilter.url_word';
     public $classKey = 'sfUrlWord';
     public $languageTopics = array('seofilter');
     //public $permission = 'create';

@@ -2,7 +2,7 @@
 
 class sfUrlsGetProcessor extends modObjectGetProcessor
 {
-    public $objectType     = 'sfUrls';
+    public $objectType     = 'seofilter.url';
     public $classKey       = 'sfUrls';
     public $languageTopics = ['seofilter:default'];
     //public $permission = 'view';

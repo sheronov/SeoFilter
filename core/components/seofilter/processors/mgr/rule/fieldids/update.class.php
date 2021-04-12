@@ -2,7 +2,7 @@
 
 class sfFieldIdsUpdateProcessor extends modObjectUpdateProcessor
 {
-    public $objectType = 'sfFieldIds';
+    public $objectType = 'seofilter.rule_field';
     public $classKey = 'sfFieldIds';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';

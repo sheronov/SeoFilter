@@ -2,7 +2,7 @@
 
 class sfFieldIdsGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'sfFieldIds';
+    public $objectType = 'seofilter.rule_field';
     public $classKey = 'sfFieldIds';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';

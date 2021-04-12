@@ -2,7 +2,7 @@
 
 class sfUrlsCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType = 'url';
+    public $objectType = 'seofilter.url';
     public $classKey = 'sfUrls';
     public $languageTopics = array('seofilter');
     public $beforeSaveEvent = 'sfOnBeforeUrlAdd';

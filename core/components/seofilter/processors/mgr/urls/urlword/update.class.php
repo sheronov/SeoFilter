@@ -2,7 +2,7 @@
 
 class sfUrlWordUpdateProcessor extends modObjectUpdateProcessor
 {
-    public $objectType = 'sfUrlWord';
+    public $objectType = 'seofilter.url_word';
     public $classKey = 'sfUrlWord';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';

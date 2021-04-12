@@ -2,7 +2,7 @@
 
 class sfFieldEnableProcessor extends modObjectProcessor
 {
-    public $objectType = 'sfDictionary';
+    public $objectType      = 'seofilter.word';
     public $classKey = 'sfDictionary';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';

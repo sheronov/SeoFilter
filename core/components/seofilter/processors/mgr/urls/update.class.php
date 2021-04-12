@@ -2,7 +2,7 @@
 
 class sfUrlsUpdateProcessor extends modObjectUpdateProcessor
 {
-    public $objectType = 'sfUrls';
+    public $objectType = 'seofilter.url';
     public $classKey = 'sfUrls';
     public $languageTopics = array('seofilter');
     public $beforeSaveEvent = 'sfOnBeforeUrlUpdate';

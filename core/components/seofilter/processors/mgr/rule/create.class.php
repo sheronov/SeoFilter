@@ -2,7 +2,7 @@
 
 class sfRuleCreateProcessor extends modObjectCreateProcessor
 {
-    public $objectType = 'sfRule';
+    public $objectType = 'seofilter.rule';
     public $classKey = 'sfRule';
     public $languageTopics = array('seofilter');
     //public $permission = 'create';

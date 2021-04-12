@@ -2,7 +2,7 @@
 
 class sfUrlWordGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'sfUrlWord';
+    public $objectType = 'seofilter.url_word';
     public $classKey = 'sfUrlWord';
     public $defaultSortField = 'priority';
     public $defaultSortDirection = 'ASC';

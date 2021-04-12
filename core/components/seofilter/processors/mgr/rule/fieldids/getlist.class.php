@@ -2,7 +2,7 @@
 
 class sfFieldIdsGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'sfFieldIds';
+    public $objectType = 'seofilter.rule_field';
     public $classKey = 'sfFieldIds';
     public $defaultSortField = 'priority';
     public $defaultSortDirection = 'ASC';

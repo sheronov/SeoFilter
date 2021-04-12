@@ -2,7 +2,7 @@
 
 class sfDictionaryGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'sfDictionary';
+    public $objectType      = 'seofilter.word';
     public $classKey = 'sfDictionary';
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';

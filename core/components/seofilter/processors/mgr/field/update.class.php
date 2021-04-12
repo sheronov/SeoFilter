@@ -6,7 +6,7 @@ class sfFieldUpdateProcessor extends modObjectUpdateProcessor
 {
     use sfFieldValues;
 
-    public $objectType     = 'sfField';
+    public $objectType     = 'seofilter.field';
     public $classKey       = 'sfField';
     public $languageTopics = ['seofilter'];
     //public $permission = 'save';

@@ -2,7 +2,7 @@
 
 class sfRuleDuplicateProcessor extends modObjectDuplicateProcessor
 {
-    public $objectType = 'sfRule';
+    public $objectType = 'seofilter.rule';
     public $classKey = 'sfRule';
     public $languageTopics = array('seofilter');
     public $nameField = 'name';

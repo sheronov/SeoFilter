@@ -2,7 +2,7 @@
 
 class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
 {
-    public $objectType     = 'sfDictionary';
+    public $objectType = 'seofilter.word';
     public $classKey       = 'sfDictionary';
     public $languageTopics = ['seofilter'];
     public $afterSaveEvent = 'sfOnAfterUpdateWord';

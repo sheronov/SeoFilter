@@ -2,7 +2,7 @@
 
 class sfDictionaryGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'sfDictionary';
+    public $objectType      = 'seofilter.word';
     public $classKey = 'sfDictionary';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';

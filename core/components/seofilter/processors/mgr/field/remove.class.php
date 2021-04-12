@@ -2,7 +2,7 @@
 
 class sfFieldRemoveProcessor extends modObjectProcessor
 {
-    public $objectType = 'sfField';
+    public $objectType = 'seofilter.field';
     public $classKey = 'sfField';
     public $languageTopics = array('seofilter');
     //public $permission = 'remove';

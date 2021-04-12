@@ -2,7 +2,7 @@
 
 class sfRuleGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'sfRule';
+    public $objectType = 'seofilter.rule';
     public $classKey = 'sfRule';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';

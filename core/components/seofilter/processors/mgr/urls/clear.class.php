@@ -2,7 +2,7 @@
 
 class sfUrlsClearProcessor extends modProcessor
 {
-    public $objectType = 'sfUrls';
+    public $objectType = 'seofilter.url';
     public $classKey = 'sfUrls';
     public $languageTopics = array('seofilter');
     //public $permission = 'save';

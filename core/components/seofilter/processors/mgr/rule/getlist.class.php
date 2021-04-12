@@ -2,7 +2,7 @@
 
 class sfRuleGetListProcessor extends modObjectGetListProcessor
 {
-    public $objectType = 'sfRule';
+    public $objectType = 'seofilter.rule';
     public $classKey = 'sfRule';
     public $defaultSortField = 'id';
     public $defaultSortDirection = 'DESC';
@@ -54,7 +54,7 @@ class sfRuleGetListProcessor extends modObjectGetListProcessor
                 'OR:title:LIKE' => "%{$query}%",
             ));
         }
-        
+
         if ($page = $this->getProperty('page',null)) {
             $proMode =  $this->modx->getOption('seofilter_pro_mode',null,0,true);
             if($proMode) {

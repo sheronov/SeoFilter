@@ -2,7 +2,7 @@
 
 class sfUrlWordGetProcessor extends modObjectGetProcessor
 {
-    public $objectType = 'sfUrlWord';
+    public $objectType = 'seofilter.url_word';
     public $classKey = 'sfUrlWord';
     public $languageTopics = array('seofilter:default');
     //public $permission = 'view';
