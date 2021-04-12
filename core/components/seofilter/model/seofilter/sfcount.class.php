@@ -9,7 +9,6 @@ class sfCountHandler
     /* @var pdoFetch|pdoTools $pdoTools */
     public $pdoTools;
 
-
     /**
      * @param  modX  $modx
      * @param  array  $config
@@ -518,7 +517,7 @@ class sfCountHandler
 
             $sclass = $this->classCanonical($sclass);
 
-            if($sclass === $class) {
+            if ($sclass === $class) {
                 $conditions['select'][$sclass][] = $cselect;
                 continue;
             }
@@ -527,14 +526,19 @@ class sfCountHandler
             $clear_key = array_shift($clear_key);
             $method_name = 'get'.ucfirst($sclass).'Conditions';
             if (method_exists($this, $method_name)) {
-                if ($add_conditions = call_user_func_array([$this, $method_name], ['', ['key' => $clear_key], 0])) {
+                if ($add_conditions = $this->$method_name('', ['key' => $clear_key], 0)) {
                     foreach ($add_conditions as $add => $vals) {
-                        if($add === 'join') {
-                            switch($sclass) {
+                        if ($add === 'join') {
+                            switch ($sclass) {
                                 case 'msVendor':
                                 case 'msProductOption':
-                                    $vals = array_filter($vals,function($value, $table) {return $table !=='msProductData';},ARRAY_FILTER_USE_BOTH);
-                                    $conditions['join']['msProductData'] = ['class' => 'msProductData', 'on' => 'msProductData.id = modResource.id'];
+                                    $vals = array_filter($vals, function ($value, $table) {
+                                        return $table !== 'msProductData';
+                                    }, ARRAY_FILTER_USE_BOTH);
+                                    $conditions['join']['msProductData'] = [
+                                        'class' => 'msProductData',
+                                        'on'    => 'msProductData.id = modResource.id'
+                                    ];
                                     $add = 'leftJoin';
                                     break;
                             }
@@ -545,13 +549,13 @@ class sfCountHandler
                             $conditions[$add] = $vals;
                         }
                     }
-                    switch($sclass) {
+                    switch ($sclass) {
                         case 'msProductOption':
                             $option = ucfirst($clear_key);
                             $table = $this->modx->escape('option'.$option);
                             $column = $table.'.`value`';
-                            if(mb_strpos($cselect,' ') !== false) {
-                                $tmpSelect = explode(' ',$cselect);
+                            if (mb_strpos($cselect, ' ') !== false) {
+                                $tmpSelect = explode(' ', $cselect);
                                 $column .= ' as '.array_pop($tmpSelect);
                             } else {
                                 $column .= ' as '.$clear_key;
@@ -578,7 +582,8 @@ class sfCountHandler
                 if ($sclass != $class) {
                     $method_name = 'get'.ucfirst($sclass).'Conditions';
                     if (method_exists($this, $method_name)) {
-                        if ($add_conditions = call_user_func_array([$this, $method_name], ['', ['key' => $clear_key], 0])) {
+                        if ($add_conditions = call_user_func_array([$this, $method_name],
+                            ['', ['key' => $clear_key], 0])) {
                             foreach ($add_conditions as $add => $vals) {
                                 if (isset($conditions[$add])) {
                                     $conditions[$add] = array_merge($conditions[$add], $vals);
@@ -807,9 +812,9 @@ class sfCountHandler
                     }
                 }
 
-                if(!empty($conditions['leftJoin'])) {
-                    if(isset($config['leftJoin'])) {
-                        $config['leftJoin'] = array_merge($config['leftJoin'],$conditions['leftJoin']);
+                if (!empty($conditions['leftJoin'])) {
+                    if (isset($config['leftJoin'])) {
+                        $config['leftJoin'] = array_merge($config['leftJoin'], $conditions['leftJoin']);
                     } else {
                         $config['leftJoin'] = $conditions['leftJoin'];
                     }
@@ -834,6 +839,14 @@ class sfCountHandler
                             }
                             $config['sortby'] = $sortBy;
                             $config['sortdir'] = $sortDir;
+                        }
+
+                        if (!empty($config['leftJoin'])) {
+                            foreach ($config['leftJoin'] as $table => $column) {
+                                if (isset($config['innerJoin'][$table])) {
+                                    unset($config['leftJoin'][$table]);
+                                }
+                            }
                         }
 
                         if ($run = $this->run($config)) {
