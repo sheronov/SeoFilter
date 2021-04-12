@@ -2,6 +2,7 @@ Changelog for SeoFilter.
 
 1.10.2-beta (13.04.2021)
 =====================
+- added a short variable $_r to the rules with resource data (for pro mode)
 - added msProductOption support to seofilter_select setting
 - fixed warning in the modx action log
 - more correct replacement for meta[name="keywords"], etc.

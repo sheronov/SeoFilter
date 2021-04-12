@@ -1360,11 +1360,15 @@ class SeoFilter
             $seo_array = array_intersect_key($rule, array_flip($seo_array));
         }
 
+        $resourceData = $this->object->toArray();
+        if (!isset($wordsToText['_r'])) {
+            $wordsToText['_r'] = $resourceData;
+        }
         if (!isset($wordsToText['resource'])) {
-            $wordsToText['resource'] = $this->object->toArray();
+            $wordsToText['resource'] = $resourceData;
         }
         if (!isset($wordsToText['original_page'])) {
-            $wordsToText['original_page'] = $this->object->toArray();
+            $wordsToText['original_page'] = $resourceData;
         }
 
         foreach ($seo_array as $tag => $text) {
@@ -2510,11 +2514,15 @@ class SeoFilter
             }
 
             if ($this->config['proMode'] && $pageObject = $this->modx->getObject('modResource', $page_id)) {
+                $resourceData = $pageObject->toArray();
+                if (!isset($word_array['_r'])) {
+                    $word_array['_r'] = $resourceData;
+                }
                 if (!isset($word_array['resource'])) {
-                    $word_array['resource'] = $pageObject->toArray();
+                    $word_array['resource'] = $resourceData;
                 }
                 if (!isset($word_array['original_page'])) {
-                    $word_array['original_page'] = $pageObject->toArray();
+                    $word_array['original_page'] = $resourceData;
                 }
             }
 
