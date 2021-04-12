@@ -11,7 +11,7 @@ var SeoFilter = {
     config: seoFilterConfig,
     mse_config: mse2Config,
     other_config: sfConfig,
-    count: Object.keys(seoFilterConfig.params).length || 0,
+    count: Object.keys(seoFilterConfig.params || {}).length || 0,
     initialized: false,
 
     initialize: function () {
