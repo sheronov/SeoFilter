@@ -1854,7 +1854,7 @@ class SeoFilter
     {
         $link = [];
         $q = $this->modx->newQuery('sfUrls');
-        $q->where(['page_id' => $page_id]);
+        $q->where(['page_id' => $page_id, 'active' => 1]);
         if ($url_id) {
             $q->where(['id:!=' => $url_id]);
         }
