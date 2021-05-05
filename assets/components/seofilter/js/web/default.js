@@ -438,13 +438,17 @@ var SeoFilter = {
         var i;
         for (i in vars) {
             if (vars.hasOwnProperty(i)) {
-                hash += '&' + i + '=' + vars[i].toString();
+                var value = vars[i].toString();
+                if (value.indexOf('&') !== -1) {
+                    value = value.replace(new RegExp('\\&', 'g'), "%26");
+                }
+                hash += '&' + i + '=' + value;
             }
         }
         if (!this.oldbrowser()) {
             if (hash.length !== 0) {
                 hash = '?' + hash.substr(1);
-                var specialChars = {"%": "%25", "+": "%2B", "&": "%26"}; //added last char
+                var specialChars = {"%": "%25", "+": "%2B"};
                 for (i in specialChars) {
                     if (specialChars.hasOwnProperty(i) && hash.indexOf(i) !== -1) {
                         hash = hash.replace(new RegExp('\\' + i, 'g'), specialChars[i]);
