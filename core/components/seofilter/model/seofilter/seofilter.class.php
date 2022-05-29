@@ -68,12 +68,10 @@ class SeoFilter
 
             if ($this->config['page']) {
                 $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', $this->config['scheme']);
+                $pageUrlHost = parse_url($page_url, PHP_URL_HOST);
 
-                if ($this->config['replace_host']) {
-                    $site_url = explode('://', $this->config['site_url']);
-                    $site_url = array_pop($site_url);
-                    $site_url = trim($site_url, '/');
-                    $page_url = str_replace($site_url, $_SERVER['HTTP_HOST'], $page_url);
+                if ($this->config['replace_host'] && !empty($pageUrlHost)) {
+                    $page_url = str_replace($pageUrlHost, $_SERVER['HTTP_HOST'], $page_url);
                 }
 
                 $c_suffix = $this->config['container_suffix'];
@@ -1067,8 +1065,8 @@ class SeoFilter
             } else {
                 $meta['url'] = $this->config['between_urls'].$meta['url'].$this->config['url_suffix'];
             }
-            $meta['full_url'] = $this->clearSuffixes($this->modx->makeUrl($this->object->id, $this->object->context_key,
-                    '', '-1')).$meta['url'];
+            $pageUrl = parse_url($this->modx->makeUrl($this->object->id, $this->object->context_key), PHP_URL_PATH);
+            $meta['full_url'] = $this->clearSuffixes($pageUrl) . $meta['url'];
         } elseif ((int)$this->object->id === (int)$this->config['site_start']) {
             $meta['url'] = '';
         } else {
@@ -3861,7 +3859,7 @@ class SeoFilter
 
 
     /**
-     * Новый метод.Получение основных данных по страницам, привязанным к правилам
+     * Новый метод. Получение основных данных по страницам, привязанным к правилам
      *
      * @return array|null
      */
@@ -3873,13 +3871,14 @@ class SeoFilter
             return null;
         }
 
-        $contextKey = $this->modx->getOption('seofilter_catalog_context', null, $this->modx->context->key);
+        $catalogContext = $this->getOption('catalog_context');
+        $contextKey = $catalogContext ?: $this->modx->context->key;
         if (($q = $this->modx->newQuery('modResource')
                 ->where([
                     'id:IN'       => $pageIds,
                     'deleted'     => false,
                     'published'   => true,
-                    'context_key' => $contextKey// TODO: вроде как-лишнее. Достаточно сортировки по контексту
+                    // 'context_key' => $contextKey // TODO: подумать, может контекст здесь и лишний. Достаточно сортировки по контексту
                 ])
                 ->select($this->modx->getSelectColumns('modResource', 'modResource', '',
                     ['id', 'alias', 'uri', 'uri_override', 'context_key']))
@@ -3948,9 +3947,10 @@ class SeoFilter
 
         $between_urls = $this->config['between_urls'];
         $site_start = $this->config['site_start'];
-        $page = $fast_search = 0; //переменные для проверки
+        $page = 0; //переменные для проверки
         //если используете контексты, то переключить должны до события onPageNotFound
-        $ctx = $this->modx->getOption('seofilter_catalog_context', null, $this->modx->context->key);
+        $catalogContext = $this->getOption('catalog_context');
+        $ctx = $catalogContext ?: $this->modx->context->key;
         //если же каталог находится строго в другом контексте, то можете добавить настройку и прописать туда свой контекст
 
         $check_doubles = false;
@@ -3983,16 +3983,16 @@ class SeoFilter
         if (empty($all_pages)) {
             return null;
         }
-        $q = $this->modx->newQuery('modResource');
-        $q->where([
-            'id:IN'       => $all_pages,
-            'deleted'     => 0,
-            'published'   => 1,
-            'context_key' => $ctx
-        ]);
-        $q->select([
-            'modResource.id,modResource.alias,modResource.uri,modResource.uri_override'
-        ]);
+        $q = $this->modx->newQuery('modResource')
+            ->where([
+                'id:IN'       => $all_pages,
+                'deleted'     => 0,
+                'published'   => 1,
+                'context_key' => $ctx // TODO: подумать, может контекст здесь и лишний. Достаточно сортировки по контексту
+            ])
+            ->select($this->modx->getSelectColumns('modResource', 'modResource', '',
+                 ['id', 'alias', 'uri', 'uri_override', 'context_key']))
+            ->sortby("context_key = '{$ctx}'", 'DESC');
         if ($q->prepare() && $q->stmt->execute()) {
             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                 $uri = $this->clearSuffixes($row['uri']);
@@ -4135,14 +4135,14 @@ class SeoFilter
             if ((int)$page === (int)$site_start) {
                 $url = '';
             } else {
-                $url = $this->modx->makeUrl($page, $ctx, '', -1);
+                $url = parse_url($this->modx->makeUrl($page, $ctx), PHP_URL_PATH);
             }
             if ($this->modx->getOption('site_url') && $this->modx->getOption('site_url') !== '/'
                 && strpos($url, $this->modx->getOption('site_url')) !== false) {
                 $url = str_replace($this->modx->getOption('site_url'), '', $url);
             }
-            if (($c_suffix = $this->config['container_suffix'])
-                && strlen($url) && strpos($url, $c_suffix, strlen($url) - strlen($c_suffix)) !== false) {
+            if (($c_suffix = $this->config['container_suffix']) && strlen($url)
+                && strpos($url, $c_suffix, strlen($url) - strlen($c_suffix)) !== false) {
                 $url = substr($url, 0, -strlen($c_suffix));
             }
             foreach ($this->config['possibleSuffixes'] as $possibleSuffix) {
@@ -4182,8 +4182,7 @@ class SeoFilter
                 }
             }
 
-            if ($tmp && $url_array = $this->findUrlArray(implode($this->config['level_separator'], $tmp),
-                    $page)) {
+            if ($tmp && $url_array = $this->findUrlArray(implode($this->config['level_separator'], $tmp), $page)) {
                 if ($url_array['active']) {
                     $old_url = $url_array['old_url'];
                     $new_url = $url_array['new_url'];
@@ -4192,8 +4191,7 @@ class SeoFilter
 
 
                     if ($new_url && ($new_url !== implode($this->config['level_separator'], $tmp))) {
-                        if ($container_suffix && strpos($url, $container_suffix,
-                                strlen($url) - strlen($container_suffix)) !== false) {
+                        if ($container_suffix && strpos($url, $container_suffix, strlen($url) - strlen($container_suffix)) !== false) {
                             $url = substr($url, 0, -strlen($container_suffix));
                         }
                         if (((int)$site_start === (int)$page) && $this->config['main_alias']) {
@@ -4207,16 +4205,12 @@ class SeoFilter
                             'responseCode' => 'HTTP/1.1 301 Moved Permanently'
                         ]);
                     } elseif ($url_redirect && ($url_suffix !== $last_char)
-                        && ((strpos($_SERVER['REQUEST_URI'],
-                                    $toFind) === false) || (strpos($_SERVER['QUERY_STRING'],
-                                    $toFind) === false)) //when server have bugs
+                        && ((strpos($_SERVER['REQUEST_URI'], $toFind) === false) || (strpos($_SERVER['QUERY_STRING'], $toFind) === false)) //when server have bugs
                     ) {
-                        if ($container_suffix && strpos($url, $container_suffix,
-                                strlen($url) - strlen($container_suffix)) !== false) {
+                        if ($container_suffix && strpos($url, $container_suffix, strlen($url) - strlen($container_suffix)) !== false) {
                             $url = substr($url, 0, -strlen($container_suffix));
                         }
-                        $this->modx->sendRedirect($url.'/'.implode($this->config['level_separator'],
-                                $tmp).$url_suffix, [
+                        $this->modx->sendRedirect($url.'/'.implode($this->config['level_separator'], $tmp).$url_suffix, [
                             'type'         => 'REDIRECT_HEADER',
                             'responseCode' => 'HTTP/1.1 301 Moved Permanently'
                         ]);
@@ -4353,7 +4347,6 @@ class SeoFilter
                                 $base_get))
                         );
 
-                        $fast_search = true;
                         $meta = $this->getRuleMeta($params, $rule_id, $page, 0, 0, $original_params);
 
                         //обновление счётчика, если отличается количество
@@ -4410,7 +4403,13 @@ class SeoFilter
                             $meta['url'] .= $this->config['url_suffix'];
                         }
 
-                        if ($ctx !== 'web') {
+                        if (!empty($catalogContext) && $this->modx->context->key !== $catalogContext
+                            && !$this->modx->getOption('allow_forward_across_contexts')) {
+                            $this->modx->log(modX::LOG_LEVEL_ERROR, '[SeoFilter] Please enable allow_forward_across_contexts settings');
+                            $this->modx->setOption('allow_forward_across_contexts', true); // чтобы не было вечного редиректа
+                        }
+
+                        if ($ctx !== 'web' && $this->modx->context->key !== $ctx && empty($catalogContext)) {
                             $this->modx->switchContext($ctx);
                         }
 
