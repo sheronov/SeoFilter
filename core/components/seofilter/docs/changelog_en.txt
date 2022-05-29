@@ -1,5 +1,11 @@
 Changelog for SeoFilter.
 
+1.10.3-beta (29.05.2022)
+====================
+- fixed, when catalog in another context (do not forget change system setting "allow_forward_across_contexts")
+- fixed condition in recursive seo breadcrumbs
+- fixed symbol in values "&" in url hash (js)
+
 1.10.2-beta (13.04.2021)
 =====================
 - added a short variable $_r to the rules with resource data (for pro mode)
