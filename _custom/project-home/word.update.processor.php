@@ -32,17 +32,20 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
         $id = (int)$this->getProperty('id');
         $name = trim($this->getProperty('value'));
         $field_id = (int)$this->getProperty('field_id');
+        $alias = $this->getProperty('alias');
         if (empty($id)) {
             return $this->modx->lexicon('seofilter_dictionary_err_ns');
         }
 
         if (empty($name)) {
             $this->modx->error->addField('value', $this->modx->lexicon('seofilter_dictionary_err_name'));
-        } elseif ($this->modx->getCount($this->classKey, array('value' => $name, 'field_id'=>$field_id, 'id:!=' => $id))) {
+        } elseif (!empty($alias) && $this->modx->getCount($this->classKey, ['alias' => $alias, 'field_id' => $field_id, 'id:!=' => $id])) {
+            $this->modx->error->addField('alias', $this->modx->lexicon('seofilter_dictionary_err_ae'));
+        } elseif (empty($alias) && $this->modx->getCount($this->classKey, ['value' => $name, 'field_id'=>$field_id, 'id:!=' => $id])) {
             $this->modx->error->addField('value', $this->modx->lexicon('seofilter_dictionary_err_ae'));
         }
 
-        if($this->getProperty('alias') != $this->object->get('alias')) {
+        if($alias != $this->object->get('alias')) {
             $this->object->set('alias',$this->getProperty('alias')); //fix
             $this->object->save();
             $urlwords = $this->object->getMany('UrlWords');
