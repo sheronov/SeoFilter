@@ -1,5 +1,6 @@
 <?php
 /** @var modX $modx */
+/** @var modResource $resource */
 /** @var array $scriptProperties */
 switch ($modx->event->name) {
     case 'OnLoadWebDocument':
@@ -259,6 +260,11 @@ switch ($modx->event->name) {
                             $params['servicePage'] = isset($_GET['page']) ? $_GET['page'] : 1;
 
                             $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);//, $_REQUEST[$alias]);
+                            if ($url_array['custom']) {
+                                $meta = array_merge($meta, $url_array);
+                                $meta['seo_id'] = $url_array['id'];
+                                $meta['url'] = !empty($url_array['new_url']) ? $url_array['new_url'] : $url_array['old_url'];
+                            }
                             $meta['menutitle'] = $menutitle;
 
                             $meta['allProjects'] = '<span itemscope="itemscope" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="[[++site_url]]homes" itemprop="url" rel="">Каталог проектов домов</a></span>';
