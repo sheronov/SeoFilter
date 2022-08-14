@@ -65,6 +65,7 @@ $(document).ready(function(g) {
                     sf_action: "getmeta",
                     data: t,
                     pageId: this.config.page,
+                    url_id: this.config.url_id || 0,
                     hash: a,
                     aliases: this.config.aliases
                 },
@@ -74,6 +75,9 @@ $(document).ready(function(g) {
                     if (g(document).find(".fm-seofilter").length) {
                         var n = g(document).find(".fm-seofilter");
                         t.data.seo_id ? (n.attr("href", n.data("url") + t.data.seo_id), g(document).find(".fm-seofilter").removeClass("hidden")) : g(document).find(".fm-seofilter").addClass("hidden")
+                    }
+                    if (t.data.seo_id) {
+                        h.config.url_id = t.data.seo_id
                     }
                     if (t.data.title) {
                         var s = t.data.title.toString();

@@ -11,6 +11,7 @@ jQuery(document).ready(function ($) {
                     sf_action: 'getmeta',
                     data: array,
                     pageId: this.config.page,
+                    url_id: this.config.url_id || 0,
                     hash: hash,
                     aliases: this.config.aliases
                 },
@@ -26,6 +27,10 @@ jQuery(document).ready(function ($) {
                         } else {
                             $(document).find('.fm-seofilter').addClass('hidden');
                         }
+                    }
+
+                    if (response.data.seo_id) {
+                        seoFilter.config.url_id = response.data.seo_id
                     }
 
                     if (response.data.title) {
