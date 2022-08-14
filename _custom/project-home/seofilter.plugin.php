@@ -256,15 +256,14 @@ switch ($modx->event->name) {
                         if (count($params)) {
                             $original_params = array_diff_key(array_merge($params,$_GET),array_flip(array_merge(array($del_get),$base_get)));
                             $fast_search = true;
-                            $SeoFilter->initialize($modx->context->key, array('page' => $page, 'params' => $params));
+                            $SeoFilter->initialize($modx->context->key, [
+                                'page' => $page,
+                                'params' => $params,
+                                'url_id' => $url_array['id']
+                            ]);
                             $params['servicePage'] = isset($_GET['page']) ? $_GET['page'] : 1;
 
-                            $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0,0,$original_params);//, $_REQUEST[$alias]);
-                            if ($url_array['custom']) {
-                                $meta = array_merge($meta, $url_array);
-                                $meta['seo_id'] = $url_array['id'];
-                                $meta['url'] = !empty($url_array['new_url']) ? $url_array['new_url'] : $url_array['old_url'];
-                            }
+                            $meta = $SeoFilter->getRuleMeta($params, $rule_id, $page, 0, 0, $original_params, '', $url_array['id']);//, $_REQUEST[$alias]);
                             $meta['menutitle'] = $menutitle;
 
                             $meta['allProjects'] = '<span itemscope="itemscope" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="[[++site_url]]homes" itemprop="url" rel="">Каталог проектов домов</a></span>';

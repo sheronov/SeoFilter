@@ -178,6 +178,7 @@ class SeoFilter
                     'jh2'              => $this->config['jh2'],
                     'jtext'            => $this->config['jtext'],
                     'jcontent'         => $this->config['jcontent'],
+                    'url_id'           => !empty($this->config['url_id']) ? $this->config['url_id'] : 0
                 ], true);
 
                 $this->modx->regClientStartupScript(
@@ -348,6 +349,7 @@ class SeoFilter
         $diff = $original_params = [];
         $params = $copyparams = $data['data'];
         $pageId = $data['pageId'];
+        $urlId = !empty($data['url_id']) ? (int)$data['url_id'] : 0;
         $aliases = $data['aliases'];
         $base_get = array_map('trim', explode(',', $this->config['base_get']));
 
@@ -464,7 +466,7 @@ class SeoFilter
                         if ((count($diff_fields) && $rule_base) || !count($diff_fields)) {
                             $meta = $this->getRuleMeta(array_merge(array_intersect_key(array_merge($base_params,
                                 $diff_params), array_flip($rule_fields)), ['servicePage' => $data['data']['page']]),
-                                $rule_id, $pageId, 1, 0, $original_params);
+                                $rule_id, $pageId, 1, 0, $original_params, '', $urlId);
                             if (count($meta['diff'])) {
                                 $diff = array_merge($diff, $meta['diff']);
                             }
@@ -712,7 +714,8 @@ class SeoFilter
         $ajax = 0,
         $new = 0,
         $original_params = [],
-        $url = ''
+        $url = '',
+        $urlId = 0
     ) {
         $seo_system = ['id', 'field_id', 'multi_id', 'name', 'rank', 'active', 'class', 'editedon', 'key'];
         $seo_array = ['title', 'h1', 'h2', 'description', 'introtext', 'text', 'content', 'link'];
@@ -721,6 +724,26 @@ class SeoFilter
         $diff_params = [];
         $check = 0;
         $fieldWordIds = [];
+
+        $urlWordsTotal = 0;
+        $urlWordsFound = 0;
+        $urlWords = [];
+        if ($urlId) {
+            $wq = $this->modx->newQuery('sfUrlWord', ['url_id' => $urlId])
+                ->innerJoin('sfDictionary', 'Word', 'Word.id = sfUrlWord.word_id')
+                ->sortby('sfUrlWord.priority', 'ASC')
+                ->select($this->modx->getSelectColumns('sfDictionary', 'Word', '', [
+                    'id', 'input', 'value', 'alias', 'field_id', 'active',
+                ]))
+                ->select('sfUrlWord.priority')
+                ->prepare();
+            if ($wq && $wq->execute()) {
+                $urlWords = $wq->fetchAll(PDO::FETCH_ASSOC);
+            }
+
+            $urlWords = array_column($urlWords, null, 'field_id');
+            $urlWordsTotal = count($urlWords);
+        }
 
         foreach ($params as $param => $input) {
             if ($field = $this->modx->getObject('sfField', ['alias' => $param])) {
@@ -751,6 +774,15 @@ class SeoFilter
 
                     $field_word[$i][$field_id] = $word['id'];
                 } else {
+                    if ($urlId && $urlWords[$field_id] && $urlWords[$field_id]['input'] === $input) {
+                        $urlWordsFound++;
+                        $words = array_values(array_filter($words, function ($value) use ($urlWords, $field_id) {
+                           return $value['id'] === $urlWords[$field_id]['id'];
+                        }));
+                        unset($urlWords[$field_id]);
+                    } else {
+                        $words = count($words) ? [$words[0]] : [];
+                    }
                     foreach ($words as $i => $word) {
                         foreach (array_diff_key($word, array_flip($seo_system)) as $tmp_key => $tmp_array) {
                             if ($countFields == 1) {
@@ -823,12 +855,17 @@ class SeoFilter
             $params_keys = array_keys($params);
             // if($rule_id = $this->findRule($params_keys,$page_id))
             if ($rule_id = $this->findRuleId($page_id, $params_keys)) {
-                $meta = $this->getRuleMeta($params, $rule_id, $page_id, 1, $new, $original_params);
+                $meta = $this->getRuleMeta($params, $rule_id, $page_id, 1, $new, $original_params, $url, $urlId);
                 $meta['diff'] = $diff_params;
                 return $meta;
             }
         }
-        $url_array = $this->multiUrl($aliases, $rule_id, $page_id, $ajax, $new, $field_word);
+
+        if ($urlId && $urlWordsTotal !== $urlWordsFound) {
+            return $this->getRuleMeta($params, $rule_id, $page_id, $ajax, $new, $original_params, $url, 0);
+        }
+
+        $url_array = $this->multiUrl($aliases, $rule_id, $page_id, $ajax, $new, $field_word, $urlId);
 
         if ($seo = $this->pdo->getArray('sfRule', ['id' => $rule_id, 'active' => 1])) {
             if ($seo['count_parents']) {
@@ -1283,12 +1320,12 @@ class SeoFilter
         } else {
             foreach (explode(',', $input) as $val) {
                 $q = $this->modx->newQuery('sfDictionary');
-                $q->limit(1);
                 $q->where(['field_id' => $field_id, 'input' => $val]);
+                $q->sortby('id', 'ASC');
                 if ($this->modx->getCount('sfDictionary', $q)) {
                     $q->select(['sfDictionary.*']);
                     if ($q->prepare() && $q->stmt->execute()) {
-                        $word[] = $q->stmt->fetch(PDO::FETCH_ASSOC);
+                        $word = array_merge($word, $q->stmt->fetchAll(PDO::FETCH_ASSOC));
                     }
                 } else {
                     if ($field = $this->modx->getObject('sfField', $field_id)) {
@@ -1474,7 +1511,7 @@ class SeoFilter
         return $url;
     }
 
-    public function multiUrl($aliases = [], $multi_id = 0, $page_id = 0, $ajax = 0, $new = 0, $field_word = [])
+    public function multiUrl($aliases = [], $multi_id = 0, $page_id = 0, $ajax = 0, $new = 0, $field_word = [], $urlId = 0)
     {
         $url = [];
         if ($multi_id) {
@@ -1516,7 +1553,8 @@ class SeoFilter
                 }
                 $url_link = implode('/', $url_link);
 
-                if ($url_array = $this->pdo->getArray('sfUrls', ['page_id' => $page_id, 'old_url' => $url_link])) {
+                if (($urlId && $url_array = $this->pdo->getArray('sfUrls', ['id' => $urlId, 'old_url' => $url_link]))
+                    || ($url_array = $this->pdo->getArray('sfUrls', ['page_id' => $page_id, 'old_url' => $url_link], ['sortby' => 'id', 'sortdir' => 'ASC']))) {
                     if ($url_array['active']) {
                         $url = $url_array;
                         if ($url_array['new_url']) {
