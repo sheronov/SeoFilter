@@ -12,6 +12,8 @@ SeoFilter.grid.Urls = function (config) {
         baseParams: {
             action: 'mgr/urls/getlist'
         },
+        stateful: true,
+        stateId: config.id,
         listeners: {
             rowDblClick: function (grid, rowIndex, e) {
                 var row = grid.store.getAt(rowIndex);
@@ -36,6 +38,8 @@ SeoFilter.grid.Urls = function (config) {
     });
     SeoFilter.grid.Urls.superclass.constructor.call(this, config);
 
+
+
     // Clear selection on grid refresh
     this.store.on('load', function () {
         if (this._getSelectedIds().length) {
@@ -45,6 +49,7 @@ SeoFilter.grid.Urls = function (config) {
 };
 Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     windows: {},
+    progress: null,
 
     getMenu: function (grid, rowIndex) {
         var ids = this._getSelectedIds();
@@ -55,7 +60,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
         this.addContextMenuItem(menu);
     },
 
-    createField: function (btn, e) {
+    createUrl: function (btn, e) {
         var w = MODx.load({
             xtype: 'seofilter-url-window-create',
             id: Ext.id(),
@@ -104,6 +109,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
                             }
                         });
                         w.reset();
+                        r.object.ta = r.object.content || '';
                         w.setValues(r.object);
                         w.show(e.target);
                     }, scope: this
@@ -236,7 +242,7 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
             header: _('seofilter_url_id'),
             dataIndex: 'id',
             sortable: true,
-            width: 50
+            width: 40
         }, {
             header: _('seofilter_url_link'),
             dataIndex: 'link',
@@ -321,13 +327,11 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
     },
 
     getTopBar: function () {
-        return [
-            //     {
-            //     text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_url_create'),
-            //     handler: this.createField,
-            //     scope: this
-            // },
-            {
+        return [{
+            text: '<i class="icon icon-plus"></i>&nbsp;' + (_('seofilter_url_add') || 'Добавить страницу'),
+            handler: this.createUrl,
+            scope: this
+        }, {
                 xtype: 'seofilter-combo-rule'
                 ,id: 'tbar-seofilter-combo-rule'
                 ,width: 200
