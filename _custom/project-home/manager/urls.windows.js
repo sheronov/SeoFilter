@@ -170,11 +170,11 @@ Ext.extend(SeoFilter.window.UpdateUrls, MODx.Window, {
                     anchor: '99%',
                 }]
             }]
-        }, {
-            html: '<b>' + _('seofilter_url_urlword') + '</b>' + ' <span style="float:right;">'+ _('seofilter_urlword_word_edit') +'</span>',
-            cls: '',
-            style: {margin: '15px 0 5px',color: '#555',width: '99%'}
-            ,anchor: '99%'
+            // }, {
+            // html: '<b>' + _('seofilter_url_urlword') + '</b>' + ' <span style="float:right;">'+ _('seofilter_urlword_word_edit') +'</span>',
+            // cls: '',
+            // style: {margin: '15px 0 5px',color: '#555',width: '99%'}
+            // ,anchor: '99%'
         }, {
             title: _('seofilter_url_urlword')
             ,xtype: 'seofilter-grid-urlword'

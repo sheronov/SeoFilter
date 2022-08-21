@@ -5,7 +5,7 @@ SeoFilter.grid.UrlWord = function (config) {
         url: SeoFilter.config.connector_url,
         fields: this.getFields(config),
         columns: this.getColumns(config),
-        //tbar: this.getTopBar(config),
+        tbar: this.getTopBar(config),
         sm: new Ext.grid.CheckboxSelectionModel(),
         baseParams: {
             action: 'mgr/urls/urlword/getlist'
@@ -95,19 +95,18 @@ Ext.extend(SeoFilter.grid.UrlWord, MODx.grid.Grid, {
         else if (!this.menu.record) {
             return false;
         }
-        var id = this.menu.record.word_id;
 
         MODx.Ajax.request({
             url: this.config.url,
             params: {
-                action: 'mgr/dictionary/get',
-                id: id
+                action: 'mgr/urls/urlword/get',
+                id: this.menu.record.id
             },
             listeners: {
                 success: {
                     fn: function (r) {
                         var w = MODx.load({
-                            xtype: 'seofilter-dictionary-window-update',
+                            xtype: 'seofilter-urlword-window-update',
                             id: Ext.id(),
                             record: r,
                             listeners: {
@@ -133,12 +132,11 @@ Ext.extend(SeoFilter.grid.UrlWord, MODx.grid.Grid, {
             return false;
         }
         MODx.msg.confirm({
-            title: ids.length > 1
-                ? _('seofilter_urlwords_remove')
-                : _('seofilter_urlword_remove'),
-            text: ids.length > 1
-                ? _('seofilter_urlwords_remove_confirm')
-                : _('seofilter_urlword_remove_confirm'),
+            title: (ids.length > 1 ? _('seofilter_urlwords_remove') : _('seofilter_urlword_remove')) || 'Удаление',
+            text: (ids.length > 1
+                    ? _('seofilter_urlwords_remove_confirm')
+                    : _('seofilter_urlword_remove_confirm')
+            ) || 'Вы действительно хотите удалить слово из ссылки?',
             url: this.config.url,
             params: {
                 action: 'mgr/urls/urlword/remove',
@@ -207,9 +205,18 @@ Ext.extend(SeoFilter.grid.UrlWord, MODx.grid.Grid, {
             //     dataIndex: 'id',
             //     width: 50
             // },{
-            header: _('seofilter_urlword_word_id'),
-            dataIndex: 'word_id',
-            width: 75
+            //     header: _('seofilter_urlword_word_id'),
+            //     dataIndex: 'word_id',
+            //     width: 75
+            //
+            // },{
+            header: _('seofilter_urlword_field_name'),
+            dataIndex: 'field_name',
+            width: 140
+        },{
+            header: _('seofilter_urlword_field_alias'),
+            dataIndex: 'field_alias',
+            width: 140
         },{
             header: _('seofilter_urlword_word_name'),
             dataIndex: 'word_name',
@@ -217,14 +224,6 @@ Ext.extend(SeoFilter.grid.UrlWord, MODx.grid.Grid, {
         },{
             header: _('seofilter_urlword_word_alias'),
             dataIndex: 'word_alias',
-            width: 140
-        },{
-            header: _('seofilter_urlword_field_name'),
-            dataIndex: 'field_name',
-            width: 140
-        },{
-            header: _('seofilter_urlword_field_alias'),
-            dataIndex: 'field_alias',
             width: 140
         },{
             //     header: _('seofilter_urlword_priority'),
@@ -242,7 +241,16 @@ Ext.extend(SeoFilter.grid.UrlWord, MODx.grid.Grid, {
 
     getTopBar: function () {
         return [{
-            text: '<i class="icon icon-plus"></i>&nbsp;' + _('seofilter_field_create'),
+            xtype: 'modx-header',
+            autoEl: {
+                tag: 'h4'
+            },
+            html:  '<b>' + _('seofilter_url_urlword') + '</b>',
+            style: {margin: '15px 0 5px',color: '#555',width: '99%', fontSize: '13px' },
+            cls: '',
+            anchor: '50%'
+        }, '->',{
+            text: '<i class="icon icon-plus"></i>&nbsp;' + (_('seofilter_urlwords_add') || 'Добавить слово'),
             handler: this.createUrlWord,
             scope: this
         }];

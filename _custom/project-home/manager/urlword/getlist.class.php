@@ -101,15 +101,16 @@ class sfUrlWordGetListProcessor extends modObjectGetListProcessor
         //        }
 
         // Remove
-        //        $array['actions'][] = array(
-        //            'cls' => '',
-        //            'icon' => 'icon icon-trash-o action-red',
-        //            'title' => $this->modx->lexicon('seofilter_fieldids_remove'),
-        //            'multiple' => $this->modx->lexicon('seofilter_fieldids_remove'),
-        //            'action' => 'removeUrlWord',
-        //            'button' => true,
-        //            'menu' => true,
-        //        );
+        $array['actions'][] = array(
+            'cls' => '',
+            'icon' => 'icon icon-trash-o action-red',
+            'title' => $this->modx->lexicon('seofilter_fieldids_remove'),
+            'multiple' => $this->modx->lexicon('seofilter_fieldids_remove'),
+            'action' => 'removeUrlWord',
+            'button' => true,
+            'menu' => true,
+        );
+
 
         return $array;
     }

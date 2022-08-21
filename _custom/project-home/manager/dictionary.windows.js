@@ -154,8 +154,8 @@ Ext.extend(SeoFilter.window.UpdateDictionary, MODx.Window, {
                         xtype: 'seofilter-combo-field',
                         fieldLabel: _('seofilter_dictionary_field_id'),
                         name: 'field_id',
-                        readOnly: true,
-                        style: 'background:#f9f9f9;color:#aaa;',
+                        // readOnly: true,
+                        // style: 'background:#f9f9f9;color:#aaa;',
                         id: config.id + '-field_id',
                         anchor: '99%',
                     }, {
