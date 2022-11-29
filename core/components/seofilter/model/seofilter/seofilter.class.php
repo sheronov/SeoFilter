@@ -70,8 +70,8 @@ class SeoFilter
                 $page_url = $this->modx->makeUrl($this->config['page'], $ctx, '', $this->config['scheme']);
                 $pageUrlHost = parse_url($page_url, PHP_URL_HOST);
 
-                if ($this->config['replace_host'] && !empty($pageUrlHost)) {
-                    $page_url = str_replace($pageUrlHost, $_SERVER['HTTP_HOST'], $page_url);
+                if ($this->config['replace_host'] && !empty($pageUrlHost) && !empty($_SERVER[$this->config['replace_host_server_key']])) {
+                    $page_url = str_replace($pageUrlHost, $_SERVER[$this->config['replace_host_server_key']], $page_url);
                 }
 
                 $c_suffix = $this->config['container_suffix'];
@@ -4513,9 +4513,10 @@ class SeoFilter
             'admin_version' => $this->getOption('admin_version', 1),
             'main_alias'    => $this->getOption('main_alias', 0),
 
-            'replace_host'     => $this->getOption('replace_host', 0),
-            'replacebefore'    => $this->getOption('replacebefore', 0),
-            'replaceseparator' => $this->getOption('replaceseparator', ' / '),
+            'replace_host'              => $this->getOption('replace_host', 0),
+            'replace_host_server_key'   => $this->getOption('replace_host_server_key', 'HTTP_HOST'),
+            'replacebefore'             => $this->getOption('replacebefore', 0),
+            'replaceseparator'          => $this->getOption('replaceseparator', ' / '),
 
             'jtitle'       => $this->getOption('jtitle', ''),
             'jdescription' => $this->getOption('jdescription', ''),
