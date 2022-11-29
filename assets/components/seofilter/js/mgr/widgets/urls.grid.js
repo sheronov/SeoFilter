@@ -411,6 +411,10 @@ Ext.extend(SeoFilter.grid.Urls, MODx.grid.Grid, {
 
     getTopBar: function () {
         return [{
+            text: '<i class="icon icon-plus"></i>&nbsp;' + (_('seofilter_url_add') || 'Добавить страницу'),
+            handler: this.createUrl,
+            scope: this
+        }, {
                 xtype: 'seofilter-combo-resource'
                 ,id: 'tbar-seofilter-combo-page_id'
                 ,width: 200

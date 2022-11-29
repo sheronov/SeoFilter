@@ -10,6 +10,13 @@ class sfUrlsCreateProcessor extends modObjectCreateProcessor
     //public $permission = 'create';
 
 
+    public function initialize()
+    {
+        $this->modx->addPackage('seofilter', $this->modx->getOption('seofilter_core_path', null,
+                $this->modx->getOption('core_path').'components/seofilter/', true).'model/');
+        return parent::initialize();
+    }
+
     /**
      * @return bool
      */
@@ -45,8 +52,19 @@ class sfUrlsCreateProcessor extends modObjectCreateProcessor
         return parent::beforeSet();
     }
 
+    public function wordsToUrl() {
+        $urlWords = $this->modx->getIterator('sfUrlWord', ['url_id' => 0]);
+        foreach($urlWords as $urlWord) {
+            $urlWord->set('url_id', $this->object->get('id'));
+            $urlWord->save();
+        }
+    }
+
+
     public function afterSave()
     {
+        $this->wordsToUrl();
+
         $path = $this->modx->getOption('seofilter_core_path', null, $this->modx->getOption('core_path') . 'components/seofilter/');
         //$this->modx->log(modX::LOG_LEVEL_ERROR,'ID: '.$this->object->get('id').print_r($this->getProperties(),1));
         $url_id = $this->object->get('id');

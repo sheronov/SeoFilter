@@ -84,6 +84,7 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
         $this->setProperty('change_alias', $change_alias);
         $this->setProperty('change_title', $change_title);
         $this->setProperty('change_relation', $change_relation);
+        $this->setProperty('changed_field',  $field_id !== (int)$this->object->get('field_id'));
 
 
         return parent::beforeSet();
@@ -95,6 +96,17 @@ class sfDictionaryUpdateProcessor extends modObjectUpdateProcessor
         $path = $this->modx->getOption('seofilter_core_path', null,
             $this->modx->getOption('core_path').'components/seofilter/');
         $otherProps = ['processors_path' => $path.'processors/'];
+
+        if ($this->getProperty('changed_field')) {
+            $this->modx->addPackage('seofilter', $this->modx->getOption('seofilter_core_path', null,
+                $this->modx->getOption('core_path').'components/seofilter/', true).'model/');
+            $urlWords = $this->modx->getIterator('sfUrlWord', ['word_id' => $this->object->get('id')]);
+            foreach ($urlWords as $urlWord) {
+               $urlWord->set('field_id', $this->object->get('field_id'));
+               $urlWord->save();
+            }
+        }
+
 
         if ($this->getProperty('change_relation')) {
             /*** @var SeoFilter $SeoFilter */
