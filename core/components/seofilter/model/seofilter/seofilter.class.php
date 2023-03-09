@@ -699,7 +699,7 @@ class SeoFilter
             $urls[] = $param.'='.$value;
         }
 
-        return '?'.implode('&', $urls);
+        return !empty($urls) ? '?'.implode('&', $urls) : '';
     }
 
     public function clearSuffixes($url = '')
