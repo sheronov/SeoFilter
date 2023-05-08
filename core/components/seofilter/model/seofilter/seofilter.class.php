@@ -1552,11 +1552,11 @@ class SeoFilter
             return !empty($field['slider']);
         })) {
             foreach ($sliderFields as $field) {
-                $values = array_map('trim', explode(',', $params[$field['alias']]));
-                $min = (float)$values[0];
+                $values = array_map('trim', explode($this->config['values_delimeter'], $params[$field['alias']]));
+                $min = str_replace(',','.', (string)(float)$values[0]);
                 $max = $min;
                 if (isset($values[1])) {
-                    $max = (float)$values[1];
+                    $max = str_replace(',','.', (string)(float)$values[1]);
                 }
                 unset($params[$field['alias']]);
 
@@ -1564,11 +1564,11 @@ class SeoFilter
                     ->select($this->modx->getSelectColumns('sfDictionary', 'sfDictionary', ''))
                     ->where(['field_id' => $field['id']])
                     ->where([
-                        "substring_index(`sfDictionary`.input, ',', 1) <= {$min}",
-                        "substring_index(`sfDictionary`.input, ',', -1) >= {$max}"
+                        "substring_index(`sfDictionary`.`input`, '{$this->config['values_delimeter']}', 1) <= {$min}",
+                        "substring_index(`sfDictionary`.`input`, '{$this->config['values_delimeter']}', -1) >= {$max}"
                     ])
-                    ->sortby("sqrt(pow({$min} - CONVERT(substring_index(`sfDictionary`.input, ',', 1), SIGNED), 2)
-                                + pow({$max} - CONVERT(substring_index(`sfDictionary`.input, ',', -1), SIGNED), 2))")
+                    ->sortby("sqrt(pow({$min} - CONVERT(substring_index(`sfDictionary`.`input`, '{$this->config['values_delimeter']}', 1), SIGNED), 2)
+                                + pow({$max} - CONVERT(substring_index(`sfDictionary`.`input`, '{$this->config['values_delimeter']}', -1), SIGNED), 2))")
                     ->limit(1);
                 if ($q->prepare() && $q->stmt->execute() && $word = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
                     $words[$field['alias']] = $word;
