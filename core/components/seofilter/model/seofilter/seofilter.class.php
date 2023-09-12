@@ -3129,6 +3129,9 @@ class SeoFilter
         $url_array = [];
         $q = $this->modx->newQuery('sfUrls');
         $q->where(['page_id' => $page]);
+        if (mb_strpos($url, '_')) {
+            $url = str_replace('_', '\_', $url);
+        }
         $q->where(['old_url:LIKE' => $url, 'OR:new_url:LIKE' => $url]);
         $q->select($this->modx->getSelectColumns('sfUrls', 'sfUrls'));
         $q->limit(1);
