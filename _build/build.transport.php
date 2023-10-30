@@ -48,45 +48,6 @@ if (!XPDO_CLI_MODE) {
 $builder = new modPackageBuilder($modx);
 $builder->createPackage(PKG_NAME_LOWER, PKG_VERSION, PKG_RELEASE);
 $builder->registerNamespace(PKG_NAME_LOWER, false, true, PKG_NAMESPACE_PATH);
-
-// Encrypt package
-/** @var modTransportProvider $provider */
-if ($provider = $modx->getObject('transport.modTransportProvider', PKG_PROVIDER_ID)) {
-    $provider->xpdo->setOption('contentType', 'default');
-    $params = [
-        'package'         => PKG_NAME_LOWER,
-        'version'         => PKG_VERSION.'-'.PKG_RELEASE,
-        'username'        => $provider->username,
-        'api_key'         => $provider->api_key,
-        'vehicle_version' => '2.0.0',
-    ];
-    $response = $provider->request('package/encode', 'POST', $params);
-    if ($response->isError()) {
-        $msg = $response->getError();
-        $modx->log(xPDO::LOG_LEVEL_ERROR, $msg);
-    } else {
-        $data = $response->toXml();
-        if (!empty($data->key)) {
-            define('PKG_ENCODE_KEY', $data->key);
-        } elseif (!empty($data->message)) {
-            $modx->log(xPDO::LOG_LEVEL_ERROR, $data->message);
-        }
-    }
-}
-require_once $sources['source_core'].'/model/encryptedvehicle.class.php';
-$builder->package->put([
-    'source' => $sources['source_core'],
-    'target' => "return MODX_CORE_PATH . 'components/';",
-], [
-    'vehicle_class' => 'xPDOFileVehicle',
-    'resolve'       => [
-        [
-            'type'   => 'php',
-            'source' => $sources['resolvers'].'resolve.encryption.php',
-        ],
-    ],
-]);
-
 $modx->log(modX::LOG_LEVEL_INFO, 'Created Transport Package and Namespace.');
 
 // load system settings
@@ -207,8 +168,6 @@ $category = $modx->newObject('modCategory');
 $category->set('category', PKG_NAME);
 // create category vehicle
 $attr = [
-    'vehicle_class'                              => 'encryptedVehicle',
-    xPDOTransport::ABORT_INSTALL_ON_VEHICLE_FAIL => true,
     xPDOTransport::UNIQUE_KEY                    => 'category',
     xPDOTransport::PRESERVE_KEYS                 => false,
     xPDOTransport::UPDATE_OBJECT                 => true,
@@ -311,13 +270,6 @@ $modx->log(modX::LOG_LEVEL_INFO, 'Added package attributes and setup options.');
 
 // zip up package
 $modx->log(modX::LOG_LEVEL_INFO, 'Packing up transport package zip...');
-
-// Encryption resolver
-$builder->putVehicle($builder->createVehicle([
-    'source' => $sources['resolvers'].'resolve.encryption.php',
-], [
-    'vehicle_class' => 'xPDOScriptVehicle',
-]));
 
 $builder->pack();
 
