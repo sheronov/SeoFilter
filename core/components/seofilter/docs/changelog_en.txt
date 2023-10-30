@@ -1,5 +1,13 @@
 Changelog for SeoFilter.
 
+1.11.0-beta (29.10.2023)
+====================
+- component now is free and without protection
+- setting replace_host_server_key with default value "HTTP_HOST" when replace_host is enabled
+- fixed friendly urls pagination
+- fixed slider bug with float and different values delimiter
+- more strict search when searching SEO page (now without LIKE)
+
 1.10.3-beta (29.05.2022)
 ====================
 - fixed, when catalog in another context (do not forget change system setting "allow_forward_across_contexts")
