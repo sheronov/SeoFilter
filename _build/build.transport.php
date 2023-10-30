@@ -234,12 +234,10 @@ $vehicle->resolve('file', [
     'source' => $sources['source_assets'],
     'target' => "return MODX_ASSETS_PATH . 'components/';",
 ]);
-/*
 $vehicle->resolve('file', array(
     'source' => $sources['source_core'],
     'target' => "return MODX_CORE_PATH . 'components/';",
 ));
-*/
 
 /** @var array $BUILD_RESOLVERS */
 foreach ($BUILD_RESOLVERS as $resolver) {
@@ -270,7 +268,6 @@ $modx->log(modX::LOG_LEVEL_INFO, 'Added package attributes and setup options.');
 
 // zip up package
 $modx->log(modX::LOG_LEVEL_INFO, 'Packing up transport package zip...');
-
 $builder->pack();
 
 $mtime = microtime();
@@ -294,7 +291,7 @@ if (defined('PKG_AUTO_INSTALL') && PKG_AUTO_INSTALL) {
             'updated'       => null,
             'state'         => 1,
             'workspace'     => 1,
-            'provider'      => PKG_PROVIDER_ID,
+            'provider'      => 0,
             'source'        => $signature.'.transport.zip',
             'package_name'  => PKG_NAME,
             'version_major' => $versionSignature[0],
