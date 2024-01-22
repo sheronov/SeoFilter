@@ -203,6 +203,14 @@ switch ($modx->event->name) {
             if (!($SeoFilter instanceof SeoFilter)) {
                 break;
             }
+            
+            if (isset($_COOKIE['cfCity']) && intval($_COOKIE['cfCity']) > 0 && $modx->context->getOption('cityfields_active', false) && $modx->context->getOption('cityfields_cityinsubfolder', false) && intval($_COOKIE['cfCity']) != $modx->context->getOption('cityfields_default_city', 1)) {
+                $city = $modx->getObject('cfCity', intval($_COOKIE['cfCity']));
+                if ($city) {
+                    $city_key = strpos($city->get('key'), '/') !== false ? explode('/', $city->get('key'))[1] : $city->get('key');
+                    $_REQUEST[$alias] = str_replace($city_key.'/', '', $_REQUEST[$alias]);
+                }
+            }
 
             $SeoFilter->processUrl(trim($_REQUEST[$alias]));
         }
