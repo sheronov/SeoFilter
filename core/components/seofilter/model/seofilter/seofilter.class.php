@@ -82,8 +82,8 @@ class SeoFilter
                 }
                 $page_url = $this->clearSuffixes($page_url);
 
-                if (isset($_COOKIE['cfCity']) && $_COOKIE['cfCity'] > 0 && $this->modx->context->getOption('cityfields_active', false) && $this->modx->context->getOption('cityfields_cityinsubfolder', false) && $_COOKIE['cfCity'] != $this->modx->context->getOption('cityfields_default_city', 1)) {
-                    $city = $this->modx->getObject('cfCity', $_COOKIE['cfCity']);
+                if (isset($_COOKIE['cfCity']) && intval($_COOKIE['cfCity']) > 0 && $this->modx->context->getOption('cityfields_active', false) && $this->modx->context->getOption('cityfields_cityinsubfolder', false) && intval($_COOKIE['cfCity']) != $this->modx->context->getOption('cityfields_default_city', 1)) {
+                    $city = $this->modx->getObject('cfCity', intval($_COOKIE['cfCity']));
                     if ($city) {
                         $city_key = strpos($city->get('key'), '/') !== false ? explode('/', $city->get('key'))[1] : $city->get('key');
                         $page_url = str_replace(MODX_HTTP_HOST, MODX_HTTP_HOST.'/'.$city_key, $page_url);
