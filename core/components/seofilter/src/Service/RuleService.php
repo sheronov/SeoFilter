@@ -253,30 +253,138 @@ class RuleService
     }
 
     /**
-     * Get field aliases for a specific page
+     * Get field aliases for a specific page (OPTIMIZED - single query)
      *
      * @param int $pageId Page/Resource ID
+     * @param bool $activeOnly Only return active fields
      * @return array<int, string> Array of field aliases
      */
-    protected function getFieldAliasesByPage(int $pageId): array
+    protected function getFieldAliasesByPage(int $pageId, bool $activeOnly = true): array
     {
-        // Implementation would query database for field aliases
-        // This is a placeholder - actual implementation depends on data structure
-        return [];
+        if ($pageId <= 0) {
+            return [];
+        }
+
+        // Single optimized query with JOINs
+        $query = $this->modx->newQuery('sfField');
+        $query->innerJoin('sfFieldIds', 'FieldIds', 'FieldIds.field_id = sfField.id');
+        $query->innerJoin('sfRule', 'Rule', 'Rule.id = FieldIds.multi_id');
+
+        $where = [];
+        if ($activeOnly) {
+            $where['sfField.active'] = 1;
+            $where['Rule.active'] = 1;
+        }
+
+        if ($this->configService->isProMode()) {
+            $where[] = "FIND_IN_SET({$pageId}, REPLACE(IFNULL(NULLIF(Rule.pages,''), Rule.page),' ',''))";
+        } else {
+            $where['Rule.page'] = $pageId;
+        }
+
+        $query->where($where);
+        $query->select(['sfField.alias']);
+        $query->groupby('sfField.alias');
+
+        $aliases = [];
+        if ($query->prepare() && $query->stmt->execute()) {
+            while ($row = $query->stmt->fetch(PDO::FETCH_COLUMN)) {
+                $aliases[] = $row;
+            }
+        }
+
+        return $aliases;
     }
 
     /**
-     * Get page aliases with rule data
+     * Get page aliases with rule data (OPTIMIZED - single query instead of N+1)
+     *
+     * Fetches all rule aliases for a page in ONE query instead of multiple queries in loops.
+     * This eliminates the N+1 query problem in the original code.
      *
      * @param int $pageId Page ID
-     * @param array<int, string> $firstParams First parameters
+     * @param array<int, string> $firstParams First parameters (field aliases)
      * @return array<int, array<string, mixed>> Page aliases data
      */
     protected function getPageAliases(int $pageId, array $firstParams): array
     {
-        // Implementation would query database for page aliases
-        // This is a placeholder - actual implementation depends on data structure
-        return [];
+        if (empty($firstParams) || $pageId <= 0) {
+            return [];
+        }
+
+        // Get field IDs from aliases in single query
+        $query = $this->modx->newQuery('sfField');
+        $query->where(['alias:IN' => $firstParams]);
+        $query->select(['id', 'alias']);
+
+        $fieldMap = [];
+        if ($query->prepare() && $query->stmt->execute()) {
+            while ($row = $query->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $fieldMap[$row['alias']] = (int) $row['id'];
+            }
+        }
+
+        if (empty($fieldMap)) {
+            return [];
+        }
+
+        $fieldIds = array_values($fieldMap);
+
+        // Get all rule data in ONE optimized query with JOINs
+        // This replaces the original N+1 queries (one per field, then one per rule)
+        $query = $this->modx->newQuery('sfFieldIds');
+        $query->innerJoin('sfRule', 'Rule', 'Rule.id = sfFieldIds.multi_id AND Rule.active = 1');
+        $query->innerJoin('sfField', 'Field', 'Field.id = sfFieldIds.field_id');
+
+        $query->where(['sfFieldIds.field_id:IN' => $fieldIds]);
+
+        if ($this->configService->isProMode()) {
+            $query->where(
+                "FIND_IN_SET({$pageId}, REPLACE(IFNULL(NULLIF(Rule.pages,''), Rule.page),' ',''))"
+            );
+        } else {
+            $query->where(['Rule.page' => $pageId]);
+        }
+
+        $query->select([
+            'sfFieldIds.multi_id',
+            'sfFieldIds.field_id',
+            'sfFieldIds.priority',
+            'sfFieldIds.where',
+            'sfFieldIds.compare',
+            'sfFieldIds.value',
+            'Field.alias',
+            'Rule.rank',
+            'Rule.base',
+        ]);
+
+        $query->sortby('Rule.rank', 'ASC');
+        $query->sortby('sfFieldIds.priority', 'ASC');
+
+        $ruleData = [];
+        if ($query->prepare() && $query->stmt->execute()) {
+            while ($row = $query->stmt->fetch(PDO::FETCH_ASSOC)) {
+                $ruleId = (int) $row['multi_id'];
+
+                if (!isset($ruleData[$ruleId])) {
+                    $ruleData[$ruleId] = [
+                        'sort' => (int) $row['rank'],
+                        'base' => (bool) $row['base'],
+                    ];
+                }
+
+                $ruleData[$ruleId][] = [
+                    'alias' => $row['alias'],
+                    'field_id' => (int) $row['field_id'],
+                    'priority' => (int) $row['priority'],
+                    'where' => $row['where'],
+                    'compare' => $row['compare'],
+                    'value' => $row['value'],
+                ];
+            }
+        }
+
+        return $ruleData;
     }
 
     /**
