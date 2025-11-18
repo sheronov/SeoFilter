@@ -1,0 +1,55 @@
+{
+    "name": "justtop1/seofilter",
+    "description": "SEO-friendly URL filtering system for MODX Revolution - generates human-readable, indexed URLs for filter combinations (optimized for miniShop2)",
+    "type": "modx-extra",
+    "keywords": [
+        "modx",
+        "modx3",
+        "seo",
+        "filter",
+        "url",
+        "minishop2",
+        "filters",
+        "seo-urls",
+        "modx-revolution"
+    ],
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Shaun McCormick",
+            "role": "Original Template Author"
+        },
+        {
+            "name": "justtop1",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "SeoFilter\\": "core/components/seofilter/src/",
+            "SeoFilter\\Model\\": "core/components/seofilter/model/seofilter/"
+        },
+        "classmap": [
+            "core/components/seofilter/model/seofilter/"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        },
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

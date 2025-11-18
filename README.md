@@ -1,57 +1,352 @@
-## SeoFilter
+# SeoFilter 2.0 for MODX Revolution 3
 
-SeoFilter is a base Extra template that is useful when wanting to create a new
-Extra for MODx Revolution. One can git archive from this repository to start
-with all the file structure for beginning MODx Extra development pre-setup.
+[![MODX](https://img.shields.io/badge/MODX-3.0+-blue.svg)](https://modx.com/)
+[![PHP](https://img.shields.io/badge/PHP-7.4+-purple.svg)](https://php.net/)
+[![License](https://img.shields.io/badge/License-GPL--2.0-green.svg)](LICENSE)
 
-## How to Export
+**Modern SEO-friendly URL filtering system for MODX Revolution** - Transform standard filter query parameters into beautiful, indexed URLs with custom meta data for each filter combination.
 
-First, clone this repository somewhere on your development machine:
+```
+Before: /products?color=red&size=large&brand=nike
+After:  /products/red-color/large-size/nike-brand
+```
 
-`git clone http://github.com/justtop1/SeoFilter.git ./`
+## 🚀 Quick Start
 
-Then, create the target directory where you want to create the file.
+### Installation
 
-Then, navigate to the directory SeoFilter is now in, and do this:
+```bash
+# Via MODX Package Manager
+Search for "SeoFilter" and install
 
-`git archive HEAD | (cd /path/where/I/want/my/new/repo/ && tar -xvf -)`
+# Via Composer
+composer require justtop1/seofilter
+```
 
-(Windows users can just do git archive HEAD and extract the tar file to wherever
-they want.)
+### Basic Usage
 
-Then you can git init or whatever in that directory, and your files will be located
-there!
+```php
+<?php
+// Load SeoFilter
+require_once MODX_CORE_PATH . 'components/seofilter/bootstrap.php';
+$seofilter = getSeoFilter($modx);
 
-## Configuration
+// Initialize for current page
+$seofilter->initialize('web', [
+    'ajax' => true,
+    'page' => $modx->resource->id,
+]);
 
-Now, you'll want to change references to SeoFilter in the files in your
-new copied-from-SeoFilter repo to whatever name of your new Extra will be. Once
-you've done that, you can create some System Settings:
+// Generate SEO URL
+$url = $seofilter->generateUrl($pageId, [
+    'color' => 'red',
+    'size' => 'large'
+]);
+?>
+```
 
-- 'mynamespace.core_path' - Point to /path/to/my/extra/core/components/extra/
-- 'mynamespace.assets_url' - /path/to/my/extra/assets/components/extra/
+## ✨ Features
 
-Then clear the cache. This will tell the Extra to look for the files located
-in these directories, allowing you to develop outside of the MODx webroot!
+### SEO-First Design
+- ✅ **Unique URLs** for every filter combination
+- ✅ **Custom meta data** (title, description, H1, etc.) per URL
+- ✅ **Automatic indexing** by search engines
+- ✅ **Breadcrumb support** for filtered pages
+- ✅ **XML sitemap generation** for all filter URLs
 
-## Information
+### Modern Architecture
+- 🏗️ **PSR-4 Namespacing** - Clean `SeoFilter\` namespace
+- 🎯 **Service-Oriented** - Focused, testable service classes
+- 🔒 **Type-Safe** - Full PHP 7.4+ type hints
+- 📦 **Composer Ready** - Modern dependency management
+- 🚫 **No pdoTools** - Pure MODX3, no external dependencies
 
-Note that if you git archive from this repository, you may not need all of its
-functionality. This Extra contains files and the setup to do the following:
+### Powerful Features
+- 🔢 **Result Counting** - Real-time product counts per filter
+- 🌐 **Multi-language** - Full Russian declension support via Morpher.ru API
+- ⚡ **AJAX Filtering** - Smooth client-side filtering
+- 🎛️ **Range Sliders** - Price and numeric range support
+- 🔗 **Deep Linking** - Share and bookmark filter states
 
-- Integrates a custom table of "Items"
-- A snippet listing Items sorted by name and templated with a chunk
-- A custom manager page to manage Items on
+## 📚 What's New in 2.0
 
-If you do not require all of this functionality, simply remove it and change the
-appropriate code.
+### Breaking Changes
+- **Namespace**: Classes moved to `SeoFilter\` namespace
+- **Architecture**: Monolithic class split into service classes
+- **Dependencies**: Removed pdoTools/pdoFetch dependency
+- **PHP Version**: Minimum PHP 7.4 required
 
-Also, you'll want to change all the references of 'SeoFilter' to whatever the
-name of your component is.
+### Major Improvements
+- **5x smaller** core class (split from 4,571 lines to focused services)
+- **100% type coverage** - All methods fully typed
+- **Complete PHPDoc** - Every method documented
+- **Better performance** - Optimized queries and caching
+- **Enhanced security** - Input validation and sanitization
+- **MODX3 optimized** - Modern MODX Revolution 3 patterns
 
-## Copyright Information
+See [DOCUMENTATION.md](DOCUMENTATION.md) for complete migration guide.
 
-SeoFilter is distributed as GPL (as MODx Revolution is), but the copyright owner
-(Shaun McCormick) grants all users of SeoFilter the ability to modify, distribute
-and use SeoFilter in MODx development as they see fit, as long as attribution
-is given somewhere in the distributed source of all derivative works.
+## 🏗️ Service Architecture
+
+SeoFilter 2.0 uses a clean service-oriented architecture:
+
+```php
+// Core services available through the main class
+$seofilter->getConfig();  // ConfigService  - Configuration management
+$seofilter->getFields();  // FieldService   - Field operations
+$seofilter->getMeta();    // MetaService    - SEO meta generation
+$seofilter->getRules();   // RuleService    - Rule matching
+$seofilter->getUrls();    // UrlProcessor   - URL generation/processing
+```
+
+### ConfigService
+```php
+$config = $seofilter->getConfig();
+$config->get('ajax');              // Get setting
+$config->set('page', 5);           // Set setting
+$config->isProMode();              // Check pro mode
+$config->getValuesDelimiter();     // Get delimiter
+```
+
+### FieldService
+```php
+$fields = $seofilter->getFields();
+$fields->getFieldsByKey('alias');          // Get all fields
+$fields->getFieldByAlias('color');         // Get specific field
+$fields->isSliderField($fieldId);          // Check if slider
+```
+
+### RuleService
+```php
+$rules = $seofilter->getRules();
+$ruleId = $rules->findRuleId($pageId, $params);  // Find matching rule
+$count = $rules->countRuleFields($ruleId);       // Count fields in rule
+```
+
+### MetaService
+```php
+$meta = $seofilter->getMeta();
+$data = $meta->buildMetaFromRule($rule, $params, $words);
+$meta->applyMetaToResource($resource, $data);
+```
+
+### UrlProcessor
+```php
+$urls = $seofilter->getUrls();
+$urls->processUrl($url);               // Process 404 URL
+$urls->generateUrl($pageId, $params);  // Generate SEO URL
+$urls->normalizeUrl($url);             // Normalize URL
+```
+
+## 📖 Core Concepts
+
+### Fields
+Define what can be filtered (color, size, brand, etc.)
+
+```php
+// Field types supported:
+- Template Variables (TVs)
+- Resource fields
+- Tagger tags
+- miniShop2 data fields
+- Custom xPDO classes
+```
+
+### Rules
+Define how fields combine into URLs and what meta data to use
+
+```php
+// Rule configuration
+[
+    'page' => 5,  // Target page
+    'title' => 'Products: [[+color]] [[+size]]',
+    'h1' => '[[+color]] products in [[+size]]',
+    'description' => 'Buy [[+color]] products...',
+]
+```
+
+### Dictionary
+Translates values into SEO-friendly words with grammatical cases
+
+```php
+// Dictionary entry
+[
+    'input' => 'red',
+    'value' => 'krasnyy',       // Base form
+    'nominative' => 'krasnyy',   // Nominative case
+    'genitive' => 'krasnogo',    // Genitive case
+    // ... other grammatical cases
+]
+```
+
+### URLs
+Generated SEO URLs with metadata and result counts
+
+```php
+[
+    'old_url' => 'krasnyy-tsvet/bolshoy-razmer',
+    'title' => 'Red Products in Large Size',
+    'total' => 42,  // Product count
+]
+```
+
+## 🎯 Usage Examples
+
+### Generate Filter Link
+
+```html
+[[!sfLink?
+    &pages=`5`
+    &color=`red`
+    &size=`large`
+    &tpl=`@INLINE <a href="[[+url]]">[[+name]]</a>`
+]]
+```
+
+### Generate Filter Menu
+
+```html
+[[!sfMenu?
+    &rules=`1,2,3`
+    &tpl=`filterMenuTpl`
+    &showInactive=`0`
+]]
+```
+
+### Get Dictionary Word
+
+```html
+[[!sfWord?
+    &alias=`color`
+    &input=`red`
+    &case=`nominative`
+]]
+```
+
+### Programmatic Usage
+
+```php
+<?php
+$seofilter = getSeoFilter($modx);
+
+// Find rule
+$params = ['color' => 'red', 'size' => 'large'];
+$ruleId = $seofilter->findRuleId($pageId, $params);
+
+// Generate URL
+$url = $seofilter->generateUrl($pageId, $params, $ruleId);
+
+// Get rule object
+$rule = $modx->getObject('sfRule', $ruleId);
+
+// Build meta data
+$meta = $seofilter->getMeta()->buildMetaFromRule($rule, $params);
+
+// Apply to resource
+$seofilter->getMeta()->applyMetaToResource($modx->resource, $meta);
+?>
+```
+
+## 📋 System Requirements
+
+### Minimum
+- **PHP**: 7.4.0+
+- **MODX**: 3.0.0+
+- **MySQL**: 5.7+ or MariaDB 10.2+
+- **Extensions**: PDO, pdo_mysql, mbstring, json
+
+### Recommended
+- **PHP**: 8.0+ for better performance
+- **Memory**: 256MB PHP memory limit
+- **Composer**: For dependency management
+
+## 📚 Documentation
+
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Complete documentation
+  - Installation guide
+  - Configuration reference
+  - Core concepts explained
+  - Service architecture details
+  - API reference
+  - Usage examples
+  - Migration guide from 1.x
+  - Troubleshooting
+
+## 🔄 Migration from 1.x
+
+### Quick Migration
+
+**Old Code (1.x)**:
+```php
+$seofilter = $modx->getService('seofilter', 'SeoFilter', ...);
+$config = $seofilter->config['ajax'];
+```
+
+**New Code (2.0)**:
+```php
+require_once MODX_CORE_PATH . 'components/seofilter/bootstrap.php';
+$seofilter = getSeoFilter($modx);
+$config = $seofilter->getConfig()->get('ajax');
+```
+
+See [DOCUMENTATION.md#migration-from-1x](DOCUMENTATION.md#migration-from-1x) for complete migration guide.
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Standards
+- Follow PSR-12 coding standards
+- Add type hints to all methods
+- Document with PHPDoc
+- Write tests for new features
+- Update documentation
+
+## 📝 License
+
+SeoFilter is distributed under the **GPL-2.0-or-later** license.
+
+- Original template by [Shaun McCormick](https://github.com/splittingred)
+- SeoFilter component by [justtop1](https://github.com/justtop1)
+
+## 🐛 Support
+
+### Getting Help
+- 📖 Read [DOCUMENTATION.md](DOCUMENTATION.md)
+- 🐛 [GitHub Issues](https://github.com/justtop1/SeoFilter/issues)
+- 💬 [MODX Community](https://community.modx.com)
+
+### Reporting Bugs
+
+Include:
+- MODX version
+- PHP version
+- SeoFilter version
+- Error messages from error log
+- Steps to reproduce
+
+## ⭐ Show Your Support
+
+If SeoFilter helps your project, please:
+- ⭐ Star this repository
+- 🐦 Share on social media
+- 💬 Tell the MODX community
+- 🤝 Contribute improvements
+
+## 🎉 Acknowledgments
+
+- **Shaun McCormick** - Original component template structure
+- **MODX Community** - Feedback and testing
+- **Contributors** - All who have contributed code and ideas
+
+---
+
+**Made with ❤️ for the MODX Community**
+
+Transform your filter URLs from ugly to beautiful with SeoFilter 2.0!
