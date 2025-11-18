@@ -251,14 +251,15 @@ $query->select(['id', 'alias', 'active']); // Only what's needed
 
 ---
 
-## Recommended Database Indexes
+## Database Indexes
 
-Add these indexes for optimal performance:
+**IMPORTANT**: As of v2.0, all optimized indexes are **automatically created** during installation via the XML schema.
 
-```sql
--- Index for rule lookups by page
-CREATE INDEX idx_sf_rule_page_active
-ON modx_sf_rule(page, active);
+The schema file (`model/schema/seofilter.mysql.schema.xml`) includes 20+ composite indexes:
+
+### sfField Table
+```xml
+<!-- Composite indexes -->
 
 -- Index for pro mode page searches
 CREATE INDEX idx_sf_rule_pages
@@ -297,14 +298,18 @@ CREATE INDEX idx_sf_field_ids_priority
 ON modx_sf_field_ids(multi_id, priority, field_id);
 ```
 
-### Index Usage Explanation
+### Composite Index Usage
 
 | Index | Purpose | Queries Improved |
 |-------|---------|------------------|
-| `idx_sf_rule_page_active` | Fast rule lookup by page | `findRuleId()`, `pageAliases()` |
-| `idx_sf_field_ids_rule` | Fast field lookup by rule | All rule-field queries |
-| `idx_sf_urls_lookup` | Fast URL lookup | `processUrl()`, `findUrlId()` |
-| `idx_sf_dictionary_field_input` | Fast word lookup | Dictionary operations |
+| `page_active` | Fast rule lookup by page | `findRuleId()`, `pageAliases()` |
+| `multi_field` / `field_multi` | Bidirectional field-rule joins | All rule-field queries (N+1 fix) |
+| `multi_page_active` | Fast URL lookup | `processUrl()`, `findUrlId()` |
+| `field_input` / `field_value` | Fast word lookup | Dictionary operations |
+| `multi_priority` | Ordered field retrieval | Priority-based queries |
+| `url_word_field` | Junction table optimization | sfLink snippet, URL generation |
+
+**All indexes are created automatically** when you install/update SeoFilter 2.0!
 
 ---
 
@@ -341,17 +346,28 @@ ON modx_sf_field_ids(multi_id, priority, field_id);
 
 ---
 
-## Migration Steps
+## Installation & Migration
 
-### 1. Backup Database
+### Fresh Installation
+
+**No manual steps required!** Install SeoFilter 2.0 via MODX Package Manager, and all indexes are created automatically.
+
+### Upgrading from 1.x
+
+**Option 1: Reinstall Package (Recommended)**
+1. Backup database
+2. Reinstall SeoFilter 2.0 via Package Manager
+3. Indexes created automatically ✅
+
+**Option 2: Manual Index Addition (If needed)**
+If upgrading in-place and indexes aren't created:
+
 ```bash
-mysqldump -u user -p database > seofilter_backup.sql
+# Run the provided SQL file
+mysql -u user -p database < _build/data/optimize_indexes.sql
 ```
 
-### 2. Add Indexes
-Run the SQL commands above to add recommended indexes.
-
-### 3. Analyze Tables
+### Verify Indexes
 ```sql
 ANALYZE TABLE modx_sf_rule, modx_sf_field_ids, modx_sf_urls, modx_sf_dictionary;
 ```

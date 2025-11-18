@@ -44,6 +44,20 @@
             <column key="active" length="" collation="A" null="false"/>
         </index>
 
+        <!-- Composite indexes for optimized queries (v2.0) -->
+        <index alias="alias_active" name="alias_active" primary="false" unique="false" type="BTREE">
+            <column key="alias" length="50" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <index alias="class_active" name="class_active" primary="false" unique="false" type="BTREE">
+            <column key="class" length="50" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <index alias="slider_active" name="slider_active" primary="false" unique="false" type="BTREE">
+            <column key="slider" length="" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
         <composite alias="Words" class="sfDictionary" local="id" foreign="field_id" cardinality="many" owner="local"/>
         <composite alias="Links" class="sfFieldIds" local="id" foreign="field_id" cardinality="many" owner="local"/>
     </object>
@@ -99,6 +113,20 @@
             <column key="base" length="" collation="A" null="false"/>
         </index>
 
+        <!-- Composite indexes for optimized queries (v2.0) -->
+        <index alias="page_active" name="page_active" primary="false" unique="false" type="BTREE">
+            <column key="page" length="" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <index alias="pages_active" name="pages_active" primary="false" unique="false" type="BTREE">
+            <column key="pages" length="100" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <index alias="rank_active" name="rank_active" primary="false" unique="false" type="BTREE">
+            <column key="rank" length="" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
         <composite alias="Links" class="sfFieldIds" local="id" foreign="multi_id" cardinality="many" owner="local"/>
         <composite alias="Urls" class="sfUrls" local="id" foreign="multi_id" cardinality="many" owner="local"/>
     </object>
@@ -134,6 +162,21 @@
         </index>
         <index alias="active" name="active" primary="false" unique="false" type="BTREE">
             <column key="active" length="" collation="A" null="false"/>
+        </index>
+
+        <!-- Composite indexes for optimized queries (v2.0) - Eliminates N+1 query problems -->
+        <index alias="multi_field" name="multi_field" primary="false" unique="false" type="BTREE">
+            <column key="multi_id" length="" collation="A" null="false"/>
+            <column key="field_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="field_multi" name="field_multi" primary="false" unique="false" type="BTREE">
+            <column key="field_id" length="" collation="A" null="false"/>
+            <column key="multi_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="multi_priority" name="multi_priority" primary="false" unique="false" type="BTREE">
+            <column key="multi_id" length="" collation="A" null="false"/>
+            <column key="priority" length="" collation="A" null="false"/>
+            <column key="field_id" length="" collation="A" null="false"/>
         </index>
 
         <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign"/>
@@ -199,6 +242,20 @@
         </index>
         <index alias="active" name="active" primary="false" unique="false" type="BTREE">
             <column key="active" length="" collation="A" null="false"/>
+        </index>
+
+        <!-- Composite indexes for optimized queries (v2.0) -->
+        <index alias="field_input" name="field_input" primary="false" unique="false" type="BTREE">
+            <column key="field_id" length="" collation="A" null="false"/>
+            <column key="input" length="100" collation="A" null="false"/>
+        </index>
+        <index alias="field_value" name="field_value" primary="false" unique="false" type="BTREE">
+            <column key="field_id" length="" collation="A" null="false"/>
+            <column key="value" length="100" collation="A" null="false"/>
+        </index>
+        <index alias="active_field" name="active_field" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+            <column key="field_id" length="" collation="A" null="false"/>
         </index>
 
         <aggregate alias="Field" class="sfField" local="field_id" foreign="id" cardinality="one" owner="foreign"/>
@@ -275,6 +332,25 @@
             <column key="active" length="" collation="A" null="false"/>
         </index>
 
+        <!-- Composite indexes for optimized queries (v2.0) - Dramatically improves URL lookups -->
+        <index alias="multi_page_active" name="multi_page_active" primary="false" unique="false" type="BTREE">
+            <column key="multi_id" length="" collation="A" null="false"/>
+            <column key="page_id" length="" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <index alias="new_url_active" name="new_url_active" primary="false" unique="false" type="BTREE">
+            <column key="new_url" length="191" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <index alias="old_url_active" name="old_url_active" primary="false" unique="false" type="BTREE">
+            <column key="old_url" length="191" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <index alias="total_active" name="total_active" primary="false" unique="false" type="BTREE">
+            <column key="total" length="" collation="A" null="false"/>
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+
         <aggregate alias="Rule" class="sfRule" local="multi_id" foreign="id" cardinality="one" owner="foreign"/>
         <composite alias="UrlWords" class="sfUrlWord" local="id" foreign="url_id" cardinality="many" owner="local"/>
     </object>
@@ -300,6 +376,17 @@
         </index>
         <index alias="url_id" name="url_id" primary="false" unique="false" type="BTREE">
             <column key="url_id" length="" collation="A" null="false"/>
+        </index>
+
+        <!-- Composite indexes for optimized queries (v2.0) - Junction table optimization -->
+        <index alias="url_word_field" name="url_word_field" primary="false" unique="false" type="BTREE">
+            <column key="url_id" length="" collation="A" null="false"/>
+            <column key="word_id" length="" collation="A" null="false"/>
+            <column key="field_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="word_field" name="word_field" primary="false" unique="false" type="BTREE">
+            <column key="word_id" length="" collation="A" null="false"/>
+            <column key="field_id" length="" collation="A" null="false"/>
         </index>
 
         <aggregate alias="Word" class="sfDictionary" local="word_id" foreign="id" cardinality="one" owner="foreign"/>
